@@ -114,6 +114,7 @@
 			box.style.border = '2px dashed var(--ink-200)';
 			box.style.borderRadius = '16px';
 			box.style.overflow = 'hidden';
+			box.style.cursor = 'crosshair';
 
 			// Draw grid lines
 			const hLine = document.createElement('div');
@@ -311,18 +312,21 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100vh;background:var(--paper);">
+<div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
+	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
 	<div class="session-topbar">
 		<div
 			class="session-topbar-fill"
 			style="width:{pct}%;transition:width 400ms cubic-bezier(0.22,1,0.36,1);"
 		></div>
 	</div>
+	</div>
 
 	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
 		<a
 			href="/deck/{data.deck.id}"
-			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;transition:color 150ms ease;"
+			class="touch-action-manip"
+			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;transition:color 150ms ease;min-width:44px;min-height:44px;display:flex;align-items:center;"
 			onmouseenter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--sumi)')}
 			onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--fg-secondary)')}
 			>✕</a
@@ -330,7 +334,7 @@
 		<div style="font-size:14px;font-weight:600;color:var(--sumi);font-family:var(--font-ui);">
 			{i + 1} / {quizCards.length}
 		</div>
-		<div style="width:22px;"></div>
+		<div style="width:44px;"></div>
 	</div>
 
 	{#if card}
@@ -345,7 +349,7 @@
 					class="label-meta"
 					style="margin-bottom:12px;color:var(--fg-tertiary);letter-spacing:0.05em;"
 				>
-					WRITE THIS CHARACTER
+					{t('session.writeThis', $locale)}
 				</div>
 
 				<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
@@ -390,9 +394,10 @@
 					<div style="position:absolute;top:16px;right:16px;z-index:10;display:flex;gap:8px;">
 						<button
 							onclick={toggleGuide}
+							class="touch-action-manip"
 							style="padding:6px 14px;border-radius:99px;background:var(--bg-surface);border:1px solid var(--ink-200);font-size:13px;font-weight:600;color:var(--sumi);cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.02);"
 						>
-							{showGuide ? 'Hide guide' : 'Show guide'}
+							{showGuide ? t('session.hideGuide', $locale) : t('session.showGuide', $locale)}
 						</button>
 						<button
 							onclick={clearCanvas}
@@ -430,7 +435,7 @@
 								style="animation: spin 1s linear infinite;"
 								><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg
 							>
-							Loading stroke data...
+							{t('session.loadingStroke', $locale)}
 						</div>
 						<style>
 							@keyframes spin {
@@ -451,14 +456,14 @@
 			</div>
 
 			<!-- Action buttons -->
-			<div style="display:flex;gap:12px;width:100%;max-width:440px;margin-top:auto;">
+			<div style="display:flex;gap:12px;width:100%;max-width:440px;margin-top:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom));">
 				{#if !checked}
 					<button class="hm-btn hm-btn-secondary" style="flex:1;opacity:0.5;pointer-events:none;">
-						Finish drawing to continue...
+						{t('session.finishDrawing', $locale)}
 					</button>
 				{:else}
 					<button
-						class="hm-btn hm-btn-secondary"
+						class="hm-btn hm-btn-secondary touch-action-manip"
 						onclick={() => next(false)}
 						style="flex:1; transition:transform 100ms ease, box-shadow 150ms ease;"
 						onmouseenter={(e) =>
@@ -468,7 +473,7 @@
 						✕ {t('session.again', $locale)}
 					</button>
 					<button
-						class="hm-btn hm-btn-primary"
+						class="hm-btn hm-btn-primary touch-action-manip"
 						onclick={() => next(true)}
 						style="flex:1; transition:transform 100ms ease, box-shadow 150ms ease;"
 						onmouseenter={(e) =>

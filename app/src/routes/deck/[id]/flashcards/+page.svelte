@@ -88,27 +88,30 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100vh;background:var(--paper);">
-	<!-- Progress bar -->
+<div style="display:flex;flex-direction:column;min-height:100dvh;min-height:100vh;background:var(--paper);">
+	<!-- Progress bar - needs top safe area for notch/Dynamic Island -->
+	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
 	<div class="session-topbar">
 		<div
 			class="session-topbar-fill"
 			style="width:{pct}%;transition:width 400ms cubic-bezier(0.22,1,0.36,1);"
 		></div>
 	</div>
+	</div>
 
 	<!-- Top nav -->
 	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
 		<a
 			href="/deck/{data.deck.id}"
+			class="touch-action-manip"
 			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;
-             transition:color 150ms ease;"
+             transition:color 150ms ease;min-width:44px;min-height:44px;display:flex;align-items:center;"
 			onmouseenter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--sumi)')}
 			onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--fg-secondary)')}
 			>✕</a
 		>
 		<div class="label-meta">{t('session.progress', $locale, { a: i + 1, b: cards.length })}</div>
-		<div style="width:22px;"></div>
+		<div style="width:44px;"></div>
 	</div>
 
 	{#if card}
@@ -172,9 +175,9 @@
 			</div>
 
 			<!-- Action buttons -->
-			<div style="display:flex;gap:12px;width:100%;max-width:360px;">
+			<div style="display:flex;gap:12px;width:100%;max-width:360px;padding-bottom:calc(16px + env(safe-area-inset-bottom));">
 				<button
-					class="hm-btn hm-btn-secondary hm-btn-full"
+					class="hm-btn hm-btn-secondary hm-btn-full touch-action-manip"
 					onclick={() => next(false)}
 					style="transition:transform 100ms ease, box-shadow 150ms ease;"
 					onmouseenter={(e) =>
@@ -184,7 +187,7 @@
 					✕ {t('session.again', $locale)}
 				</button>
 				<button
-					class="hm-btn hm-btn-primary hm-btn-full"
+					class="hm-btn hm-btn-primary hm-btn-full touch-action-manip"
 					onclick={() => next(true)}
 					style="transition:transform 100ms ease, box-shadow 150ms ease;"
 					onmouseenter={(e) =>

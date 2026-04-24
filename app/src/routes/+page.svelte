@@ -19,7 +19,7 @@
 {#if !data.user}
 	<Landing decks={data.decks} />
 {:else}
-	<div style="max-width:720px;margin:0 auto;padding:40px 24px 120px;">
+	<div style="max-width:720px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));">
 	<!-- Header -->
 	<div
 		use:fadeUp={{ delay: 0, y: 12 }}
@@ -42,6 +42,7 @@
 	<!-- Level tabs -->
 	<div
 		use:fadeIn={{ delay: 0.18 }}
+		class="hide-scrollbar"
 		style="display:flex;gap:8px;margin-top:32px;margin-bottom:20px;overflow-x:auto;"
 	>
 		{#each levels as level (level)}
@@ -49,12 +50,13 @@
 				onclick={() => {
 					activeLevel = level;
 				}}
+				class="touch-action-manip"
 				style="height:36px;padding:0 16px;border-radius:999px;
                border:1px solid {activeLevel === level ? 'var(--sumi)' : 'var(--ink-200)'};
                background:{activeLevel === level ? 'var(--sumi)' : 'var(--bg-surface)'};
                color:{activeLevel === level ? 'var(--bg-surface)' : 'var(--sumi)'};
                font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-ui);
-               white-space:nowrap;transition:background 180ms ease,color 180ms ease,border-color 180ms ease;"
+               white-space:nowrap;flex-shrink:0;transition:background 180ms ease,color 180ms ease,border-color 180ms ease;"
 			>
 				{level}
 			</button>
@@ -81,6 +83,7 @@
 					{@const complete = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
 					<a
 						href="/deck/{deck.id}"
+						class="touch-action-manip"
 						style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:20px;
                    cursor:pointer;text-decoration:none;color:inherit;display:block;
                    box-shadow:var(--shadow-sm);
@@ -92,6 +95,12 @@
 						onmouseleave={(e) => {
 							(e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-sm)';
 							(e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+						}}
+						ontouchstart={(e) => {
+							(e.currentTarget as HTMLElement).style.transform = 'scale(0.98)';
+						}}
+						ontouchend={(e) => {
+							(e.currentTarget as HTMLElement).style.transform = 'scale(1)';
 						}}
 					>
 						<div

@@ -2,7 +2,7 @@ import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ss
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import type { LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ data, depends, fetch }) => {
+export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 	depends('supabase:auth');
 
 	const supabase = isBrowser()
@@ -19,5 +19,17 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 		data: { user }
 	} = await supabase.auth.getUser();
 
-	return { supabase, session, user };
+	let profile = null;
+	if (user) {
+		try {
+			const { data: p, error: pErr } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+			if (!pErr) profile = p;
+		} catch (e) {
+			console.error('Error fetching profile:', e);
+		}
+	}
+
+	const isPWA = url.searchParams.get('pwa') === '1';
+
+	return { supabase, session, user, profile, isPWA };
 };

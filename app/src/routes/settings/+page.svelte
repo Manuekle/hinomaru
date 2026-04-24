@@ -15,6 +15,20 @@
 		goto('/login');
 	}
 
+	async function debugResetOnboarding() {
+		localStorage.removeItem('hinomaru_onboarding_completed');
+		if (user) {
+			try {
+				await supabase.from('profiles').update({ onboarding_completed: false }).eq('id', user.id);
+			} catch {
+				// Quietly ignore if DB update fails in debug mode
+			}
+		}
+		// Force full reload to reset state
+		window.location.href = '/onboarding';
+	}
+
+
 	function setLanguage(lang: 'es' | 'en') {
 		locale.set(lang);
 	}
@@ -24,7 +38,7 @@
 	}
 </script>
 
-<div style="max-width:480px;margin:0 auto;padding:40px 24px 120px;">
+<div style="max-width:480px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));">
 	<a
 		use:fadeUp={{ delay: 0, y: 10 }}
 		href="/"
@@ -59,12 +73,21 @@
 				>
 					{user?.email?.charAt(0).toUpperCase() || 'U'}
 				</div>
-				<div>
+				<div style="flex:1;">
 					<div style="font-size:13px;color:var(--fg-secondary);margin-bottom:2px;">
 						{t('settings.email', $locale)}
 					</div>
 					<div style="font-weight:600;color:var(--sumi);">{user?.email}</div>
 				</div>
+			</div>
+			
+			<div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+				<button 
+					onclick={debugResetOnboarding}
+					style="background:none; border:none; color:var(--fg-tertiary); font-size:12px; cursor:pointer; text-decoration:underline;"
+				>
+					Reset Onboarding (Debug)
+				</button>
 			</div>
 		</section>
 

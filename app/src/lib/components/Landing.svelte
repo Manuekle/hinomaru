@@ -22,10 +22,11 @@
 	];
 </script>
 
-<div style="min-height:100vh; background:var(--paper); overflow-x:hidden;">
+<div style="min-height:100vh; background:var(--paper); overflow-x:hidden; padding-bottom:env(safe-area-inset-bottom);">
 	<!-- Hero Section -->
 	<section
-		style="padding:100px 24px 80px; max-width:1100px; margin:0 auto; display:grid; grid-template-columns: 1.1fr 0.9fr; gap:60px; align-items:center;"
+		class="hero-section"
+		style="padding:calc(80px + env(safe-area-inset-top)) 24px 60px; max-width:1100px; margin:0 auto; display:grid; grid-template-columns: 1.1fr 0.9fr; gap:60px; align-items:center;"
 	>
 		<div>
 			<div use:fadeUp={{ delay: 0 }} style="display:flex; align-items:center; gap:8px; margin-bottom:20px;">
@@ -45,7 +46,7 @@
 			>
 				{t('landing.hero.desc', $locale)}
 			</p>
-			<div use:fadeUp={{ delay: 0.3 }} style="display:flex; gap:16px; align-items:center;">
+			<div use:fadeUp={{ delay: 0.3 }} class="hero-btns" style="display:flex; gap:16px; align-items:center;">
 				<a
 					href="/login"
 					class="hm-btn hm-btn-primary hm-btn-lg"
@@ -85,7 +86,7 @@
 				>
 					<span style="font-size:24px;">あ</span>
 					<div>
-						<div style="font-size:12px; font-weight:700;">Daily Goal</div>
+						<div style="font-size:12px; font-weight:700;">{t('landing.hero.dailyGoal', $locale)}</div>
 						<div class="hm-progress" style="width:80px; height:6px; margin-top:4px;">
 							<div class="hm-progress-bar" style="width:75%;"></div>
 						</div>
@@ -105,7 +106,6 @@
 				<div
 					use:fadeUp={{ delay: 0.2 + i * 0.1 }}
 					role="article"
-					tabindex="0"
 					style="background:var(--bg-surface); border:1px solid var(--ink-200); border-radius:32px; padding:40px; box-shadow:var(--shadow-sm); transition:transform 200ms ease;"
 					onmouseenter={(e) => (e.currentTarget.style.transform = 'translateY(-4px)')}
 					onmouseleave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
@@ -141,7 +141,7 @@
 						<p style="font-size:15px; color:var(--fg-secondary); margin-top:8px; line-height:1.5;">{deck.desc_en}</p>
 						<div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
 							<span style="font-size:12px; color:var(--fg-tertiary);">{deck.card_count} {t('home.cards', $locale).split(' ')[1]}</span>
-							<a href="/login" style="font-size:13px; font-weight:700; color:var(--hinomaru-red); text-decoration:none;">Preview →</a>
+							<a href="/login" style="font-size:13px; font-weight:700; color:var(--hinomaru-red); text-decoration:none;">{t('landing.preview.btn', $locale)}</a>
 						</div>
 					</div>
 				{/each}
@@ -159,16 +159,16 @@
 		<div style="max-width:800px; margin:0 auto;">
 			<div style="font-size:40px; margin-bottom:32px;">"</div>
 			<p style="font-size:24px; font-weight:500; line-height:1.6; margin-bottom:32px; font-style:italic;">
-				"The most beautiful Japanese study tool I've ever used. It makes Kanji practice feel like a meditation."
+				"{t('landing.testimonial', $locale)}"
 			</p>
-			<div class="label-meta" style="color:var(--hinomaru-red); opacity:1;">SATO-SAN, TOKYO</div>
+			<div class="label-meta" style="color:var(--hinomaru-red); opacity:1;">{t('landing.testimonial.author', $locale)}</div>
 		</div>
 	</section>
 
 	<!-- Final CTA -->
 	<section style="padding:120px 24px; text-align:center;">
 		<h2 use:fadeUp style="font-size:48px; font-weight:800; margin-bottom:24px; letter-spacing:-0.03em;">{t('home.title', $locale)}</h2>
-		<p use:fadeUp style="font-size:18px; color:var(--fg-secondary); margin-bottom:48px;">Free forever for beginners. Pro tools for masters.</p>
+		<p use:fadeUp style="font-size:18px; color:var(--fg-secondary); margin-bottom:48px;">{t('landing.cta.subtitle', $locale)}</p>
 		<a
 			href="/login"
 			class="hm-btn hm-btn-primary hm-btn-lg"
@@ -202,10 +202,11 @@
 
 <style>
 	@media (max-width: 900px) {
-		section {
+		.hero-section {
 			grid-template-columns: 1fr !important;
 			text-align: center;
-			gap: 40px !important;
+			gap: 48px !important;
+			padding-top: calc(60px + env(safe-area-inset-top)) !important;
 		}
 		p {
 			margin-left: auto;
@@ -213,6 +214,20 @@
 		}
 		.stats {
 			justify-content: center !important;
+			gap: 24px !important;
+		}
+		.hero-btns {
+			justify-content: center !important;
+		}
+	}
+
+	@media (max-width: 480px) {
+		h1 {
+			font-size: 40px !important;
+		}
+		.stats {
+			flex-direction: column;
+			gap: 16px !important;
 		}
 	}
 </style>

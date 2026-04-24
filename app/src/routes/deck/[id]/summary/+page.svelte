@@ -85,7 +85,7 @@
 		</div>
 
 		<!-- CTA -->
-		<div use:fadeUp={{ delay: 0.75, y: 12 }} style="margin-top:32px;">
+		<div use:fadeUp={{ delay: 0.75, y: 12 }} style="margin-top:32px;padding-bottom:calc(16px + env(safe-area-inset-bottom));">
 			<a
 				href="/"
 				class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"

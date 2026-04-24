@@ -14,11 +14,11 @@
 			animate(
 				logoEl,
 				{
-					scale: [0.8, 1.1, 1],
+					scale: [0.9, 1.05, 1],
 					opacity: [0, 1]
 				},
 				{
-					duration: 0.8,
+					duration: 0.5,
 					ease: [0.22, 1, 0.36, 1]
 				}
 			);
@@ -29,22 +29,34 @@
 				textEl,
 				{
 					opacity: [0, 1],
-					y: [10, 0]
+					y: [8, 0]
 				},
 				{
-					duration: 0.6,
-					delay: 0.2,
+					duration: 0.4,
+					delay: 0.15,
 					ease: [0.22, 1, 0.36, 1]
 				}
 			);
 		}
+	});
+
+	$effect(() => {
+		if (visible) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = '';
+		}
+		
+		return () => {
+			document.body.style.overflow = '';
+		};
 	});
 </script>
 
 {#if visible}
 	<div
 		bind:this={containerEl}
-		out:fade={{ duration: 400 }}
+		out:fade={{ duration: 300 }}
 		style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;
            background:var(--paper);display:flex;flex-direction:column;
            align-items:center;justify-content:center;gap:24px;"
@@ -69,7 +81,7 @@
 			Hinomaru
 		</div>
 
-		<!-- Bottom "from Meta" style footer (optional branding) -->
+		<!-- Bottom footer -->
 		<div
 			style="position:absolute;bottom:48px;left:0;right:0;text-align:center;
                font-size:12px;font-weight:600;letter-spacing:0.1em;
@@ -79,10 +91,3 @@
 		</div>
 	</div>
 {/if}
-
-<style>
-	/* Prevent scrolling while splash is active */
-	:global(body) {
-		overflow: hidden;
-	}
-</style>

@@ -53,7 +53,7 @@
 {#if showPrompt}
 	<div
 		use:fadeUp={{ y: 20 }}
-		style="position:fixed; bottom:24px; left:24px; right:24px; z-index:100;
+		style="position:fixed; bottom:calc(24px + env(safe-area-inset-bottom)); left:max(24px, env(safe-area-inset-left)); right:max(24px, env(safe-area-inset-right)); z-index:100;
                background:var(--bg-header); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
                color:var(--fg-primary); padding:16px 20px; 
                border-radius:24px; border:1px solid var(--ink-200);

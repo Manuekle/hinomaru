@@ -92,17 +92,20 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100vh;background:var(--paper);">
+<div style="display:flex;flex-direction:column;min-height:100dvh;min-height:100vh;background:var(--paper);">
+	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
 	<div class="session-topbar">
 		<div class="session-topbar-fill" style="width:{pct}%;"></div>
+	</div>
 	</div>
 	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
 		<a
 			href="/deck/{data.deck.id}"
-			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;">✕</a
+			class="touch-action-manip"
+			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;min-width:44px;min-height:44px;display:flex;align-items:center;">✕</a
 		>
 		<div class="label-meta">{t('session.progress', $locale, { a: i + 1, b: cards.length })}</div>
-		<div style="width:22px;"></div>
+		<div style="width:44px;"></div>
 	</div>
 
 	{#if card}
@@ -149,10 +152,10 @@
 						{t('session.answerIs', $locale, { a: card.en })}
 					</div>
 				{/if}
-				<div style="margin-top:20px;">
+				<div style="margin-top:20px;padding-bottom:calc(8px + env(safe-area-inset-bottom));">
 					{#if !submitted}
 						<button
-							class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
+							class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg touch-action-manip"
 							onclick={submit}
 							disabled={!answer.trim()}
 						>
@@ -160,7 +163,7 @@
 						</button>
 					{:else}
 						<button
-							class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} hm-btn-full hm-btn-lg"
+							class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} hm-btn-full hm-btn-lg touch-action-manip"
 							onclick={next}
 						>
 							{i >= cards.length - 1

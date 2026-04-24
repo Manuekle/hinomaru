@@ -30,34 +30,30 @@
 	const supabase = $derived(data.supabase!);
 
 	// ── Schemas ──────────────────────────────────────────────
-	const emailSchema = z.string().email('Ingresa un correo válido.');
-
-	const signinSchema = z.object({
-		email: emailSchema,
-		password: z.string().min(1, 'La contraseña es requerida.')
-	});
-
-	const signupSchema = z
-		.object({
+	// NOTE: Schemas are rebuilt reactively when locale changes via $derived
+	const schemas = $derived.by(() => {
+		const emailSchema = z.string().email(t('auth.validation.email', $locale));
+		const signinSchema = z.object({
 			email: emailSchema,
-			password: z
-				.string()
-				.min(6, 'Mínimo 6 caracteres.')
-				.regex(/[A-Z]/, 'Debe contener al menos una mayúscula.')
-				.regex(/[0-9]/, 'Debe contener al menos un número.'),
-			confirm: z.string().min(1, 'Confirma tu contraseña.')
-		})
-		.refine((d) => d.password === d.confirm, {
-			message: 'Las contraseñas no coinciden.',
-			path: ['confirm']
+			password: z.string().min(1, t('auth.validation.passwordRequired', $locale))
 		});
-
-	const forgotSchema = z.object({
-		email: emailSchema
-	});
-
-	const magicSchema = z.object({
-		email: emailSchema
+		const signupSchema = z
+			.object({
+				email: emailSchema,
+				password: z
+					.string()
+					.min(6, t('auth.validation.passwordMin', $locale))
+					.regex(/[A-Z]/, t('auth.validation.passwordUpper', $locale))
+					.regex(/[0-9]/, t('auth.validation.passwordNumber', $locale)),
+				confirm: z.string().min(1, t('auth.validation.confirmRequired', $locale))
+			})
+			.refine((d) => d.password === d.confirm, {
+				message: t('auth.validation.passwordsMismatch', $locale),
+				path: ['confirm']
+			});
+		const forgotSchema = z.object({ email: emailSchema });
+		const magicSchema = z.object({ email: emailSchema });
+		return { signinSchema, signupSchema, forgotSchema, magicSchema };
 	});
 
 	// ── State ─────────────────────────────────────────────────
@@ -83,9 +79,9 @@
 	// Error param from URL (e.g. after failed callback)
 	const errorParam = $page.url.searchParams.get('error');
 	if (errorParam === 'confirmation_failed')
-		globalError = 'El enlace de confirmación falló. Intenta de nuevo.';
+		globalError = t('auth.error.confirmationFailed', $locale);
 	else if (errorParam === 'link_expired')
-		globalError = 'El enlace ha expirado. Solicita uno nuevo.';
+		globalError = t('auth.error.linkExpired', $locale);
 
 	// ── Validation helpers ────────────────────────────────────
 	function validate(): boolean {
@@ -97,13 +93,13 @@
 			| { success: false; error: z.ZodError<any> };
 
 		if (mode === 'signin') {
-			result = signinSchema.safeParse({ email, password });
+			result = schemas.signinSchema.safeParse({ email, password });
 		} else if (mode === 'signup') {
-			result = signupSchema.safeParse({ email, password, confirm });
+			result = schemas.signupSchema.safeParse({ email, password, confirm });
 		} else if (mode === 'forgot') {
-			result = forgotSchema.safeParse({ email });
+			result = schemas.forgotSchema.safeParse({ email });
 		} else {
-			result = magicSchema.safeParse({ email });
+			result = schemas.magicSchema.safeParse({ email });
 		}
 
 		if (!result.success) {
@@ -120,7 +116,9 @@
 
 	// Live validation for confirm field
 	const confirmError = $derived(
-		mode === 'signup' && confirm && password !== confirm ? 'Las contraseñas no coinciden.' : ''
+		mode === 'signup' && confirm && password !== confirm 
+            ? t('auth.validation.passwordsMismatch', $locale) 
+            : ''
 	);
 
 	// Password strength (signup only)
@@ -136,10 +134,10 @@
 
 	const strengthLabel = $derived.by(() => {
 		const s = strength;
-		if (s <= 1) return { text: 'Débil', color: '#BC002D' };
-		if (s === 2) return { text: 'Regular', color: '#A8741A' };
-		if (s === 3) return { text: 'Buena', color: '#2E7D5B' };
-		return { text: 'Fuerte', color: '#2E7D5B' };
+		if (s <= 1) return { text: t('auth.strength.weak', $locale), color: '#BC002D' };
+		if (s === 2) return { text: t('auth.strength.fair', $locale), color: '#A8741A' };
+		if (s === 3) return { text: t('auth.strength.good', $locale), color: '#2E7D5B' };
+		return { text: t('auth.strength.strong', $locale), color: '#2E7D5B' };
 	});
 
 	// ── Submit ────────────────────────────────────────────────
@@ -199,12 +197,11 @@
 	}
 
 	function friendlyError(msg: string): string {
-		if (msg.includes('Invalid login credentials')) return 'Correo o contraseña incorrectos.';
-		if (msg.includes('Email not confirmed')) return 'Confirma tu correo antes de entrar.';
-		if (msg.includes('User already registered')) return 'Ya existe una cuenta con ese correo.';
-		if (msg.includes('Password should be'))
-			return 'La contraseña debe tener al menos 6 caracteres.';
-		if (msg.includes('rate limit')) return 'Demasiados intentos. Espera un momento.';
+		if (msg.includes('Invalid login credentials')) return t('auth.error.invalidCredentials', $locale);
+		if (msg.includes('Email not confirmed')) return t('auth.error.emailNotConfirmed', $locale);
+		if (msg.includes('User already registered')) return t('auth.error.alreadyRegistered', $locale);
+		if (msg.includes('Password should be')) return t('auth.error.passwordTooShort', $locale);
+		if (msg.includes('rate limit')) return t('auth.error.rateLimit', $locale);
 		return msg;
 	}
 
@@ -241,9 +238,9 @@
 				{:else if mode === 'signup'}
 					{t('auth.signup.subtitle', $locale)}
 				{:else if mode === 'forgot'}
-					Te enviaremos un enlace para restablecer tu contraseña.
+					{t('auth.forgot.subtitle', $locale)}
 				{:else if mode === 'magic'}
-					Recibe un enlace mágico en tu correo para entrar sin contraseña.
+					{t('auth.magic.subtitle', $locale)}
 				{/if}
 			</div>
 		</div>
@@ -254,17 +251,16 @@
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
 			>
 				<div style="font-size:36px;margin-bottom:12px;">📨</div>
-				<div style="font-size:18px;font-weight:600;margin-bottom:8px;">Revisa tu correo</div>
+				<div style="font-size:18px;font-weight:600;margin-bottom:8px;">{t('auth.signup.done.title', $locale)}</div>
 				<div style="font-size:14px;color:var(--fg-secondary);line-height:1.6;">
-					Enviamos un enlace de confirmación a <strong>{email}</strong>.<br />
-					Haz clic en él para activar tu cuenta.
+					{t('auth.signup.done.desc', $locale, { email })}
 				</div>
 				<button
 					class="hm-btn hm-btn-ghost"
 					style="margin-top:24px;"
 					onclick={() => switchMode('signin')}
 				>
-					Volver al inicio de sesión
+					{t('auth.backToSigninBtn', $locale)}
 				</button>
 			</div>
 		{:else if forgotDone}
@@ -272,17 +268,16 @@
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
 			>
 				<div style="font-size:36px;margin-bottom:12px;">🔑</div>
-				<div style="font-size:18px;font-weight:600;margin-bottom:8px;">Correo enviado</div>
+				<div style="font-size:18px;font-weight:600;margin-bottom:8px;">{t('auth.forgot.done.title', $locale)}</div>
 				<div style="font-size:14px;color:var(--fg-secondary);line-height:1.6;">
-					Si existe una cuenta con <strong>{email}</strong>, recibirás el enlace de recuperación en
-					minutos.
+					{t('auth.forgot.done.desc', $locale, { email })}
 				</div>
 				<button
 					class="hm-btn hm-btn-ghost"
 					style="margin-top:24px;"
 					onclick={() => switchMode('signin')}
 				>
-					Volver al inicio de sesión
+					{t('auth.backToSigninBtn', $locale)}
 				</button>
 			</div>
 		{:else if magicDone}
@@ -290,17 +285,16 @@
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
 			>
 				<div style="font-size:36px;margin-bottom:12px;">✨</div>
-				<div style="font-size:18px;font-weight:600;margin-bottom:8px;">¡Enlace enviado!</div>
+				<div style="font-size:18px;font-weight:600;margin-bottom:8px;">{t('auth.magic.done.title', $locale)}</div>
 				<div style="font-size:14px;color:var(--fg-secondary);line-height:1.6;">
-					Enviamos un enlace mágico a <strong>{email}</strong>.<br />
-					Haz clic en él para entrar sin contraseña.
+					{t('auth.magic.done.desc', $locale, { email })}
 				</div>
 				<button
 					class="hm-btn hm-btn-ghost"
 					style="margin-top:24px;"
 					onclick={() => switchMode('signin')}
 				>
-					Volver al inicio de sesión
+					{t('auth.backToSigninBtn', $locale)}
 				</button>
 			</div>
 		{:else}
@@ -317,14 +311,14 @@
 							type="button"
 							onclick={() => switchMode('signin')}
 						>
-							Iniciar sesión
+							{t('auth.signin', $locale)}
 						</button>
 						<button
 							class="tab-btn {mode === 'signup' ? 'active' : ''}"
 							type="button"
 							onclick={() => switchMode('signup')}
 						>
-							Crear cuenta
+							{t('auth.signup', $locale)}
 						</button>
 					</div>
 				{:else}
@@ -334,7 +328,7 @@
 						onclick={() => switchMode('signin')}
 						style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;text-align:left;display:flex;align-items:center;gap:4px;"
 					>
-						← Volver al inicio de sesión
+						{t('auth.backToSignin', $locale)}
 					</button>
 				{/if}
 
@@ -363,7 +357,7 @@
 									type={showPassword ? 'text' : 'password'}
 									bind:value={password}
 									placeholder={mode === 'signup'
-										? 'Mín. 6 caract., 1 mayúscula, 1 número'
+										? t('auth.validation.passwordPlaceholder', $locale)
 										: '••••••••'}
 									class="hm-input {fieldErrors.password ? 'input-error' : ''}"
 									autocomplete={mode === 'signup' ? 'new-password' : 'current-password'}
@@ -372,7 +366,7 @@
 									type="button"
 									class="pw-toggle"
 									onclick={() => (showPassword = !showPassword)}
-									aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+									aria-label={showPassword ? t('auth.password', $locale) : t('auth.password', $locale)}
 								>
 									{#if showPassword}
 										<!-- Eye-off icon -->
@@ -433,12 +427,12 @@
 						<!-- Confirm password (signup only) -->
 						{#if mode === 'signup'}
 							<div class="field">
-								<div class="label-meta" style="margin-bottom:8px;">Confirmar contraseña</div>
+								<div class="label-meta" style="margin-bottom:8px;">{t('auth.confirmPassword', $locale)}</div>
 								<div class="pw-wrap">
 									<input
 										type={showConfirm ? 'text' : 'password'}
 										bind:value={confirm}
-										placeholder="Repite tu contraseña"
+										placeholder={t('auth.confirmPassword.placeholder', $locale)}
 										class="hm-input {fieldErrors.confirm || confirmError ? 'input-error' : ''}"
 										autocomplete="new-password"
 									/>
@@ -446,7 +440,7 @@
 										type="button"
 										class="pw-toggle"
 										onclick={() => (showConfirm = !showConfirm)}
-										aria-label={showConfirm ? 'Ocultar contraseña' : 'Ver contraseña'}
+										aria-label={showConfirm ? t('auth.password', $locale) : t('auth.password', $locale)}
 									>
 										{#if showConfirm}
 											<svg
@@ -492,7 +486,7 @@
 									<span
 										style="font-size:12px;color:var(--success);margin-top:5px;display:flex;align-items:center;gap:4px;"
 									>
-										✓ Las contraseñas coinciden
+										{t('auth.passwordsMatch', $locale)}
 									</span>
 								{/if}
 							</div>
@@ -506,7 +500,7 @@
 									onclick={() => switchMode('forgot')}
 									style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;text-decoration:underline;"
 								>
-									¿Olvidaste tu contraseña?
+									{t('auth.forgotPassword', $locale)}
 								</button>
 							</div>
 						{/if}
@@ -530,9 +524,9 @@
 						{:else if mode === 'signup'}
 							{t('auth.signup', $locale)}
 						{:else if mode === 'forgot'}
-							Enviar enlace de recuperación
+							{t('auth.forgot.submit', $locale)}
 						{:else}
-							Enviar enlace mágico ✨
+							{t('auth.magic.submit', $locale)}
 						{/if}
 					</button>
 
@@ -544,9 +538,9 @@
 								onclick={() => switchMode('magic')}
 								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;"
 							>
-								¿Preferir sin contraseña? <span
+								{t('auth.magic.hint', $locale)} <span
 									style="color:var(--sumi);font-weight:600;text-decoration:underline;"
-									>Enlace mágico ✨</span
+									>{t('auth.magic.hintLink', $locale)}</span
 								>
 							</button>
 						</div>
