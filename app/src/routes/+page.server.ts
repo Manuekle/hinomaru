@@ -37,6 +37,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.gte('created_at', new Date(Date.now() - 14 * 86400000).toISOString());
 
 	return {
+		user,
 		decks: (decks ?? []).map((d: any) => ({
 			...d,
 			learned: learnedByDeck[d.id] ?? 0,

@@ -8,6 +8,7 @@
 	import { t } from '$lib/i18n';
 	import { animate } from 'motion/mini';
 	import { pwaInfo } from 'virtual:pwa-info';
+	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
@@ -67,10 +68,10 @@
                    box-shadow:0 0 0 0 rgba(188,0,45,0.4);
                    animation:dot-pulse 3s ease-in-out infinite;"
 			></span>
-			<span style="font-size:17px;font-weight:700;letter-spacing:-0.01em;">Hinomaru</span>
+			<span class="nav-text" style="font-size:17px;font-weight:700;letter-spacing:-0.01em;">Hinomaru</span>
 		</a>
 
-		<nav style="display:flex;gap:28px;font-size:14px;color:var(--fg-secondary);">
+		<nav class="nav-links" style="display:flex;gap:28px;font-size:14px;color:var(--fg-secondary);">
 			<a
 				href="/"
 				style="font-weight:600;color:var(--sumi);text-decoration:none;
@@ -116,6 +117,7 @@
 {/if}
 
 {@render children()}
+<InstallPrompt />
 
 <style>
 	@keyframes dot-pulse {
@@ -143,5 +145,12 @@
 	}
 	.nav-link:hover::after {
 		transform: scaleX(1);
+	}
+
+	@media (max-width: 600px) {
+		.nav-text,
+		.nav-links {
+			display: none !important;
+		}
 	}
 </style>

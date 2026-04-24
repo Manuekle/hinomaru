@@ -4,6 +4,7 @@
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { fly } from 'svelte/transition';
 	import { cubicOut, cubicIn } from 'svelte/easing';
+	import Landing from '$lib/components/Landing.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -15,7 +16,10 @@
 	const totalLearned = $derived(data.decks.reduce((s, d) => s + (d.learned ?? 0), 0));
 </script>
 
-<div style="max-width:720px;margin:0 auto;padding:40px 24px 120px;">
+{#if !data.user}
+	<Landing decks={data.decks} />
+{:else}
+	<div style="max-width:720px;margin:0 auto;padding:40px 24px 120px;">
 	<!-- Header -->
 	<div
 		use:fadeUp={{ delay: 0, y: 12 }}
@@ -135,3 +139,4 @@
 		{/key}
 	</div>
 </div>
+{/if}
