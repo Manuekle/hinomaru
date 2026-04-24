@@ -1,0 +1,69 @@
+
+> sveltekit@0.0.1 lint
+> eslint .
+
+
+/home/manudev/Dev/nihongo/app/src/routes/+layout.svelte
+   5:11  warning  'goto' is defined but never used          @typescript-eslint/no-unused-vars
+  22:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.server.ts
+  21:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.svelte
+   5:11  warning  'flip' is defined but never used              @typescript-eslint/no-unused-vars
+   6:16  warning  'fade' is defined but never used              @typescript-eslint/no-unused-vars
+  15:50  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  16:65  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  18:6   warning  'gridKey' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  46:3   error    Each block should have a key                  svelte/require-each-key
+  78:5   error    Each block should have a key                  svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/callback/+server.ts
+  22:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/reset-password/+page.svelte
+  58:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/+page.svelte
+  81:3  error  Each block should have a key  svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte
+  11:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte
+   9:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  95:5   error    Each block should have a key              svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/summary/+page.svelte
+  6:11  warning  'animate' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/type/+page.svelte
+  13:39  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  64:26  error    Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/write/+page.svelte
+    3:11  warning  'onMount' is defined but never used                                           @typescript-eslint/no-unused-vars
+    3:20  warning  'tick' is defined but never used                                              @typescript-eslint/no-unused-vars
+    9:11  warning  'fadeUp' is defined but never used                                            @typescript-eslint/no-unused-vars
+   13:44  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+   27:23  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+   91:14  warning  'e' is defined but never used                                                 @typescript-eslint/no-unused-vars
+  102:22  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+  188:17  warning  'strokeData' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  188:29  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/login/+page.svelte
+   10:11  warning  'fadeUp' is defined but never used                             @typescript-eslint/no-unused-vars
+   10:19  warning  'scaleIn' is defined but never used                            @typescript-eslint/no-unused-vars
+  102:60  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  104:69  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  106:50  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  108:49  warning  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  549:34  error    Unexpected mustache interpolation with a string literal value  svelte/no-useless-mustaches
+
+✖ 38 problems (9 errors, 29 warnings)
+

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirma tu cuenta — Hinomaru</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F7F5F2;
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 40px 16px;
+      color: #1A1A1A;
+    }
+
+    .wrapper {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      text-decoration: none;
+    }
+    .brand-dot {
+      width: 28px;
+      height: 28px;
+      background: #BC002D;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1A1A1A;
+    }
+
+    /* Card */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid #E8E6E2;
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 4px 16px rgba(26,26,26,0.06), 0 2px 4px rgba(26,26,26,0.04);
+    }
+
+    .icon-wrap {
+      width: 64px;
+      height: 64px;
+      background: #FDECEF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #6E6C69;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      background: #BC002D;
+      color: #FFFFFF;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 16px;
+      letter-spacing: -0.01em;
+      transition: background 120ms ease;
+    }
+
+    .btn:hover { background: #9A0025; }
+
+    .divider {
+      height: 1px;
+      background: #E8E6E2;
+      margin: 28px 0;
+    }
+
+    .fallback-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #A8A6A2;
+      margin-bottom: 8px;
+    }
+
+    .fallback-url {
+      font-size: 12px;
+      color: #BC002D;
+      word-break: break-all;
+      line-height: 1.5;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #A8A6A2;
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 12px;
+      color: #A8A6A2;
+      line-height: 1.6;
+    }
+
+    .footer a {
+      color: #6E6C69;
+      text-decoration: none;
+    }
+
+    /* Japanese accent */
+    .jp-accent {
+      font-size: 13px;
+      color: #A8A6A2;
+      text-align: center;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <span class="brand-name">Hinomaru</span>
+    </div>
+
+    <div class="card">
+      <div class="icon-wrap">✉️</div>
+
+      <h1>Confirma tu cuenta</h1>
+      <p class="jp-accent">アカウントを確認する</p>
+
+      <p class="subtitle">
+        Gracias por registrarte en <strong>Hinomaru</strong>. Solo un paso más:
+        confirma tu dirección de correo para activar tu cuenta.
+      </p>
+
+      <a href="{{ .ConfirmationURL }}" class="btn">
+        Confirmar mi cuenta
+      </a>
+
+      <div class="divider"></div>
+
+      <div class="fallback-label">¿El botón no funciona? Copia este enlace</div>
+      <div class="fallback-url">{{ .ConfirmationURL }}</div>
+
+      <p class="note">
+        Este enlace expira en <strong>24 horas</strong>. Si no creaste esta cuenta,
+        puedes ignorar este correo.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Enviado a <a href="mailto:{{ .Email }}">{{ .Email }}</a></p>
+      <p style="margin-top:4px;">
+        Hinomaru · <a href="{{ .SiteURL }}">{{ .SiteURL }}</a>
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

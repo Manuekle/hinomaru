@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Te invitamos a Hinomaru</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F7F5F2;
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 40px 16px;
+      color: #1A1A1A;
+    }
+
+    .wrapper { max-width: 520px; margin: 0 auto; }
+
+    .brand {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 32px;
+    }
+    .brand-dot { width: 28px; height: 28px; background: #BC002D; border-radius: 50%; flex-shrink: 0; }
+    .brand-name { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #1A1A1A; }
+
+    .card {
+      background: #FFFFFF;
+      border: 1px solid #E8E6E2;
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 4px 16px rgba(26,26,26,0.06), 0 2px 4px rgba(26,26,26,0.04);
+    }
+
+    .icon-wrap {
+      width: 64px; height: 64px; background: #FDECEF; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; font-size: 28px;
+    }
+
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; text-align: center; margin-bottom: 12px; }
+
+    .jp-accent { font-size: 13px; color: #A8A6A2; text-align: center; letter-spacing: 0.06em; margin-top: 4px; }
+
+    .subtitle {
+      font-size: 15px; color: #6E6C69; text-align: center; line-height: 1.6; margin-bottom: 32px;
+    }
+
+    /* Feature pills */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      background: #F7F5F2;
+      border-radius: 14px;
+      border: 1px solid #E8E6E2;
+    }
+    .feature-icon {
+      width: 36px; height: 36px; background: #FDECEF; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .feature-text { font-size: 14px; font-weight: 500; color: #2E2D2B; }
+    .feature-sub { font-size: 12px; color: #A8A6A2; margin-top: 1px; }
+
+    .btn {
+      display: block; width: 100%; padding: 16px 24px;
+      background: #BC002D; color: #FFFFFF; text-align: center; text-decoration: none;
+      font-size: 16px; font-weight: 600; border-radius: 16px; letter-spacing: -0.01em;
+    }
+
+    .divider { height: 1px; background: #E8E6E2; margin: 28px 0; }
+
+    .fallback-label {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #A8A6A2; margin-bottom: 8px;
+    }
+    .fallback-url { font-size: 12px; color: #BC002D; word-break: break-all; line-height: 1.5; }
+
+    .note { font-size: 13px; color: #A8A6A2; text-align: center; margin-top: 20px; line-height: 1.5; }
+
+    .footer {
+      text-align: center; margin-top: 32px; font-size: 12px; color: #A8A6A2; line-height: 1.6;
+    }
+    .footer a { color: #6E6C69; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <span class="brand-name">Hinomaru</span>
+    </div>
+
+    <div class="card">
+      <div class="icon-wrap">🎌</div>
+
+      <h1>¡Estás invitado!</h1>
+      <p class="jp-accent">日の丸へようこそ</p>
+
+      <p class="subtitle">
+        Alguien te ha invitado a unirte a <strong>Hinomaru</strong>, la app para
+        aprender japonés con tarjetas flash. Crea tu cuenta gratis y empieza hoy.
+      </p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🗂️</div>
+          <div>
+            <div class="feature-text">Tarjetas flash adaptativas</div>
+            <div class="feature-sub">Hiragana, katakana y kanji organizados por nivel</div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔥</div>
+          <div>
+            <div class="feature-text">Rachas de aprendizaje</div>
+            <div class="feature-sub">Mantén el hábito diario y avanza sin esfuerzo</div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📊</div>
+          <div>
+            <div class="feature-text">Progreso guardado</div>
+            <div class="feature-sub">Tu avance sincronizado en todos tus dispositivos</div>
+          </div>
+        </div>
+      </div>
+
+      <a href="{{ .ConfirmationURL }}" class="btn">
+        Aceptar invitación y crear cuenta
+      </a>
+
+      <div class="divider"></div>
+
+      <div class="fallback-label">¿El botón no funciona? Copia este enlace</div>
+      <div class="fallback-url">{{ .ConfirmationURL }}</div>
+
+      <p class="note">
+        Este enlace expira en <strong>24 horas</strong>. Si no esperabas esta invitación,
+        simplemente ignora este correo.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Enviado a <a href="mailto:{{ .Email }}">{{ .Email }}</a></p>
+      <p style="margin-top:4px;">
+        Hinomaru · <a href="{{ .SiteURL }}">{{ .SiteURL }}</a>
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>

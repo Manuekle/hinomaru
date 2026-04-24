@@ -1,0 +1,32 @@
+/* Base styling for all preview cards — keeps them consistent */
+@import url('../colors_and_type.css');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  font-family: var(--font-ui);
+  color: var(--fg-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row { display: flex; align-items: center; gap: 12px; }
+.row-wrap { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-tertiary);
+  letter-spacing: 0;
+}

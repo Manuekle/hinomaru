@@ -1,0 +1,43 @@
+
+> sveltekit@0.0.1 lint
+> eslint .
+
+
+/home/manudev/Dev/nihongo/app/src/routes/+layout.svelte
+   5:11  warning  'goto' is defined but never used          @typescript-eslint/no-unused-vars
+  22:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.server.ts
+  21:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/callback/+server.ts
+  22:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/reset-password/+page.svelte
+  58:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte
+  11:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/summary/+page.svelte
+  6:11  warning  'animate' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/write/+page.svelte
+    3:11  warning  'onMount' is defined but never used                                           @typescript-eslint/no-unused-vars
+    3:20  warning  'tick' is defined but never used                                              @typescript-eslint/no-unused-vars
+    9:11  warning  'fadeUp' is defined but never used                                            @typescript-eslint/no-unused-vars
+   13:44  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+   27:23  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+   91:14  warning  'e' is defined but never used                                                 @typescript-eslint/no-unused-vars
+  102:22  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+  188:17  warning  'strokeData' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  188:29  warning  Unexpected any. Specify a different type                                      @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/login/+page.svelte
+  96:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 20 problems (0 errors, 20 warnings)
+

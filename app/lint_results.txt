@@ -1,0 +1,95 @@
+
+> sveltekit@0.0.1 lint
+> eslint .
+
+
+/home/manudev/Dev/nihongo/app/src/lib/motion.ts
+  67:8  error  'end' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/+layout.svelte
+   5:11  error  'goto' is defined but never used          @typescript-eslint/no-unused-vars
+  22:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:4   error  Unexpected href link without resolve()    svelte/no-navigation-without-resolve
+  72:5   error  Unexpected href link without resolve()    svelte/no-navigation-without-resolve
+  82:4   error  Unexpected href link without resolve()    svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.server.ts
+  21:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.svelte
+   5:11  error  'flip' is defined but never used              @typescript-eslint/no-unused-vars
+   6:16  error  'fade' is defined but never used              @typescript-eslint/no-unused-vars
+  15:50  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  16:65  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  18:6   error  'gridKey' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  46:3   error  Each block should have a key                  svelte/require-each-key
+  78:5   error  Each block should have a key                  svelte/require-each-key
+  83:7   error  Unexpected href link without resolve()        svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/callback/+server.ts
+  22:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/reset-password/+page.svelte
+  58:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  89:25  error  Unexpected goto() call without resolve()  svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/+page.svelte
+  29:3  error  Unexpected href link without resolve()  svelte/no-navigation-without-resolve
+  81:3  error  Each block should have a key            svelte/require-each-key
+  83:5  error  Unexpected href link without resolve()  svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte
+   11:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:9   error  Unexpected goto() call without resolve()  svelte/no-navigation-without-resolve
+  103:4   error  Unexpected href link without resolve()    svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte
+   9:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:9   error  Unexpected goto() call without resolve()  svelte/no-navigation-without-resolve
+  75:4   error  Unexpected href link without resolve()    svelte/no-navigation-without-resolve
+  95:5   error  Each block should have a key              svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/summary/+page.svelte
+   6:11  error  'animate' is defined but never used     @typescript-eslint/no-unused-vars
+  91:5   error  Unexpected href link without resolve()  svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/type/+page.svelte
+  13:39  error  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  55:9   error  Unexpected goto() call without resolve()                               svelte/no-navigation-without-resolve
+  64:26  error  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  74:4   error  Unexpected href link without resolve()                                 svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/write/+page.svelte
+    3:11  error  'onMount' is defined but never used                                                                                                                                @typescript-eslint/no-unused-vars
+    3:20  error  'tick' is defined but never used                                                                                                                                   @typescript-eslint/no-unused-vars
+    9:11  error  'fadeUp' is defined but never used                                                                                                                                 @typescript-eslint/no-unused-vars
+   13:44  error  Unexpected any. Specify a different type                                                                                                                           @typescript-eslint/no-explicit-any
+   27:23  error  Unexpected any. Specify a different type                                                                                                                           @typescript-eslint/no-explicit-any
+   45:23  error  Don't manipulate the DOM directly. The Svelte runtime can get confused if there is a difference between the actual DOM and the DOM expected by the Svelte runtime  svelte/no-dom-manipulating
+   91:14  error  'e' is defined but never used                                                                                                                                      @typescript-eslint/no-unused-vars
+  102:22  error  Unexpected any. Specify a different type                                                                                                                           @typescript-eslint/no-explicit-any
+  172:4   error  Don't manipulate the DOM directly. The Svelte runtime can get confused if there is a difference between the actual DOM and the DOM expected by the Svelte runtime  svelte/no-dom-manipulating
+  188:17  error  'strokeData' is defined but never used                                                                                                                             @typescript-eslint/no-unused-vars
+  188:29  error  Unexpected any. Specify a different type                                                                                                                           @typescript-eslint/no-explicit-any
+  249:9   error  Unexpected goto() call without resolve()                                                                                                                           svelte/no-navigation-without-resolve
+  303:4   error  Unexpected href link without resolve()                                                                                                                             svelte/no-navigation-without-resolve
+
+/home/manudev/Dev/nihongo/app/src/routes/login/+page.svelte
+   10:11  error  'fadeUp' is defined but never used                             @typescript-eslint/no-unused-vars
+   10:19  error  'scaleIn' is defined but never used                            @typescript-eslint/no-unused-vars
+  102:60  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  104:69  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  106:50  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  108:49  error  Unexpected any. Specify a different type                       @typescript-eslint/no-explicit-any
+  163:9   error  Unexpected goto() call without resolve()                       svelte/no-navigation-without-resolve
+  549:34  error  Unexpected mustache interpolation with a string literal value  svelte/no-useless-mustaches
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte
+  15:8  error  Unexpected goto() call without resolve()  svelte/no-navigation-without-resolve
+  30:3  error  Unexpected href link without resolve()    svelte/no-navigation-without-resolve
+
+✖ 60 problems (60 errors, 0 warnings)
+

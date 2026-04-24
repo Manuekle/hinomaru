@@ -1,0 +1,289 @@
+/* =========================================================================
+   Hinomaru 日の丸 — Design tokens
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---------- Brand ---------- */
+  --hinomaru-red: #BC002D;
+  --hinomaru-red-ink: #9A0025;      /* hover / pressed */
+  --hinomaru-red-wash: #FDECEF;     /* tinted background for red pill tags */
+
+  --sumi: #1A1A1A;                  /* primary text, soft warm black */
+  --washi: #FFFFFF;                 /* card surface */
+  --paper: #F7F5F2;                 /* page surface, warm off-white */
+
+  /* ---------- Ink ramp (neutrals) ---------- */
+  --ink-50:  #FAFAF9;
+  --ink-100: #F2F2F1;
+  --ink-200: #E8E6E2;               /* default borders */
+  --ink-300: #D4D2CE;
+  --ink-400: #A8A6A2;
+  --ink-500: #6E6C69;               /* secondary text */
+  --ink-600: #4A4846;
+  --ink-700: #2E2D2B;
+  --ink-900: var(--sumi);
+
+  /* ---------- Semantic ---------- */
+  --success: #2E7D5B;
+  --success-wash: #E9F3EE;
+  --warning: #A8741A;
+  --warning-wash: #F6EEDC;
+  --error: var(--hinomaru-red);
+  --error-wash: var(--hinomaru-red-wash);
+
+  /* ---------- Foregrounds (semantic aliases) ---------- */
+  --fg-primary: var(--sumi);
+  --fg-secondary: var(--ink-500);
+  --fg-tertiary: var(--ink-400);
+  --fg-inverse: var(--washi);
+  --fg-accent: var(--hinomaru-red);
+
+  /* ---------- Backgrounds ---------- */
+  --bg-page: var(--paper);
+  --bg-surface: var(--washi);
+  --bg-muted: var(--ink-100);
+
+  /* ---------- Typography ---------- */
+  --font-ui: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --font-jp: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Type scale (desktop) */
+  --fs-xs:   12px;  /* labels, metadata */
+  --fs-sm:   14px;  /* secondary body */
+  --fs-base: 16px;  /* body */
+  --fs-md:   18px;  /* large body */
+  --fs-lg:   22px;  /* h3 */
+  --fs-xl:   28px;  /* h2 */
+  --fs-2xl:  40px;  /* h1 */
+  --fs-display: 80px; /* flashcard glyph */
+  --fs-display-lg: 120px; /* hero glyph */
+
+  /* Line heights */
+  --lh-tight: 1.1;
+  --lh-snug:  1.25;
+  --lh-body:  1.55;
+  --lh-loose: 1.7;
+
+  /* Letter spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.1em;      /* for small metadata in ALL CAPS */
+
+  /* ---------- Spacing (8pt grid) ---------- */
+  --space-0:  0px;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ---------- Radii ---------- */
+  --radius-sm:   8px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-full: 999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-sm: 0 1px 2px rgba(26,26,26,0.04), 0 1px 1px rgba(26,26,26,0.03);
+  --shadow-md: 0 4px 16px rgba(26,26,26,0.06), 0 2px 4px rgba(26,26,26,0.04);
+  --shadow-focus: 0 0 0 3px rgba(188,0,45,0.18);
+
+  /* ---------- Motion ---------- */
+  --ease-brand: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-micro: 120ms;
+  --dur-base:  240ms;
+  --dur-flip:  480ms;
+
+  /* ---------- Layout ---------- */
+  --content-narrow: 720px;
+  --content-wide:   1080px;
+}
+
+/* =========================================================================
+   Base + semantic classes
+   ========================================================================= */
+
+html, body {
+  background: var(--bg-page);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.h1, h1 {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+.h2, h2 {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+.h3, h3 {
+  font-family: var(--font-ui);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  color: var(--fg-primary);
+  margin: 0;
+}
+
+.p, p {
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--fg-primary);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.p-sm { font-size: var(--fs-sm); color: var(--fg-secondary); }
+
+.display {
+  font-family: var(--font-ui);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-primary);
+}
+
+.display-jp {
+  font-family: var(--font-jp);
+  font-size: var(--fs-display);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--fg-primary);
+}
+
+.jp {
+  font-family: var(--font-jp);
+  font-weight: 500;
+}
+
+.romaji {
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  color: var(--fg-secondary);
+  letter-spacing: var(--tracking-wide);
+}
+
+.label-meta {
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--fg-secondary);
+}
+
+.code, code {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  background: var(--bg-muted);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* ---------- Primitives ---------- */
+
+.hm-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.hm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 48px;
+  padding: 0 var(--space-6);
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease-brand),
+              transform 80ms var(--ease-brand),
+              box-shadow var(--dur-micro) var(--ease-brand);
+}
+.hm-btn:active { transform: scale(0.98); }
+
+.hm-btn-primary {
+  background: var(--hinomaru-red);
+  color: var(--fg-inverse);
+}
+.hm-btn-primary:hover { background: var(--hinomaru-red-ink); }
+
+.hm-btn-secondary {
+  background: var(--washi);
+  color: var(--fg-primary);
+  border-color: var(--ink-200);
+}
+.hm-btn-secondary:hover { background: var(--ink-50); }
+
+.hm-btn-ghost {
+  background: transparent;
+  color: var(--fg-primary);
+}
+.hm-btn-ghost:hover { background: var(--ink-100); }
+
+.hm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 24px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+}
+
+.hm-pill-red  { background: var(--hinomaru-red-wash); color: var(--hinomaru-red-ink); }
+.hm-pill-ink  { background: var(--ink-100); color: var(--ink-700); }
+.hm-pill-success { background: var(--success-wash); color: var(--success); }
+
+.hm-logo-dot {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background: var(--hinomaru-red);
+  border-radius: 50%;
+  vertical-align: -0.1em;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

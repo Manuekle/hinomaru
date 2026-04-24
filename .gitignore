@@ -1,0 +1,12 @@
+# Claude Code internals
+.claude/
+
+# Design reference images (not source)
+uploads/
+
+# Internal tool descriptor
+SKILL.md
+
+# OS
+.DS_Store
+Thumbs.db
