@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { fadeUp } from '$lib/motion';
+	import { t } from '$lib/i18n';
+	import { locale } from '$lib/stores/locale';
 
 	let deferredPrompt = $state<any>(null);
 	let showPrompt = $state(false);
@@ -52,23 +54,26 @@
 	<div
 		use:fadeUp={{ y: 20 }}
 		style="position:fixed; bottom:24px; left:24px; right:24px; z-index:100;
-               background:var(--sumi); color:var(--bg-surface); padding:20px; border-radius:24px;
+               background:var(--bg-header); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+               color:var(--fg-primary); padding:16px 20px; 
+               border-radius:24px; border:1px solid var(--ink-200);
                display:flex; align-items:center; justify-content:space-between; gap:16px;
-               box-shadow:0 12px 40px rgba(0,0,0,0.3); max-width:500px; margin:0 auto;"
+               box-shadow:var(--shadow-md); max-width:500px; margin:0 auto;"
 	>
 		<div style="display:flex; gap:12px; align-items:center;">
 			<div
-				style="width:48px; height:48px; background:var(--hinomaru-red); border-radius:12px; 
-                       display:flex; align-items:center; justify-content:center; flex-shrink:0;"
+				style="width:44px; height:44px; background:var(--hinomaru-red); border-radius:12px; 
+                       display:flex; align-items:center; justify-content:center; flex-shrink:0;
+                       box-shadow: 0 4px 12px rgba(188,0,45,0.2);"
 			>
-				<span style="width:16px; height:16px; background:white; border-radius:50%;"></span>
+				<span style="width:14px; height:14px; background:white; border-radius:50%;"></span>
 			</div>
 			<div>
-				<div style="font-weight:700; font-size:15px;">Install Hinomaru</div>
-				<div style="font-size:13px; opacity:0.8; line-height:1.3;">
+				<div style="font-weight:700; font-size:15px; line-height:1.2;">{t('pwa.install.title', $locale)}</div>
+				<div style="font-size:13px; color:var(--fg-secondary); line-height:1.3; margin-top:1px;">
 					{isIOS 
-						? 'Tap the Share icon and "Add to Home Screen"' 
-						: 'Study offline and with a better experience.'}
+						? t('pwa.install.ios', $locale) 
+						: t('pwa.install.desc', $locale)}
 				</div>
 			</div>
 		</div>
@@ -77,18 +82,34 @@
 			{#if !isIOS}
 				<button
 					onclick={handleInstall}
-					style="background:var(--bg-surface); color:var(--sumi); border:none; padding:8px 16px; 
-                           border-radius:12px; font-weight:700; font-size:13px; cursor:pointer;"
+					style="background:var(--sumi); color:var(--washi); border:none; padding:8px 16px; 
+                           border-radius:12px; font-weight:700; font-size:13px; cursor:pointer;
+                           transition: transform 0.1s ease;"
+                    onmousedown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
+                    onmouseup={(e) => (e.currentTarget.style.transform = 'scale(1)')}
 				>
-					Install
+					{t('pwa.install.btn', $locale)}
 				</button>
 			{/if}
 			<button
 				onclick={closePrompt}
-				style="background:rgba(255,255,255,0.1); color:white; border:none; width:32px; height:32px; 
-                       border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"
+				aria-label="Close"
+				style="background:var(--ink-100); color:var(--fg-tertiary); border:none; width:32px; height:32px; 
+                       border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
+                       transition: background 0.2s ease, color 0.2s ease;"
+                onmouseenter={(e) => {
+                    e.currentTarget.style.background = 'var(--ink-200)';
+                    e.currentTarget.style.color = 'var(--fg-primary)';
+                }}
+                onmouseleave={(e) => {
+                    e.currentTarget.style.background = 'var(--ink-100)';
+                    e.currentTarget.style.color = 'var(--fg-tertiary)';
+                }}
 			>
-				✕
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
 			</button>
 		</div>
 	</div>

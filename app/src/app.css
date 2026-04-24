@@ -1,7 +1,5 @@
 @import 'tailwindcss';
 
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
-
 @theme {
 	--color-hm-red: #bc002d;
 	--color-hm-red-ink: #9a0025;

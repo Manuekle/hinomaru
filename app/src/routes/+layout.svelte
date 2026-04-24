@@ -9,6 +9,7 @@
 	import { animate } from 'motion/mini';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
+	import SupportKofi from '$lib/components/SupportKofi.svelte';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
@@ -44,7 +45,24 @@
 </script>
 
 <svelte:head>
-	<title>Hinomaru 日の丸</title>
+	<title>{t('seo.title', $locale)}</title>
+	<meta name="description" content={t('seo.description', $locale)} />
+	<link rel="canonical" href="https://hinomaru.app{$page.url.pathname}" />
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://hinomaru.app{$page.url.pathname}" />
+	<meta property="og:title" content={t('seo.title', $locale)} />
+	<meta property="og:description" content={t('seo.description', $locale)} />
+	<meta property="og:image" content="https://hinomaru.app/landing_hero.png" />
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image" />
+	<meta property="twitter:url" content="https://hinomaru.app{$page.url.pathname}" />
+	<meta property="twitter:title" content={t('seo.title', $locale)} />
+	<meta property="twitter:description" content={t('seo.description', $locale)} />
+	<meta property="twitter:image" content="https://hinomaru.app/landing_hero.png" />
+
 	{#if pwaInfo}
 		{@html pwaInfo.webManifest.linkTag}
 	{/if}
@@ -82,8 +100,10 @@
 			</a>
 		</nav>
 
-		<a
-			href="/settings"
+		<div style="display:flex;align-items:center;gap:12px;">
+			<SupportKofi variant="minimal" />
+			<a
+				href="/settings"
 			aria-label="Settings"
 			style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;
              border-radius:50%;color:var(--fg-tertiary);
