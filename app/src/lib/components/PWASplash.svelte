@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { animate } from 'motion/mini';
-	import { fadeOut } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 
 	let { visible = true } = $props<{ visible: boolean }>();
 
@@ -44,7 +44,7 @@
 {#if visible}
 	<div
 		bind:this={containerEl}
-		out:fadeOut={{ duration: 400 }}
+		out:fade={{ duration: 400 }}
 		style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;
            background:var(--paper);display:flex;flex-direction:column;
            align-items:center;justify-content:center;gap:24px;"
