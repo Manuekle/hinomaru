@@ -14,7 +14,7 @@ export default defineConfig({
 				short_name: 'Hinomaru',
 				description: 'Master Japanese with Hinomaru',
 				theme_color: '#BC002D',
-				background_color: '#ffffff',
+				background_color: '#f7f5f2',
 				display: 'standalone',
 				icons: [
 					{

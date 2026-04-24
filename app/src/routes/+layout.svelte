@@ -10,14 +10,23 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
 	import SupportKofi from '$lib/components/SupportKofi.svelte';
+	import PWASplash from '$lib/components/PWASplash.svelte';
+	import { goto } from '$app/navigation';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
 
 	let headerEl = $state<HTMLElement | null>(null);
+	let booting = $state(true);
+	let isPWA = $state(false);
 
 	onMount(() => {
 		theme.init();
+
+		// Detect PWA mode
+		isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+				(window.navigator as any).standalone || 
+				document.referrer.includes('android-app://');
 
 		const {
 			data: { subscription }
@@ -26,6 +35,21 @@
 				invalidate('supabase:auth');
 			}
 		});
+
+		// Handle PWA specific redirects
+		if (isPWA) {
+			const path = $page.url.pathname;
+			if (!session && path === '/') {
+				goto('/login', { replaceState: true });
+			} else if (session && path === '/login') {
+				goto('/', { replaceState: true });
+			}
+		}
+
+		// Keep splash for a minimum duration for premium feel
+		const timer = setTimeout(() => {
+			booting = false;
+		}, 1200);
 
 		// Animate header in
 		if (headerEl) {
@@ -36,7 +60,10 @@
 			);
 		}
 
-		return () => subscription.unsubscribe();
+		return () => {
+			subscription.unsubscribe();
+			clearTimeout(timer);
+		};
 	});
 
 	const showNav = $derived(
@@ -138,6 +165,7 @@
 
 {@render children()}
 <InstallPrompt />
+<PWASplash visible={booting} />
 
 <style>
 	@keyframes dot-pulse {
