@@ -1,5 +1,12 @@
-const URL_BASE = 'https://ambiocrendaqohjcudtj.supabase.co/rest/v1';
-const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtYmlvY3JlbmRhcW9oamN1ZHRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjkwMjg5MywiZXhwIjoyMDkyNDc4ODkzfQ.l6IHpQ7slr85iVfq14oh8orzv4RzUYhDdYPzVIcDwlY';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !KEY) {
+  console.error('Missing required environment variables: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
+  process.exit(1);
+}
+
+const URL_BASE = `${SUPABASE_URL}/rest/v1`;
 
 const HEADERS = {
   'apikey': KEY,

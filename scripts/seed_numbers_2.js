@@ -1,5 +1,12 @@
-const URL = 'https://ambiocrendaqohjcudtj.supabase.co/rest/v1/cards';
-const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtYmlvY3JlbmRhcW9oamN1ZHRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjkwMjg5MywiZXhwIjoyMDkyNDc4ODkzfQ.l6IHpQ7slr85iVfq14oh8orzv4RzUYhDdYPzVIcDwlY';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !KEY) {
+  console.error('Missing required environment variables: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
+  process.exit(1);
+}
+
+const URL = `${SUPABASE_URL}/rest/v1/cards`;
 
 const cards = [
   {deck_id:'n5-numbers',jp:'二千万',romaji:'ni-sen-man',en:'20,000,000',es:'veinte millones',example:'二千万円の家。',example_en:'A 20 million yen house.',example_es:'Una casa de 20 millones de yenes.',sort_order:21},
@@ -34,11 +41,11 @@ for (let i = 0; i < cards.length; i += 10) {
 }
 
 // Update card_count
-const r = await fetch(`https://ambiocrendaqohjcudtj.supabase.co/rest/v1/cards?select=count&deck_id=eq.n5-numbers`, {
+const r = await fetch(`${SUPABASE_URL}/rest/v1/cards?select=count&deck_id=eq.n5-numbers`, {
   headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Prefer': 'count=exact' }
 });
 const count = parseInt(r.headers.get('content-range')?.split('/')[1] || '0');
-const u = await fetch(`https://ambiocrendaqohjcudtj.supabase.co/rest/v1/decks?id=eq.n5-numbers`, {
+const u = await fetch(`${SUPABASE_URL}/rest/v1/decks?id=eq.n5-numbers`, {
   method: 'PATCH',
   headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
   body: JSON.stringify({ card_count: count })
