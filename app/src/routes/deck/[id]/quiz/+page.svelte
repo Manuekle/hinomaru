@@ -94,7 +94,7 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100dvh;min-height:100vh;background:var(--paper);">
+<div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
 	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
 	<div class="session-topbar">
 		<div class="session-topbar-fill" style="width:{pct}%;"></div>

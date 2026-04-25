@@ -103,7 +103,7 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100dvh;min-height:100vh;background:var(--paper);">
+<div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
 	<!-- Progress bar - needs top safe area for notch/Dynamic Island -->
 	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
 	<div class="session-topbar">

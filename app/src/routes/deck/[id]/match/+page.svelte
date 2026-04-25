@@ -261,7 +261,7 @@
 
 	/* ── Header ── */
 	.match-header {
-		padding: 12px 16px;
+		padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

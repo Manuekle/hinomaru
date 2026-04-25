@@ -31,7 +31,7 @@
 </script>
 
 <div
-	style="min-height:100vh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;"
+	style="min-height:100vh;min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));position:relative;overflow:hidden;"
 >
 	<!-- Decorative background circle (gently pulsing via CSS) -->
 	<div
