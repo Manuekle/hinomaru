@@ -2,9 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
+	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { animate } from 'motion/mini';
+	import { speakJapanese } from '$lib/utils/tts';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -31,12 +33,7 @@
 	});
 
 	function speak(text: string) {
-		if (!('speechSynthesis' in window)) return;
-		window.speechSynthesis.cancel();
-		const u = new SpeechSynthesisUtterance(text);
-		u.lang = 'ja-JP';
-		u.rate = 0.9;
-		window.speechSynthesis.speak(u);
+		speakJapanese(text);
 	}
 
 	async function next(gotIt: boolean) {
@@ -114,9 +111,15 @@
 		<div style="width:44px;"></div>
 	</div>
 
-	{#if card}
+	{#if data.cards.length === 0}
+		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+			<div style="font-size:48px;margin-bottom:16px;">📭</div>
+			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
+			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
+		</div>
+	{:else if card}
 		<div
-			style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:32px;"
+			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 24px 40px;gap:32px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
 			<!-- Card with 3D flip -->
 			<div
@@ -161,12 +164,34 @@
 						>
 							{$locale === 'es' ? card.es : card.en}
 						</div>
-						<div class="romaji" style="margin-top:8px;">{card.romaji}</div>
+						{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+							<div class="romaji" style="margin-top:8px;">{card.romaji}</div>
+						{/if}
 						<div
-							style="margin-top:20px;padding-top:20px;border-top:1px solid var(--ink-200);width:80%;text-align:center;"
+							style="margin-top:20px;padding-top:20px;border-top:1px solid var(--ink-200);width:90%;text-align:center;position:relative;"
 						>
-							<div class="jp" style="font-size:16px;">{card.example}</div>
-							<div style="font-size:12px;color:var(--fg-tertiary);margin-top:4px;">
+							<div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+								<div class="jp" style="font-size:17px;line-height:1.4;">{card.example}</div>
+								<button
+									onclick={(e) => {
+										e.stopPropagation();
+										speak(card.example);
+									}}
+									style="width:28px;height:28px;border-radius:50%;border:1px solid var(--ink-100);
+										   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
+										   justify-content:center;font-size:12px;color:var(--fg-tertiary);flex-shrink:0;"
+								>
+									🔊
+								</button>
+							</div>
+							
+							{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+								<div style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;font-weight:600;letter-spacing:0.02em;">
+									{card.example_romaji || card.extra?.example_romaji || ''}
+								</div>
+							{/if}
+
+							<div style="font-size:13px;color:var(--fg-secondary);margin-top:6px;line-height:1.4;">
 								{$locale === 'es' ? card.example_es : card.example_en}
 							</div>
 						</div>

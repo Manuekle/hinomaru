@@ -99,6 +99,7 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: env(safe-area-inset-top);
+		touch-action: none;
 	}
 
 	.progress-wrapper {
@@ -112,7 +113,7 @@
 
 	.progress-bar {
 		height: 100%;
-		background: var(--sumi);
+		background: var(--hinomaru-red);
 		transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
@@ -120,6 +121,6 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		overflow-y: auto;
+		overflow: hidden;
 	}
 </style>

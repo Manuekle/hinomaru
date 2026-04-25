@@ -2,6 +2,8 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { FavouriteIcon, Mortarboard01Icon, VoiceIcon, FireIcon, Notification03Icon, Tick01Icon } from '@hugeicons/core-free-icons';
 
 	let { selections, onComplete } = $props();
 
@@ -9,27 +11,27 @@
 		{ 
 			label: t('onboarding.summary.motivation', $locale), 
 			value: selections.motivation ? t(`onboarding.motivation.${selections.motivation}`, $locale) : '...', 
-			icon: '❤️' 
+			icon: FavouriteIcon 
 		},
 		{ 
 			label: t('onboarding.summary.level', $locale), 
 			value: selections.experience ? t(`onboarding.experience.${selections.experience}`, $locale) : '...', 
-			icon: '🎓' 
+			icon: Mortarboard01Icon 
 		},
 		{ 
 			label: t('onboarding.summary.voice', $locale), 
 			value: selections.voice === 'kaito' ? t('onboarding.voice.kaito.name', $locale) : t('onboarding.voice.standard.name', $locale), 
-			icon: '〰️' 
+			icon: VoiceIcon 
 		},
 		{ 
 			label: t('onboarding.summary.goal', $locale), 
 			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }), 
-			icon: '🔥' 
+			icon: FireIcon 
 		},
 		{ 
 			label: t('onboarding.summary.notifications', $locale), 
 			value: t('onboarding.summary.enabled', $locale), 
-			icon: '🔔' 
+			icon: Notification03Icon 
 		}
 	]);
 </script>
@@ -43,16 +45,14 @@
 		{#each items as item, i}
 			<div class="summary-item" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
-					<span class="icon">{item.icon}</span>
+					<span class="icon"><Icon icon={item.icon} size={24} color="var(--bg-surface)" /></span>
 				</div>
 				<div class="text">
 					<div class="label">{item.label}</div>
 					<div class="value">{item.value}</div>
 				</div>
 				<div class="checkmark">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d5b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-						<polyline points="20 6 9 17 4 12"></polyline>
-					</svg>
+					<Icon icon={Tick01Icon} size={20} class="check-icon" strokeWidth={3} />
 				</div>
 			</div>
 		{/each}
@@ -100,7 +100,7 @@
 	.icon-box {
 		width: 48px;
 		height: 48px;
-		background: #1a1a1a;
+		background: var(--sumi);
 		border-radius: 14px;
 		display: flex;
 		align-items: center;
@@ -133,11 +133,15 @@
 	.checkmark {
 		width: 24px;
 		height: 24px;
-		background: #e9f3ee;
+		background: var(--success-wash);
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.check-icon {
+		stroke: var(--success);
 	}
 
 	.footer {

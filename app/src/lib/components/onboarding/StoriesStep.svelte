@@ -2,6 +2,8 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { PencilEdit01Icon, BrainIcon, ChartUpIcon, BookOpen01Icon } from '@hugeicons/core-free-icons';
 
 	let { onNext } = $props();
 
@@ -9,17 +11,17 @@
 		{ 
 			title: t('onboarding.stories.p1.title', $locale), 
 			desc: t('onboarding.stories.p1.desc', $locale), 
-			icon: '📝' 
+			icon: PencilEdit01Icon 
 		},
 		{ 
 			title: t('onboarding.stories.p2.title', $locale), 
 			desc: t('onboarding.stories.p2.desc', $locale), 
-			icon: '🧠' 
+			icon: BrainIcon 
 		},
 		{ 
 			title: t('onboarding.stories.p3.title', $locale), 
 			desc: t('onboarding.stories.p3.desc', $locale), 
-			icon: '📈' 
+			icon: ChartUpIcon 
 		}
 	]);
 
@@ -45,7 +47,7 @@
 	<div class="preview-card" use:fadeUp={{ delay: 0.1, y: 20 }}>
 		<div class="story-header">
 			<div class="story-title-row">
-				<span class="icon">📖</span>
+				<span class="icon"><Icon icon={BookOpen01Icon} size={20} /></span>
 				<span class="story-title">{story.title}</span>
 			</div>
 			<span class="level-pill">N5</span>
@@ -67,7 +69,7 @@
 		{#each points as point, i}
 			<div class="point-item" use:fadeUp={{ delay: 0.2 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
-					<span class="icon-small">{point.icon}</span>
+					<span class="icon-small"><Icon icon={point.icon} size={20} /></span>
 				</div>
 				<div class="text">
 					<h4 class="point-title">{point.title}</h4>
@@ -137,7 +139,7 @@
 
 	.level-pill {
 		background: var(--sumi);
-		color: white;
+		color: var(--bg-surface);
 		font-size: 11px;
 		font-weight: 800;
 		padding: 2px 8px;
@@ -211,6 +213,7 @@
 
 	.icon-small {
 		font-size: 18px;
+		color: var(--bg-surface);
 	}
 
 	.text {

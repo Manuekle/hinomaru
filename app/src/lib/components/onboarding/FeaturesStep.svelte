@@ -9,32 +9,27 @@
 		{
 			title: t('onboarding.features.write.title', $locale),
 			desc: t('onboarding.features.write.desc', $locale),
-			icon: '✍️',
-			color: '#1a1a1a'
+			icon: '✍️'
 		},
 		{
 			title: t('onboarding.features.srs.title', $locale),
 			desc: t('onboarding.features.srs.desc', $locale),
-			icon: '🎴',
-			color: '#1a1a1a'
+			icon: '🎴'
 		},
 		{
 			title: t('onboarding.features.decks.title', $locale),
 			desc: t('onboarding.features.decks.desc', $locale),
-			icon: '📚',
-			color: '#1a1a1a'
+			icon: '📚'
 		},
 		{
 			title: t('onboarding.features.grammar.title', $locale),
 			desc: t('onboarding.features.grammar.desc', $locale),
-			icon: '📖',
-			color: '#1a1a1a'
+			icon: '📖'
 		},
 		{
 			title: t('onboarding.features.stories.title', $locale),
 			desc: t('onboarding.features.stories.desc', $locale),
-			icon: '📰',
-			color: '#1a1a1a'
+			icon: '📰'
 		}
 	]);
 </script>
@@ -48,7 +43,7 @@
 	<div class="features-list">
 		{#each features as feature, i}
 			<div class="feature-item" use:fadeUp={{ delay: 0.1 + i * 0.05, y: 12 }}>
-				<div class="icon-box" style="background: {feature.color}">
+				<div class="icon-box">
 					<span class="icon">{feature.icon}</span>
 				</div>
 				<div class="text-content">
@@ -111,6 +106,7 @@
 		width: 48px;
 		height: 48px;
 		min-width: 48px;
+		background: var(--sumi);
 		border-radius: 12px;
 		display: flex;
 		align-items: center;

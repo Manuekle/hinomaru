@@ -2,6 +2,8 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { Tick01Icon } from '@hugeicons/core-free-icons';
 
 	let { onSelect } = $props();
 
@@ -107,7 +109,9 @@
 				</button>
 
 				{#if selected === voice.id}
-					<div class="check" aria-label="Selected">✓</div>
+					<div class="check" aria-label="Selected">
+						<Icon icon={Tick01Icon} size={20} strokeWidth={3} />
+					</div>
 				{/if}
 			</div>
 		{/each}
@@ -166,14 +170,18 @@
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		border-radius: 20px;
-		transition: background 0.2s ease, border-color 0.2s ease;
+		transition: all 0.2s var(--ease-brand);
 		position: relative;
+		cursor: pointer;
+	}
+	.voice-card:active {
+		transform: scale(0.98);
 	}
 
 	.voice-card.selected {
 		background: var(--sumi);
 		border-color: var(--sumi);
-		color: white;
+		color: var(--bg-surface);
 	}
 
 	/* Play button */
@@ -210,7 +218,7 @@
 	}
 
 	.selected .play-icon {
-		color: white;
+		color: var(--bg-surface);
 	}
 
 	/* Voice selector button — fills space and triggers selection */
@@ -241,7 +249,7 @@
 	}
 
 	.selected .voice-desc {
-		color: rgba(255, 255, 255, 0.6);
+		color: color-mix(in srgb, var(--bg-surface) 60%, transparent);
 	}
 
 	.check {

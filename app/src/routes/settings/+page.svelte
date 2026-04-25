@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { theme, type ThemeType } from '$lib/stores/theme';
+	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
 	import { goto, invalidate } from '$app/navigation';
@@ -129,6 +130,28 @@
 				>
 					<span style="display:block;margin-bottom:4px;font-size:18px;">🌙</span>
 					{t('settings.theme.dark', $locale)}
+				</button>
+			</div>
+		</section>
+
+		<!-- Romaji Section -->
+		<section>
+			<div
+				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;"
+			>
+				<div style="display:flex;align-items:center;gap:12px;">
+					<span style="font-size:18px;">🔤</span>
+					<span style="font-weight:600;color:var(--sumi);font-size:15px;"
+						>{t('settings.showRomaji', $locale)}</span
+					>
+				</div>
+				<button 
+					onclick={() => showRomaji.toggle()}
+					style="width:48px;height:26px;background:{$showRomaji ? 'var(--hinomaru-red)' : 'var(--ink-200)'};border-radius:13px;border:none;position:relative;cursor:pointer;transition:background 200ms ease;"
+				>
+					<div 
+						style="width:20px;height:20px;background:white;border-radius:50%;position:absolute;top:3px;left:{$showRomaji ? '25px' : '3px'};transition:left 200ms cubic-bezier(0.22, 1, 0.36, 1);box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+					></div>
 				</button>
 			</div>
 		</section>

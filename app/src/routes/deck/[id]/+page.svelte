@@ -19,7 +19,9 @@
 		},
 		{ id: 'quiz', titleKey: 'mode.quiz.title', descKey: 'mode.quiz.desc', icon: '✓' },
 		{ id: 'type', titleKey: 'mode.type.title', descKey: 'mode.type.desc', icon: 'T' },
-		{ id: 'write', titleKey: 'mode.write.title', descKey: 'mode.write.desc', icon: '✍️' }
+		{ id: 'write', titleKey: 'mode.write.title', descKey: 'mode.write.desc', icon: '✍️' },
+		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: '🧩' },
+		{ id: 'stories/today', titleKey: 'stories.today', descKey: 'stories.subtitle', icon: '📖' }
 	];
 </script>
 
@@ -80,7 +82,7 @@
 	>
 		{#each modes as mode (mode.id)}
 			<a
-				href="/deck/{deck.id}/{mode.id}"
+				href={mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`}
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:18px;
                cursor:pointer;display:flex;align-items:center;gap:16px;
                text-decoration:none;color:inherit;

@@ -3,6 +3,8 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
 	let deferredPrompt = $state<any>(null);
 	let showPrompt = $state(false);
@@ -62,11 +64,11 @@
 	>
 		<div style="display:flex; gap:12px; align-items:center;">
 			<div
-				style="width:44px; height:44px; background:var(--hinomaru-red); border-radius:12px; 
+				style="width:44px; height:44px; background:#ffffff; border-radius:12px; 
                        display:flex; align-items:center; justify-content:center; flex-shrink:0;
-                       box-shadow: 0 4px 12px rgba(188,0,45,0.2);"
+                       box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
 			>
-				<span style="width:14px; height:14px; background:white; border-radius:50%;"></span>
+				<span style="width:18px; height:18px; background:#bc002d; border-radius:50%;"></span>
 			</div>
 			<div>
 				<div style="font-weight:700; font-size:15px; line-height:1.2;">{t('pwa.install.title', $locale)}</div>
@@ -106,10 +108,7 @@
                     e.currentTarget.style.color = 'var(--fg-tertiary)';
                 }}
 			>
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+				<Icon icon={Cancel01Icon} size={14} strokeWidth={2.5} />
 			</button>
 		</div>
 	</div>

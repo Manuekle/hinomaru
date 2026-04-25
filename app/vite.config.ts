@@ -37,5 +37,8 @@ export default defineConfig({
 				]
 			}
 		})
-	]
+	],
+	ssr: {
+		noExternal: ['@hugeicons/svelte']
+	}
 });

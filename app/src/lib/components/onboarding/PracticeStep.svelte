@@ -1,132 +1,199 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
-	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { Eraser01Icon, Loading03Icon } from '@hugeicons/core-free-icons';
 
 	let { onNext } = $props();
 
-	let container = $state<HTMLDivElement | null>(null);
-	let cardEl = $state<HTMLDivElement | null>(null);
-	let writer: any = null; // Removed $state to prevent Proxy issues with HanziWriter
+	let hanziContainer = $state<HTMLDivElement | null>(null);
+
+	// Plain vars — NOT $state, to avoid Svelte 5 Proxy wrapping HanziWriter internals
+	let writer: any = null;
+	let setupIteration = 0;
+
 	let completed = $state(false);
-	let loading = $state(true);
-	let loadError = $state(false);
+	let loadingWriters = $state(true);
 
-	onMount(async () => {
-		const hwModule = await import('hanzi-writer');
-		const HanziWriter = hwModule.default || hwModule;
-		
-		if (!container) return;
-		await tick(); // Ensure DOM and styles are fully applied
+	// 一 = "ichi" (one) — simplest kanji, 1 stroke
+	const char = '一';
 
-		// Ensure we don't pass negative dimensions if layout hasn't painted yet
-		let w = cardEl?.clientWidth || 320;
-		if (w === 0) w = 320; // fallback if display is not ready
-		const cardSize = Math.max(200, Math.min(w - 60, 280));
-
-		const char = '山';
-		try {
-			const res = await fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data-jp@0.1.8/${encodeURIComponent(char)}.json`);
-			if (!res.ok) throw new Error('Failed to load stroke data');
-			const data = await res.json();
-
-			writer = HanziWriter.create(container, char, {
-				width: cardSize,
-				height: cardSize,
-				padding: Math.round(cardSize * 0.1),
-				strokeColor: '#BC002D',
-				highlightColor: '#FF6B6B',
-				drawingColor: '#1a1a1a',
-				showOutline: true,
-				outlineColor: 'rgba(0,0,0,0.08)',
-				drawingWidth: Math.round(cardSize * 0.07),
-				charDataLoader: () => Promise.resolve(data)
-			});
-
-			loading = false;
-
-			// Wait a bit to ensure SVG is painted and not hidden before attaching quiz events
-			setTimeout(() => {
-				if (writer) {
-					writer.quiz({
-						onComplete: () => {
-							completed = true;
-						}
-					});
-				}
-			}, 100);
-		} catch (err) {
-			console.error('HanziWriter error:', err);
-			loading = false;
-			loadError = true;
-			// Let user continue if stroke data fails to load
-			completed = true;
+	$effect(() => {
+		if (hanziContainer) {
+			setupWriters();
 		}
 	});
 
-	function handleContinue() {
-		if (completed) onNext();
+	async function setupWriters() {
+		const iteration = ++setupIteration;
+		loadingWriters = true;
+		writer = null;
+
+		if (hanziContainer) hanziContainer.innerHTML = '';
+
+		let HanziWriter: any;
+		try {
+			const mod = await import('hanzi-writer');
+			HanziWriter = mod.default ?? mod;
+		} catch {
+			completed = true;
+			loadingWriters = false;
+			return;
+		}
+
+		if (iteration !== setupIteration || !hanziContainer) return;
+
+		// Use the container's actual rendered width
+		await new Promise((r) => requestAnimationFrame(r));
+		if (iteration !== setupIteration || !hanziContainer) return;
+
+		const containerW = hanziContainer.clientWidth || 280;
+		const boxSize = Math.min(containerW, 280);
+
+		let charData: any = null;
+		try {
+			const res = await fetch(
+				`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`
+			);
+			if (res.ok) charData = await res.json();
+		} catch {
+			/* fallback: let it render without outline */
+		}
+
+		if (iteration !== setupIteration || !hanziContainer) return;
+
+		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+		// Inject the box exactly like deck/[id]/write does
+		const box = document.createElement('div');
+		box.style.cssText = [
+			`width:${boxSize}px`,
+			`height:${boxSize}px`,
+			'position:relative',
+			'display:flex',
+			'align-items:center',
+			'justify-content:center',
+			`font-size:${boxSize * 0.6}px`,
+			'color:var(--sumi)',
+			'background:var(--ink-100)',
+			'border:2px dashed var(--ink-200)',
+			'border-radius:16px',
+			'overflow:hidden',
+			'cursor:crosshair'
+		].join(';');
+
+		// Grid lines
+		const hLine = document.createElement('div');
+		hLine.style.cssText = 'position:absolute;top:50%;left:0;right:0;height:1px;background:var(--ink-300);pointer-events:none;';
+		const vLine = document.createElement('div');
+		vLine.style.cssText = 'position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink-300);pointer-events:none;';
+		box.appendChild(hLine);
+		box.appendChild(vLine);
+
+		if (charData) {
+			const writerEl = document.createElement('div');
+			writerEl.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;';
+			box.appendChild(writerEl);
+
+			writer = HanziWriter.create(writerEl, char, {
+				width: boxSize,
+				height: boxSize,
+				padding: boxSize * 0.12,
+				strokeColor: isDark ? '#ff6b8b' : '#BC002D', // Use red-ink color in dark mode for better visibility
+				highlightColor: '#FF6B6B',
+				drawingColor: isDark ? '#f2f2f1' : '#1A1A1A', // Match --sumi
+				showOutline: true,
+				outlineColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.10)',
+				drawingWidth: boxSize * 0.07,
+				charDataLoader: () => Promise.resolve(charData)
+			});
+
+			// Mark active with red border, start quiz
+			box.style.borderColor = 'var(--hinomaru-red)';
+			writer.quiz({
+				onComplete: () => {
+					box.style.borderColor = 'var(--success)';
+					completed = true;
+				}
+			});
+		} else {
+			// Fallback: show static character
+			const span = document.createElement('span');
+			span.textContent = char;
+			span.className = 'jp';
+			span.style.zIndex = '1';
+			box.appendChild(span);
+			completed = true;
+		}
+
+		hanziContainer.appendChild(box);
+		loadingWriters = false;
 	}
 
-	function skipStep() {
-		onNext();
+	function clearCanvas() {
+		if (!writer) return;
+		writer.cancelQuiz();
+		const box = hanziContainer?.querySelector('div') as HTMLDivElement | null;
+		if (box) box.style.borderColor = 'var(--hinomaru-red)';
+		writer.quiz({
+			onComplete: () => {
+				if (box) box.style.borderColor = 'var(--success)';
+				completed = true;
+			}
+		});
 	}
 </script>
 
 <div class="step-content">
-	<header class="header" use:fadeUp={{ delay: 0, y: 16 }}>
+	<!-- Header -->
+	<header class="header">
 		<h1 class="title">{t('onboarding.practice.title', $locale)}</h1>
 		<p class="subtitle">{t('onboarding.practice.subtitle', $locale)}</p>
 	</header>
 
-	<div class="canvas-wrapper" use:fadeUp={{ delay: 0.1, y: 20 }}>
-		<div class="canvas-card" bind:this={cardEl}>
-			<div class="meta">{t('onboarding.practice.strokes', $locale, { n: 3 })}</div>
-			<div class="grid-overlay">
-				<div class="line h"></div>
-				<div class="line v"></div>
-				<div class="line d1"></div>
-				<div class="line d2"></div>
+	<!-- Canvas area -->
+	<div class="canvas-area">
+		<!-- Character hint above the box -->
+		<div class="char-hint">
+			<span class="char-label">{t('session.writeThis', $locale)}</span>
+			<span class="char-name">{t('onboarding.practice.one', $locale)}</span>
+			<span class="char-romaji">ichi • いち</span>
+		</div>
+
+		<!-- The writing card — matches write page visual -->
+		<div class="writing-card">
+			<!-- Controls -->
+			<div class="card-controls">
+				<button class="clear-btn" onclick={clearCanvas} aria-label="Clear strokes">
+					<Icon icon={Eraser01Icon} size={14} strokeWidth={2.5} />
+				</button>
 			</div>
-			
-			{#if loading}
+
+			<!-- Loading spinner -->
+			{#if loadingWriters}
 				<div class="loading-state">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
-						<path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-					</svg>
+					<Icon icon={Loading03Icon} size={20} strokeWidth={2} style="animation:spin 1s linear infinite;" />
 				</div>
 			{/if}
 
-			{#if loadError}
-				<div class="error-state jp" style="font-size: 80px; color: var(--fg-tertiary);">山</div>
-			{/if}
-			
-			<div bind:this={container} class="writer-container" style={loadError ? 'display:none;' : ''}></div>
-			<div class="meaning">{t('onboarding.practice.mountain', $locale)}</div>
+			<!-- HanziWriter canvas injected here -->
+			<div bind:this={hanziContainer} class="hanzi-host"></div>
 		</div>
+
+		{#if !loadingWriters && !completed}
+			<p class="tip">{t('onboarding.practice.tip', $locale)}</p>
+		{/if}
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.3, y: 10 }}>
-		{#if !completed}
-			<div style="text-align:center;margin-bottom:12px;">
-				<button
-					class="hm-btn hm-btn-ghost"
-					style="font-size:13px;color:var(--fg-tertiary);height:36px;"
-					onclick={skipStep}
-				>
-					{t('onboarding.continue', $locale)} →
-				</button>
-			</div>
-		{/if}
-		<button 
+	<!-- Footer -->
+	<footer class="footer">
+		<button
 			class="hm-btn hm-btn-full hm-btn-lg"
 			class:hm-btn-dark={completed}
 			class:btn-muted={!completed}
-			disabled={!completed}
-			onclick={handleContinue}
+			onclick={() => onNext()}
 		>
-			{completed ? t('onboarding.continue', $locale) : t('session.finishDrawing', $locale)}
+			{t('onboarding.continue', $locale)}
 		</button>
 	</footer>
 </div>
@@ -136,129 +203,165 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 32px 24px 24px;
+		padding: 24px 24px 0;
+		/* Ensure ALL touch goes to HanziWriter, not browser scroll */
+		touch-action: none;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 
 	.header {
 		text-align: center;
-		margin-bottom: 24px;
+		margin-bottom: 20px;
+		flex-shrink: 0;
 	}
 
 	.title {
-		font-size: clamp(24px, 6vw, 32px);
+		font-size: clamp(22px, 5.5vw, 30px);
 		font-weight: 800;
 		letter-spacing: -0.04em;
-		margin: 0 0 8px;
+		margin: 0 0 6px;
+		color: var(--sumi);
 	}
 
 	.subtitle {
-		font-size: 16px;
+		font-size: 15px;
 		color: var(--fg-secondary);
 		margin: 0;
+		line-height: 1.4;
 	}
 
-	.canvas-wrapper {
+	/* ── Canvas area ───────────────────────────────── */
+	.canvas-area {
 		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 0;
-	}
-
-	.canvas-card {
-		width: min(100%, 320px);
-		aspect-ratio: 1;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 32px;
-		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		box-shadow: var(--shadow-md);
-		overflow: hidden;
+		gap: 12px;
+		min-height: 0;
 	}
 
-	.meta {
-		position: absolute;
-		top: 16px;
+	.char-hint {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+	}
+
+	.char-label {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--fg-tertiary);
+	}
+
+	.char-name {
+		font-size: 28px;
+		font-weight: 800;
+		color: var(--sumi);
+		font-family: var(--font-jp), serif;
+		line-height: 1;
+	}
+
+	.char-romaji {
 		font-size: 13px;
 		color: var(--fg-tertiary);
-		font-weight: 600;
 	}
 
-	.meaning {
+	.writing-card {
+		position: relative;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 24px;
+		padding: 20px;
+		box-shadow: var(--shadow-md);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		/* Critical: touch-action none on the card too */
+		touch-action: none;
+	}
+
+	.card-controls {
 		position: absolute;
-		bottom: 20px;
-		font-size: 16px;
-		font-weight: 600;
-		color: var(--fg-primary);
+		top: 14px;
+		right: 14px;
+		z-index: 10;
 	}
 
-	.writer-container {
+	.clear-btn {
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: var(--fg-secondary);
+		transition: color 150ms, border-color 150ms;
+	}
+	.clear-btn:hover {
+		color: var(--sumi);
+		border-color: var(--ink-400);
+	}
+
+	.loading-state {
 		position: absolute;
 		inset: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 5;
-		touch-action: none;
-		cursor: crosshair;
-	}
-
-	.writer-container :global(svg) {
-		pointer-events: auto;
-		touch-action: none;
-	}
-
-	.writer-container.hidden {
-		visibility: hidden;
-	}
-
-	.loading-state {
-		position: absolute;
-		font-size: 14px;
 		color: var(--fg-tertiary);
+	}
+
+	.hanzi-host {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		justify-content: center;
+		/* Absolutely critical for touch recognition */
+		touch-action: none;
 	}
 
-	.error-state {
-		position: absolute;
-		opacity: 0.15;
+	/* Force SVG inside the host to also accept touch */
+	.hanzi-host :global(svg) {
+		touch-action: none;
+		pointer-events: auto;
 	}
 
-	.grid-overlay {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-		opacity: 0.4;
+	.tip {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		text-align: center;
+		margin: 0;
 	}
 
-	.line {
-		position: absolute;
-		background: var(--ink-200);
+	/* ── Footer ───────────────────────────────────── */
+	.footer {
+		flex-shrink: 0;
+		padding: 16px 0 calc(16px + env(safe-area-inset-bottom));
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
 	}
 
-	.line.h { top: 50%; left: 0; right: 0; height: 1px; border-top: 1px dashed var(--ink-300); background: none; }
-	.line.v { left: 50%; top: 0; bottom: 0; width: 1px; border-left: 1px dashed var(--ink-300); background: none; }
-	.line.d1 { top: 50%; left: 50%; width: 142%; height: 1px; border-top: 1px dashed var(--ink-200); background: none; transform: translate(-50%, -50%) rotate(45deg); }
-	.line.d2 { top: 50%; left: 50%; width: 142%; height: 1px; border-top: 1px dashed var(--ink-200); background: none; transform: translate(-50%, -50%) rotate(-45deg); }
+	.skip-link {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		height: 36px;
+	}
 
 	.btn-muted {
 		background: var(--ink-100);
 		color: var(--fg-tertiary);
 		cursor: not-allowed;
-	}
-
-	.footer {
-		margin-top: 16px;
-		padding-bottom: env(safe-area-inset-bottom);
+		opacity: 0.8; /* Increased opacity for better readability in dark mode */
 	}
 
 	@keyframes spin {
-		100% { transform: rotate(360deg); }
+		to { transform: rotate(360deg); }
 	}
 </style>

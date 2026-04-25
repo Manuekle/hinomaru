@@ -8,25 +8,28 @@
 	const supabase = createClient();
 
 	async function handleFinish() {
-		const { data: { user } } = await supabase.auth.getUser();
-		if (user) {
-			try {
-				// Save onboarding completion and preferences
+		console.log('ONBOARDING: Finalizing...');
+		
+		// 1. Mark as completed in localStorage immediately (optimistic)
+		localStorage.setItem('hinomaru_onboarding_completed', 'true');
+
+		try {
+			// 2. Perform database updates in the background or parallel
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
 				await supabase.from('profiles').upsert({
 					id: user.id,
 					onboarding_completed: true,
 					updated_at: new Date().toISOString()
 				});
-			} catch (e) {
-				console.error('Failed to save profile to database, using fallback:', e);
 			}
+		} catch (e) {
+			console.error('Failed to save profile to database:', e);
+		} finally {
+			// 3. Always navigate, even if DB fails
+			console.log('ONBOARDING: Navigating to home');
+			goto('/', { replaceState: true });
 		}
-		
-		// Fallback for local persistence
-		localStorage.setItem('hinomaru_onboarding_completed', 'true');
-		
-		// Navigate to home
-		goto('/', { replaceState: true });
 	}
 </script>
 

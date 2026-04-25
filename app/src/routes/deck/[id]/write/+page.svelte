@@ -2,14 +2,16 @@
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { theme } from '$lib/stores/theme';
+	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
+	import { speakJapanese } from '$lib/utils/tts';
 	import { animate } from 'motion/mini';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
-	let quizCards = $state([...(data.cards as { jp: string; en: string; es?: string; romaji: string }[])]);
+	let quizCards = $state([...(data.cards as any[])]);
 	const supabase = createClient();
 
 	let i = $state(0);
@@ -78,12 +80,14 @@
 				try {
 					let res;
 					if (code >= 0x3040 && code <= 0x30ff) {
+						// Hiragana / Katakana → kana-json CDN
 						res = await fetch(
 							`https://raw.githubusercontent.com/ailectra/kana-json/main/data/${encodeURIComponent(char)}.json`
 						);
 					} else {
+						// Kanji (CJK) → official hanzi-writer-data package
 						res = await fetch(
-							`https://cdn.jsdelivr.net/npm/hanzi-writer-data-jp@0.1.8/${encodeURIComponent(char)}.json`
+							`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`
 						);
 					}
 					if (res.ok) return { char, data: await res.json() };
@@ -304,11 +308,7 @@
 	}
 
 	function playAudio() {
-		if (!card?.jp) return;
-		const utterance = new SpeechSynthesisUtterance(card.jp);
-		utterance.lang = 'ja-JP';
-		utterance.rate = 0.85;
-		window.speechSynthesis.speak(utterance);
+		speakJapanese(card?.jp ?? '');
 	}
 </script>
 
@@ -337,7 +337,13 @@
 		<div style="width:44px;"></div>
 	</div>
 
-	{#if card}
+	{#if quizCards.length === 0}
+		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+			<div style="font-size:48px;margin-bottom:16px;">📭</div>
+			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
+			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark" style="text-decoration:none;">{t('deck.back', $locale)}</a>
+		</div>
+	{:else if card}
 		<div
 			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 24px 32px;gap:24px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
@@ -383,9 +389,11 @@
 					</button>
 				</div>
 
-				<div style="font-size:16px;color:var(--fg-tertiary);margin-bottom:24px;">
-					{card.romaji}
-				</div>
+				{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+					<div style="font-size:16px;color:var(--fg-tertiary);margin-bottom:24px;">
+						{card.romaji}
+					</div>
+				{/if}
 
 				<div
 					style="position:relative;width:100%;background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:24px;box-sizing:border-box;touch-action:none;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:center;min-height:240px;"
@@ -452,6 +460,35 @@
 					>
 						<!-- Writers injected here -->
 					</div>
+
+					{#if checked && card.example}
+						<div 
+							style="margin-top:24px;padding:16px;border-radius:16px;background:var(--ink-100);
+								   border:1px solid var(--ink-200);width:100%;display:flex;flex-direction:column;gap:8px;"
+						>
+							<div style="display:flex;align-items:flex-start;gap:8px;">
+								<div style="flex:1;">
+									<div class="jp" style="font-size:15px;line-height:1.4;color:var(--sumi);">{card.example}</div>
+									{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+										<div style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.7;margin-top:2px;font-weight:600;">
+											{card.example_romaji || card.extra?.example_romaji || ''}
+										</div>
+									{/if}
+									<div style="font-size:12px;color:var(--fg-secondary);margin-top:4px;">
+										{$locale === 'es' ? card.example_es : card.example_en}
+									</div>
+								</div>
+								<button
+									onclick={() => speakJapanese(card.example)}
+									style="width:28px;height:28px;border-radius:50%;border:1px solid var(--ink-200);
+										   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
+										   justify-content:center;font-size:12px;color:var(--fg-tertiary);flex-shrink:0;"
+								>
+									🔊
+								</button>
+							</div>
+						</div>
+					{/if}
 				</div>
 			</div>
 

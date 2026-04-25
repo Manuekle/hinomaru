@@ -36,6 +36,32 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.eq('user_id', user?.id ?? '')
 		.gte('created_at', new Date(Date.now() - 14 * 86400000).toISOString());
 
+	// Historia del día — la más reciente con publish_date <= hoy
+	const today = new Date().toISOString().split('T')[0];
+	let todayStory: any = null;
+	let storyRead = false;
+
+	if (user) {
+		const { data: story } = await locals.supabase
+			.from('stories')
+			.select('id, level, title_en, title_es, body_jp, publish_date')
+			.lte('publish_date', today)
+			.order('publish_date', { ascending: false })
+			.limit(1)
+			.single();
+
+		if (story) {
+			todayStory = story;
+			const { data: readRow } = await locals.supabase
+				.from('user_story_reads')
+				.select('id')
+				.eq('user_id', user.id)
+				.eq('story_id', story.id)
+				.maybeSingle();
+			storyRead = !!readRow;
+		}
+	}
+
 	return {
 		user,
 		decks: (decks ?? []).map((d: any) => ({
@@ -43,6 +69,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 			learned: learnedByDeck[d.id] ?? 0,
 			due: dueByDeck[d.id] ?? 0
 		})),
-		streak: streakDays ?? 0
+		streak: streakDays ?? 0,
+		todayStory,
+		storyRead
 	};
 };
+

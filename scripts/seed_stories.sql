@@ -1,0 +1,76 @@
+-- Stories Seed Data
+INSERT INTO stories (level, title_en, title_es, body_jp, body_en, body_es, publish_date, vocab, quiz) VALUES
+
+('N5', 'At the Supermarket', 'En el supermercado',
+'今日、スーパーに行きました。りんごとパンとぎゅうにゅうを買いました。レジで「ありがとうございます」と言いました。',
+'Today I went to the supermarket. I bought apples, bread, and milk. At the checkout I said "thank you".',
+'Hoy fui al supermercado. Compré manzanas, pan y leche. En la caja dije "gracias".',
+'2026-04-25',
+'[{"jp":"スーパー","kana":"スーパー","en":"supermarket","es":"supermercado"},{"jp":"りんご","kana":"りんご","en":"apple","es":"manzana"},{"jp":"パン","kana":"パン","en":"bread","es":"pan"},{"jp":"ぎゅうにゅう","kana":"ぎゅうにゅう","en":"milk","es":"leche"},{"jp":"レジ","kana":"レジ","en":"checkout / cash register","es":"caja registradora"}]'::jsonb,
+'[{"q":"What did the narrator buy?","o":["Oranges, cake, juice","Apples, bread, milk","Rice, fish, tea","Eggs, butter, jam"],"a":1},{"q":"Where did this story take place?","o":["School","Hospital","Supermarket","Park"],"a":2},{"q":"What did the narrator say at the checkout?","o":["Sumimasen","Ohayou","Arigatou gozaimasu","Sayounara"],"a":2}]'::jsonb),
+
+('N5', 'My Family', 'Mi familia',
+'わたしのかぞくは四人です。ちちとははとあにとわたしです。ちちはかいしゃいんです。はははせんせいです。あにはだいがくせいです。',
+'My family has four people. There is my father, mother, older brother, and me. My father is a company employee. My mother is a teacher. My brother is a university student.',
+'Mi familia tiene cuatro personas. Están mi padre, mi madre, mi hermano mayor y yo. Mi padre es empleado de empresa. Mi madre es maestra. Mi hermano es estudiante universitario.',
+'2026-04-26',
+'[{"jp":"かぞく","kana":"かぞく","en":"family","es":"familia"},{"jp":"ちち","kana":"ちち","en":"father (my)","es":"padre (mío)"},{"jp":"はは","kana":"はは","en":"mother (my)","es":"madre (mía)"},{"jp":"あに","kana":"あに","en":"older brother (my)","es":"hermano mayor (mío)"},{"jp":"かいしゃいん","kana":"かいしゃいん","en":"company employee","es":"empleado de empresa"},{"jp":"せんせい","kana":"せんせい","en":"teacher","es":"maestro/a"}]'::jsonb,
+'[{"q":"How many people are in the narrator''s family?","o":["Three","Four","Five","Two"],"a":1},{"q":"What does the mother do?","o":["Doctor","Chef","Teacher","Office worker"],"a":2},{"q":"What is the older brother?","o":["A high school student","A company employee","A teacher","A university student"],"a":3}]'::jsonb),
+
+('N5', 'My Favorite Season', 'Mi estación favorita',
+'わたしはなつがすきです。うみとおまつりがたのしいです。でも、ふゆもすきです。ゆきがきれいですから。',
+'I like summer. The sea and festivals are fun. But I also like winter. That''s because snow is beautiful.',
+'Me gusta el verano. El mar y los festivales son divertidos. Pero también me gusta el invierno. Eso es porque la nieve es hermosa.',
+'2026-04-27',
+'[{"jp":"なつ","kana":"なつ","en":"summer","es":"verano"},{"jp":"うみ","kana":"うみ","en":"sea / ocean","es":"mar"},{"jp":"おまつり","kana":"おまつり","en":"festival","es":"festival"},{"jp":"ふゆ","kana":"ふゆ","en":"winter","es":"invierno"},{"jp":"ゆき","kana":"ゆき","en":"snow","es":"nieve"},{"jp":"きれい","kana":"きれい","en":"beautiful","es":"hermoso/a"}]'::jsonb,
+'[{"q":"What season does the narrator like most?","o":["Spring","Summer","Autumn","Winter"],"a":1},{"q":"Why does the narrator also like winter?","o":["Because it''s warm","Because snow is beautiful","Because of winter food","Because school is off"],"a":1},{"q":"What two things make summer fun?","o":["Mountains and parks","Sea and festivals","Rain and reading","Food and sports"],"a":0}]'::jsonb),
+
+('N4', 'Lost in Tokyo', 'Perdido en Tokio',
+'先週、東京に行きました。地図を持っていなかったので、道に迷いました。駅員さんに聞いたら、親切に教えてくれました。次は地図を持って行こうと思います。',
+'Last week I went to Tokyo. Since I didn''t have a map, I got lost. When I asked a station employee, they kindly told me the way. Next time I think I''ll bring a map.',
+'La semana pasada fui a Tokio. Como no tenía mapa, me perdí. Cuando le pregunté a un empleado de la estación, me indicó el camino amablemente. La próxima vez llevaré un mapa.',
+'2026-04-28',
+'[{"jp":"地図","kana":"ちず","en":"map","es":"mapa"},{"jp":"道に迷う","kana":"みちにまよう","en":"to get lost","es":"perderse"},{"jp":"駅員","kana":"えきいん","en":"station employee","es":"empleado de estación"},{"jp":"親切に","kana":"しんせつに","en":"kindly","es":"amablemente"},{"jp":"次は","kana":"つぎは","en":"next time","es":"la próxima vez"}]'::jsonb,
+'[{"q":"Why did the narrator get lost?","o":["The map was wrong","They didn''t have a map","They forgot the address","It was dark"],"a":1},{"q":"Who helped the narrator?","o":["A tourist","A police officer","A station employee","A shop owner"],"a":2},{"q":"What will the narrator bring next time?","o":["A phone","A dictionary","A friend","A map"],"a":3}]'::jsonb),
+
+('N4', 'Cooking for the First Time', 'Cocinando por primera vez',
+'昨日、初めて料理を作りました。カレーを作ろうとしましたが、野菜を切るのが難しかったです。味は少し辛かったけど、おいしかったです。また作りたいと思います。',
+'Yesterday I cooked for the first time. I tried to make curry, but cutting the vegetables was difficult. The taste was a little spicy, but it was delicious. I want to make it again.',
+'Ayer cociné por primera vez. Intenté hacer curry, pero cortar las verduras fue difícil. El sabor estaba un poco picante, pero estaba delicioso. Quiero hacerlo de nuevo.',
+'2026-04-29',
+'[{"jp":"初めて","kana":"はじめて","en":"for the first time","es":"por primera vez"},{"jp":"料理","kana":"りょうり","en":"cooking / dish","es":"cocinar / platillo"},{"jp":"カレー","kana":"カレー","en":"curry","es":"curry"},{"jp":"野菜","kana":"やさい","en":"vegetables","es":"verduras"},{"jp":"辛い","kana":"からい","en":"spicy","es":"picante"}]'::jsonb,
+'[{"q":"What did the narrator try to cook?","o":["Sushi","Ramen","Curry","Tempura"],"a":2},{"q":"What was difficult?","o":["Boiling the water","Cutting the vegetables","Buying the ingredients","Timing the cooking"],"a":1},{"q":"How was the taste?","o":["Sour","Salty","Bland","A little spicy but delicious"],"a":3}]'::jsonb),
+
+('N3', 'The Job Interview', 'La entrevista de trabajo',
+'先月、大手企業の面接を受けました。緊張していたので、最初はうまく話せませんでした。しかし、練習してきた自己紹介をしっかり伝えられました。結果は来週わかります。',
+'Last month I had an interview at a major company. Since I was nervous, I couldn''t speak well at first. However, I was able to properly deliver the self-introduction I had practiced. The result will be known next week.',
+'El mes pasado tuve una entrevista en una empresa importante. Como estaba nervioso, al principio no pude hablar bien. Sin embargo, pude dar correctamente la autopresentación que había practicado. El resultado se sabrá la próxima semana.',
+'2026-04-30',
+'[{"jp":"面接","kana":"めんせつ","en":"interview","es":"entrevista"},{"jp":"緊張する","kana":"きんちょうする","en":"to be nervous","es":"estar nervioso"},{"jp":"自己紹介","kana":"じこしょうかい","en":"self-introduction","es":"autopresentación"},{"jp":"結果","kana":"けっか","en":"result","es":"resultado"},{"jp":"大手企業","kana":"おおてきぎょう","en":"major company","es":"empresa importante"}]'::jsonb,
+'[{"q":"When did the interview take place?","o":["Last week","Yesterday","Last month","Today"],"a":2},{"q":"Why couldn''t the narrator speak well at first?","o":["They forgot the words","They were nervous","They were tired","The interviewer was rude"],"a":1},{"q":"When will the narrator know the result?","o":["Today","Tomorrow","Next month","Next week"],"a":3}]'::jsonb),
+
+('N3', 'Studying Abroad', 'Estudiar en el extranjero',
+'大学を卒業したら、海外に留学したいと考えています。特に、フランス語が話せるようになりたいので、フランスに行きたいです。費用が心配ですが、アルバイトをして貯金しています。',
+'After graduating from university, I''m thinking of studying abroad. Especially, since I want to be able to speak French, I want to go to France. I''m worried about the cost, but I''m saving money by working part-time.',
+'Después de graduarme de la universidad, estoy pensando en estudiar en el extranjero. En particular, quiero poder hablar francés, así que quiero ir a Francia. Me preocupa el costo, pero estoy ahorrando dinero trabajando a tiempo parcial.',
+'2026-05-01',
+'[{"jp":"卒業する","kana":"そつぎょうする","en":"to graduate","es":"graduarse"},{"jp":"留学","kana":"りゅうがく","en":"studying abroad","es":"estudiar en el extranjero"},{"jp":"費用","kana":"ひよう","en":"cost / expenses","es":"costo / gastos"},{"jp":"貯金する","kana":"ちょきんする","en":"to save money","es":"ahorrar dinero"},{"jp":"アルバイト","kana":"アルバイト","en":"part-time job","es":"trabajo a tiempo parcial"}]'::jsonb,
+'[{"q":"Where does the narrator want to study abroad?","o":["Germany","Spain","France","Italy"],"a":2},{"q":"What is the narrator worried about?","o":["Language barrier","The cost","Making friends","The weather"],"a":1},{"q":"How is the narrator saving money?","o":["Selling things online","Borrowing from parents","Working part-time","Getting a scholarship"],"a":2}]'::jsonb),
+
+('N2', 'The Aging Society', 'La sociedad envejecida',
+'日本では少子高齢化が深刻な問題になっています。高齢者の割合が増える一方で、生産年齢人口は減少しています。この問題を解決するために、政府はさまざまな政策を検討しています。',
+'In Japan, the declining birthrate and aging population have become a serious problem. While the proportion of elderly people is increasing, the working-age population is decreasing. To solve this problem, the government is considering various policies.',
+'En Japón, la baja tasa de natalidad y el envejecimiento de la población se han convertido en un problema grave. Mientras que la proporción de personas mayores aumenta, la población en edad de trabajar disminuye. Para resolver este problema, el gobierno está considerando diversas políticas.',
+'2026-05-02',
+'[{"jp":"少子高齢化","kana":"しょうしこうれいか","en":"declining birthrate and aging population","es":"baja natalidad y envejecimiento"},{"jp":"高齢者","kana":"こうれいしゃ","en":"elderly person","es":"persona mayor"},{"jp":"生産年齢人口","kana":"せいさんねんれいじんこう","en":"working-age population","es":"población en edad laboral"},{"jp":"減少する","kana":"げんしょうする","en":"to decrease","es":"disminuir"},{"jp":"政策","kana":"せいさく","en":"policy","es":"política (gubernamental)"}]'::jsonb,
+'[{"q":"What is described as a serious problem in Japan?","o":["High unemployment","Declining birthrate and aging population","Low education standards","Environmental pollution"],"a":1},{"q":"What is happening to the working-age population?","o":["Increasing rapidly","Staying the same","Decreasing","Moving overseas"],"a":2},{"q":"What is the government doing about this issue?","o":["Ignoring it","Considering various policies","Asking other countries for help","Building more hospitals"],"a":1}]'::jsonb),
+
+('N1', 'The Philosophy of Impermanence', 'La filosofía de la impermanencia',
+'仏教における「無常」の概念は、すべての存在は変化し続けるという思想である。執着を手放すことによってのみ、人は真の平静を得られるという。現代社会においても、この哲学は精神的な安定を求める人々に影響を与え続けている。',
+'The concept of "impermanence" in Buddhism is the idea that all existence continues to change. It is said that only by releasing attachment can a person attain true peace of mind. Even in modern society, this philosophy continues to influence people seeking spiritual stability.',
+'El concepto de "impermanencia" en el budismo es la idea de que toda existencia continúa cambiando. Se dice que solo liberando el apego puede una persona alcanzar la verdadera paz mental. Incluso en la sociedad moderna, esta filosofía continúa influyendo en las personas que buscan estabilidad espiritual.',
+'2026-05-03',
+'[{"jp":"無常","kana":"むじょう","en":"impermanence","es":"impermanencia"},{"jp":"執着","kana":"しゅうちゃく","en":"attachment / obsession","es":"apego"},{"jp":"平静","kana":"へいせい","en":"composure / peace of mind","es":"ecuanimidad"},{"jp":"哲学","kana":"てつがく","en":"philosophy","es":"filosofía"},{"jp":"概念","kana":"がいねん","en":"concept","es":"concepto"}]'::jsonb,
+'[{"q":"What does impermanence (無常) refer to?","o":["That life is eternal","That all existence continuously changes","That happiness is impossible","That nature controls humans"],"a":1},{"q":"What must one release to attain peace according to Buddhism?","o":["Relationships","Wealth","Attachment","Ambition"],"a":2},{"q":"Who is still influenced by this philosophy today?","o":["Only Buddhist monks","Only Japanese people","People seeking spiritual stability","Politicians"],"a":2}]'::jsonb)
+
+ON CONFLICT DO NOTHING;

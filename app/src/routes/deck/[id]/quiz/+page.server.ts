@@ -12,7 +12,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.from('cards')
 		.select('*, progress(easiness, interval, repetitions, next_review)')
 		.eq('deck_id', params.id)
-		.limit(20);
+		.order('sort_order', { ascending: true })
+		.limit(50);
 
 	return { deck, cards: cards ?? [] };
 };

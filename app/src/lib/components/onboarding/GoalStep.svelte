@@ -137,8 +137,8 @@
 	.popular-badge {
 		position: absolute;
 		top: -10px;
-		background: #1a1a1a;
-		color: white;
+		background: var(--sumi);
+		color: var(--bg-surface);
 		font-size: 10px;
 		font-weight: 800;
 		padding: 2px 10px;

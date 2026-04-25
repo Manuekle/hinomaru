@@ -2,6 +2,8 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import { fadeUp } from '$lib/motion';
+	import Icon from '$lib/Icon.svelte';
+	import { Coffee02Icon } from '@hugeicons/core-free-icons';
 
 	let { variant = 'card' } = $props<{ variant?: 'card' | 'button' | 'minimal' }>();
 
@@ -14,7 +16,7 @@
 		class="support-card"
 	>
 		<div class="icon-container">
-			<span class="emoji">☕</span>
+			<Icon icon={Coffee02Icon} size={40} strokeWidth={1.5} />
 		</div>
 		<div class="content">
 			<h3>{t('support.title', $locale)}</h3>
@@ -26,13 +28,7 @@
 				class="kofi-button"
 			>
 				<span class="kofi-icon">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-						<path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-						<line x1="6" y1="1" x2="6" y2="4"></line>
-						<line x1="10" y1="1" x2="10" y2="4"></line>
-						<line x1="14" y1="1" x2="14" y2="4"></line>
-					</svg>
+					<Icon icon={Coffee02Icon} size={20} strokeWidth={2} />
 				</span>
 				{t('support.kofi', $locale)}
 			</a>
@@ -45,7 +41,7 @@
 		rel="noopener noreferrer"
 		class="kofi-button-large"
 	>
-		<span class="emoji">☕</span>
+		<Icon icon={Coffee02Icon} size={24} strokeWidth={2} />
 		{t('support.kofi', $locale)}
 	</a>
 {:else}
@@ -56,13 +52,7 @@
 		class="minimal-link"
 		title={t('support.kofi', $locale)}
 	>
-		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-			<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-			<path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-			<line x1="6" y1="1" x2="6" y2="4"></line>
-			<line x1="10" y1="1" x2="10" y2="4"></line>
-			<line x1="14" y1="1" x2="14" y2="4"></line>
-		</svg>
+		<Icon icon={Coffee02Icon} size={20} strokeWidth={2} />
 	</a>
 {/if}
 

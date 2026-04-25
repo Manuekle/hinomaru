@@ -16,6 +16,7 @@
 	const totalLearned = $derived(data.decks.reduce((s, d) => s + (d.learned ?? 0), 0));
 </script>
 
+
 {#if !data.user}
 	<Landing decks={data.decks} />
 {:else}
@@ -39,7 +40,37 @@
 		{t('home.summary', $locale, { n: totalLearned })}
 	</p>
 
+	<!-- Historia del día -->
+	{#if data.todayStory}
+		<a
+			href="/deck/stories/today"
+			use:fadeIn={{ delay: 0.18 }}
+			class="story-card"
+			class:story-read={data.storyRead}
+		>
+			<div class="story-card-left">
+				<div class="story-card-icon">📖</div>
+				<div>
+					<div class="story-card-label">{t('stories.today', $locale)}</div>
+					<div class="story-card-title">
+						{$locale === 'es' ? data.todayStory.title_es : data.todayStory.title_en}
+					</div>
+					<div class="story-card-preview">{data.todayStory.body_jp.slice(0, 28)}…</div>
+				</div>
+			</div>
+			<div class="story-card-right">
+				<span class="story-level-pill">{data.todayStory.level}</span>
+				{#if data.storyRead}
+					<span class="story-done-badge">{t('stories.alreadyRead', $locale)}</span>
+				{:else}
+					<span class="story-read-btn">{t('stories.read', $locale)} →</span>
+				{/if}
+			</div>
+		</a>
+	{/if}
+
 	<!-- Level tabs -->
+
 	<div
 		use:fadeIn={{ delay: 0.18 }}
 		class="hide-scrollbar"
@@ -146,6 +177,129 @@
 				{/each}
 			</div>
 		{/key}
+		</div>
 	</div>
-</div>
 {/if}
+
+<style>
+	/* ── Historia del día ── */
+	.story-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 16px 20px;
+		margin-top: 24px;
+		text-decoration: none;
+		color: inherit;
+		box-shadow: var(--shadow-sm);
+		transition: box-shadow 200ms ease, transform 200ms ease;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.story-card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(135deg, rgba(188, 0, 45, 0.04) 0%, transparent 60%);
+		pointer-events: none;
+	}
+
+	.story-card:hover {
+		box-shadow: var(--shadow-md);
+		transform: translateY(-2px);
+	}
+
+	.story-card:active {
+		transform: scale(0.99);
+	}
+
+	.story-card.story-read {
+		border-color: var(--success-wash);
+	}
+
+	.story-card-left {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		min-width: 0;
+	}
+
+	.story-card-icon {
+		font-size: 28px;
+		flex-shrink: 0;
+		width: 44px;
+		height: 44px;
+		background: var(--sumi);
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.story-card-label {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--hinomaru-red);
+		margin-bottom: 2px;
+	}
+
+	.story-card-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		line-height: 1.2;
+		margin-bottom: 4px;
+	}
+
+	.story-card-preview {
+		font-family: var(--font-jp);
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 200px;
+	}
+
+	.story-card-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.story-level-pill {
+		background: var(--sumi);
+		color: var(--bg-surface);
+		font-size: 10px;
+		font-weight: 800;
+		padding: 2px 8px;
+		border-radius: 6px;
+		letter-spacing: 0.04em;
+	}
+
+	.story-read-btn {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--hinomaru-red);
+		white-space: nowrap;
+	}
+
+	.story-done-badge {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--success);
+		background: var(--success-wash);
+		padding: 2px 10px;
+		border-radius: 99px;
+		white-space: nowrap;
+	}
+</style>

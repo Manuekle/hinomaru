@@ -87,10 +87,7 @@
 	const showNav = $derived(
 		session && 
 		onboardingCompleted &&
-		$page.url.pathname !== '/onboarding' &&
-		$page.url.pathname !== '/login' &&
-		$page.url.pathname !== '/signup' &&
-		($page.url.pathname === '/' || !!$page.url.pathname.match(/^\/deck\/[^/]+$/) || $page.url.pathname === '/settings')
+		$page.url.pathname === '/'
 	);
 
 	// Reactively handle onboarding redirects after login/signup
@@ -132,32 +129,11 @@
 			class="premium-nav"
 		>
 			<div class="nav-content">
-				<!-- Profile / Left slot -->
-				<div class="nav-slot left">
-					<div class="user-avatar">
-						{#if data.profile?.avatar_url}
-							<img src={data.profile.avatar_url} alt="Profile" />
-						{:else}
-							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-								<circle cx="12" cy="7" r="4"></circle>
-							</svg>
-						{/if}
-					</div>
-					<!-- Logo on mobile (shown when center is hidden) -->
-					<a href="/" class="nav-brand nav-brand-mobile">
-						<span class="brand-dot" style="width:8px;height:8px;"></span>
-						<span class="brand-text">Hinomaru</span>
-					</a>
-				</div>
+				<!-- Profile / Left slot (Removed) -->
+				<div class="nav-slot left"></div>
 
-				<!-- Logo / Center slot -->
-				<div class="nav-slot center">
-					<a href="/" class="nav-brand">
-						<span class="brand-dot"></span>
-						<span class="brand-text">Hinomaru</span>
-					</a>
-				</div>
+				<!-- Logo / Center slot (Removed) -->
+				<div class="nav-slot center"></div>
 
 				<!-- Actions / Right slot -->
 				<div class="nav-slot right">
@@ -302,6 +278,10 @@
 	}
 
 	@media (max-width: 600px) {
+		.premium-nav {
+			position: static;
+		}
+
 		.nav-content {
 			height: 64px;
 			padding: 0 16px;
