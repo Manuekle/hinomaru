@@ -2,6 +2,7 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
 	let { onSelect } = $props();
 
@@ -47,7 +48,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
@@ -57,7 +58,7 @@
 
 	.title {
 		font-size: 32px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
 		margin: 0 0 40px;

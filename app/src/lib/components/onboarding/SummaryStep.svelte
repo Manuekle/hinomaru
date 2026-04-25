@@ -3,35 +3,50 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
-	import { FavouriteIcon, Mortarboard01Icon, VoiceIcon, FireIcon, Notification03Icon, Tick01Icon } from '@hugeicons/core-free-icons';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import {
+		FavouriteIcon,
+		Mortarboard01Icon,
+		VoiceIcon,
+		FireIcon,
+		Notification03Icon,
+		Tick01Icon
+	} from '@hugeicons/core-free-icons';
 
 	let { selections, onComplete } = $props();
 
 	const items = $derived([
-		{ 
-			label: t('onboarding.summary.motivation', $locale), 
-			value: selections.motivation ? t(`onboarding.motivation.${selections.motivation}`, $locale) : '...', 
-			icon: FavouriteIcon 
+		{
+			label: t('onboarding.summary.motivation', $locale),
+			value: selections.motivation
+				? t(`onboarding.motivation.${selections.motivation}`, $locale)
+				: '...',
+			icon: FavouriteIcon
 		},
-		{ 
-			label: t('onboarding.summary.level', $locale), 
-			value: selections.experience ? t(`onboarding.experience.${selections.experience}`, $locale) : '...', 
-			icon: Mortarboard01Icon 
+		{
+			label: t('onboarding.summary.level', $locale),
+			value: selections.experience
+				? t(`onboarding.experience.${selections.experience}`, $locale)
+				: '...',
+			icon: Mortarboard01Icon
 		},
-		{ 
-			label: t('onboarding.summary.voice', $locale), 
-			value: selections.voice === 'kaito' ? t('onboarding.voice.kaito.name', $locale) : t('onboarding.voice.standard.name', $locale), 
-			icon: VoiceIcon 
+		{
+			label: t('onboarding.summary.voice', $locale),
+			value:
+				selections.voice === 'kaito'
+					? t('onboarding.voice.kaito.name', $locale)
+					: t('onboarding.voice.standard.name', $locale),
+			icon: VoiceIcon
 		},
-		{ 
-			label: t('onboarding.summary.goal', $locale), 
-			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }), 
-			icon: FireIcon 
+		{
+			label: t('onboarding.summary.goal', $locale),
+			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }),
+			icon: FireIcon
 		},
-		{ 
-			label: t('onboarding.summary.notifications', $locale), 
-			value: t('onboarding.summary.enabled', $locale), 
-			icon: Notification03Icon 
+		{
+			label: t('onboarding.summary.notifications', $locale),
+			value: t('onboarding.summary.enabled', $locale),
+			icon: Notification03Icon
 		}
 	]);
 </script>
@@ -58,11 +73,11 @@
 		{/each}
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.7, y: 10 }}>
+	<StickyFooter>
 		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={onComplete}>
 			{t('onboarding.summary.start', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>
@@ -70,7 +85,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
@@ -80,7 +95,7 @@
 
 	.title {
 		font-size: 32px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0;
 	}

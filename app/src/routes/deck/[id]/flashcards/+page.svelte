@@ -8,6 +8,8 @@
 	import { animate } from 'motion/mini';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import SessionNav from '$lib/components/SessionNav.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -104,31 +106,12 @@
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
-	<!-- Progress bar - needs top safe area for notch/Dynamic Island -->
-	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
-	<div class="session-topbar">
-		<div
-			class="session-topbar-fill"
-			style="width:{pct}%;transition:width 400ms cubic-bezier(0.22,1,0.36,1);"
-		></div>
-	</div>
-	</div>
-
-	<!-- Top nav -->
-	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
-		<a
-			href="/deck/{data.deck.id}"
-			aria-label="Close session"
-			class="touch-action-manip"
-			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;
-             transition:color 150ms ease;min-width:44px;min-height:44px;display:flex;align-items:center;"
-			onmouseenter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--sumi)')}
-			onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--fg-secondary)')}
-			>✕</a
-		>
-		<div class="label-meta">{t('session.progress', $locale, { a: i + 1, b: cards.length })}</div>
-		<div style="width:44px;"></div>
-	</div>
+	<SessionNav 
+		progress={pct} 
+		current={i + 1} 
+		total={cards.length} 
+		onClose={() => goto(`/deck/${data.deck.id}`)}
+	/>
 
 	{#if data.cards.length === 0}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
@@ -138,7 +121,7 @@
 		</div>
 	{:else if card}
 		<div
-			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 24px 40px;gap:32px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
+			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 24px 140px;gap:32px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
 			<!-- Card with 3D flip -->
 			<div
@@ -218,18 +201,7 @@
 				</div>
 			</div>
 
-			<!-- Action buttons -->
-			<div style="display:flex;gap:12px;width:100%;max-width:360px;padding-bottom:calc(16px + env(safe-area-inset-bottom));">
-				<button
-					class="hm-btn hm-btn-secondary hm-btn-full touch-action-manip"
-					onclick={() => next(false)}
-					style="transition:transform 100ms ease, box-shadow 150ms ease;"
-					onmouseenter={(e) =>
-						((e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)')}
-					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = '')}
-				>
-					✕ {t('session.again', $locale)}
-				</button>
+			<StickyFooter>
 				<button
 					class="hm-btn hm-btn-primary hm-btn-full touch-action-manip"
 					onclick={() => next(true)}
@@ -240,7 +212,7 @@
 				>
 					✓ {t('session.gotIt', $locale)}
 				</button>
-			</div>
+			</StickyFooter>
 		</div>
 	{/if}
 </div>

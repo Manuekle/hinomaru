@@ -3,7 +3,7 @@
 	import { locale } from '$lib/stores/locale';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
-	import { Coffee02Icon } from '@hugeicons/core-free-icons';
+	import { Coffee04Icon } from '@hugeicons/core-free-icons';
 
 	let { variant = 'card' } = $props<{ variant?: 'card' | 'button' | 'minimal' }>();
 
@@ -11,37 +11,24 @@
 </script>
 
 {#if variant === 'card'}
-	<div
-		use:fadeUp={{ delay: 0.3 }}
-		class="support-card"
-	>
+	<div use:fadeUp={{ delay: 0.3 }} class="support-card">
 		<div class="icon-container">
-			<Icon icon={Coffee02Icon} size={40} strokeWidth={1.5} />
+			<Icon icon={Coffee04Icon} size={40} strokeWidth={1.5} />
 		</div>
 		<div class="content">
 			<h3>{t('support.title', $locale)}</h3>
 			<p>{t('support.desc', $locale)}</p>
-			<a
-				href={kofiUrl}
-				target="_blank"
-				rel="noopener noreferrer"
-				class="kofi-button"
-			>
+			<a href={kofiUrl} target="_blank" rel="noopener noreferrer" class="kofi-button">
 				<span class="kofi-icon">
-					<Icon icon={Coffee02Icon} size={20} strokeWidth={2} />
+					<Icon icon={Coffee04Icon} size={20} strokeWidth={2} />
 				</span>
 				{t('support.kofi', $locale)}
 			</a>
 		</div>
 	</div>
 {:else if variant === 'button'}
-	<a
-		href={kofiUrl}
-		target="_blank"
-		rel="noopener noreferrer"
-		class="kofi-button-large"
-	>
-		<Icon icon={Coffee02Icon} size={24} strokeWidth={2} />
+	<a href={kofiUrl} target="_blank" rel="noopener noreferrer" class="kofi-button-large">
+		<Icon icon={Coffee04Icon} size={24} strokeWidth={2} />
 		{t('support.kofi', $locale)}
 	</a>
 {:else}
@@ -52,7 +39,7 @@
 		class="minimal-link"
 		title={t('support.kofi', $locale)}
 	>
-		<Icon icon={Coffee02Icon} size={20} strokeWidth={2} />
+		<Icon icon={Coffee04Icon} size={20} strokeWidth={2} />
 	</a>
 {/if}
 
@@ -124,7 +111,9 @@
 		border-radius: var(--radius-sm);
 		font-size: var(--fs-sm);
 		font-weight: 700;
-		transition: transform 200ms ease, box-shadow 200ms ease;
+		transition:
+			transform 200ms ease,
+			box-shadow 200ms ease;
 		box-shadow: 0 4px 12px rgba(255, 94, 91, 0.2);
 	}
 

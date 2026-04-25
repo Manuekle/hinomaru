@@ -6,6 +6,8 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import SessionNav from '$lib/components/SessionNav.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -95,21 +97,12 @@
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
-	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
-	<div class="session-topbar">
-		<div class="session-topbar-fill" style="width:{pct}%;"></div>
-	</div>
-	</div>
-	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
-		<a
-			href="/deck/{data.deck.id}"
-			aria-label="Close session"
-			class="touch-action-manip"
-			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;min-width:44px;min-height:44px;display:flex;align-items:center;">✕</a
-		>
-		<div class="label-meta">{t('session.progress', $locale, { a: i + 1, b: cards.length })}</div>
-		<div style="width:44px;"></div>
-	</div>
+	<SessionNav 
+		progress={pct} 
+		current={i + 1} 
+		total={cards.length} 
+		onClose={() => goto(`/deck/${data.deck.id}`)}
+	/>
 
 	{#if cards.length === 0}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
@@ -119,7 +112,7 @@
 		</div>
 	{:else if card}
 		<div
-			style="flex:1;padding:32px 24px calc(48px + env(safe-area-inset-bottom));max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
+			style="flex:1;padding:32px 24px 140px;max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
 			<div
 				style="background:var(--bg-surface);border-radius:24px;padding:48px;text-align:center;box-shadow:var(--shadow-sm);position:relative;"
@@ -190,24 +183,19 @@
 						? 'var(--success-wash)'
 						: 'var(--hinomaru-red-wash)'};display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow-sm);"
 				>
-					<div style="display:flex;align-items:center;gap:12px;">
-						<div style="flex:1;">
-							<div
-								style="font-weight:700;font-size:18px;color:{isCorrect
-									? 'var(--success)'
-									: 'var(--hinomaru-red-ink)'};"
-							>
-								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-							</div>
-							{#if !isCorrect}
-								<div style="font-size:14px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;">
-									{t('session.answerIs', $locale, { a: card.en })}
-								</div>
-							{/if}
+					<div style="display:flex;flex-direction:column;gap:2px;">
+						<div
+							style="font-weight:700;font-size:18px;color:{isCorrect
+								? 'var(--success)'
+								: 'var(--hinomaru-red-ink)'};"
+						>
+							{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
 						</div>
-						<button class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} touch-action-manip" onclick={next}>
-							{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
-						</button>
+						{#if !isCorrect}
+							<div style="font-size:14px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;">
+								{t('session.answerIs', $locale, { a: card.en })}
+							</div>
+						{/if}
 					</div>
 
 					{#if card.example}
@@ -236,6 +224,12 @@
 						</div>
 					{/if}
 				</div>
+
+				<StickyFooter>
+					<button class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} touch-action-manip" onclick={next} style="flex:1;">
+						{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
+					</button>
+				</StickyFooter>
 			{/if}
 		</div>
 	{/if}

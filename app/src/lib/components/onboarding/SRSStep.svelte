@@ -42,7 +42,8 @@
 
 	<footer class="footer" use:fadeUp={{ delay: 0.4, y: 10 }}>
 		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={() => onNext(true)}>
-			<span class="btn-icon">🧠</span> {t('onboarding.srs.enable', $locale)}
+			<span class="btn-icon">🧠</span>
+			{t('onboarding.srs.enable', $locale)}
 		</button>
 		<button class="hm-btn hm-btn-ghost hm-btn-full" onclick={() => onNext(false)}>
 			{t('onboarding.srs.later', $locale)}
@@ -65,7 +66,7 @@
 
 	.title {
 		font-size: 32px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
 		margin: 0;

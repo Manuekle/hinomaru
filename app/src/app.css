@@ -144,6 +144,7 @@ body {
 	-ms-overflow-style: none;
 	-webkit-overflow-scrolling: touch;
 }
+
 .hide-scrollbar::-webkit-scrollbar {
 	display: none;
 }
@@ -157,13 +158,15 @@ body {
 	font-family: var(--font-jp);
 	font-weight: 500;
 }
+
 .romaji {
 	font-family: var(--font-ui);
 	font-size: var(--fs-sm);
-	font-weight: 400;
+	font-weight: 600;
 	color: var(--fg-secondary);
 	letter-spacing: var(--tracking-wide);
 }
+
 .label-meta {
 	font-family: var(--font-ui);
 	font-size: var(--fs-xs);
@@ -198,19 +201,23 @@ body {
 		transform 80ms var(--ease-brand);
 	text-decoration: none;
 }
+
 .hm-btn:active {
 	transform: scale(0.98);
 }
+
 .hm-btn-sm {
 	height: 36px;
 	padding: 0 16px;
 	font-size: var(--fs-sm);
 }
+
 .hm-btn-lg {
 	height: 56px;
 	padding: 0 32px;
 	font-size: var(--fs-md);
 }
+
 .hm-btn-full {
 	width: 100%;
 }
@@ -219,28 +226,35 @@ body {
 	background: var(--hinomaru-red);
 	color: var(--fg-inverse);
 }
+
 .hm-btn-primary:hover {
 	background: var(--hinomaru-red-ink);
 }
+
 .hm-btn-secondary {
 	background: var(--washi);
 	color: var(--fg-primary);
 	border-color: var(--ink-200);
 }
+
 .hm-btn-secondary:hover {
 	background: var(--ink-50);
 }
+
 .hm-btn-ghost {
 	background: transparent;
 	color: var(--fg-primary);
 }
+
 .hm-btn-ghost:hover {
 	background: var(--ink-100);
 }
+
 .hm-btn-dark {
 	background: var(--sumi);
 	color: var(--washi);
 }
+
 .hm-btn-dark:hover {
 	background: var(--ink-700);
 }
@@ -255,14 +269,17 @@ body {
 	font-weight: 600;
 	letter-spacing: var(--tracking-wide);
 }
+
 .hm-pill-red {
 	background: var(--hinomaru-red-wash);
 	color: var(--hinomaru-red-ink);
 }
+
 .hm-pill-ink {
 	background: var(--ink-100);
 	color: var(--ink-700);
 }
+
 .hm-pill-success {
 	background: var(--success-wash);
 	color: var(--success);
@@ -284,6 +301,7 @@ body {
 		border-color var(--dur-micro) var(--ease-brand),
 		box-shadow var(--dur-micro) var(--ease-brand);
 }
+
 .hm-input:focus {
 	border-color: var(--hinomaru-red);
 	box-shadow: var(--shadow-focus);
@@ -296,6 +314,7 @@ body {
 	border-radius: 99px;
 	overflow: hidden;
 }
+
 .hm-progress-bar {
 	height: 100%;
 	background: var(--hinomaru-red);
@@ -308,6 +327,7 @@ body {
 	height: 2px;
 	background: var(--ink-200);
 }
+
 .session-topbar-fill {
 	height: 100%;
 	background: var(--hinomaru-red);
@@ -319,6 +339,7 @@ body {
 	perspective: 1200px;
 	cursor: pointer;
 }
+
 .card-body {
 	position: relative;
 	width: 100%;
@@ -326,9 +347,11 @@ body {
 	transform-style: preserve-3d;
 	transition: transform var(--dur-flip) var(--ease-brand);
 }
+
 .card-body.flipped {
 	transform: rotateY(180deg);
 }
+
 .card-face {
 	position: absolute;
 	inset: 0;
@@ -343,6 +366,7 @@ body {
 	padding: 32px;
 	text-align: center;
 }
+
 .card-face.back {
 	transform: rotateY(180deg);
 }

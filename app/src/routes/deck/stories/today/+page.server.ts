@@ -12,28 +12,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const { data: story, error } = await locals.supabase
 		.from('stories')
-		.select('*')
+		.select('id')
 		.lte('publish_date', today)
 		.order('publish_date', { ascending: false })
 		.limit(1)
 		.single();
 
 	if (error || !story) {
-		return { story: null, alreadyRead: false, userId: user.id };
+		return { story: null };
 	}
 
-	// Check if user already read/quizzed this story
-	const { data: readRow } = await locals.supabase
-		.from('user_story_reads')
-		.select('id, quiz_score')
-		.eq('user_id', user.id)
-		.eq('story_id', story.id)
-		.maybeSingle();
-
-	return {
-		story,
-		alreadyRead: !!readRow,
-		quizScore: readRow?.quiz_score ?? null,
-		userId: user.id
-	};
+	throw redirect(303, `/deck/stories/${story.id}`);
 };

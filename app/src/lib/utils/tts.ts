@@ -25,6 +25,9 @@ export function cleanForTTS(text: string): string {
 	);
 }
 
+import { get } from 'svelte/store';
+import { preferredVoice } from '$lib/stores/settings';
+
 /**
  * Speaks Japanese text using the Web Speech API.
  * Automatically cleans the text before synthesis.
@@ -41,15 +44,24 @@ export function speakJapanese(text: string, rate = 0.85): void {
 	const utterance = new SpeechSynthesisUtterance(cleaned);
 	utterance.lang = 'ja-JP';
 	utterance.rate = rate;
-	utterance.pitch = 1.0;
+
+	const voiceMode = get(preferredVoice);
 
 	// Prefer a Japanese voice if available
 	const voices = window.speechSynthesis.getVoices();
-	const japaneseVoice = voices.find(
+	const japaneseVoices = voices.filter(
 		(v) => v.lang === 'ja-JP' || v.lang.startsWith('ja')
 	);
-	if (japaneseVoice) {
-		utterance.voice = japaneseVoice;
+
+	if (voiceMode === 'kaito') {
+		// Kaito effect: deeper pitch and try to find a male-sounding voice
+		utterance.pitch = 0.8;
+		const kaitoVoice = japaneseVoices.find(v => !v.name.toLowerCase().includes('kyoko')) || japaneseVoices[1] || japaneseVoices[0];
+		if (kaitoVoice) utterance.voice = kaitoVoice;
+	} else {
+		// Standard voice
+		utterance.pitch = 1.0;
+		if (japaneseVoices[0]) utterance.voice = japaneseVoices[0];
 	}
 
 	window.speechSynthesis.speak(utterance);

@@ -39,16 +39,19 @@
 		if (!('speechSynthesis' in window)) return;
 		window.speechSynthesis.cancel();
 		playingId = id;
-		
+
 		const utterance = new SpeechSynthesisUtterance('こんにちは、日本語の勉強を始めましょう');
 		utterance.lang = 'ja-JP';
-		
+
 		// Try to find different Japanese voices
-		const availableVoices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('ja') || v.lang.includes('JP'));
-		
+		const availableVoices = window.speechSynthesis
+			.getVoices()
+			.filter((v) => v.lang.includes('ja') || v.lang.includes('JP'));
+
 		if (id === 'kaito' && availableVoices.length > 1) {
 			// Find a male-sounding voice if possible, or just pick the second voice
-			const kaitoVoice = availableVoices.find(v => !v.name.toLowerCase().includes('kyoko')) || availableVoices[1];
+			const kaitoVoice =
+				availableVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) || availableVoices[1];
 			utterance.voice = kaitoVoice;
 			utterance.pitch = 0.8; // Deeper pitch
 		} else if (availableVoices.length > 0) {
@@ -99,11 +102,7 @@
 				</button>
 
 				<!-- Select trigger: also a real <button> for accessibility -->
-				<button
-					class="voice-select-btn"
-					onclick={() => handleSelect(voice.id)}
-					type="button"
-				>
+				<button class="voice-select-btn" onclick={() => handleSelect(voice.id)} type="button">
 					<span class="voice-name">{voice.name}</span>
 					<span class="voice-desc">{voice.desc}</span>
 				</button>
@@ -142,7 +141,7 @@
 
 	.title {
 		font-size: clamp(24px, 6vw, 32px);
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0 0 8px;
 	}
@@ -196,7 +195,9 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: transform 0.1s ease, background 0.15s ease;
+		transition:
+			transform 0.1s ease,
+			background 0.15s ease;
 		flex-shrink: 0;
 	}
 
@@ -253,7 +254,7 @@
 	}
 
 	.check {
-		font-weight: 800;
+		font-weight: 600;
 		font-size: 18px;
 		flex-shrink: 0;
 		color: inherit;

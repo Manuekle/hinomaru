@@ -84,9 +84,11 @@
 
 		// Grid lines
 		const hLine = document.createElement('div');
-		hLine.style.cssText = 'position:absolute;top:50%;left:0;right:0;height:1px;background:var(--ink-300);pointer-events:none;';
+		hLine.style.cssText =
+			'position:absolute;top:50%;left:0;right:0;height:1px;background:var(--ink-300);pointer-events:none;';
 		const vLine = document.createElement('div');
-		vLine.style.cssText = 'position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink-300);pointer-events:none;';
+		vLine.style.cssText =
+			'position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink-300);pointer-events:none;';
 		box.appendChild(hLine);
 		box.appendChild(vLine);
 
@@ -172,7 +174,12 @@
 			<!-- Loading spinner -->
 			{#if loadingWriters}
 				<div class="loading-state">
-					<Icon icon={Loading03Icon} size={20} strokeWidth={2} style="animation:spin 1s linear infinite;" />
+					<Icon
+						icon={Loading03Icon}
+						size={20}
+						strokeWidth={2}
+						style="animation:spin 1s linear infinite;"
+					/>
 				</div>
 			{/if}
 
@@ -218,7 +225,7 @@
 
 	.title {
 		font-size: clamp(22px, 5.5vw, 30px);
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0 0 6px;
 		color: var(--sumi);
@@ -259,7 +266,7 @@
 
 	.char-name {
 		font-size: 28px;
-		font-weight: 800;
+		font-weight: 600;
 		color: var(--sumi);
 		font-family: var(--font-jp), serif;
 		line-height: 1;
@@ -302,7 +309,9 @@
 		justify-content: center;
 		cursor: pointer;
 		color: var(--fg-secondary);
-		transition: color 150ms, border-color 150ms;
+		transition:
+			color 150ms,
+			border-color 150ms;
 	}
 	.clear-btn:hover {
 		color: var(--sumi);
@@ -362,6 +371,8 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

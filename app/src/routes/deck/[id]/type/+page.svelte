@@ -6,6 +6,8 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import SessionNav from '$lib/components/SessionNav.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
 
 	function focusOnMount(node: HTMLElement) {
@@ -98,21 +100,12 @@
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
-	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
-	<div class="session-topbar">
-		<div class="session-topbar-fill" style="width:{pct}%;"></div>
-	</div>
-	</div>
-	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
-		<a
-			href="/deck/{data.deck.id}"
-			aria-label="Close session"
-			class="touch-action-manip"
-			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;min-width:44px;min-height:44px;display:flex;align-items:center;">✕</a
-		>
-		<div class="label-meta">{t('session.progress', $locale, { a: i + 1, b: cards.length })}</div>
-		<div style="width:44px;"></div>
-	</div>
+	<SessionNav 
+		progress={pct} 
+		current={i + 1} 
+		total={cards.length} 
+		onClose={() => goto(`/deck/${data.deck.id}`)}
+	/>
 
 	{#if cards.length === 0}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
@@ -122,7 +115,7 @@
 		</div>
 	{:else if card}
 		<div
-			style="flex:1;padding:32px 24px;max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
+			style="flex:1;padding:32px 24px 140px;max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
 			<div
 				style="background:var(--bg-surface);border-radius:24px;padding:48px;text-align:center;box-shadow:var(--shadow-sm);position:relative;"
@@ -213,7 +206,7 @@
 						{/if}
 					</div>
 				{/if}
-				<div style="margin-top:20px;padding-bottom:calc(8px + env(safe-area-inset-bottom));">
+				<StickyFooter>
 					{#if !submitted}
 						<button
 							class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg touch-action-manip"
@@ -232,7 +225,7 @@
 								: t('session.continue', $locale)}
 						</button>
 					{/if}
-				</div>
+				</StickyFooter>
 			</div>
 		</div>
 	{/if}

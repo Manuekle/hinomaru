@@ -2,6 +2,7 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
 	let { onNext } = $props();
 </script>
@@ -20,11 +21,17 @@
 		</p>
 	</div>
 
-	<div class="footer-section" use:fadeUp={{ delay: 0.2, y: 10 }}>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={() => { console.log('WELCOME: Button clicked'); onNext(); }}>
+	<StickyFooter>
+		<button
+			class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
+			onclick={() => {
+				console.log('WELCOME: Button clicked');
+				onNext();
+			}}
+		>
 			{t('onboarding.welcome.btn', $locale)}
 		</button>
-	</div>
+	</StickyFooter>
 </div>
 
 <style>
@@ -32,7 +39,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 		text-align: center;
 	}
 
@@ -42,7 +49,7 @@
 
 	.title {
 		font-size: 36px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0;
 	}

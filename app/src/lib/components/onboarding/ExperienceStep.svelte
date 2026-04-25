@@ -55,7 +55,7 @@
 
 	.title {
 		font-size: 32px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
 		margin: 0 0 80px;

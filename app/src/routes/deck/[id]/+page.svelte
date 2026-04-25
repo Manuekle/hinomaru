@@ -20,8 +20,7 @@
 		{ id: 'quiz', titleKey: 'mode.quiz.title', descKey: 'mode.quiz.desc', icon: '✓' },
 		{ id: 'type', titleKey: 'mode.type.title', descKey: 'mode.type.desc', icon: 'T' },
 		{ id: 'write', titleKey: 'mode.write.title', descKey: 'mode.write.desc', icon: '✍️' },
-		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: '🧩' },
-		{ id: 'stories/today', titleKey: 'stories.today', descKey: 'stories.subtitle', icon: '📖' }
+		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: '🧩' }
 	];
 </script>
 

@@ -4,6 +4,7 @@
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren, popIn, animateNumber } from '$lib/motion';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -31,7 +32,7 @@
 </script>
 
 <div
-	style="min-height:100vh;min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));position:relative;overflow:hidden;"
+	style="min-height:100vh;min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;position:relative;overflow:hidden;"
 >
 	<!-- Decorative background circle (gently pulsing via CSS) -->
 	<div
@@ -84,8 +85,7 @@
 			</div>
 		</div>
 
-		<!-- CTA -->
-		<div use:fadeUp={{ delay: 0.75, y: 12 }} style="margin-top:32px;padding-bottom:calc(16px + env(safe-area-inset-bottom));">
+		<StickyFooter>
 			<a
 				href="/"
 				class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
@@ -101,7 +101,7 @@
 			>
 				{t('summary.back', $locale)}
 			</a>
-		</div>
+		</StickyFooter>
 	</div>
 </div>
 

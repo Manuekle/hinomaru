@@ -5,8 +5,10 @@
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
-	import type { PageData } from './$types';
 	import { onMount, onDestroy } from 'svelte';
+	import SessionNav from '$lib/components/SessionNav.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
 	const allCards = $derived(data.cards as any[]);
@@ -59,7 +61,7 @@
 		const items: any[] = [];
 		next.forEach((c) => {
 			items.push({ id: c.id, text: c.jp, type: 'jp', romaji: c.romaji });
-			items.push({ id: c.id, text: c.en,  type: 'en', romaji: c.romaji });
+			items.push({ id: c.id, text: c.en, type: 'en', romaji: c.romaji });
 		});
 		currentSet = items.sort(() => Math.random() - 0.5);
 		matchedIds = new Set();
@@ -130,7 +132,9 @@
 		finalTime = elapsed;
 		finished = true;
 
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
 		if (user) {
 			await supabase.from('sessions').insert({
 				user_id: user.id,
@@ -148,8 +152,8 @@
 
 	// ── Derived ────────────────────────────────────────────────────────────
 	const progress = $derived(
-		sessionCards.length > 0
-			? Math.min(100, (currentIndex / sessionCards.length) * 100)
+		allCards.length > 0
+			? Math.min(100, ((currentIndex + matchedIds.size) / allCards.length) * 100)
 			: 0
 	);
 
@@ -161,39 +165,35 @@
 </script>
 
 <div class="match-container">
-	<!-- Progress bar -->
-	<div class="session-topbar">
-		<div class="session-topbar-fill" style="width:{progress}%;transition:width 400ms ease;"></div>
-	</div>
-
-	<!-- Header -->
-	<div class="match-header">
-		<button class="close-btn" onclick={goBack} aria-label="Close">✕</button>
-		<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-			<div class="match-title">{t('session.matchMode', $locale)}</div>
-			<div style="font-size:11px;color:var(--fg-tertiary);font-weight:500;">
-				{currentIndex}/{sessionCards.length} {$locale === 'es' ? 'cartas' : 'cards'}
-			</div>
-		</div>
-		<div class="match-timer">{formatTime(elapsed)}</div>
-	</div>
+	<SessionNav
+		{progress}
+		current={currentIndex + matchedIds.size}
+		total={sessionCards.length}
+		title={t('session.matchMode', $locale)}
+		showTimer={true}
+		{elapsed}
+		onClose={goBack}
+	/>
 
 	{#if allCards.length === 0}
 		<!-- Empty state -->
-		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+		<div
+			style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;"
+		>
 			<div style="font-size:48px;margin-bottom:16px;">📭</div>
 			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
-			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark" style="text-decoration:none;">{t('deck.back', $locale)}</a>
+			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark" style="text-decoration:none;"
+				>{t('deck.back', $locale)}</a
+			>
 		</div>
-
 	{:else if !finished}
 		<!-- Game grid -->
 		<div class="match-grid" style="--cols:2;--rows:{Math.ceil(currentSet.length / 2)};">
 			{#each currentSet as item (item.id + item.type)}
 				{@const key = makeKey(item.id, item.type)}
-				{@const isMatched  = matchedIds.has(item.id)}
+				{@const isMatched = matchedIds.has(item.id)}
 				{@const isSelected = selectedKey === key}
-				{@const isWrong    = wrongKeys.has(key)}
+				{@const isWrong = wrongKeys.has(key)}
 				<!-- Keep matched cards in DOM as placeholders so grid doesn't shift -->
 				<button
 					class="match-card"
@@ -227,7 +227,6 @@
 		<div class="round-hint">
 			{t('session.matchHint', $locale) || 'Empareja el japonés con su significado'}
 		</div>
-
 	{:else}
 		<!-- Finish screen -->
 		<div class="finish-overlay">
@@ -236,16 +235,32 @@
 				<h2>{t('session.wellDone', $locale) || '¡Muy bien!'}</h2>
 				<div class="finish-time">{formatTime(finalTime)}</div>
 				<p style="color:var(--fg-secondary);font-size:15px;margin-bottom:32px;">
-					{allCards.length} {t('home.cards', $locale) || 'cartas'} completadas
+					{allCards.length}
+					{t('home.cards', $locale) || 'cartas'} completadas
 				</p>
-				<div style="display:flex;flex-direction:column;gap:10px;">
-					<button class="hm-btn hm-btn-primary" onclick={() => { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } finished=false; currentIndex=0; elapsed=0; sessionCards=[...allCards].sort(()=>Math.random()-0.5); loadNextSet(); timerInterval=setInterval(()=>elapsed++,1000); }}>
+				<StickyFooter>
+					<button
+						class="hm-btn hm-btn-primary hm-btn-full"
+						style="flex:1;"
+						onclick={() => {
+							if (timerInterval) {
+								clearInterval(timerInterval);
+								timerInterval = null;
+							}
+							finished = false;
+							currentIndex = 0;
+							elapsed = 0;
+							sessionCards = [...allCards].sort(() => Math.random() - 0.5);
+							loadNextSet();
+							timerInterval = setInterval(() => elapsed++, 1000);
+						}}
+					>
 						↺ {t('session.again', $locale) || 'Jugar de nuevo'}
 					</button>
-					<button class="hm-btn hm-btn-dark" onclick={goBack}>
+					<button class="hm-btn hm-btn-dark hm-btn-full" style="flex:1;" onclick={goBack}>
 						{t('session.finish', $locale) || 'Terminar'}
 					</button>
-				</div>
+				</StickyFooter>
 			</div>
 		</div>
 	{/if}
@@ -258,53 +273,6 @@
 		min-height: 100dvh;
 		background: var(--paper);
 		padding-bottom: env(safe-area-inset-bottom);
-	}
-
-	/* ── Header ── */
-	.match-header {
-		padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-100);
-		position: sticky;
-		top: 0;
-		z-index: 10;
-	}
-
-	.close-btn {
-		background: none;
-		border: none;
-		color: var(--fg-secondary);
-		font-size: 22px;
-		cursor: pointer;
-		padding: 8px;
-		min-width: 44px;
-		min-height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 50%;
-		transition: background 150ms ease;
-	}
-	.close-btn:hover { background: var(--ink-100); }
-
-	.match-title {
-		font-weight: 700;
-		color: var(--sumi);
-		font-size: 16px;
-		font-family: var(--font-ui);
-	}
-
-	.match-timer {
-		font-variant-numeric: tabular-nums;
-		color: var(--hinomaru-red);
-		font-weight: 700;
-		font-size: 18px;
-		min-width: 50px;
-		text-align: right;
-		font-family: var(--font-ui);
 	}
 
 	/* ── Grid ── */
@@ -332,7 +300,12 @@
 		padding: 16px 12px;
 		min-height: 80px;
 		cursor: pointer;
-		transition: border-color 180ms ease, background 180ms ease, transform 150ms ease, opacity 300ms ease, box-shadow 180ms ease;
+		transition:
+			border-color 180ms ease,
+			background 180ms ease,
+			transform 150ms ease,
+			opacity 300ms ease,
+			box-shadow 180ms ease;
 		text-align: center;
 		position: relative;
 		overflow: hidden;
@@ -388,21 +361,40 @@
 	.matched-icon {
 		font-size: 24px;
 		color: var(--success);
-		font-weight: 800;
+		font-weight: 600;
 		opacity: 0;
 		animation: fade-check 0.4s ease 0.1s forwards;
 	}
 
 	@keyframes match-success {
-		0%   { transform: scale(1); border-color: var(--success); background: var(--success-wash); opacity: 1; }
-		40%  { transform: scale(1.06); }
-		100% { transform: scale(1); opacity: 1; }
+		0% {
+			transform: scale(1);
+			border-color: var(--success);
+			background: var(--success-wash);
+			opacity: 1;
+		}
+		40% {
+			transform: scale(1.06);
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
 	}
 
 	@keyframes fade-check {
-		0%   { opacity: 0; transform: scale(0.5); }
-		60%  { opacity: 1; transform: scale(1.2); }
-		100% { opacity: 1; transform: scale(1); }
+		0% {
+			opacity: 0;
+			transform: scale(0.5);
+		}
+		60% {
+			opacity: 1;
+			transform: scale(1.2);
+		}
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
 	}
 
 	.card-inner {
@@ -485,14 +477,14 @@
 	.finish-card h2 {
 		margin: 0 0 4px;
 		font-size: 28px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.02em;
 		color: var(--sumi);
 	}
 
 	.finish-time {
 		font-size: 48px;
-		font-weight: 800;
+		font-weight: 600;
 		color: var(--hinomaru-red);
 		font-variant-numeric: tabular-nums;
 		letter-spacing: -0.02em;
@@ -501,16 +493,33 @@
 
 	/* ── Animations ── */
 	@keyframes shake {
-		0%, 100% { transform: translateX(0); }
-		20% { transform: translateX(-6px); }
-		40% { transform: translateX(6px); }
-		60% { transform: translateX(-4px); }
-		80% { transform: translateX(4px); }
+		0%,
+		100% {
+			transform: translateX(0);
+		}
+		20% {
+			transform: translateX(-6px);
+		}
+		40% {
+			transform: translateX(6px);
+		}
+		60% {
+			transform: translateX(-4px);
+		}
+		80% {
+			transform: translateX(4px);
+		}
 	}
 
 	@keyframes slide-up {
-		from { opacity: 0; transform: translateY(24px) scale(0.96); }
-		to   { opacity: 1; transform: translateY(0) scale(1); }
+		from {
+			opacity: 0;
+			transform: translateY(24px) scale(0.96);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
 	}
 
 	/* ── Mobile tweaks ── */
@@ -524,7 +533,11 @@
 			min-height: 70px;
 			border-radius: 14px;
 		}
-		.card-text { font-size: 14px; }
-		.card-text.jp { font-size: 20px; }
+		.card-text {
+			font-size: 14px;
+		}
+		.card-text.jp {
+			font-size: 20px;
+		}
 	}
 </style>

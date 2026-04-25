@@ -61,6 +61,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
+	// Word of the day
+	const { data: todayWord } = await locals.supabase
+		.from('daily_words')
+		.select('*')
+		.eq('date', today)
+		.maybeSingle();
+
 	return {
 		user,
 		decks: (decks ?? []).map((d: any) => ({
@@ -70,7 +77,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		})),
 		streak: streakDays ?? 0,
 		todayStory,
-		storyRead
+		storyRead,
+		todayWord
 	};
 };
-

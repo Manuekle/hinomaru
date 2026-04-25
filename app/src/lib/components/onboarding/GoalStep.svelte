@@ -2,6 +2,7 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
 	let { onSelect } = $props();
 
@@ -47,8 +48,10 @@
 			{/each}
 		</div>
 		<p class="goal-info" use:fadeUp={{ delay: 0.4 }}>
-			{t('onboarding.goal.wordsDay', $locale, { n: selected })} 
-			{selected === 5 ? t('onboarding.goal.choicePopular', $locale) : t('onboarding.goal.choiceGreat', $locale)}
+			{t('onboarding.goal.wordsDay', $locale, { n: selected })}
+			{selected === 5
+				? t('onboarding.goal.choicePopular', $locale)
+				: t('onboarding.goal.choiceGreat', $locale)}
 		</p>
 	</div>
 
@@ -57,11 +60,11 @@
 		<p class="tip-text">{t('onboarding.goal.tip', $locale)}</p>
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.6, y: 10 }}>
+	<StickyFooter>
 		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={handleNext}>
 			{t('onboarding.next', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>
@@ -69,7 +72,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
@@ -79,7 +82,7 @@
 
 	.title {
 		font-size: 32px;
-		font-weight: 800;
+		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0 0 40px;
 	}
@@ -140,7 +143,7 @@
 		background: var(--sumi);
 		color: var(--bg-surface);
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 600;
 		padding: 2px 10px;
 		border-radius: 99px;
 		text-transform: uppercase;
@@ -149,7 +152,7 @@
 
 	.value {
 		font-size: 44px;
-		font-weight: 800;
+		font-weight: 600;
 		line-height: 1;
 		color: var(--sumi);
 	}

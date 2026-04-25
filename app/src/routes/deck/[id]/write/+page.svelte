@@ -9,6 +9,8 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { animate } from 'motion/mini';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import SessionNav from '$lib/components/SessionNav.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -60,12 +62,21 @@
 		if (iteration !== setupIteration) return;
 
 		const chars = Array.from(card.jp);
-
-		// Determine size based on char count
+		
+		// Responsive box size
+		const containerWidth = hanziContainer?.clientWidth || 320;
+		const gap = 12;
 		let boxSize = 320;
-		if (chars.length === 2) boxSize = 220;
-		else if (chars.length === 3) boxSize = 160;
-		else if (chars.length > 3) boxSize = 120;
+		
+		if (chars.length === 1) {
+			boxSize = Math.min(320, containerWidth);
+		} else if (chars.length === 2) {
+			boxSize = Math.min(220, (containerWidth - gap) / 2);
+		} else if (chars.length === 3) {
+			boxSize = Math.min(160, (containerWidth - gap * 2) / 3);
+		} else {
+			boxSize = Math.min(120, (containerWidth - gap * 2) / 3);
+		}
 
 		async function fetchCharData(char: string, code: number): Promise<any | null> {
 			const urls =
@@ -328,30 +339,12 @@
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
-	<div style="padding-top:env(safe-area-inset-top);background:var(--bg-surface);">
-	<div class="session-topbar">
-		<div
-			class="session-topbar-fill"
-			style="width:{pct}%;transition:width 400ms cubic-bezier(0.22,1,0.36,1);"
-		></div>
-	</div>
-	</div>
-
-	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
-		<a
-			href="/deck/{data.deck.id}"
-			aria-label="Close session"
-			class="touch-action-manip"
-			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;transition:color 150ms ease;min-width:44px;min-height:44px;display:flex;align-items:center;"
-			onmouseenter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--sumi)')}
-			onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--fg-secondary)')}
-			>✕</a
-		>
-		<div style="font-size:14px;font-weight:600;color:var(--sumi);font-family:var(--font-ui);">
-			{i + 1} / {quizCards.length}
-		</div>
-		<div style="width:44px;"></div>
-	</div>
+	<SessionNav 
+		progress={pct} 
+		current={i + 1} 
+		total={quizCards.length} 
+		onClose={() => goto(`/deck/${data.deck.id}`)}
+	/>
 
 	{#if quizCards.length === 0}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
@@ -361,7 +354,7 @@
 		</div>
 	{:else if card}
 		<div
-			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 24px 32px;gap:24px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
+			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 24px 140px;gap:24px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
 			<div
 				bind:this={cardEl}
@@ -412,10 +405,10 @@
 				{/if}
 
 				<div
-					style="position:relative;width:100%;background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:24px;box-sizing:border-box;touch-action:none;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:center;min-height:240px;"
+					style="position:relative;width:100%;background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:16px;box-sizing:border-box;touch-action:none;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:center;min-height:280px;"
 				>
-					<!-- Guide toggle and clear -->
-					<div style="position:absolute;top:16px;right:16px;z-index:10;display:flex;gap:8px;">
+					<!-- Header actions -->
+					<div style="width:100%;display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px;">
 						<button
 							onclick={toggleGuide}
 							class="touch-action-manip"
@@ -425,7 +418,7 @@
 						</button>
 						<button
 							onclick={clearCanvas}
-							style="width:44px;height:44px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:0 2px 4px rgba(0,0,0,0.02);"
+							style="width:40px;height:40px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:0 2px 4px rgba(0,0,0,0.02);"
 						>
 							<svg
 								width="16"
@@ -472,7 +465,7 @@
 
 					<div
 						bind:this={hanziContainer}
-						style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px;"
+						style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;"
 					>
 						<!-- Writers injected here -->
 					</div>
@@ -508,8 +501,7 @@
 				</div>
 			</div>
 
-			<!-- Action buttons -->
-			<div style="display:flex;gap:12px;width:100%;max-width:440px;margin-top:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom));">
+			<StickyFooter>
 				{#if !checked}
 					<button class="hm-btn hm-btn-secondary" style="flex:1;opacity:0.5;pointer-events:none;">
 						{t('session.finishDrawing', $locale)}
@@ -536,7 +528,7 @@
 						✓ {t('session.gotIt', $locale)}
 					</button>
 				{/if}
-			</div>
+			</StickyFooter>
 		</div>
 	{/if}
 </div>

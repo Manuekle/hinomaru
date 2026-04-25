@@ -115,6 +115,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.light': 'Light',
 		'settings.theme.dark': 'Dark',
 		'settings.showRomaji': 'Show Romaji',
+		'settings.preferences': 'Preferences',
+		'settings.debugReset': 'Reset Onboarding (Debug)',
 		'pwa.install.title': 'Install Hinomaru',
 		'pwa.install.desc': 'Study offline and with a better experience.',
 		'pwa.install.ios': 'Tap the Share icon and "Add to Home Screen"',
@@ -265,7 +267,11 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'stories.back': 'Back',
 		'stories.title': 'Stories',
 		'stories.subtitle': 'Read curated stories for your level and learn naturally.',
-		'stories.noStory': 'No story available today. Check back tomorrow!'
+		'stories.noStory': 'No story available today. Check back tomorrow!',
+		'nav.alphabet': 'Alphabet',
+		'nav.vocabulary': 'Vocabulary',
+		'alphabet.title': 'Kana Chart',
+		'alphabet.subtitle': 'Master Hiragana and Katakana with audio and visual reference.'
 	},
 	es: {
 		'auth.signin.subtitle': 'Inicia sesión para guardar tu progreso.',
@@ -381,6 +387,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.light': 'Claro',
 		'settings.theme.dark': 'Oscuro',
 		'settings.showRomaji': 'Mostrar Romaji',
+		'settings.preferences': 'Preferencias',
+		'settings.debugReset': 'Reiniciar Onboarding (Debug)',
 		'pwa.install.title': 'Instalar Hinomaru',
 		'pwa.install.desc': 'Estudia sin conexión y con una mejor experiencia.',
 		'pwa.install.ios': 'Pulsa el icono Compartir y "Añadir a la pantalla de inicio"',
@@ -531,7 +539,11 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'stories.back': 'Volver',
 		'stories.title': 'Historias',
 		'stories.subtitle': 'Lee historias curadas para tu nivel y aprende de forma natural.',
-		'stories.noStory': 'No hay historia hoy. ¡Vuelve mañana!'
+		'stories.noStory': 'No hay historia hoy. ¡Vuelve mañana!',
+		'nav.alphabet': 'Alfabeto',
+		'nav.vocabulary': 'Vocabulario',
+		'alphabet.title': 'Tabla de Kana',
+		'alphabet.subtitle': 'Domina Hiragana y Katakana con referencia visual y de audio.'
 	}
 };
 

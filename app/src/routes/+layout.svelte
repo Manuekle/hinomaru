@@ -26,11 +26,12 @@
 
 	onMount(() => {
 		theme.init();
-		
+
 		// Detect PWA mode - combine server-side hint with client-side detection
-		const clientPWA = window.matchMedia('(display-mode: standalone)').matches || 
-				(window.navigator as any).standalone;
-		
+		const clientPWA =
+			window.matchMedia('(display-mode: standalone)').matches ||
+			(window.navigator as any).standalone;
+
 		isPWA = data.isPWA || clientPWA;
 		booting = isPWA;
 
@@ -46,13 +47,13 @@
 		if (isPWA) {
 			const path = $page.url.pathname;
 			let targetPath = path;
-			
+
 			if (!session && path === '/') {
 				targetPath = '/login';
 			} else if (session && path === '/login') {
 				targetPath = '/';
 			}
-			
+
 			// Navigate if path changed OR if we need to remove ?pwa=1
 			if (targetPath !== path || $page.url.searchParams.has('pwa')) {
 				goto(targetPath, { replaceState: true, noScroll: true, keepFocus: true });
@@ -83,15 +84,11 @@
 	});
 
 	const onboardingCompleted = $derived(
-		!!data.profile?.onboarding_completed || 
-		(isBrowser() && localStorage.getItem('hinomaru_onboarding_completed') === 'true')
+		!!data.profile?.onboarding_completed ||
+			(isBrowser() && localStorage.getItem('hinomaru_onboarding_completed') === 'true')
 	);
 
-	const showNav = $derived(
-		session && 
-		onboardingCompleted &&
-		$page.url.pathname === '/'
-	);
+	const showNav = $derived(session && onboardingCompleted && $page.url.pathname === '/');
 
 	// Reactively handle onboarding redirects after login/signup
 	$effect(() => {
@@ -127,10 +124,7 @@
 
 <div class="app-container">
 	{#if showNav}
-		<header
-			bind:this={headerEl}
-			class="premium-nav"
-		>
+		<header bind:this={headerEl} class="premium-nav">
 			<div class="nav-content">
 				<!-- Profile / Left slot (Removed) -->
 				<div class="nav-slot left"></div>
@@ -143,8 +137,19 @@
 					<div class="nav-actions">
 						<SupportKofi variant="minimal" />
 						<a href="/settings" class="settings-btn" aria-label="Settings">
-							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+								></path>
 								<circle cx="12" cy="12" r="3"></circle>
 							</svg>
 						</a>
@@ -159,7 +164,6 @@
 	<PWASplash visible={booting} />
 </div>
 
-
 <style>
 	@keyframes dot-pulse {
 		0%,
@@ -170,7 +174,6 @@
 			box-shadow: 0 0 0 5px rgba(188, 0, 45, 0);
 		}
 	}
-
 
 	.premium-nav {
 		position: sticky;
@@ -240,7 +243,7 @@
 	}
 
 	.brand-text {
-		font-weight: 800;
+		font-weight: 600;
 		font-size: 18px;
 		letter-spacing: -0.04em;
 	}
@@ -256,7 +259,7 @@
 		padding: 4px 10px;
 		border-radius: 100px;
 		border: 1px solid var(--ink-200);
-		box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 	}
 
 	.settings-btn {
@@ -274,7 +277,7 @@
 
 	.settings-btn:hover {
 		color: var(--sumi);
-		background: rgba(0,0,0,0.05);
+		background: rgba(0, 0, 0, 0.05);
 	}
 
 	/* Mobile brand — hidden by default on desktop */
@@ -291,7 +294,7 @@
 			height: 64px;
 			padding: 0 16px;
 		}
-		
+
 		.brand-text {
 			font-size: 18px;
 		}
@@ -300,7 +303,7 @@
 			width: 8px;
 			height: 8px;
 		}
-		
+
 		/* On mobile, hide the centered slot and show brand in left slot */
 		.center {
 			display: none;
