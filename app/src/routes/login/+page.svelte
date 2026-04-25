@@ -220,7 +220,7 @@
 </script>
 
 <div
-	style="min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));"
+	style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));"
 >
 	<div style="width:100%;max-width:400px;">
 		<!-- Brand -->

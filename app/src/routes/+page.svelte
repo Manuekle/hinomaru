@@ -21,7 +21,7 @@
 	<Landing decks={data.decks} />
 {:else}
 	<div
-		style="max-width:720px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));"
+		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 	>
 		<!-- Header -->
 		<div
@@ -98,7 +98,7 @@
 		</div>
 
 		<!-- Word of the Day -->
-		<WordOfTheDay word={data.todayWord} />
+		<WordOfTheDay word={data.todayWord} initiallySaved={data.wordSaved} />
 
 		<!-- Level tabs -->
 
@@ -113,7 +113,7 @@
 						activeLevel = level;
 					}}
 					class="touch-action-manip"
-					style="height:36px;padding:0 16px;border-radius:999px;
+					style="height:42px;padding:0 16px;border-radius:999px;
                border:1px solid {activeLevel === level ? 'var(--sumi)' : 'var(--ink-200)'};
                background:{activeLevel === level ? 'var(--sumi)' : 'var(--bg-surface)'};
                color:{activeLevel === level ? 'var(--bg-surface)' : 'var(--sumi)'};

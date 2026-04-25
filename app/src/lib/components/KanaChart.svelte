@@ -27,7 +27,7 @@
 
 	<!-- Kana Grid -->
 	<div class="kana-grid" use:fadeUp={{ delay: 0.1, y: 16 }}>
-		{#each currentData as item}
+		{#each currentData as item, i (i)}
 			{#if item.jp}
 				<button class="kana-cell" onclick={() => play(item.jp)}>
 					<span class="kana-char">{item.jp}</span>

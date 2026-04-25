@@ -96,7 +96,7 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
+<div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
 	<SessionNav 
 		progress={pct} 
 		current={i + 1} 

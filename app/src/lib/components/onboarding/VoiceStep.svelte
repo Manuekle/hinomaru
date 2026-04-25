@@ -78,7 +78,7 @@
 	</header>
 
 	<div class="options-list">
-		{#each voices as voice, i}
+		{#each voices as voice, i (voice.id)}
 			<div
 				class="voice-card"
 				class:selected={selected === voice.id}

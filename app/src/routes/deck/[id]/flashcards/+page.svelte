@@ -105,7 +105,7 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;background:var(--paper);">
+<div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
 	<SessionNav 
 		progress={pct} 
 		current={i + 1} 
@@ -114,7 +114,9 @@
 	/>
 
 	{#if data.cards.length === 0}
-		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+		<div
+	style="min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;position:relative;overflow:hidden;"
+>
 			<div style="font-size:48px;margin-bottom:16px;">📭</div>
 			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
 			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>

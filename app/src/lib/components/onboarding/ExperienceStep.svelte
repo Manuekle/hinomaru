@@ -26,7 +26,7 @@
 	</header>
 
 	<div class="options-list">
-		{#each options as option, i}
+		{#each options as option, i (option.id)}
 			<button
 				class="option-btn"
 				class:selected={selected === option.id}

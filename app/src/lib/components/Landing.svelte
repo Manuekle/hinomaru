@@ -58,7 +58,7 @@
 
 			<!-- Stats row -->
 			<div use:fadeUp={{ delay: 0.5 }} class="stats" style="display:flex; gap:40px; margin-top:60px;">
-				{#each stats as stat}
+				{#each stats as stat (stat.key)}
 					<div>
 						<div style="font-size:24px; font-weight:800; color:var(--sumi);">{stat.value}</div>
 						<div class="label-meta" style="font-size:11px; opacity:0.6;">{t(stat.key, $locale)}</div>
@@ -102,7 +102,7 @@
 			<h2 use:fadeUp style="font-size:36px; font-weight:800; letter-spacing:-0.02em;">{t('landing.features.title', $locale)}</h2>
 		</div>
 		<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:24px;">
-			{#each features as feature, i}
+			{#each features as feature, i (feature.key)}
 				<div
 					use:fadeUp={{ delay: 0.2 + i * 0.1 }}
 					role="article"
@@ -128,7 +128,7 @@
 			<div class="label-meta" style="margin-bottom:16px; opacity:0.5;">{t('landing.preview.label', $locale)}</div>
 			<h2 use:fadeUp style="font-size:40px; font-weight:800; margin-bottom:48px; letter-spacing:-0.02em;">{t('landing.preview.title', $locale)}</h2>
 			<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
-				{#each previewDecks as deck}
+				{#each previewDecks as deck (deck.id)}
 					<div
 						use:fadeUp
 						style="background:var(--bg-surface); border:1px solid var(--ink-200); border-radius:28px; padding:24px; text-align:left; position:relative; overflow:hidden;"

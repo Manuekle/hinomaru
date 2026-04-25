@@ -3,7 +3,7 @@
 	import { theme, type ThemeType } from '$lib/stores/theme';
 	import { showRomaji, preferredVoice } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
-	import { fadeUp, fadeIn } from '$lib/motion';
+	import { fadeUp } from '$lib/motion';
 	import { goto, invalidate } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
 	import supportImg from '$lib/assets/support.png';
@@ -51,7 +51,7 @@
 </svelte:head>
 
 <div
-	style="max-width:720px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));"
+	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 >
 	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
 		<a href="/" class="back-link-beautiful">
@@ -203,9 +203,9 @@
 
 		<!-- Support Section -->
 		<section class="settings-group">
-			<h2 class="group-label">Apoyar el proyecto</h2>
+			<h2 class="group-label">{t('settings.support.title', $locale)}</h2>
 			<div class="support-container">
-				<p class="support-text">Hinomaru es un proyecto personal. Si te gusta, puedes apoyarme para seguir mejorando la app.</p>
+				<p class="support-text">{t('settings.support.desc', $locale)}</p>
 				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="support-image-btn">
 					<img src={supportImg} alt="Support on Ko-fi" />
 				</a>

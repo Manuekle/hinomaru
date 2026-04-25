@@ -65,8 +65,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { data: todayWord } = await locals.supabase
 		.from('daily_words')
 		.select('*')
-		.eq('date', today)
+		.eq('publish_date', today)
 		.maybeSingle();
+
+	let wordSaved = false;
+	if (user && todayWord) {
+		const { data: savedWord } = await locals.supabase
+			.from('user_saved_words')
+			.select('id')
+			.eq('user_id', user.id)
+			.eq('jp', todayWord.jp)
+			.maybeSingle();
+		wordSaved = !!savedWord;
+	}
 
 	return {
 		user,
@@ -78,6 +89,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		streak: streakDays ?? 0,
 		todayStory,
 		storyRead,
-		todayWord
+		todayWord,
+		wordSaved
 	};
 };

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
-	import { locale } from '$lib/stores/locale';
 
 	let {
 		progress = 0,

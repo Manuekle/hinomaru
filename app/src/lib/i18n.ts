@@ -270,8 +270,24 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'stories.noStory': 'No story available today. Check back tomorrow!',
 		'nav.alphabet': 'Alphabet',
 		'nav.vocabulary': 'Vocabulary',
-		'alphabet.title': 'Kana Chart',
-		'alphabet.subtitle': 'Master Hiragana and Katakana with audio and visual reference.'
+		'alphabet.subtitle': 'Master Hiragana and Katakana with audio and visual reference.',
+		'wotd.title': 'Word of the Day',
+		'wotd.save': '+ Save to my vocabulary',
+		'wotd.saved': 'Saved ✓',
+		'settings.support.title': 'Support the project',
+		'settings.support.desc': 'Hinomaru is a personal project. If you like it, you can support me to keep improving the app.',
+		'vocab.search': 'Search word...',
+		'vocab.empty': 'No saved words yet.',
+		'vocab.listen': 'Listen',
+		'vocab.delete': 'Delete',
+		'auth.reset.title': 'New password',
+		'auth.reset.subtitle': 'Choose a secure password for your account.',
+		'auth.reset.submit': 'Save password',
+		'auth.reset.done.title': 'Password updated!',
+		'auth.reset.done.desc': 'Your password was updated successfully. Redirecting to home...',
+		'auth.reset.error.same': 'The new password must be different from the current one.',
+		'auth.reset.show': 'Show password',
+		'auth.reset.hide': 'Hide password'
 	},
 	es: {
 		'auth.signin.subtitle': 'Inicia sesión para guardar tu progreso.',
@@ -542,8 +558,24 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'stories.noStory': 'No hay historia hoy. ¡Vuelve mañana!',
 		'nav.alphabet': 'Alfabeto',
 		'nav.vocabulary': 'Vocabulario',
-		'alphabet.title': 'Tabla de Kana',
-		'alphabet.subtitle': 'Domina Hiragana y Katakana con referencia visual y de audio.'
+		'alphabet.subtitle': 'Domina Hiragana y Katakana con referencia visual y de audio.',
+		'wotd.title': 'Palabra del día',
+		'wotd.save': '+ Guardar en mi vocabulario',
+		'wotd.saved': 'Guardado ✓',
+		'settings.support.title': 'Apoyar el proyecto',
+		'settings.support.desc': 'Hinomaru es un proyecto personal. Si te gusta, puedes apoyarme para seguir mejorando la app.',
+		'vocab.search': 'Buscar palabra...',
+		'vocab.empty': 'No hay palabras guardadas aún.',
+		'vocab.listen': 'Escuchar',
+		'vocab.delete': 'Eliminar',
+		'auth.reset.title': 'Nueva contraseña',
+		'auth.reset.subtitle': 'Elige una contraseña segura para tu cuenta.',
+		'auth.reset.submit': 'Guardar contraseña',
+		'auth.reset.done.title': '¡Contraseña actualizada!',
+		'auth.reset.done.desc': 'Tu contraseña se actualizó correctamente. Redirigiendo al inicio…',
+		'auth.reset.error.same': 'La nueva contraseña debe ser diferente a la actual.',
+		'auth.reset.show': 'Ver contraseña',
+		'auth.reset.hide': 'Ocultar contraseña'
 	}
 };
 

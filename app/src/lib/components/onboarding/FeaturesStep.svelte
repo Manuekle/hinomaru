@@ -41,7 +41,7 @@
 	</header>
 
 	<div class="features-list">
-		{#each features as feature, i}
+		{#each features as feature, i (feature.title)}
 			<div class="feature-item" use:fadeUp={{ delay: 0.1 + i * 0.05, y: 12 }}>
 				<div class="icon-box">
 					<span class="icon">{feature.icon}</span>

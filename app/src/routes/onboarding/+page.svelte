@@ -2,9 +2,6 @@
 	import Onboarding from '$lib/components/onboarding/Onboarding.svelte';
 	import { goto } from '$app/navigation';
 	import { createClient } from '$lib/supabase';
-	import type { PageData } from './$types';
-
-	let { data } = $props<{ data: PageData }>();
 	const supabase = createClient();
 
 	async function handleFinish() {

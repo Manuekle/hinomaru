@@ -26,7 +26,7 @@
 		</p>
 
 		<div class="timeline" use:fadeUp={{ delay: 0.2, y: 15 }}>
-			{#each intervals as interval, i}
+			{#each intervals as interval, i (interval.label)}
 				<div class="interval-item">
 					<div class="icon-box">
 						<span class="icon">{interval.icon}</span>

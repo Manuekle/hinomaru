@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { tick } from 'svelte';
-	import { animate } from 'motion/mini';
-	import { onMount } from 'svelte';
 	import WelcomeStep from './WelcomeStep.svelte';
 	import FeaturesStep from './FeaturesStep.svelte';
 	import MotivationStep from './MotivationStep.svelte';

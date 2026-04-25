@@ -32,7 +32,7 @@
 
 	<div class="main-body">
 		<div class="goals-grid">
-			{#each options as option, i}
+			{#each options as option, i (option.value)}
 				<button
 					class="goal-card"
 					class:selected={selected === option.value}

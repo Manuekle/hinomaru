@@ -17,7 +17,7 @@
 </svelte:head>
 
 <div
-	style="max-width:720px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));"
+	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 >
 	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
 		<a href="/" class="back-link-beautiful">
@@ -108,7 +108,7 @@
 	}
 
 	.filter-chip {
-		height: 36px;
+		height: 42px;
 		padding: 0 16px;
 		border-radius: 999px;
 		border: 1px solid var(--ink-200);

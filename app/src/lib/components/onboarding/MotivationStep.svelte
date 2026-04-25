@@ -2,7 +2,6 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
 	let { onSelect } = $props();
 
@@ -29,7 +28,7 @@
 	</header>
 
 	<div class="options-list">
-		{#each options as option, i}
+		{#each options as option, i (option.id)}
 			<button
 				class="option-btn"
 				class:selected={selected === option.id}

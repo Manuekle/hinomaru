@@ -64,14 +64,14 @@
 		</div>
 
 		<div class="chips">
-			{#each story.chips as chip}
+			{#each story.chips as chip (chip.jp)}
 				<div class="chip">{chip.jp} <span class="translation">{chip.trans}</span></div>
 			{/each}
 		</div>
 	</div>
 
 	<div class="points-list">
-		{#each points as point, i}
+		{#each points as point, i (i)}
 			<div class="point-item" use:fadeUp={{ delay: 0.2 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
 					<span class="icon-small"><Icon icon={point.icon} size={20} /></span>

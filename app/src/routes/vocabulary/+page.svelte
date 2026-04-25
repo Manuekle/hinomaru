@@ -1,9 +1,17 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
-	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
+	import { fadeUp, staggerChildren } from '$lib/motion';
 	import { speakJapanese } from '$lib/utils/tts';
 	import type { PageData } from './$types';
+
+	interface SavedWord {
+		id: string;
+		jp: string;
+		kana: string;
+		en: string;
+		es: string;
+	}
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -12,13 +20,13 @@
 	async function removeWord(id: string) {
 		const { error } = await supabase.from('user_saved_words').delete().eq('id', id);
 		if (!error) {
-			data.savedWords = data.savedWords.filter(w => w.id !== id);
+			data.savedWords = (data.savedWords as SavedWord[]).filter((w: SavedWord) => w.id !== id);
 		}
 	}
 
 	let searchQuery = $state('');
 	const filteredWords = $derived(
-		data.savedWords.filter(w => 
+		(data.savedWords as SavedWord[]).filter((w: SavedWord) => 
 			w.jp.includes(searchQuery) || 
 			w.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			w.es.toLowerCase().includes(searchQuery.toLowerCase())
@@ -30,7 +38,7 @@
 	<title>{t('nav.vocabulary', $locale) || 'Mi Vocabulario'} — Hinomaru</title>
 </svelte:head>
 
-<div style="max-width:720px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));">
+<div style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));">
 	<div
 		use:fadeUp={{ delay: 0, y: 12 }}
 		style="margin-bottom:8px;"
@@ -50,7 +58,7 @@
 	<div class="search-box" use:fadeUp={{ delay: 0.12 }}>
 		<input 
 			type="text" 
-			placeholder="Buscar palabra..." 
+			placeholder={t('vocab.search', $locale)} 
 			bind:value={searchQuery}
 		/>
 	</div>
@@ -58,7 +66,7 @@
 	<div class="vocab-list" use:staggerChildren={{ delay: 0.18, stagger: 0.05 }}>
 		{#if filteredWords.length === 0}
 			<div class="empty-state">
-				<p>No hay palabras guardadas aún.</p>
+				<p>{t('vocab.empty', $locale)}</p>
 			</div>
 		{:else}
 			{#each filteredWords as word (word.id)}
@@ -69,10 +77,10 @@
 							<span class="word-kana">{word.kana}</span>
 						</div>
 						<div class="word-actions">
-							<button class="action-btn audio" onclick={() => speakJapanese(word.jp)} title="Escuchar">
+							<button class="action-btn audio" onclick={() => speakJapanese(word.jp)} title={t('vocab.listen', $locale)}>
 								🔊
 							</button>
-							<button class="action-btn delete" onclick={() => removeWord(word.id)} title="Eliminar">
+							<button class="action-btn delete" onclick={() => removeWord(word.id)} title={t('vocab.delete', $locale)}>
 								✕
 							</button>
 						</div>

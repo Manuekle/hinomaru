@@ -48,7 +48,7 @@
 	</header>
 
 	<div class="summary-list">
-		{#each items as item, i}
+		{#each items as item, i (item.labelKey)}
 			<div class="summary-item" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
 					<span class="icon">{item.icon}</span>

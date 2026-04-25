@@ -7,7 +7,6 @@
 	import { fadeUp } from '$lib/motion';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
 
@@ -91,7 +90,7 @@
 <div class="story-viewer-layout">
 	<!-- Standardized Container matching Dashboard -->
 	<div
-		style="max-width:720px;margin:0 auto;padding:40px 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
+		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 	>
 		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
 			<a href="/deck/stories" class="back-link-beautiful">
@@ -107,7 +106,7 @@
 		{:else if phase === 'read'}
 			<div class="story-content" use:fadeUp={{ delay: 0.1, y: 12 }}>
 				<div class="story-meta-tags">
-					<span class="level-badge">{story.level}</span>
+					<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{story.level}</span>
 					<span class="date-badge">
 						{new Date(story.publish_date).toLocaleDateString($locale === 'es' ? 'es-MX' : 'en-US', {
 							month: 'long',
@@ -152,7 +151,7 @@
 					<section class="vocab-section">
 						<h3 class="section-title">{t('stories.vocab', $locale)}</h3>
 						<div class="vocab-list">
-							{#each vocab as word}
+							{#each vocab as word (word.jp)}
 								<div class="vocab-card">
 									<div class="vocab-card-main">
 										<div class="vocab-jp-group">
@@ -196,7 +195,7 @@
 						</h2>
 
 						<div class="options-grid">
-							{#each $locale === 'es' ? currentQuestion.o_es || currentQuestion.o : currentQuestion.o_en || currentQuestion.o as option, i}
+							{#each $locale === 'es' ? currentQuestion.o_es || currentQuestion.o : currentQuestion.o_en || currentQuestion.o as option, i (i)}
 								<button
 									class="option-item"
 									class:is-selected={selected === i}
@@ -288,15 +287,7 @@
 		margin-bottom: 16px;
 	}
 
-	.level-badge {
-		background: var(--sumi);
-		color: white;
-		font-size: 10px;
-		font-weight: 600;
-		padding: 2px 10px;
-		border-radius: 6px;
-		text-transform: uppercase;
-	}
+
 
 	.date-badge {
 		font-size: 12px;

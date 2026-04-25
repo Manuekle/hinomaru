@@ -4,9 +4,20 @@
 	import { fadeUp } from '$lib/motion';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { page } from '$app/stores';
+	import { invalidateAll, goto } from '$app/navigation';
 
-	let { word } = $props<{ word: any }>();
-	let saved = $state(false);
+	interface Word {
+		id?: string;
+		jp: string;
+		kana: string;
+		romaji?: string;
+		en: string;
+		es: string;
+		level?: string;
+	}
+
+	let { word, initiallySaved = false } = $props<{ word: Word | null, initiallySaved?: boolean }>();
+	let saved = $state(initiallySaved);
 
 	const supabase = $derived($page.data.supabase);
 
@@ -17,27 +28,33 @@
 		} = await supabase.auth.getUser();
 		if (!user) return;
 
-		const { error } = await supabase.from('user_saved_words').upsert({
+		const { error } = await supabase.from('user_saved_words').insert({
 			user_id: user.id,
-			word_id: word.id,
 			jp: word.jp,
 			kana: word.kana,
-			romaji: word.romaji,
 			en: word.en,
 			es: word.es
 		});
 
 		if (!error) {
 			saved = true;
+			// Force SvelteKit to refresh all data from the server
+			await invalidateAll();
 		}
+	}
+
+	async function goToVocab() {
+		await goto('/vocabulary');
 	}
 </script>
 
 {#if word}
 	<div class="wotd-card" use:fadeUp={{ delay: 0.1, y: 12 }}>
 		<div class="wotd-header">
-			<span class="wotd-label">Palabra del día</span>
-			<span class="level-pill">{word.level}</span>
+			<span class="wotd-label">{t('wotd.title', $locale)}</span>
+			{#if word.level}
+				<span class="level-pill">{word.level}</span>
+			{/if}
 		</div>
 
 		<div class="wotd-main">
@@ -56,9 +73,15 @@
 		</p>
 
 		<div class="wotd-actions">
-			<button class="save-btn" class:saved onclick={saveWord} disabled={saved}>
-				{saved ? '✓ Guardada' : '+ Guardar en mi vocabulario'}
-			</button>
+			{#if saved}
+				<button class="save-btn saved" onclick={goToVocab} use:fadeUp={{y: 5}}>
+					{t('wotd.saved', $locale)} {t('nav.vocabulary', $locale)} →
+				</button>
+			{:else}
+				<button class="save-btn" onclick={saveWord}>
+					{t('wotd.save', $locale)}
+				</button>
+			{/if}
 		</div>
 	</div>
 {/if}

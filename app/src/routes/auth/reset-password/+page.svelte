@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { t } from '$lib/i18n';
+	import { locale } from '$lib/stores/locale';
 	import { z } from 'zod';
 
 	let { data } = $props();
@@ -10,13 +12,13 @@
 		.object({
 			password: z
 				.string()
-				.min(6, 'Mínimo 6 caracteres.')
-				.regex(/[A-Z]/, 'Debe contener al menos una mayúscula.')
-				.regex(/[0-9]/, 'Debe contener al menos un número.'),
-			confirm: z.string().min(1, 'Confirma tu contraseña.')
+				.min(6, t('auth.validation.passwordMin', $locale))
+				.regex(/[A-Z]/, t('auth.validation.passwordUpper', $locale))
+				.regex(/[0-9]/, t('auth.validation.passwordNumber', $locale)),
+			confirm: z.string().min(1, t('auth.validation.confirmRequired', $locale))
 		})
 		.refine((d) => d.password === d.confirm, {
-			message: 'Las contraseñas no coinciden.',
+			message: t('auth.validation.passwordsMismatch', $locale),
 			path: ['confirm']
 		});
 
@@ -31,7 +33,7 @@
 	let done = $state(false);
 
 	const confirmError = $derived(
-		confirm && password !== confirm ? 'Las contraseñas no coinciden.' : ''
+		confirm && password !== confirm ? t('auth.validation.passwordsMismatch', $locale) : ''
 	);
 
 	const strength = $derived(() => {
@@ -46,10 +48,10 @@
 
 	const strengthLabel = $derived(() => {
 		const s = strength();
-		if (s <= 1) return { text: 'Débil', color: '#BC002D' };
-		if (s === 2) return { text: 'Regular', color: '#A8741A' };
-		if (s === 3) return { text: 'Buena', color: '#2E7D5B' };
-		return { text: 'Fuerte', color: '#2E7D5B' };
+		if (s <= 1) return { text: t('auth.strength.weak', $locale), color: '#BC002D' };
+		if (s === 2) return { text: t('auth.strength.fair', $locale), color: '#A8741A' };
+		if (s === 3) return { text: t('auth.strength.good', $locale), color: '#2E7D5B' };
+		return { text: t('auth.strength.strong', $locale), color: '#2E7D5B' };
 	});
 
 	function validate(): boolean {
@@ -78,7 +80,7 @@
 		const { error: err } = await supabase.auth.updateUser({ password });
 		if (err) {
 			globalError = err.message.includes('same password')
-				? 'La nueva contraseña debe ser diferente a la actual.'
+				? t('auth.reset.error.same', $locale)
 				: err.message;
 			loading = false;
 			return;
@@ -91,7 +93,7 @@
 </script>
 
 <div
-	style="min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));"
+	style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));"
 >
 	<div style="width:100%;max-width:400px;">
 		<div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:40px;">
@@ -111,10 +113,10 @@
 					✓
 				</div>
 				<div style="font-size:18px;font-weight:600;margin-bottom:8px;color:var(--success);">
-					¡Contraseña actualizada!
+					{t('auth.reset.done.title', $locale)}
 				</div>
 				<div style="font-size:14px;color:var(--fg-secondary);line-height:1.6;">
-					Tu contraseña se actualizó correctamente.<br />Redirigiendo al inicio…
+					{t('auth.reset.done.desc', $locale)}
 				</div>
 			</div>
 		{:else}
@@ -124,21 +126,21 @@
 			>
 				<div>
 					<div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px;">
-						Nueva contraseña
+						{t('auth.reset.title', $locale)}
 					</div>
 					<div style="font-size:14px;color:var(--fg-secondary);">
-						Elige una contraseña segura para tu cuenta.
+						{t('auth.reset.subtitle', $locale)}
 					</div>
 				</div>
 
 				<!-- Password -->
 				<div class="field">
-					<div class="label-meta" style="margin-bottom:8px;">Nueva contraseña</div>
+					<div class="label-meta" style="margin-bottom:8px;">{t('auth.reset.label', $locale)}</div>
 					<div class="pw-wrap">
 						<input
 							type={showPassword ? 'text' : 'password'}
 							bind:value={password}
-							placeholder="Mín. 6 caract., 1 mayúscula, 1 número"
+							placeholder={t('auth.validation.passwordPlaceholder', $locale)}
 							class="hm-input {fieldErrors.password ? 'input-error' : ''}"
 							autocomplete="new-password"
 						/>
@@ -146,7 +148,7 @@
 							type="button"
 							class="pw-toggle"
 							onclick={() => (showPassword = !showPassword)}
-							aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+							aria-label={showPassword ? t('auth.reset.hide', $locale) : t('auth.reset.show', $locale)}
 						>
 							{#if showPassword}
 								<svg
@@ -200,12 +202,12 @@
 
 				<!-- Confirm -->
 				<div class="field">
-					<div class="label-meta" style="margin-bottom:8px;">Confirmar contraseña</div>
+					<div class="label-meta" style="margin-bottom:8px;">{t('auth.confirmPassword', $locale)}</div>
 					<div class="pw-wrap">
 						<input
 							type={showConfirm ? 'text' : 'password'}
 							bind:value={confirm}
-							placeholder="Repite tu contraseña"
+							placeholder={t('auth.confirmPassword.placeholder', $locale)}
 							class="hm-input {fieldErrors.confirm || confirmError ? 'input-error' : ''}"
 							autocomplete="new-password"
 						/>
@@ -213,7 +215,7 @@
 							type="button"
 							class="pw-toggle"
 							onclick={() => (showConfirm = !showConfirm)}
-							aria-label={showConfirm ? 'Ocultar contraseña' : 'Ver contraseña'}
+							aria-label={showConfirm ? t('auth.reset.hide', $locale) : t('auth.reset.show', $locale)}
 						>
 							{#if showConfirm}
 								<svg
@@ -256,7 +258,7 @@
 					{:else if confirm && password === confirm}
 						<span
 							style="font-size:12px;color:var(--success);margin-top:5px;display:flex;align-items:center;gap:4px;"
-							>✓ Las contraseñas coinciden</span
+							>✓ {t('auth.passwordsMatch', $locale)}</span
 						>
 					{/if}
 				</div>
@@ -270,7 +272,7 @@
 				{/if}
 
 				<button type="submit" class="hm-btn hm-btn-primary hm-btn-full" disabled={loading}>
-					{#if loading}<span style="opacity:0.7;">…</span>{:else}Guardar contraseña{/if}
+					{#if loading}<span style="opacity:0.7;">…</span>{:else}{t('auth.reset.submit', $locale)}{/if}
 				</button>
 			</form>
 		{/if}

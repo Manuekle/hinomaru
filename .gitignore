@@ -4,6 +4,7 @@
 # Design reference images (not source)
 uploads/
 scripts/
+scratch/
 
 # Internal tool descriptor
 SKILL.md
