@@ -38,7 +38,13 @@
 		</div>
 	{/if}
 
-	<div class="panda-wrapper" class:pulse={mood === 'happy'} class:float={mood === 'thinking'}>
+	<div 
+		class="panda-wrapper" 
+		class:pulse={mood === 'happy'} 
+		class:float={mood === 'thinking'}
+		class:shake={mood === 'encouraging'}
+		class:sway={mood === 'wave'}
+	>
 		<img 
 			src={images[mood]} 
 			alt="Hino the Red Panda"
@@ -110,6 +116,14 @@
 		animation: panda-float 3s ease-in-out infinite;
 	}
 
+	.shake {
+		animation: panda-shake 0.5s ease-in-out infinite;
+	}
+
+	.sway {
+		animation: panda-sway 2s ease-in-out infinite;
+	}
+
 	@keyframes panda-bounce {
 		from { transform: translateY(0); }
 		to { transform: translateY(-8px); }
@@ -118,6 +132,17 @@
 	@keyframes panda-float {
 		0%, 100% { transform: translateY(0); }
 		50% { transform: translateY(-6px); }
+	}
+
+	@keyframes panda-shake {
+		0%, 100% { transform: translateX(0); }
+		25% { transform: translateX(-2px) rotate(-1deg); }
+		75% { transform: translateX(2px) rotate(1deg); }
+	}
+
+	@keyframes panda-sway {
+		0%, 100% { transform: rotate(-2deg); }
+		50% { transform: rotate(2deg); }
 	}
 
 	/* Speech Bubble */
