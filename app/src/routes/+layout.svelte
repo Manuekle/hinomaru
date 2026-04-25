@@ -10,6 +10,8 @@
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
 	import { isBrowser } from '$lib/supabase';
+	import { inject } from '@vercel/analytics';
+	import { dev } from '$app/environment';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
@@ -21,6 +23,7 @@
 	let isPWA = $state(false);
 
 	onMount(() => {
+		inject({ mode: dev ? 'development' : 'production' });
 		theme.init();
 
 		// Detect PWA mode - combine server-side hint with client-side detection

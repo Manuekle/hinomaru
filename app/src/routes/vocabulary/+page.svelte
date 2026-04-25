@@ -3,12 +3,17 @@
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren } from '$lib/motion';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { showRomaji } from '$lib/stores/settings';
+	import { kanaToRomaji } from '$lib/utils/romaji';
+	import Icon from '$lib/Icon.svelte';
+	import { Cancel01Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
 	interface SavedWord {
 		id: string;
 		jp: string;
 		kana: string;
+		romaji?: string;
 		en: string;
 		es: string;
 	}
@@ -26,11 +31,16 @@
 
 	let searchQuery = $state('');
 	const filteredWords = $derived(
-		(data.savedWords as SavedWord[]).filter((w: SavedWord) => 
-			w.jp.includes(searchQuery) || 
-			w.en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			w.es.toLowerCase().includes(searchQuery.toLowerCase())
-		)
+		(data.savedWords as SavedWord[]).filter((w: SavedWord) => {
+			const q = searchQuery.toLowerCase();
+			return (
+				w.jp.includes(searchQuery) ||
+				w.kana.includes(searchQuery) ||
+				w.en.toLowerCase().includes(q) ||
+				w.es.toLowerCase().includes(q) ||
+				(w.romaji || kanaToRomaji(w.kana)).toLowerCase().includes(q)
+			);
+		})
 	);
 </script>
 
@@ -81,10 +91,13 @@
 								🔊
 							</button>
 							<button class="action-btn delete" onclick={() => removeWord(word.id)} title={t('vocab.delete', $locale)}>
-								✕
+								<Icon icon={Cancel01Icon} size={14} strokeWidth={2} />
 							</button>
 						</div>
 					</div>
+					{#if $showRomaji}
+						<div class="word-romaji">{word.romaji || kanaToRomaji(word.kana)}</div>
+					{/if}
 					<div class="word-meaning">
 						{$locale === 'es' ? word.es : word.en}
 					</div>
@@ -183,6 +196,13 @@
 
 	.action-btn.audio:hover {
 		background: var(--ink-200);
+	}
+
+	.word-romaji {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		margin-top: 2px;
+		margin-bottom: 2px;
 	}
 
 	.word-meaning {

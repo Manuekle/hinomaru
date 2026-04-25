@@ -4,6 +4,7 @@
 	import { fadeUp } from '$lib/motion';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { showRomaji } from '$lib/stores/settings';
+	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 
@@ -37,6 +38,7 @@
 			user_id: user.id,
 			jp: word.jp,
 			kana: word.kana,
+			romaji: word.romaji || kanaToRomaji(word.kana),
 			en: word.en,
 			es: word.es
 		});
@@ -61,8 +63,8 @@
 			<div class="wotd-jp-group">
 				<h2 class="wotd-jp">{word.jp}</h2>
 				<span class="wotd-kana">{word.kana}</span>
-				{#if $showRomaji && word.romaji}
-					<span class="wotd-romaji">{word.romaji}</span>
+				{#if $showRomaji}
+					<span class="wotd-romaji">{word.romaji || kanaToRomaji(word.kana)}</span>
 				{/if}
 			</div>
 
