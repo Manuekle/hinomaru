@@ -7,16 +7,26 @@
 	import { fadeUp, fadeIn, scaleIn } from '$lib/motion';
 	import { jlptSongs, parseTime } from '$lib/utils/jlptSongs';
 	import Mascot from '$lib/components/Mascot.svelte';
+	import Icon from '$lib/Icon.svelte';
+	import { 
+		PlayIcon, 
+		PauseIcon, 
+		ArrowReloadHorizontalIcon, 
+		ArrowLeft02Icon,
+		Tick01Icon,
+		Cancel01Icon,
+		VolumeHighIcon
+	} from '@hugeicons/core-free-icons';
+	import { speakJapanese } from '$lib/utils/tts';
 
 	// ── Song data ──────────────────────────────────────────────────
-	const songId = Number($page.params.id);
-	const song = jlptSongs[songId];
-	const startSec = song ? parseTime(song.start) : 0;
-	const endSec = song ? parseTime(song.end) : 30;
-	const clipDuration = endSec - startSec;
-
-	const hasVideo = song?.youtubeId && song.youtubeId !== 'PLACEHOLDER';
-	const hasLyrics = song?.lyrics && song.lyrics.length > 0;
+	let songId = $derived(Number($page.params.id));
+	let song = $derived(jlptSongs[songId]);
+	let startSec = $derived(song ? parseTime(song.start) : 0);
+	let endSec = $derived(song ? parseTime(song.end) : 30);
+	let clipDuration = $derived(endSec - startSec);
+	let hasVideo = $derived(song?.youtubeId && song.youtubeId !== 'PLACEHOLDER');
+	let hasLyrics = $derived(song?.lyrics && song.lyrics.length > 0);
 
 	const levelColors: Record<string, string> = {
 		N5: '#2e7d5b', N4: '#6d8c3b', N3: '#a8741a', N2: '#2563ab', N1: '#bc002d'
@@ -30,6 +40,7 @@
 	let speed = $state(1);
 	let completed = $state(false);
 	let showCompletionToast = $state(false);
+	let mascotMood = $derived((isPlaying || completed ? 'happy' : 'thinking') as 'happy' | 'thinking');
 
 	// Interval for time tracking
 	let trackInterval: ReturnType<typeof setInterval> | null = null;
@@ -37,25 +48,26 @@
 	// ── Lyric state ────────────────────────────────────────────────
 	let currentLyricIndex = $state(-1);
 	let lyricEls = $state<HTMLElement[]>([]);
+	let lyricsContainer = $state<HTMLElement | null>(null);
 
 	const clipProgress = $derived(
 		Math.min(100, Math.max(0, ((currentTime - startSec) / clipDuration) * 100))
 	);
 
-	const clipElapsed = $derived(() => {
+	const clipElapsed = $derived.by(() => {
 		const s = Math.floor(Math.max(0, currentTime - startSec));
 		const m = Math.floor(s / 60);
 		return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 	});
-
-	const clipTotal = $derived(() => {
+	
+	const clipTotal = $derived.by(() => {
 		const s = clipDuration;
 		const m = Math.floor(s / 60);
 		return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 	});
 
 	// ── YouTube IFrame API ─────────────────────────────────────────
-	let playerContainerId = 'yt-player-' + songId;
+	let playerContainerId = $derived('yt-player-' + songId);
 
 	function startTracking() {
 		stopTracking();
@@ -85,13 +97,20 @@
 	function syncLyrics(time: number) {
 		if (!hasLyrics) return;
 		let active = -1;
+		// Add a tiny offset (0.1s) for smoother transitions
+		const adjustedTime = time + 0.1;
+		
 		for (let i = song.lyrics.length - 1; i >= 0; i--) {
-			if (song.lyrics[i].time <= time) { active = i; break; }
+			if (song.lyrics[i].time <= adjustedTime) { active = i; break; }
 		}
+		
 		if (active !== currentLyricIndex) {
 			currentLyricIndex = active;
-			if (active >= 0 && lyricEls[active]) {
-				lyricEls[active].scrollIntoView({ behavior: 'smooth', block: 'center' });
+			if (active >= 0 && lyricEls[active] && lyricsContainer) {
+				const el = lyricEls[active];
+				const container = lyricsContainer;
+				const targetScroll = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+				container.scrollTo({ top: targetScroll, behavior: 'smooth' });
 			}
 		}
 	}
@@ -139,7 +158,10 @@
 	}
 
 	function initYT() {
-		if (!hasVideo) return;
+		if (!hasVideo || !song) return;
+		// Destroy existing player if any
+		try { player?.destroy(); player = null; playerReady = false; } catch {}
+
 		// @ts-ignore
 		const YT = (window as any).YT;
 		if (!YT) return;
@@ -162,20 +184,45 @@
 				onReady: () => {
 					playerReady = true;
 					player.setPlaybackRate(speed);
+					// Force seek to start position to avoid starting at 0
+					player.seekTo(startSec, true);
 				},
 				onStateChange: (e: any) => {
 					const YTStates = (window as any).YT.PlayerState;
 					if (e.data === YTStates.PLAYING) {
 						isPlaying = true;
 						startTracking();
-					} else if (e.data === YTStates.PAUSED || e.data === YTStates.ENDED) {
+					} else if (e.data === YTStates.PAUSED) {
 						isPlaying = false;
 						stopTracking();
+					} else if (e.data === YTStates.ENDED) {
+						isPlaying = false;
+						stopTracking();
+						onClipEnd();
 					}
 				}
 			}
 		});
 	}
+
+	$effect(() => {
+		// When songId changes, reset state and re-init player
+		if (songId !== undefined) {
+			isPlaying = false;
+			completed = false;
+			currentTime = startSec;
+			currentLyricIndex = -1;
+			showCompletionToast = false;
+			
+			// Re-init player after a small delay to allow DOM to update
+			setTimeout(() => {
+				const win = window as any;
+				if (win.YT && win.YT.Player) {
+					initYT();
+				}
+			}, 50);
+		}
+	});
 
 	onMount(() => {
 		if (!hasVideo) return;
@@ -213,7 +260,10 @@
 
 	<!-- Header -->
 	<div class="page-header" use:fadeIn={{ delay: 0 }}>
-		<a href="/deck/songs" class="back-link">← {t('deck.back', $locale)}</a>
+		<a href="/deck/songs" class="back-link">
+			<Icon icon={ArrowLeft02Icon} size={18} />
+			<span>{t('deck.back', $locale)}</span>
+		</a>
 		<div class="header-pills">
 			<span class="level-pill" style="background:{levelColors[song.level] ?? '#bc002d'}">{song.level}</span>
 			<span class="diff-pill">{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span>
@@ -224,13 +274,13 @@
 	<div class="song-header" use:fadeUp={{ delay: 0.06, y: 14 }}>
 		<h1 class="song-title jp">{song.title}</h1>
 		<p class="song-artist">{song.artist}</p>
-		<p class="song-focus">{song.focus}</p>
+		<p class="song-focus">{$locale === 'es' ? song.focus.es : song.focus.en}</p>
 	</div>
 
 	{#if !hasVideo}
 		<!-- Coming soon state -->
 		<div class="coming-soon" use:scaleIn={{ delay: 0.12 }}>
-			<Mascot mood="thinking" size={120} position="center" />
+			<Mascot mood={mascotMood} size={120} position="center" />
 			<p class="cs-title">{t('songs.comingSoon', $locale)}</p>
 			<p class="cs-desc">{t('songs.comingSoonDesc', $locale)}</p>
 		</div>
@@ -257,24 +307,12 @@
 					disabled={!playerReady}
 					aria-label={isPlaying ? 'Pause' : 'Play'}
 				>
-					{#if isPlaying}
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-							<rect x="6" y="4" width="4" height="16" rx="1"/>
-							<rect x="14" y="4" width="4" height="16" rx="1"/>
-						</svg>
-					{:else}
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-							<path d="M8 5v14l11-7z"/>
-						</svg>
-					{/if}
+					<Icon icon={isPlaying ? PauseIcon : PlayIcon} size={22} variant="solid" />
 				</button>
 
 				<!-- Replay -->
 				<button class="ctrl-btn" onclick={replay} disabled={!playerReady} aria-label="Replay">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-						<path d="M3 3v5h5"/>
-					</svg>
+					<Icon icon={ArrowReloadHorizontalIcon} size={18} />
 					{t('songs.replay', $locale)}
 				</button>
 
@@ -287,20 +325,26 @@
 
 			<!-- Progress bar -->
 			<div class="progress-row">
-				<span class="time-label">{clipElapsed()}</span>
+				<span class="time-label">{clipElapsed}</span>
 				<div class="clip-bar">
 					<div class="clip-fill" style="width:{clipProgress}%"></div>
 				</div>
-				<span class="time-label">{clipTotal()}</span>
+				<span class="time-label">{clipTotal}</span>
 			</div>
 		</div>
 
 		<!-- Completion toast -->
 		{#if showCompletionToast}
 			<div class="completion-toast" use:scaleIn={{ delay: 0 }}>
-				<span class="toast-emoji">🎉</span>
-				<span>{t('songs.doneBravo', $locale)}</span>
-				<button class="toast-close" onclick={() => (showCompletionToast = false)}>✕</button>
+				<div class="toast-icon">
+					<Icon icon={Tick01Icon} size={20} />
+				</div>
+				<div class="toast-content">
+					<span class="toast-title">{t('songs.doneBravo', $locale)}</span>
+				</div>
+				<button class="toast-close" onclick={() => (showCompletionToast = false)}>
+					<Icon icon={Cancel01Icon} size={16} />
+				</button>
 			</div>
 		{/if}
 	{/if}
@@ -309,7 +353,7 @@
 	{#if hasLyrics}
 		<div class="section" use:fadeUp={{ delay: 0.2, y: 12 }}>
 			<div class="section-label">{t('songs.lyrics', $locale)}</div>
-			<div class="lyrics-scroll">
+			<div class="lyrics-scroll" bind:this={lyricsContainer}>
 				{#each song.lyrics as line, idx}
 					<div
 						bind:this={lyricEls[idx]}
@@ -341,8 +385,13 @@
 			<div class="section-label">{t('songs.vocab', $locale)}</div>
 			<div class="vocab-grid">
 				{#each song.vocab as word}
-					<div class="vocab-card">
-						<div class="vocab-jp jp">{word.jp}</div>
+					<button class="vocab-card" onclick={() => speakJapanese(word.jp)}>
+						<div class="vocab-header">
+							<div class="vocab-jp jp">{word.jp}</div>
+							<div class="vocab-play-btn">
+								<Icon icon={VolumeHighIcon} size={14} />
+							</div>
+						</div>
 						<div class="vocab-kana">{word.kana}</div>
 						{#if $showRomaji && word.romaji}
 							<div class="vocab-romaji">{word.romaji}</div>
@@ -350,7 +399,7 @@
 						<div class="vocab-meaning">
 							{$locale === 'es' ? word.es : word.en}
 						</div>
-					</div>
+					</button>
 				{/each}
 			</div>
 		</div>
@@ -378,12 +427,20 @@
 	}
 
 	.back-link {
-		font-size: 13px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 14px;
+		font-weight: 600;
 		color: var(--fg-secondary);
 		text-decoration: none;
-		transition: color 150ms ease;
+		transition: all 150ms ease;
+		padding: 4px 0;
 	}
-	.back-link:hover { color: var(--sumi); }
+	.back-link:hover { 
+		color: var(--hinomaru-red); 
+		transform: translateX(-2px);
+	}
 
 	.header-pills {
 		display: flex;
@@ -628,28 +685,65 @@
 	.completion-toast {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		background: var(--success-wash);
+		gap: 12px;
+		background: var(--bg-surface);
 		border: 1.5px solid var(--success);
-		border-radius: 16px;
-		padding: 12px 16px;
-		margin-bottom: 20px;
-		font-size: 14px;
-		font-weight: 600;
-		color: var(--success);
+		border-radius: 20px;
+		padding: 14px 20px;
+		margin-bottom: 24px;
+		box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+		position: relative;
+		overflow: hidden;
 	}
 
-	.toast-emoji { font-size: 20px; }
+	.completion-toast::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--success);
+		opacity: 0.05;
+		pointer-events: none;
+	}
+
+	.toast-icon {
+		width: 36px;
+		height: 36px;
+		background: var(--success);
+		color: white;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+	}
+
+	.toast-content {
+		flex: 1;
+	}
+
+	.toast-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--success-dark, #166534);
+	}
 
 	.toast-close {
-		margin-left: auto;
-		background: none;
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--ink-100);
 		border: none;
+		border-radius: 50%;
 		cursor: pointer;
-		color: var(--success);
-		font-size: 14px;
-		padding: 0;
-		opacity: 0.7;
+		color: var(--fg-tertiary);
+		transition: all 150ms ease;
+	}
+	.toast-close:hover {
+		background: var(--ink-200);
+		color: var(--fg-primary);
 	}
 
 	/* ── Sections ── */
@@ -681,7 +775,8 @@
 		overflow-y: auto;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
-		padding: 8px 0;
+		padding: 10px 0 60px;
+		scroll-behavior: smooth;
 	}
 	.lyrics-scroll::-webkit-scrollbar { display: none; }
 
@@ -700,8 +795,9 @@
 	.lyric-line.active {
 		opacity: 1;
 		background: var(--hinomaru-red-wash);
-		border-color: rgba(188, 0, 45, 0.15);
-		transform: scale(1.01);
+		border-color: rgba(188, 0, 45, 0.1);
+		transform: scale(1.02);
+		box-shadow: 0 4px 16px rgba(188, 0, 45, 0.05);
 	}
 
 	.lyric-jp {
@@ -749,6 +845,24 @@
 		flex-direction: column;
 		gap: 3px;
 		box-shadow: var(--shadow-sm);
+		text-align: left;
+		cursor: pointer;
+		transition: all 150ms ease;
+		width: 100%;
+		font-family: inherit;
+	}
+	.vocab-card:hover {
+		border-color: var(--hinomaru-red);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-md);
+	}
+	.vocab-card:active { transform: scale(0.98); }
+
+	.vocab-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
 	}
 
 	.vocab-jp {
@@ -756,6 +870,22 @@
 		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1;
+	}
+
+	.vocab-play-btn {
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--ink-100);
+		border-radius: 50%;
+		color: var(--fg-tertiary);
+		transition: all 150ms ease;
+	}
+	.vocab-card:hover .vocab-play-btn {
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
 	}
 
 	.vocab-kana {
