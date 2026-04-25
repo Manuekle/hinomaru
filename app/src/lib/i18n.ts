@@ -287,7 +287,12 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.reset.done.desc': 'Your password was updated successfully. Redirecting to home...',
 		'auth.reset.error.same': 'The new password must be different from the current one.',
 		'auth.reset.show': 'Show password',
-		'auth.reset.hide': 'Hide password'
+		'auth.reset.hide': 'Hide password',
+		'mascot.greetingHighStreak': "Wow! {n} days! You're on fire! 🔥",
+		'mascot.greetingStreak': "Great to see you! Ready for today? 🎌",
+		'mascot.greetingNew': "Welcome! I'm Hino, your sensei! Let's start! 🦊",
+		'mascot.correct': "Excellent! Keep it up! ✨",
+		'mascot.wrong': "Don't worry, even samurai fail! Try again! 💪"
 	},
 	es: {
 		'auth.signin.subtitle': 'Inicia sesión para guardar tu progreso.',
@@ -575,7 +580,12 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.reset.done.desc': 'Tu contraseña se actualizó correctamente. Redirigiendo al inicio…',
 		'auth.reset.error.same': 'La nueva contraseña debe ser diferente a la actual.',
 		'auth.reset.show': 'Ver contraseña',
-		'auth.reset.hide': 'Ocultar contraseña'
+		'auth.reset.hide': 'Ocultar contraseña',
+		'mascot.greetingHighStreak': "¡Guau! ¡{n} días! ¡Estás imparable! 🔥",
+		'mascot.greetingStreak': "¡Qué bueno verte! ¿Listo para hoy? 🎌",
+		'mascot.greetingNew': "¡Bienvenido! ¡Soy Hino, tu sensei! ¡Empecemos! 🦊",
+		'mascot.correct': "¡Excelente! ¡Sigue así! ✨",
+		'mascot.wrong': "¡No te rindas! ¡Hasta los samuráis fallan! 💪"
 	}
 };
 

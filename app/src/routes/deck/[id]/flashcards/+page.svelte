@@ -19,6 +19,7 @@
 	let i = $state(0);
 	let flipped = $state(false);
 	let correct = $state(0);
+	let struggled = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const card = $derived(cards[i]);
@@ -39,11 +40,11 @@
 		speakJapanese(text);
 	}
 
-	async function updateCardProgress(c: any, gotIt: boolean) {
+	async function updateCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
 		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
-		const quality = mapPerformanceToQuality(gotIt);
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentProgress);
 		await supabase.from('progress').upsert({
 			user_id: user.id,
@@ -58,7 +59,7 @@
 		if (gotIt) correct++;
 		flipped = false;
 
-		await updateCardProgress(card, gotIt);
+		await updateCardProgress(card, gotIt, struggled);
 
 		if (i >= cards.length - 1) {
 			// Fade out before leaving
@@ -83,6 +84,8 @@
 					{ duration: 0.2, ease: 'easeIn' }
 				).finished;
 				i++;
+				flipped = false;
+				struggled = false;
 				await animate(
 					cardEl,
 					{ opacity: [0, 1], x: [dir * -40, 0] },
@@ -90,7 +93,17 @@
 				);
 			} else {
 				i++;
+				flipped = false;
+				struggled = false;
 			}
+		}
+	}
+
+	async function retry() {
+		struggled = true;
+		flipped = false;
+		if (cardEl) {
+			animate(cardEl, { scale: [1, 0.98, 1] }, { duration: 0.3 });
 		}
 	}
 
@@ -204,15 +217,24 @@
 			</div>
 
 			<StickyFooter>
+				{#if flipped}
+					<button 
+						class="hm-btn hm-btn-secondary touch-action-manip" 
+						onclick={retry} 
+						style="flex:1;"
+					>
+						✕ {t('session.again', $locale)}
+					</button>
+				{/if}
 				<button
-					class="hm-btn hm-btn-primary hm-btn-full touch-action-manip"
-					onclick={() => next(true)}
-					style="transition:transform 100ms ease, box-shadow 150ms ease;"
+					class="hm-btn hm-btn-primary {flipped ? '' : 'hm-btn-full'} touch-action-manip"
+					onclick={() => (flipped ? next(true) : (flipped = true))}
+					style="flex:1; transition:transform 100ms ease, box-shadow 150ms ease;"
 					onmouseenter={(e) =>
 						((e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(188,0,45,0.30)')}
 					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = '')}
 				>
-					✓ {t('session.gotIt', $locale)}
+					{flipped ? `✓ ${t('session.gotIt', $locale)}` : t('session.flip', $locale)}
 				</button>
 			</StickyFooter>
 		</div>

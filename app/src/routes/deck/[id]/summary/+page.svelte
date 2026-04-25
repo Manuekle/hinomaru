@@ -5,6 +5,7 @@
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren, popIn, animateNumber } from '$lib/motion';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import Mascot from '$lib/components/Mascot.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -19,6 +20,13 @@
 			: pct >= 70
 				? t('summary.solid', $locale)
 				: t('summary.retry', $locale)
+	);
+
+	const mascotMood = $derived(pct >= 90 ? 'happy' : 'encouraging');
+	const mascotMessage = $derived(
+		pct >= 90 
+			? t('mascot.correct', $locale) 
+			: t('mascot.wrong', $locale)
 	);
 
 	// Animated score counter
@@ -103,6 +111,8 @@
 			</a>
 		</StickyFooter>
 	</div>
+
+	<Mascot mood={mascotMood} message={mascotMessage} position="bottom-right" size={120} />
 </div>
 
 <style>

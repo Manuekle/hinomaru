@@ -22,14 +22,20 @@
 	let answer = $state('');
 	let submitted = $state(false);
 	let correct = $state(0);
+	let struggled = $state(false);
 	let inputEl = $state<HTMLInputElement | null>(null);
 
 	const card = $derived(cards[i]);
 	const pct = $derived(((i + 1) / cards.length) * 100);
-	const isCorrect = $derived(
-		answer.trim().toLowerCase() === (card?.en ?? '').toLowerCase() ||
-			answer.trim().toLowerCase() === (card?.es ?? '').toLowerCase()
-	);
+	
+	const isCorrect = $derived.by(() => {
+		if (!card || !answer) return false;
+		const clean = (s: string) => s.trim().toLowerCase().replace(/^to\s+/, '');
+		const userAns = clean(answer);
+		const targetEn = clean(card.en);
+		const targetEs = clean(card.es || '');
+		return userAns === targetEn || userAns === targetEs;
+	});
 
 	function submit() {
 		if (submitted || !answer.trim()) return;
@@ -39,7 +45,7 @@
 
 	async function next() {
 		// Save progress for this specific card before moving to next
-		await updateCardProgress(card, isCorrect);
+		await updateCardProgress(card, isCorrect, struggled);
 
 		if (i >= cards.length - 1) {
 			const {
@@ -66,14 +72,14 @@
 		}
 	}
 
-	async function updateCardProgress(c: any, gotIt: boolean) {
+	async function updateCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
 		const {
 			data: { user }
 		} = await supabase.auth.getUser();
 		if (!user) return;
 
 		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
-		const quality = mapPerformanceToQuality(gotIt);
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentProgress);
 
 		await supabase.from('progress').upsert({
@@ -128,11 +134,7 @@
 					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 				>
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-						<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-						<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-					</svg>
+					🔊
 				</button>
 				<div class="label-meta" style="margin-bottom:16px;">{t('session.typeMean', $locale)}</div>
 				<div class="jp" style="font-size:72px;line-height:1;">{card.jp}</div>
@@ -216,9 +218,24 @@
 							{t('session.check', $locale)}
 						</button>
 					{:else}
+						{#if !isCorrect}
+							<button 
+								class="hm-btn hm-btn-secondary touch-action-manip" 
+								onclick={() => { 
+									submitted = false; 
+									answer = ''; 
+									struggled = true;
+									setTimeout(() => inputEl?.focus(), 50);
+								}} 
+								style="flex:1;"
+							>
+								✕ {t('session.again', $locale)}
+							</button>
+						{/if}
 						<button
 							class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} hm-btn-full hm-btn-lg touch-action-manip"
 							onclick={next}
+							style="flex:1;"
 						>
 							{i >= cards.length - 1
 								? t('session.finish', $locale)

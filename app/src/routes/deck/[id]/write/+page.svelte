@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { onDestroy } from 'svelte';
 	import { locale } from '$lib/stores/locale';
-	import { theme } from '$lib/stores/theme';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
@@ -11,14 +10,23 @@
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import Mascot from '$lib/components/Mascot.svelte';
 	import type { PageData } from './$types';
+	
+	interface HanziWriterInstance {
+		quiz: (options?: any) => void;
+		cancelQuiz: () => void;
+		showOutline: () => void;
+		hideOutline: () => void;
+	}
 
 	let { data } = $props<{ data: PageData }>();
-	let quizCards = $state([...(data.cards as any[])]);
+	let quizCards = $state([...data.cards]);
 	const supabase = createClient();
 
 	let i = $state(0);
 	let correctCount = $state(0);
+	let struggled = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const card = $derived(quizCards[i]);
@@ -28,7 +36,7 @@
 	let showGuide = $state(true);
 
 	let hanziContainer = $state<HTMLDivElement | null>(null);
-	let writers = $state<{ writer: any; box: HTMLDivElement }[]>([]);
+	let writers = $state<{ writer: HanziWriterInstance; box: HTMLDivElement }[]>([]);
 	let currentQuizIndex = $state(0);
 	let loadingWriters = $state(true);
 	let setupIteration = 0;
@@ -66,7 +74,7 @@
 		// Responsive box size
 		const containerWidth = hanziContainer?.clientWidth || 320;
 		const gap = 12;
-		let boxSize = 320;
+		let boxSize: number;
 		
 		if (chars.length === 1) {
 			boxSize = Math.min(320, containerWidth);
@@ -78,7 +86,7 @@
 			boxSize = Math.min(120, (containerWidth - gap * 2) / 3);
 		}
 
-		async function fetchCharData(char: string, code: number): Promise<any | null> {
+		async function fetchCharData(char: string, code: number): Promise<unknown> {
 			const urls =
 				code >= 0x3040 && code <= 0x30ff
 					? [
@@ -120,7 +128,7 @@
 		if (!hanziContainer) return;
 
 		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-		const tempWriters: { writer: any; box: HTMLDivElement }[] = [];
+		const tempWriters: { writer: HanziWriterInstance; box: HTMLDivElement }[] = [];
 
 		for (const { char, data } of charDataResults) {
 			const box = document.createElement('div');
@@ -258,46 +266,57 @@
 		if (gotIt) {
 			correctCount++;
 		} else {
-			// Re-add card to the end of the deck so they must practice it again
+			// Re-add card to the end of the deck so they must practice it again later
 			quizCards = [...quizCards, quizCards[i]];
 		}
 
 		// Save progress for this specific card
-		await updateCardProgress(card, gotIt);
+		await updateCardProgress(card, gotIt, struggled);
 
-		if (i >= quizCards.length - 1) {
-			if (cardEl) {
-				await animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.3, ease: 'easeIn' })
-					.finished;
-			}
-			await saveSession(correctCount, data.cards.length);
-			const params = new URLSearchParams({
-				correct: String(correctCount),
-				total: String(data.cards.length),
-				mode: 'write'
-			});
-			goto(`/deck/${data.deck.id}/summary?${params}`);
-		} else {
-			if (cardEl) {
-				const dir = gotIt ? -1 : 1;
-				await animate(
-					cardEl,
-					{ opacity: [1, 0], x: [0, dir * 40] },
-					{ duration: 0.2, ease: 'easeIn' }
-				).finished;
-				i++;
-				await animate(
-					cardEl,
-					{ opacity: [0, 1], x: [dir * -40, 0] },
-					{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-				);
+		if (gotIt) {
+			if (i >= quizCards.length - 1) {
+				if (cardEl) {
+					await animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.3, ease: 'easeIn' })
+						.finished;
+				}
+				await saveSession(correctCount, data.cards.length);
+				const params = new URLSearchParams({
+					correct: String(correctCount),
+					total: String(data.cards.length),
+					mode: 'write'
+				});
+				goto(`/deck/${data.deck.id}/summary?${params}`);
 			} else {
-				i++;
+				if (cardEl) {
+					await animate(
+						cardEl,
+						{ opacity: [1, 0], x: [0, -40] },
+						{ duration: 0.2, ease: 'easeIn' }
+					).finished;
+					i++;
+					struggled = false;
+					await animate(
+						cardEl,
+						{ opacity: [0, 1], x: [40, 0] },
+						{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+					);
+				} else {
+					i++;
+					struggled = false;
+				}
+			}
+		} else {
+			// "Again" - Reset current card state immediately
+			checked = false;
+			struggled = true;
+			setupWriters();
+			if (cardEl) {
+				animate(cardEl, { scale: [1, 0.98, 1] }, { duration: 0.3 });
 			}
 		}
 	}
 
-	async function updateCardProgress(c: any, gotIt: boolean) {
+	async function updateCardProgress(c: { id: string; progress?: unknown[] }, gotIt: boolean, hadDifficulty: boolean = false) {
 		const {
 			data: { user }
 		} = await supabase.auth.getUser();
@@ -307,7 +326,7 @@
 		// card.progress is an array due to Supabase join
 		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
 
-		const quality = mapPerformanceToQuality(gotIt);
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentProgress);
 
 		await supabase.from('progress').upsert({
@@ -381,20 +400,7 @@
 						onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 						onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 					>
-						<svg
-							width="18"
-							height="18"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-							<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-							<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-						</svg>
+						🔊
 					</button>
 				</div>
 
@@ -420,47 +426,15 @@
 							onclick={clearCanvas}
 							style="width:40px;height:40px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:0 2px 4px rgba(0,0,0,0.02);"
 						>
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path
-									d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L20 9C20.5 9.5 20.5 10.5 20 11L11 20"
-								></path>
-							</svg>
+							🧹
 						</button>
 					</div>
 
 					<!-- HanziWriter Container -->
 					{#if loadingWriters}
-						<div
-							style="margin:auto;color:var(--fg-tertiary);font-size:14px;display:flex;align-items:center;gap:8px;"
-						>
-							<svg
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								style="animation: spin 1s linear infinite;"
-								><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg
-							>
-							{t('session.loadingStroke', $locale)}
+						<div style="margin:auto; display:flex; flex-direction:column; align-items:center;">
+							<Mascot mood="thinking" message={t('session.loadingStroke', $locale)} position="center" size={140} />
 						</div>
-						<style>
-							@keyframes spin {
-								100% {
-									transform: rotate(360deg);
-								}
-							}
-						</style>
 					{/if}
 
 					<div

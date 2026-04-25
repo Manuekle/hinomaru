@@ -138,14 +138,13 @@ body {
 	-webkit-tap-highlight-color: transparent;
 }
 
-/* Hide scrollbars while keeping scroll functionality */
-.hide-scrollbar {
+/* Hide scrollbars globally while keeping scroll functionality */
+* {
 	scrollbar-width: none;
 	-ms-overflow-style: none;
-	-webkit-overflow-scrolling: touch;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
+*::-webkit-scrollbar {
 	display: none;
 }
 

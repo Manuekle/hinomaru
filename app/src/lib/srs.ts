@@ -59,7 +59,14 @@ export function calculateNextReview(quality: number, current?: SRSState): SRSSta
 
 /**
  * Map user performance (correct/wrong) to quality (0-5)
+ * 5: Perfect
+ * 4: Correct after hesitation
+ * 3: Correct after difficulty
+ * 2: Wrong but remembered
+ * 1: Wrong, looked familiar
+ * 0: Total blackout
  */
-export function mapPerformanceToQuality(correct: boolean): number {
-  return correct ? 5 : 0;
+export function mapPerformanceToQuality(correct: boolean, struggled: boolean = false): number {
+  if (!correct) return 0;
+  return struggled ? 3 : 5;
 }

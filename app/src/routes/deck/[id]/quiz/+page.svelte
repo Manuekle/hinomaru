@@ -17,6 +17,7 @@
 	let i = $state(0);
 	let picked = $state<string | null>(null);
 	let correct = $state(0);
+	let struggled = $state(false);
 
 	const card = $derived(cards[i]);
 	const pct = $derived(((i + 1) / cards.length) * 100);
@@ -24,14 +25,23 @@
 
 	const options = $derived.by(() => {
 		if (!card) return [];
-		const pool = cards.filter((_, j) => j !== i).map((c) => c.en);
+		// Filter out the correct answer and duplicates by meaning
+		const pool = Array.from(new Set(
+			cards
+				.filter((c) => c.en !== card.en && c.es !== card.es)
+				.map((c) => $locale === 'es' ? c.es : c.en)
+		));
+
 		// Fisher-Yates partial shuffle to pick 2 random distractors
 		for (let k = pool.length - 1; k > pool.length - 3 && k > 0; k--) {
 			const r = Math.floor(Math.random() * (k + 1));
 			[pool[k], pool[r]] = [pool[r], pool[k]];
 		}
-		const result = [...pool.slice(pool.length - 2), card.en];
-		// Fisher-Yates shuffle final 3 options
+		
+		const distractors = pool.slice(-2);
+		const result = [...distractors, $locale === 'es' ? card.es : card.en];
+		
+		// Fisher-Yates shuffle final options
 		for (let k = result.length - 1; k > 0; k--) {
 			const r = Math.floor(Math.random() * (k + 1));
 			[result[k], result[r]] = [result[r], result[k]];
@@ -47,7 +57,7 @@
 
 	async function next() {
 		// Save progress for this specific card before moving to next
-		await updateCardProgress(card, isCorrect);
+		await updateCardProgress(card, isCorrect, struggled);
 
 		if (i >= cards.length - 1) {
 			const {
@@ -70,17 +80,18 @@
 		} else {
 			picked = null;
 			i++;
+			struggled = false;
 		}
 	}
 
-	async function updateCardProgress(c: any, gotIt: boolean) {
+	async function updateCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
 		const {
 			data: { user }
 		} = await supabase.auth.getUser();
 		if (!user) return;
 
 		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
-		const quality = mapPerformanceToQuality(gotIt);
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentProgress);
 
 		await supabase.from('progress').upsert({
@@ -125,11 +136,7 @@
 					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 				>
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-						<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-						<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-					</svg>
+					🔊
 				</button>
 				<div class="label-meta" style="margin-bottom:16px;">{t('session.whatMean', $locale)}</div>
 				<div class="jp" style="font-size:64px;line-height:1;">{card.jp}</div>
@@ -226,6 +233,15 @@
 				</div>
 
 				<StickyFooter>
+					{#if !isCorrect}
+						<button 
+							class="hm-btn hm-btn-secondary touch-action-manip" 
+							onclick={() => { picked = null; struggled = true; }} 
+							style="flex:1;"
+						>
+							✕ {t('session.again', $locale)}
+						</button>
+					{/if}
 					<button class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} touch-action-manip" onclick={next} style="flex:1;">
 						{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
 					</button>

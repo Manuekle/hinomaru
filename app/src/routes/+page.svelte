@@ -6,6 +6,7 @@
 	import { cubicOut, cubicIn } from 'svelte/easing';
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
+	import Mascot from '$lib/components/Mascot.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -15,6 +16,13 @@
 
 	const filtered = $derived(data.decks.filter((d) => d.level === activeLevel));
 	const totalLearned = $derived(data.decks.reduce((s, d) => s + (d.learned ?? 0), 0));
+
+	const mascotMessage = $derived.by(() => {
+		if (data.streak > 7) return t('mascot.greetingHighStreak', $locale, { n: data.streak });
+		if (data.streak > 0) return t('mascot.greetingStreak', $locale, { n: data.streak });
+		return t('mascot.greetingNew', $locale);
+	});
+</script>
 </script>
 
 {#if !data.user}
@@ -211,6 +219,8 @@
 			{/key}
 		</div>
 	</div>
+
+	<Mascot mood="wave" message={mascotMessage} position="bottom-right" size={100} />
 {/if}
 
 <style>
