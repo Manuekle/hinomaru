@@ -3,6 +3,7 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import SupportKofi from '$lib/components/SupportKofi.svelte';
+	import supportImg from '$lib/assets/support.png';
 
 	let { decks = [] } = $props();
 
@@ -137,8 +138,12 @@
 							{deck.level}
 						</div>
 						<span class="hm-pill hm-pill-red" style="margin-bottom:16px; display:inline-block;">{deck.level}</span>
-						<h4 style="font-size:20px; font-weight:700; margin:0;">{deck.title_en}</h4>
-						<p style="font-size:15px; color:var(--fg-secondary); margin-top:8px; line-height:1.5;">{deck.desc_en}</p>
+						<h4 style="font-size:20px; font-weight:700; margin:0;">
+							{$locale === 'es' ? (deck.title_es || deck.title_en) : deck.title_en}
+						</h4>
+						<p style="font-size:15px; color:var(--fg-secondary); margin-top:8px; line-height:1.5;">
+							{$locale === 'es' ? (deck.desc_es || deck.desc_en) : deck.desc_en}
+						</p>
 						<div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
 							<span style="font-size:12px; color:var(--fg-tertiary);">{deck.card_count} {t('home.cards', $locale).split(' ')[1]}</span>
 							<a href="/login" style="font-size:13px; font-weight:700; color:var(--hinomaru-red); text-decoration:none;">{t('landing.preview.btn', $locale)}</a>
@@ -177,8 +182,17 @@
 			{t('auth.signup', $locale)}
 		</a>
 
-		<div style="margin-top:40px;">
-			<SupportKofi variant="button" />
+		<div style="margin-top:40px; max-width:400px; margin-left:auto; margin-right:auto;">
+			<a
+				href="https://ko-fi.com/manujsx"
+				target="_blank"
+				rel="noopener noreferrer"
+				style="display:inline-block; transition:transform 0.2s;"
+				onmouseenter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+				onmouseleave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+			>
+				<img src={supportImg} alt="Support on Ko-fi" style="height:48px; width:auto;" />
+			</a>
 		</div>
 	</section>
 
@@ -189,8 +203,8 @@
 			<span style="font-weight:700; font-size:18px;">Hinomaru</span>
 		</div>
 		<div style="font-size:14px; color:var(--fg-tertiary); display:flex; justify-content:center; gap:24px; margin-bottom:24px;">
-			<a href="/terms" style="color:inherit; text-decoration:none;">Terms</a>
-			<a href="/privacy" style="color:inherit; text-decoration:none;">Privacy</a>
+			<a href="/terms" style="color:inherit; text-decoration:none;">{t('terms.title', $locale)}</a>
+			<a href="/privacy" style="color:inherit; text-decoration:none;">{t('privacy.title', $locale)}</a>
 			<a href="/contact" style="color:inherit; text-decoration:none;">{t('contact.title', $locale)}</a>
 			<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:none;">Ko-fi</a>
 		</div>

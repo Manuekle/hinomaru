@@ -7,6 +7,7 @@
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
 	import type { PageData } from './$types';
+	import supportImg from '$lib/assets/support.png';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -211,11 +212,77 @@
 				</div>
 			{/key}
 		</div>
+		<div style="margin-top:40px;">
+			<section class="settings-group">
+				<h2 class="group-label" style="text-align:center;">{t('settings.support.title', $locale)}</h2>
+				<div class="support-container">
+					<p class="support-text">{t('settings.support.desc', $locale)}</p>
+					<a
+						href="https://ko-fi.com/manujsx"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="support-image-btn"
+					>
+						<img src={supportImg} alt="Support on Ko-fi" />
+					</a>
+				</div>
+			</section>
+		</div>
 	</div>
-
 {/if}
 
 <style>
+	.settings-group {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.group-label {
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--fg-tertiary);
+		margin-bottom: 4px;
+	}
+
+	.support-container {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 24px;
+		box-shadow: var(--shadow-sm);
+		text-align: center;
+	}
+
+	.support-text {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		line-height: 1.5;
+		margin: 0 0 16px;
+	}
+
+	.support-image-btn {
+		display: inline-block;
+		transition: transform 0.2s;
+	}
+
+	.support-image-btn img {
+		height: 44px;
+		width: auto;
+		display: block;
+		margin: 0 auto;
+	}
+
+	.support-image-btn:hover {
+		transform: scale(1.05);
+	}
+
+	.support-image-btn:active {
+		transform: scale(0.95);
+	}
+
 	/* ── Historia del día ── */
 	.story-card {
 		display: flex;
