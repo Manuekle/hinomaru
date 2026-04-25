@@ -97,6 +97,10 @@
 				<span class="tool-icon">📚</span>
 				<span>{t('nav.vocabulary', $locale) || 'Vocabulario'}</span>
 			</a>
+			<a href="/deck/songs" class="tool-btn">
+				<span class="tool-icon">♪</span>
+				<span>{t('nav.songs', $locale) || 'Canciones'}</span>
+			</a>
 		</div>
 
 		<!-- Word of the Day -->
