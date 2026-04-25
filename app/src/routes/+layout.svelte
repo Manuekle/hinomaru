@@ -17,7 +17,7 @@
 	// Init locale from server cookie so SSR and client agree — prevents locale flash
 	locale.set(data.initialLocale ?? 'es');
 
-	let booting = $state(false);
+	let booting = $state(data.isPWA ?? false);
 	let isPWA = $state(false);
 
 	onMount(() => {
