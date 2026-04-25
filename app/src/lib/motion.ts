@@ -2,7 +2,7 @@
  * Svelte actions & helpers built on top of `motion/mini` (DOM-only, no React).
  * Usage: <div use:fadeUp> or <div use:staggerChildren>
  */
-import { animate } from 'motion/mini';
+import { animate } from 'motion';
 
 type FadeUpOpts = { delay?: number; duration?: number; y?: number };
 type FadeInOpts = { delay?: number; duration?: number };

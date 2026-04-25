@@ -5,7 +5,7 @@
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
-	import { animate } from 'motion/mini';
+	import { animate } from 'motion';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import SessionNav from '$lib/components/SessionNav.svelte';

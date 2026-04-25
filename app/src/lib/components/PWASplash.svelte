@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { animate } from 'motion/mini';
+	import { animate } from 'motion';
 	import { fade } from 'svelte/transition';
 
 	let { visible = true } = $props<{ visible: boolean }>();
@@ -10,33 +10,37 @@
 	let containerEl = $state<HTMLElement | null>(null);
 
 	onMount(() => {
-		if (logoEl) {
-			animate(
-				logoEl,
-				{
-					scale: [0.9, 1.05, 1],
-					opacity: [0, 1]
-				},
-				{
-					duration: 0.5,
-					ease: [0.22, 1, 0.36, 1]
-				}
-			);
-		}
+		try {
+			if (logoEl) {
+				animate(
+					logoEl,
+					{
+						scale: [0.9, 1.05, 1],
+						opacity: [0, 1]
+					},
+					{
+						duration: 0.5,
+						ease: [0.22, 1, 0.36, 1]
+					}
+				);
+			}
 
-		if (textEl) {
-			animate(
-				textEl,
-				{
-					opacity: [0, 1],
-					y: [8, 0]
-				},
-				{
-					duration: 0.4,
-					delay: 0.15,
-					ease: [0.22, 1, 0.36, 1]
-				}
-			);
+			if (textEl) {
+				animate(
+					textEl,
+					{
+						opacity: [0, 1],
+						y: [8, 0]
+					},
+					{
+						duration: 0.4,
+						delay: 0.15,
+						ease: [0.22, 1, 0.36, 1]
+					}
+				);
+			}
+		} catch (e) {
+			console.error('Splash animation error:', e);
 		}
 	});
 

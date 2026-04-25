@@ -192,13 +192,10 @@
 					if (e.data === YTStates.PLAYING) {
 						isPlaying = true;
 						startTracking();
-					} else if (e.data === YTStates.PAUSED) {
+					} else if (e.data === YTStates.PAUSED || e.data === YTStates.ENDED) {
 						isPlaying = false;
 						stopTracking();
-					} else if (e.data === YTStates.ENDED) {
-						isPlaying = false;
-						stopTracking();
-						onClipEnd();
+						if (e.data === YTStates.ENDED) onClipEnd();
 					}
 				}
 			}
@@ -260,10 +257,7 @@
 
 	<!-- Header -->
 	<div class="page-header" use:fadeIn={{ delay: 0 }}>
-		<a href="/deck/songs" class="back-link">
-			<Icon icon={ArrowLeft02Icon} size={18} />
-			<span>{t('deck.back', $locale)}</span>
-		</a>
+		<a href="/deck/songs" class="back-link">← {t('deck.back', $locale)}</a>
 		<div class="header-pills">
 			<span class="level-pill" style="background:{levelColors[song.level] ?? '#bc002d'}">{song.level}</span>
 			<span class="diff-pill">{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span>
@@ -336,15 +330,9 @@
 		<!-- Completion toast -->
 		{#if showCompletionToast}
 			<div class="completion-toast" use:scaleIn={{ delay: 0 }}>
-				<div class="toast-icon">
-					<Icon icon={Tick01Icon} size={20} />
-				</div>
-				<div class="toast-content">
-					<span class="toast-title">{t('songs.doneBravo', $locale)}</span>
-				</div>
-				<button class="toast-close" onclick={() => (showCompletionToast = false)}>
-					<Icon icon={Cancel01Icon} size={16} />
-				</button>
+				<span class="toast-emoji">🎉</span>
+				<span>{t('songs.doneBravo', $locale)}</span>
+				<button class="toast-close" onclick={() => (showCompletionToast = false)}>✕</button>
 			</div>
 		{/if}
 	{/if}
@@ -427,20 +415,12 @@
 	}
 
 	.back-link {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 14px;
-		font-weight: 600;
+		font-size: 13px;
 		color: var(--fg-secondary);
 		text-decoration: none;
-		transition: all 150ms ease;
-		padding: 4px 0;
+		transition: color 150ms ease;
 	}
-	.back-link:hover { 
-		color: var(--hinomaru-red); 
-		transform: translateX(-2px);
-	}
+	.back-link:hover { color: var(--sumi); }
 
 	.header-pills {
 		display: flex;
@@ -501,7 +481,7 @@
 		gap: 12px;
 		padding: 40px 24px;
 		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
+		border: 1px solid var(--ink-200);
 		border-radius: 24px;
 		text-align: center;
 		margin-bottom: 24px;
@@ -534,7 +514,7 @@
 		background: var(--sumi);
 		border-radius: 20px;
 		overflow: hidden;
-		box-shadow: var(--shadow-lg);
+		box-shadow: var(--shadow-md);
 	}
 
 	.yt-embed {
@@ -576,7 +556,7 @@
 	/* ── Controls ── */
 	.controls {
 		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
+		border: 1px solid var(--ink-200);
 		border-radius: 20px;
 		padding: 16px;
 		margin-bottom: 24px;
@@ -599,7 +579,7 @@
 		padding: 0 16px;
 		height: 40px;
 		border-radius: 12px;
-		border: 1.5px solid var(--ink-200);
+		border: 1px solid var(--ink-200);
 		background: var(--ink-100);
 		font-size: 13px;
 		font-weight: 600;
@@ -635,7 +615,7 @@
 	.speed-btn {
 		padding: 6px 11px;
 		border-radius: 8px;
-		border: 1.5px solid var(--ink-200);
+		border: 1px solid var(--ink-200);
 		background: transparent;
 		font-size: 12px;
 		font-weight: 600;
@@ -686,64 +666,28 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		background: var(--bg-surface);
-		border: 1.5px solid var(--success);
-		border-radius: 20px;
-		padding: 14px 20px;
+		background: var(--success-wash);
+		border: 1px solid var(--success);
+		border-radius: 16px;
+		padding: 12px 16px;
 		margin-bottom: 24px;
-		box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-		position: relative;
-		overflow: hidden;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--success);
+		box-shadow: var(--shadow-sm);
 	}
 
-	.completion-toast::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: var(--success);
-		opacity: 0.05;
-		pointer-events: none;
-	}
-
-	.toast-icon {
-		width: 36px;
-		height: 36px;
-		background: var(--success);
-		color: white;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-	}
-
-	.toast-content {
-		flex: 1;
-	}
-
-	.toast-title {
-		font-size: 15px;
-		font-weight: 700;
-		color: var(--success-dark, #166534);
-	}
+	.toast-emoji { font-size: 20px; }
 
 	.toast-close {
-		width: 28px;
-		height: 28px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--ink-100);
+		margin-left: auto;
+		background: none;
 		border: none;
-		border-radius: 50%;
 		cursor: pointer;
-		color: var(--fg-tertiary);
-		transition: all 150ms ease;
-	}
-	.toast-close:hover {
-		background: var(--ink-200);
-		color: var(--fg-primary);
+		color: var(--success);
+		font-size: 14px;
+		padding: 0;
+		opacity: 0.7;
 	}
 
 	/* ── Sections ── */
@@ -772,7 +716,7 @@
 		flex-direction: column;
 		gap: 4px;
 		max-height: 400px;
-		overflow-y: auto;
+		overflow-x: hidden;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 		padding: 10px 0 60px;
@@ -785,7 +729,7 @@
 		border-radius: 16px;
 		transition: all 250ms ease;
 		opacity: 0.5;
-		border: 1.5px solid transparent;
+		border: 1px solid transparent;
 	}
 
 	.lyric-line.past {
@@ -796,8 +740,6 @@
 		opacity: 1;
 		background: var(--hinomaru-red-wash);
 		border-color: rgba(188, 0, 45, 0.1);
-		transform: scale(1.02);
-		box-shadow: 0 4px 16px rgba(188, 0, 45, 0.05);
 	}
 
 	.lyric-jp {
@@ -838,7 +780,7 @@
 
 	.vocab-card {
 		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
+		border: 1px solid var(--ink-200);
 		border-radius: 16px;
 		padding: 14px;
 		display: flex;

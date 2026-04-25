@@ -109,7 +109,7 @@
 					<span class="arrow">→</span>
 				</div>
 
-				<div class="song-focus">{song.focus}</div>
+				<div class="song-focus">{$locale === 'es' ? song.focus.es : song.focus.en}</div>
 			</a>
 		{/each}
 	</div>

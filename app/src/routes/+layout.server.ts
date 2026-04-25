@@ -15,5 +15,5 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 
 	const initialLocale = (cookies.get('hm-locale') as 'es' | 'en') ?? 'es';
 
-	return { session, user, initialLocale };
+	return { session, user, initialLocale, cookies: cookies.getAll() };
 };
