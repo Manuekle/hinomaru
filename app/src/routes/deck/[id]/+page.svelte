@@ -25,7 +25,7 @@
 	];
 </script>
 
-<div style="max-width:720px;margin:0 auto;padding:24px 24px calc(100px + env(safe-area-inset-bottom));">
+<div style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));">
 	<a
 		use:fadeIn={{ delay: 0 }}
 		href="/"

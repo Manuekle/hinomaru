@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div style="max-width:480px;margin:0 auto;padding:40px 24px calc(100px + env(safe-area-inset-bottom));">
+<div style="max-width:480px;margin:0 auto;padding:calc(40px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));">
 	<a
 		use:fadeUp={{ delay: 0, y: 10 }}
 		href="/"

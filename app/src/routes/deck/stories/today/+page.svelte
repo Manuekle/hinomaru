@@ -283,7 +283,7 @@
 	.story-page {
 		max-width: 720px;
 		margin: 0 auto;
-		padding: 24px 24px calc(100px + env(safe-area-inset-bottom));
+		padding: calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
 		min-height: 100vh;
 	}
 

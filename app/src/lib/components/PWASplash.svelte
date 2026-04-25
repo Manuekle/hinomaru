@@ -83,7 +83,7 @@
 
 		<!-- Bottom footer -->
 		<div
-			style="position:absolute;bottom:48px;left:0;right:0;text-align:center;
+			style="position:absolute;bottom:calc(48px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;
                font-size:12px;font-weight:600;letter-spacing:0.1em;
                color:var(--fg-tertiary);text-transform:uppercase;opacity:0.6;"
 		>

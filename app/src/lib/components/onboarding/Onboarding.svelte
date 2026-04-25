@@ -99,6 +99,7 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: env(safe-area-inset-top);
+		padding-bottom: env(safe-area-inset-bottom);
 		touch-action: none;
 	}
 

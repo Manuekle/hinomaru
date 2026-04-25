@@ -257,6 +257,7 @@
 		flex-direction: column;
 		min-height: 100dvh;
 		background: var(--paper);
+		padding-bottom: env(safe-area-inset-bottom);
 	}
 
 	/* ── Header ── */

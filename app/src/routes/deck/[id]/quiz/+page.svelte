@@ -119,7 +119,7 @@
 		</div>
 	{:else if card}
 		<div
-			style="flex:1;padding:32px 24px;max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
+			style="flex:1;padding:32px 24px calc(48px + env(safe-area-inset-bottom));max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
 			<div
 				style="background:var(--bg-surface);border-radius:24px;padding:48px;text-align:center;box-shadow:var(--shadow-sm);position:relative;"
