@@ -6,6 +6,7 @@
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { goto, invalidate } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
+	import supportImg from '$lib/assets/support.png';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -197,6 +198,17 @@
 						<div class="check-icon">✓</div>
 					{/if}
 				</button>
+			</div>
+		</section>
+
+		<!-- Support Section -->
+		<section class="settings-group">
+			<h2 class="group-label">Apoyar el proyecto</h2>
+			<div class="support-container">
+				<p class="support-text">Hinomaru es un proyecto personal. Si te gusta, puedes apoyarme para seguir mejorando la app.</p>
+				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="support-image-btn">
+					<img src={supportImg} alt="Support on Ko-fi" />
+				</a>
 			</div>
 		</section>
 
@@ -440,6 +452,42 @@
 		right: 12px;
 		color: var(--success);
 		font-weight: 600;
+	}
+
+	/* Support Section */
+	.support-container {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 24px;
+		box-shadow: var(--shadow-sm);
+		text-align: center;
+	}
+
+	.support-text {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		line-height: 1.5;
+		margin: 0 0 16px;
+	}
+
+	.support-image-btn {
+		display: inline-block;
+		transition: transform 0.2s;
+	}
+
+	.support-image-btn img {
+		height: 44px;
+		width: auto;
+		display: block;
+	}
+
+	.support-image-btn:hover {
+		transform: scale(1.05);
+	}
+
+	.support-image-btn:active {
+		transform: scale(0.95);
 	}
 
 	/* Buttons */

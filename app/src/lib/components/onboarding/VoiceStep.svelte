@@ -2,8 +2,6 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
-	import Icon from '$lib/Icon.svelte';
-	import { Tick01Icon } from '@hugeicons/core-free-icons';
 
 	let { onSelect } = $props();
 
@@ -94,11 +92,7 @@
 					type="button"
 					aria-label="Play voice sample"
 				>
-					{#if playingId === voice.id}
-						<span class="play-icon">⏸</span>
-					{:else}
-						<span class="play-icon">▶</span>
-					{/if}
+					<span class="play-icon">🔊</span>
 				</button>
 
 				<!-- Select trigger: also a real <button> for accessibility -->
@@ -109,7 +103,7 @@
 
 				{#if selected === voice.id}
 					<div class="check" aria-label="Selected">
-						<Icon icon={Tick01Icon} size={20} strokeWidth={3} />
+						✓
 					</div>
 				{/if}
 			</div>
@@ -212,9 +206,8 @@
 	}
 
 	.play-icon {
-		font-size: 13px;
+		font-size: 16px;
 		color: var(--sumi);
-		margin-left: 2px;
 		line-height: 1;
 	}
 

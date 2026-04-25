@@ -2,16 +2,7 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
-	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import {
-		FavouriteIcon,
-		Mortarboard01Icon,
-		VoiceIcon,
-		FireIcon,
-		Notification03Icon,
-		Tick01Icon
-	} from '@hugeicons/core-free-icons';
 
 	let { selections, onComplete } = $props();
 
@@ -21,14 +12,14 @@
 			value: selections.motivation
 				? t(`onboarding.motivation.${selections.motivation}`, $locale)
 				: '...',
-			icon: FavouriteIcon
+			icon: '❤️'
 		},
 		{
 			label: t('onboarding.summary.level', $locale),
 			value: selections.experience
 				? t(`onboarding.experience.${selections.experience}`, $locale)
 				: '...',
-			icon: Mortarboard01Icon
+			icon: '🎓'
 		},
 		{
 			label: t('onboarding.summary.voice', $locale),
@@ -36,17 +27,17 @@
 				selections.voice === 'kaito'
 					? t('onboarding.voice.kaito.name', $locale)
 					: t('onboarding.voice.standard.name', $locale),
-			icon: VoiceIcon
+			icon: '🔊'
 		},
 		{
 			label: t('onboarding.summary.goal', $locale),
 			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }),
-			icon: FireIcon
+			icon: '🔥'
 		},
 		{
 			label: t('onboarding.summary.notifications', $locale),
 			value: t('onboarding.summary.enabled', $locale),
-			icon: Notification03Icon
+			icon: '🔔'
 		}
 	]);
 </script>
@@ -60,14 +51,14 @@
 		{#each items as item, i}
 			<div class="summary-item" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
-					<span class="icon"><Icon icon={item.icon} size={24} color="var(--bg-surface)" /></span>
+					<span class="icon">{item.icon}</span>
 				</div>
 				<div class="text">
 					<div class="label">{item.label}</div>
 					<div class="value">{item.value}</div>
 				</div>
 				<div class="checkmark">
-					<Icon icon={Tick01Icon} size={20} class="check-icon" strokeWidth={3} />
+					<span class="check-icon">✓</span>
 				</div>
 			</div>
 		{/each}
@@ -123,7 +114,7 @@
 	}
 
 	.icon {
-		font-size: 20px;
+		font-size: 24px;
 	}
 
 	.text {
@@ -156,10 +147,8 @@
 	}
 
 	.check-icon {
-		stroke: var(--success);
-	}
-
-	.footer {
-		margin-top: auto;
+		color: var(--success);
+		font-weight: 800;
+		font-size: 14px;
 	}
 </style>
