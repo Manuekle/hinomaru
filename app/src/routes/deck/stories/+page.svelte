@@ -2,7 +2,6 @@
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
-	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -49,7 +48,7 @@
 
 		{#each data.stories as story (story.id)}
 			<a
-				href="/deck/stories/today" 
+				href="/deck/stories/{story.id}"
 				class="story-item"
 			>
 				<div class="story-item-left">

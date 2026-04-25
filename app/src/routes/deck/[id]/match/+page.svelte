@@ -239,7 +239,7 @@
 					{allCards.length} {t('home.cards', $locale) || 'cartas'} completadas
 				</p>
 				<div style="display:flex;flex-direction:column;gap:10px;">
-					<button class="hm-btn hm-btn-primary" onclick={() => { finished=false; currentIndex=0; elapsed=0; sessionCards=[...allCards].sort(()=>Math.random()-0.5); loadNextSet(); timerInterval=setInterval(()=>elapsed++,1000); }}>
+					<button class="hm-btn hm-btn-primary" onclick={() => { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } finished=false; currentIndex=0; elapsed=0; sessionCards=[...allCards].sort(()=>Math.random()-0.5); loadNextSet(); timerInterval=setInterval(()=>elapsed++,1000); }}>
 						↺ {t('session.again', $locale) || 'Jugar de nuevo'}
 					</button>
 					<button class="hm-btn hm-btn-dark" onclick={goBack}>

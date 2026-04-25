@@ -96,7 +96,7 @@
 			<button
 				onclick={closePrompt}
 				aria-label="Close"
-				style="background:var(--ink-100); color:var(--fg-tertiary); border:none; width:32px; height:32px; 
+				style="background:var(--ink-100); color:var(--fg-tertiary); border:none; width:44px; height:44px;
                        border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
                        transition: background 0.2s ease, color 0.2s ease;"
                 onmouseenter={(e) => {

@@ -7,6 +7,7 @@
 	import { createClient } from '$lib/supabase';
 	import { animate } from 'motion/mini';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -36,9 +37,26 @@
 		speakJapanese(text);
 	}
 
+	async function updateCardProgress(c: any, gotIt: boolean) {
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return;
+		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
+		const quality = mapPerformanceToQuality(gotIt);
+		const nextState = calculateNextReview(quality, currentProgress);
+		await supabase.from('progress').upsert({
+			user_id: user.id,
+			card_id: c.id,
+			learned: true,
+			...nextState,
+			last_seen: new Date().toISOString()
+		});
+	}
+
 	async function next(gotIt: boolean) {
 		if (gotIt) correct++;
 		flipped = false;
+
+		await updateCardProgress(card, gotIt);
 
 		if (i >= cards.length - 1) {
 			// Fade out before leaving
@@ -100,6 +118,7 @@
 	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
 		<a
 			href="/deck/{data.deck.id}"
+			aria-label="Close session"
 			class="touch-action-manip"
 			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;
              transition:color 150ms ease;min-width:44px;min-height:44px;display:flex;align-items:center;"

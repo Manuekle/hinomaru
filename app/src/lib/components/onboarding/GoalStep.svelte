@@ -162,7 +162,7 @@
 
 	.goal-info {
 		font-size: 14px;
-		color: var(--ink-300);
+		color: var(--fg-tertiary);
 		font-weight: 500;
 	}
 

@@ -204,7 +204,7 @@
 		width: 36px;
 		height: 36px;
 		min-width: 36px;
-		background: var(--sumi);
+		background: var(--ink-700);
 		border-radius: 10px;
 		display: flex;
 		align-items: center;
@@ -213,7 +213,7 @@
 
 	.icon-small {
 		font-size: 18px;
-		color: var(--bg-surface);
+		color: var(--washi);
 	}
 
 	.text {

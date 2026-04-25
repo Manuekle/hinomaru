@@ -11,9 +11,11 @@
 
 		<script>
 			(function() {
-				const theme = localStorage.getItem('hm-theme') || 'system';
-				const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-				if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+				try {
+					var theme = localStorage.getItem('hm-theme') || 'system';
+					var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+					if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+				} catch(e) {}
 			})();
 		</script>
 		

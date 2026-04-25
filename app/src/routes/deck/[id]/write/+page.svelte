@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { theme } from '$lib/stores/theme';
 	import { showRomaji } from '$lib/stores/settings';
@@ -66,35 +67,41 @@
 		else if (chars.length === 3) boxSize = 160;
 		else if (chars.length > 3) boxSize = 120;
 
+		async function fetchCharData(char: string, code: number): Promise<any | null> {
+			const urls =
+				code >= 0x3040 && code <= 0x30ff
+					? [
+							`https://cdn.jsdelivr.net/gh/ailectra/kana-json@main/data/${encodeURIComponent(char)}.json`,
+							`https://raw.githubusercontent.com/ailectra/kana-json/main/data/${encodeURIComponent(char)}.json`
+						]
+					: [
+							`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`,
+							`https://unpkg.com/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`
+						];
+			for (const url of urls) {
+				try {
+					const res = await fetch(url);
+					if (res.ok) return await res.json();
+				} catch {
+					// try next CDN
+				}
+			}
+			return null;
+		}
+
 		// Fetch all data in parallel
 		const charDataResults = await Promise.all(
 			chars.map(async (char) => {
-				const code = char.charCodeAt(0);
+				const code = char.codePointAt(0)!;
 				const isKanjiKana =
 					(code >= 0x4e00 && code <= 0x9faf) ||
 					(code >= 0x3040 && code <= 0x309f) ||
 					(code >= 0x30a0 && code <= 0x30ff);
 
 				if (!isKanjiKana) return { char, data: null };
-
-				try {
-					let res;
-					if (code >= 0x3040 && code <= 0x30ff) {
-						// Hiragana / Katakana → kana-json CDN
-						res = await fetch(
-							`https://raw.githubusercontent.com/ailectra/kana-json/main/data/${encodeURIComponent(char)}.json`
-						);
-					} else {
-						// Kanji (CJK) → official hanzi-writer-data package
-						res = await fetch(
-							`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`
-						);
-					}
-					if (res.ok) return { char, data: await res.json() };
-				} catch (err) {
-					console.warn('Failed to load stroke data for', char);
-				}
-				return { char, data: null };
+				const charData = await fetchCharData(char, code);
+				if (!charData) console.warn('All CDNs failed for char:', char);
+				return { char, data: charData };
 			})
 		);
 
@@ -204,15 +211,23 @@
 		if (currentQuizIndex < writers.length) {
 			const current = writers[currentQuizIndex];
 			current.writer.cancelQuiz();
-			current.writer.quiz({
-				onComplete: () => {
-					current.box.style.borderColor = 'var(--success)';
-					currentQuizIndex++;
-					startQuizSequence();
-				}
+			requestAnimationFrame(() => {
+				current.writer.quiz({
+					onComplete: () => {
+						current.box.style.borderColor = 'var(--success)';
+						currentQuizIndex++;
+						startQuizSequence();
+					}
+				});
 			});
 		}
 	}
+
+	onDestroy(() => {
+		setupIteration++;
+		if (hanziContainer) hanziContainer.innerHTML = '';
+		writers = [];
+	});
 
 	function toggleGuide() {
 		showGuide = !showGuide;
@@ -325,6 +340,7 @@
 	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
 		<a
 			href="/deck/{data.deck.id}"
+			aria-label="Close session"
 			class="touch-action-manip"
 			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;transition:color 150ms ease;min-width:44px;min-height:44px;display:flex;align-items:center;"
 			onmouseenter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--sumi)')}
@@ -367,7 +383,7 @@
 					<button
 						onclick={playAudio}
 						aria-label="Play pronunciation"
-						style="width:36px;height:36px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:var(--shadow-sm);transition:transform 100ms ease;"
+						style="width:44px;height:44px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:var(--shadow-sm);transition:transform 100ms ease;"
 						onmousedown={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(0.92)')}
 						onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 						onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
@@ -409,7 +425,7 @@
 						</button>
 						<button
 							onclick={clearCanvas}
-							style="width:32px;height:32px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:0 2px 4px rgba(0,0,0,0.02);"
+							style="width:44px;height:44px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:0 2px 4px rgba(0,0,0,0.02);"
 						>
 							<svg
 								width="16"

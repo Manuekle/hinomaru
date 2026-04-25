@@ -17,6 +17,9 @@
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
 
+	// Init locale from server cookie so SSR and client agree — prevents locale flash
+	locale.set(data.initialLocale ?? 'es');
+
 	let headerEl = $state<HTMLElement | null>(null);
 	let booting = $state(false);
 	let isPWA = $state(false);
@@ -259,6 +262,8 @@
 	.settings-btn {
 		width: 28px;
 		height: 28px;
+		min-width: 44px;
+		min-height: 44px;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;

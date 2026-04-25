@@ -100,7 +100,7 @@
 	.icon-box {
 		width: 48px;
 		height: 48px;
-		background: var(--sumi);
+		background: var(--ink-700);
 		border-radius: 14px;
 		display: flex;
 		align-items: center;
@@ -127,7 +127,7 @@
 	.value {
 		font-size: 17px;
 		font-weight: 700;
-		color: var(--sumi);
+		color: var(--fg-primary);
 	}
 
 	.checkmark {

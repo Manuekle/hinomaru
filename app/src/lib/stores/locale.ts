@@ -9,7 +9,11 @@ function createLocaleStore() {
 	return {
 		subscribe,
 		set(locale: Locale) {
-			if (typeof localStorage !== 'undefined') localStorage.setItem('hm-locale', locale);
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem('hm-locale', locale);
+				// Also write cookie so server can read it for SSR (1 year, SameSite=Lax)
+				document.cookie = `hm-locale=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+			}
 			set(locale);
 		}
 	};

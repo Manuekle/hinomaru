@@ -1,14 +1,19 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-const PUBLIC_PATHS = ['/', '/login', '/auth/callback', '/auth/reset-password', '/terms', '/privacy', '/contact'];
+const EXACT_PUBLIC = new Set(['/', '/login', '/terms', '/privacy', '/contact']);
+const PREFIX_PUBLIC = ['/auth/callback', '/auth/reset-password'];
 
 export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	const { session, user } = await locals.safeGetSession();
-	const isPublic = PUBLIC_PATHS.some((p) => url.pathname.startsWith(p));
+	const isPublic =
+		EXACT_PUBLIC.has(url.pathname) ||
+		PREFIX_PUBLIC.some((p) => url.pathname.startsWith(p));
 
 	if (!session && !isPublic) throw redirect(303, '/login');
 	if (session && url.pathname === '/login') throw redirect(303, '/');
 
-	return { session, user, cookies: cookies.getAll() };
+	const initialLocale = (cookies.get('hm-locale') as 'es' | 'en') ?? 'es';
+
+	return { session, user, initialLocale };
 };

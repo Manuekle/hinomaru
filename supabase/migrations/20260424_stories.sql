@@ -202,4 +202,5 @@ INSERT INTO stories (level, title_en, title_es, body_jp, body_en, body_es, publi
    {"q":"What will the narrator do on the weekend?","o":["Go shopping","Watch a movie","Play sports","Study"],"a":1},
    {"q":"Who will the narrator go with?","o":["Family","Alone","Friends","Teacher"],"a":2},
    {"q":"Where will they go after the movie?","o":["Home","Park","Café","School"],"a":2}
- ]');
+ ]')
+ON CONFLICT (title_en) DO NOTHING;

@@ -30,11 +30,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	const { count: streakDays } = await locals.supabase
-		.from('sessions')
-		.select('*', { count: 'exact', head: true })
-		.eq('user_id', user?.id ?? '')
-		.gte('created_at', new Date(Date.now() - 14 * 86400000).toISOString());
+	const { data: streakData } = user
+		? await locals.supabase.rpc('get_user_streak')
+		: { data: 0 };
+	const streakDays = streakData ?? 0;
 
 	// Historia del día — la más reciente con publish_date <= hoy
 	const today = new Date().toISOString().split('T')[0];

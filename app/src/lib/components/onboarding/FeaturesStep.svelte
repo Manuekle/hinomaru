@@ -106,7 +106,7 @@
 		width: 48px;
 		height: 48px;
 		min-width: 48px;
-		background: var(--sumi);
+		background: var(--ink-700);
 		border-radius: 12px;
 		display: flex;
 		align-items: center;

@@ -55,7 +55,7 @@
 					<div class="story-card-title">
 						{$locale === 'es' ? data.todayStory.title_es : data.todayStory.title_en}
 					</div>
-					<div class="story-card-preview">{data.todayStory.body_jp.slice(0, 28)}…</div>
+					<div class="story-card-preview">{[...data.todayStory.body_jp].slice(0, 28).join('')}{[...data.todayStory.body_jp].length > 28 ? '…' : ''}</div>
 				</div>
 			</div>
 			<div class="story-card-right">

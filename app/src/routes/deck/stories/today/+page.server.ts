@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = await locals.safeGetSession();
 
 	if (!user) {
-		redirect(303, '/login');
+		throw redirect(303, '/login');
 	}
 
 	const today = new Date().toISOString().split('T')[0];

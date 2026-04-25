@@ -82,14 +82,16 @@
 				</div>
 			</div>
 			
+			{#if import.meta.env.DEV}
 			<div style="margin-top: 12px; display: flex; justify-content: flex-end;">
-				<button 
+				<button
 					onclick={debugResetOnboarding}
 					style="background:none; border:none; color:var(--fg-tertiary); font-size:12px; cursor:pointer; text-decoration:underline;"
 				>
 					Reset Onboarding (Debug)
 				</button>
 			</div>
+			{/if}
 		</section>
 
 		<!-- Theme Section -->

@@ -158,8 +158,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 36px;
-		height: 36px;
+		width: 44px;
+		height: 44px;
 		border-radius: var(--radius-full);
 		color: var(--fg-tertiary);
 		transition: all 150ms ease;

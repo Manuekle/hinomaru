@@ -22,17 +22,19 @@
 
 	const options = $derived.by(() => {
 		if (!card) return [];
-		const others = cards.filter((_, j) => j !== i).map((c) => c.en);
-		const seed = i * 13 + 7;
-		const picks: string[] = [];
-		const pool = [...others];
-		for (let k = 0; k < 2 && pool.length; k++) {
-			const idx = (seed + k * 3) % pool.length;
-			picks.push(pool.splice(idx, 1)[0]);
+		const pool = cards.filter((_, j) => j !== i).map((c) => c.en);
+		// Fisher-Yates partial shuffle to pick 2 random distractors
+		for (let k = pool.length - 1; k > pool.length - 3 && k > 0; k--) {
+			const r = Math.floor(Math.random() * (k + 1));
+			[pool[k], pool[r]] = [pool[r], pool[k]];
 		}
-		return [...picks, card.en].sort(
-			(a: string, b: string) => ((a.charCodeAt(0) + i) % 7) - ((b.charCodeAt(0) + i) % 7)
-		);
+		const result = [...pool.slice(pool.length - 2), card.en];
+		// Fisher-Yates shuffle final 3 options
+		for (let k = result.length - 1; k > 0; k--) {
+			const r = Math.floor(Math.random() * (k + 1));
+			[result[k], result[r]] = [result[r], result[k]];
+		}
+		return result;
 	});
 
 	function pick(opt: string) {
@@ -101,6 +103,7 @@
 	<div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
 		<a
 			href="/deck/{data.deck.id}"
+			aria-label="Close session"
 			class="touch-action-manip"
 			style="color:var(--fg-secondary);text-decoration:none;font-size:22px;line-height:1;min-width:44px;min-height:44px;display:flex;align-items:center;">✕</a
 		>
@@ -124,7 +127,7 @@
 				<button
 					onclick={playAudio}
 					aria-label="Play pronunciation"
-					style="position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:var(--shadow-sm);transition:transform 100ms ease;"
+					style="position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:var(--shadow-sm);transition:transform 100ms ease;"
 					onmousedown={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(0.92)')}
 					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}

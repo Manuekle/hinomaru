@@ -292,8 +292,8 @@
 	}
 
 	.clear-btn {
-		width: 30px;
-		height: 30px;
+		min-width: 44px;
+		min-height: 44px;
 		border-radius: 50%;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
