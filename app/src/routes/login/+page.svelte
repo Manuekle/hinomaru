@@ -180,13 +180,18 @@
 		forgotDone = false;
 		magicDone = false;
 	}
+
+	const pageTitle = $derived(
+		(mode === 'signin'
+			? t('auth.signin', $locale)
+			: mode === 'signup'
+				? t('auth.signup', $locale)
+				: t('auth.reset.title', $locale)) + ' — Hinomaru'
+	);
 </script>
 
 <svelte:head>
-	<title>
-		{#if mode === 'signin'}{t('auth.signin', $locale)}{:else if mode === 'signup'}{t('auth.signup', $locale)}{:else}{t('auth.reset.title', $locale)}{/if}
-		— Hinomaru
-	</title>
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <div

@@ -7,7 +7,7 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { animate } from 'motion';
-	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { calculateNextReview, mapPerformanceToQuality, type SRSState } from '$lib/srs';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Mascot from '$lib/components/Mascot.svelte';
@@ -30,7 +30,7 @@
 	}
 
 	let { data } = $props<{ data: PageData }>();
-	let quizCards = $state([...data.cards]);
+	let quizCards = $state([...(data.cards || [])]);
 	const supabase = createClient();
 
 	let i = $state(0);
@@ -51,7 +51,7 @@
 	let setupIteration = 0;
 
 	// Whether we use sequential (one-at-a-time) mode
-	const sequential = $derived(card ? Array.from(card.jp).filter(isKanjiKana).length > 2 : false);
+	const sequential = $derived(card ? (Array.from(card.jp) as string[]).filter(isKanjiKana).length > 2 : false);
 
 	function isKanjiKana(ch: string): boolean {
 		const code = ch.codePointAt(0)!;
@@ -91,7 +91,7 @@
 
 		if (iteration !== setupIteration) return;
 
-		const chars = Array.from(card.jp);
+		const chars = Array.from(card.jp) as string[];
 		const writableChars = chars.filter(isKanjiKana);
 		const useSequential = writableChars.length > 2;
 
@@ -131,10 +131,10 @@
 		const charDataResults = await Promise.all(
 			chars.map(async (char) => {
 				const code = char.codePointAt(0)!;
-				if (!isKanjiKana(char)) return { char, data: null };
+				if (!isKanjiKana(char)) return { char, data: null as any };
 				const charData = await fetchCharData(char, code);
 				if (!charData) console.warn('All CDNs failed for char:', char);
-				return { char, data: charData };
+				return { char, data: charData as any };
 			})
 		);
 
@@ -151,7 +151,7 @@
 		hanziContainer.style.gap = `${gap}px`;
 
 		for (let idx = 0; idx < charDataResults.length; idx++) {
-			const { char, data: charData } = charDataResults[idx];
+			const { char, data: charData } = charDataResults[idx] as { char: string; data: any };
 
 			const box = document.createElement('div');
 			box.style.width = `${boxSize}px`;
@@ -232,7 +232,7 @@
 	let charProgressEl = $state<HTMLDivElement | null>(null);
 
 	// Derived list of writable chars for progress dots
-	const writableChars = $derived(card ? Array.from(card.jp).filter(isKanjiKana) : []);
+	const writableChars = $derived(card ? (Array.from(card.jp) as string[]).filter(isKanjiKana) : []);
 
 	function startQuizSequence() {
 		writers.forEach((w) => w.box && (w.box.style.borderColor = 'var(--ink-200)'));
@@ -370,7 +370,7 @@
 	}
 
 	async function updateCardProgress(
-		c: { id: string; progress?: unknown[] },
+		c: { id: string; progress?: SRSState[] },
 		gotIt: boolean,
 		hadDifficulty: boolean = false
 	) {
@@ -379,7 +379,7 @@
 		} = await supabase.auth.getUser();
 		if (!user) return;
 
-		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
+		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : undefined;
 		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentProgress);
 
