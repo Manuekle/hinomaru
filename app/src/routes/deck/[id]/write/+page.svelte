@@ -30,7 +30,13 @@
 	}
 
 	let { data } = $props<{ data: PageData }>();
-	let quizCards = $state([...(data.cards || [])]);
+	let quizCards = $state<any[]>([]);
+
+	$effect(() => {
+		if (data.cards) {
+			quizCards = [...data.cards];
+		}
+	});
 	const supabase = createClient();
 
 	let i = $state(0);
