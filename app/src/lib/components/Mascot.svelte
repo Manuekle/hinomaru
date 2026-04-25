@@ -209,7 +209,7 @@
 		filter: blur(2px);
 	}
 
-	:global(.dark) .panda-wrapper::after {
+	:global([data-theme='dark']) .panda-wrapper::after {
 		background: rgba(0,0,0,0.2);
 	}
 

@@ -8,6 +8,7 @@
 
 	const items = $derived([
 		{
+			id: 'motivation',
 			label: t('onboarding.summary.motivation', $locale),
 			value: selections.motivation
 				? t(`onboarding.motivation.${selections.motivation}`, $locale)
@@ -15,6 +16,7 @@
 			icon: '❤️'
 		},
 		{
+			id: 'level',
 			label: t('onboarding.summary.level', $locale),
 			value: selections.experience
 				? t(`onboarding.experience.${selections.experience}`, $locale)
@@ -22,6 +24,7 @@
 			icon: '🎓'
 		},
 		{
+			id: 'voice',
 			label: t('onboarding.summary.voice', $locale),
 			value:
 				selections.voice === 'kaito'
@@ -30,14 +33,18 @@
 			icon: '🔊'
 		},
 		{
+			id: 'goal',
 			label: t('onboarding.summary.goal', $locale),
 			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }),
 			icon: '🔥'
 		},
 		{
-			label: t('onboarding.summary.notifications', $locale),
-			value: t('onboarding.summary.enabled', $locale),
-			icon: '🔔'
+			id: 'srs',
+			label: t('onboarding.summary.srs', $locale) || 'Spaced repetition',
+			value: selections.srsEnabled
+				? t('onboarding.summary.enabled', $locale)
+				: t('onboarding.summary.disabled', $locale) || 'Disabled',
+			icon: '🧠'
 		}
 	]);
 </script>
@@ -48,7 +55,7 @@
 	</header>
 
 	<div class="summary-list">
-		{#each items as item, i (item.labelKey)}
+		{#each items as item, i (item.id)}
 			<div class="summary-item" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
 					<span class="icon">{item.icon}</span>

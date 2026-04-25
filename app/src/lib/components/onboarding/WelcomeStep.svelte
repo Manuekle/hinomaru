@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fadeUp } from '$lib/motion';
+	import { fadeUp, popIn, fadeIn } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -8,15 +8,15 @@
 </script>
 
 <div class="step-content">
-	<div class="header-section" use:fadeUp={{ delay: 0, y: 16 }}>
+	<div class="header-section" use:fadeUp={{ delay: 0.25, y: 16 }}>
 		<h1 class="title">{t('onboarding.welcome.title', $locale)}</h1>
 	</div>
 
-	<div class="main-visual" use:fadeUp={{ delay: 0.1, y: 20 }}>
-		<div class="app-icon-container">
+	<div class="main-visual">
+		<div class="app-icon-container" use:popIn={{ delay: 0.05, duration: 0.6 }}>
 			<img src="/icon-512.png" alt="Hinomaru Logo" class="app-logo" />
 		</div>
-		<p class="subtitle">
+		<p class="subtitle" use:fadeIn={{ delay: 0.45, duration: 0.4 }}>
 			{t('onboarding.welcome.desc', $locale)}
 		</p>
 	</div>
@@ -24,10 +24,7 @@
 	<StickyFooter>
 		<button
 			class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
-			onclick={() => {
-				console.log('WELCOME: Button clicked');
-				onNext();
-			}}
+			onclick={onNext}
 		>
 			{t('onboarding.welcome.btn', $locale)}
 		</button>

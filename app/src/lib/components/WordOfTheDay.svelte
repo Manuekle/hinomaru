@@ -3,8 +3,9 @@
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { showRomaji } from '$lib/stores/settings';
 	import { page } from '$app/stores';
-	import { invalidateAll, goto } from '$app/navigation';
+	import { invalidateAll } from '$app/navigation';
 
 	interface Word {
 		id?: string;
@@ -18,6 +19,10 @@
 
 	let { word, initiallySaved = false } = $props<{ word: Word | null, initiallySaved?: boolean }>();
 	let saved = $state(initiallySaved);
+
+	$effect(() => {
+		if (initiallySaved) saved = true;
+	});
 
 	const supabase = $derived($page.data.supabase);
 
@@ -38,13 +43,8 @@
 
 		if (!error) {
 			saved = true;
-			// Force SvelteKit to refresh all data from the server
 			await invalidateAll();
 		}
-	}
-
-	async function goToVocab() {
-		await goto('/vocabulary');
 	}
 </script>
 
@@ -61,6 +61,9 @@
 			<div class="wotd-jp-group">
 				<h2 class="wotd-jp">{word.jp}</h2>
 				<span class="wotd-kana">{word.kana}</span>
+				{#if $showRomaji && word.romaji}
+					<span class="wotd-romaji">{word.romaji}</span>
+				{/if}
 			</div>
 
 			<button class="audio-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
@@ -72,17 +75,13 @@
 			{$locale === 'es' ? word.es : word.en}
 		</p>
 
-		<div class="wotd-actions">
-			{#if saved}
-				<button class="save-btn saved" onclick={goToVocab} use:fadeUp={{y: 5}}>
-					{t('wotd.saved', $locale)} {t('nav.vocabulary', $locale)} →
-				</button>
-			{:else}
+		{#if !saved}
+			<div class="wotd-actions" use:fadeUp={{y: 5}}>
 				<button class="save-btn" onclick={saveWord}>
 					{t('wotd.save', $locale)}
 				</button>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 {/if}
 
@@ -127,7 +126,7 @@
 
 	.level-pill {
 		background: var(--sumi);
-		color: white;
+		color: var(--paper);
 		font-size: 10px;
 		font-weight: 600;
 		padding: 2px 8px;
@@ -156,6 +155,13 @@
 		color: var(--fg-secondary);
 		display: block;
 		margin-top: 4px;
+	}
+
+	.wotd-romaji {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		display: block;
+		margin-top: 2px;
 	}
 
 	.audio-btn {
@@ -200,9 +206,4 @@
 		background: var(--ink-200);
 	}
 
-	.save-btn.saved {
-		background: var(--success-wash);
-		color: var(--success);
-		cursor: default;
-	}
 </style>

@@ -2,14 +2,17 @@ import { writable } from 'svelte/store';
 import { isBrowser } from '$lib/supabase';
 
 function createPersistedStore<T>(key: string, initialValue: T) {
-	const initial = isBrowser() ? (localStorage.getItem(key) ?? String(initialValue)) : String(initialValue);
-	
-	// Handle booleans specifically
+	const stored = isBrowser() ? localStorage.getItem(key) : null;
+
 	let value: T;
-	if (typeof initialValue === 'boolean') {
-		value = (initial !== 'false') as T;
+	if (stored === null) {
+		value = initialValue;
+	} else if (typeof initialValue === 'boolean') {
+		value = (stored !== 'false') as T;
+	} else if (typeof initialValue === 'number') {
+		value = (Number(stored) || initialValue) as T;
 	} else {
-		value = initial as T;
+		value = stored as T;
 	}
 
 	const { subscribe, set, update } = writable(value);
@@ -34,3 +37,5 @@ function createPersistedStore<T>(key: string, initialValue: T) {
 
 export const showRomaji = createPersistedStore('hinomaru_show_romaji', true);
 export const preferredVoice = createPersistedStore<'standard' | 'kaito'>('hinomaru_preferred_voice', 'standard');
+export const dailyGoal = createPersistedStore('hinomaru_daily_goal', 5);
+export const srsEnabled = createPersistedStore('hinomaru_srs_enabled', true);

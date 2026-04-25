@@ -17,8 +17,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.order('publish_date', { ascending: false })
 		.limit(20);
 
+	if (error) throw new Error(error.message);
+
 	return {
-		stories: stories || [],
+		stories: stories ?? [],
 		user
 	};
 };

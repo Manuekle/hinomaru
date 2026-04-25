@@ -9,6 +9,9 @@
 	import VoiceStep from './VoiceStep.svelte';
 	import GoalStep from './GoalStep.svelte';
 	import SummaryStep from './SummaryStep.svelte';
+	import { fly } from 'svelte/transition';
+	import { cubicOut, cubicIn } from 'svelte/easing';
+	import { preferredVoice, dailyGoal, srsEnabled as srsStore } from '$lib/stores/settings';
 
 	let { onFinish } = $props();
 
@@ -23,9 +26,7 @@
 	});
 
 	function nextStep() {
-		console.log('ONBOARDING: Advancing from step', step);
 		step = step + 1;
-		console.log('ONBOARDING: New step is', step);
 	}
 
 	const progress = $derived((step / totalSteps) * 100);
@@ -42,16 +43,19 @@
 
 	function handleSRS(enabled: boolean) {
 		selections.srsEnabled = enabled;
+		srsStore.set(enabled);
 		nextStep();
 	}
 
 	function handleVoice(val: string) {
 		selections.voice = val;
+		preferredVoice.set(val as 'standard' | 'kaito');
 		nextStep();
 	}
 
 	function handleGoal(val: number) {
 		selections.goal = val;
+		dailyGoal.set(val);
 		nextStep();
 	}
 </script>
@@ -63,27 +67,35 @@
 	</div>
 
 	<div class="step-wrapper">
-		{#if step === 1}
-			<WelcomeStep onNext={nextStep} />
-		{:else if step === 2}
-			<FeaturesStep onNext={nextStep} />
-		{:else if step === 3}
-			<MotivationStep onSelect={handleMotivation} />
-		{:else if step === 4}
-			<ExperienceStep onSelect={handleExperience} />
-		{:else if step === 5}
-			<PracticeStep onNext={nextStep} />
-		{:else if step === 6}
-			<StoriesStep onNext={nextStep} />
-		{:else if step === 7}
-			<SRSStep onNext={handleSRS} />
-		{:else if step === 8}
-			<VoiceStep onSelect={handleVoice} />
-		{:else if step === 9}
-			<GoalStep onSelect={handleGoal} />
-		{:else if step === 10}
-			<SummaryStep {selections} onComplete={onFinish} />
-		{/if}
+		{#key step}
+			<div
+				class="step-inner"
+				in:fly={{ x: 48, duration: 360, easing: cubicOut }}
+				out:fly={{ x: -32, duration: 240, easing: cubicIn }}
+			>
+				{#if step === 1}
+					<WelcomeStep onNext={nextStep} />
+				{:else if step === 2}
+					<FeaturesStep onNext={nextStep} />
+				{:else if step === 3}
+					<MotivationStep onSelect={handleMotivation} />
+				{:else if step === 4}
+					<ExperienceStep onSelect={handleExperience} />
+				{:else if step === 5}
+					<PracticeStep onNext={nextStep} />
+				{:else if step === 6}
+					<StoriesStep onNext={nextStep} />
+				{:else if step === 7}
+					<SRSStep onNext={handleSRS} />
+				{:else if step === 8}
+					<VoiceStep onSelect={handleVoice} />
+				{:else if step === 9}
+					<GoalStep onSelect={handleGoal} />
+				{:else if step === 10}
+					<SummaryStep {selections} onComplete={onFinish} />
+				{/if}
+			</div>
+		{/key}
 	</div>
 </div>
 
@@ -117,8 +129,16 @@
 
 	.step-wrapper {
 		flex: 1;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.step-inner {
+		position: absolute;
+		inset: 0;
 		display: flex;
 		flex-direction: column;
-		overflow: hidden;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 </style>

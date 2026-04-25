@@ -386,7 +386,7 @@
 	.switch-handle {
 		width: 18px;
 		height: 18px;
-		background: white;
+		background: var(--paper);
 		border-radius: 50%;
 		position: absolute;
 		top: 3px;

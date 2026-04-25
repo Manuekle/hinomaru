@@ -52,7 +52,7 @@
 	.vocab-chip:hover,
 	.vocab-chip[aria-expanded='true'] {
 		background: var(--hinomaru-red);
-		color: white;
+		color: var(--paper);
 	}
 
 	.vocab-popup {

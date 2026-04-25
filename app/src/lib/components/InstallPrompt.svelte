@@ -64,7 +64,7 @@
 	>
 		<div style="display:flex; gap:12px; align-items:center;">
 			<div
-				style="width:44px; height:44px; background:#ffffff; border-radius:12px; 
+				style="width:44px; height:44px; background:var(--paper); border-radius:12px;
                        display:flex; align-items:center; justify-content:center; flex-shrink:0;
                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
 			>
