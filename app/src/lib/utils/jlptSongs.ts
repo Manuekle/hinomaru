@@ -175,19 +175,28 @@ export const jlptSongs: SongLesson[] = [
         title: "Butter-Fly",
         artist: "和田光司",
         start: "00:00",
-        end: "01:00",
+        end: "01:35",
         focus: { es: "Intención y futuro", en: "Intent and future" },
         difficulty: 2,
-        youtubeId: "32JTFI0alPk", // ✅ CORREGIDO — Canal oficial Digimon (Digimon Adventure Opening Video)
+        youtubeId: "jB7ecG_12x8", // ✅ CORREGIDO — Canal oficial Digimon (Digimon Adventure Opening Video)
         lyrics: [
-            { time: 10.0, text: "ゴキゲンな蝶になって きらめく風に乗って", romaji: "gokigen na chou ni natte kirameku kaze ni notte", translation_es: "Convirtiéndome en una mariposa alegre, montando el viento resplandeciente", translation_en: "Becoming a cheerful butterfly, riding the sparkling wind" },
-            { time: 18.0, text: "今すぐ キミに会いに行こう", romaji: "ima sugu kimi ni ai ni ikou", translation_es: "Iré a verte ahora mismo", translation_en: "I'll go see you right now" },
-            { time: 24.0, text: "余計な事なんて 忘れた方がマシさ", romaji: "yokei na koto nante wasureta hou ga mashi sa", translation_es: "Es mejor olvidar las cosas innecesarias", translation_en: "It's better to forget about unnecessary things" }
+            { time: 18.5, text: "ゴキゲンな蝶になって きらめく風に乗って", romaji: "gokigen na chou ni natte kirameku kaze ni notte", translation_es: "Convirtiéndome en una mariposa alegre, montando el viento resplandeciente.", translation_en: "Becoming a cheerful butterfly, riding the sparkling wind." },
+            { time: 24.0, text: "今すぐ君に会いに行こう", romaji: "ima sugu kimi ni ai ni ikou", translation_es: "Iré a verte ahora mismo.", translation_en: "I'll go see you right now." },
+            { time: 30.5, text: "余計なことなんて 忘れたほうがましさ", romaji: "yokei na koto nante wasureta hou ga mashi sa", translation_es: "Es mejor olvidar las cosas innecesarias.", translation_en: "It's better to forget about unnecessary things." },
+            { time: 36.0, text: "これ以上 しゃれてる時間はない", romaji: "kore ijou shareteru jikan wa nai", translation_es: "No hay más tiempo para andarse con rodeos.", translation_en: "There's no more time for messing around." },
+            { time: 42.0, text: "何が wow wow wow wow wow この空に届くのだろう", romaji: "nani ga wow wow wow wow wow kono sora ni todoku no darou", translation_es: "¿Qué será lo que llegará a este cielo?", translation_en: "I wonder what will reach this sky?" },
+            { time: 47.8, text: "だけど wow wow wow wow wow 明日の予定もわからない", romaji: "dakedo wow wow wow wow wow ashita no yotei mo wakaranai", translation_es: "Pero ni siquiera sé qué haré mañana.", translation_en: "But I don't even know my plans for tomorrow." },
+            { time: 56.5, text: "無限大な夢のあとの 何もない世の中じゃ", romaji: "mugendai na yume no ato no nani mo nai yo no naka ja", translation_es: "En este mundo vacío tras un sueño infinito.", translation_en: "In this empty world after an infinite dream." },
+            { time: 63.0, text: "そうさ 愛しい思いも負けそうになるけど", romaji: "sou sa itoshii omoi mo makesou ni naru kedo", translation_es: "Sí, parece que hasta mis sentimientos más queridos van a perder, pero...", translation_en: "Yeah, even my beloved feelings seem like they're going to lose, but..." },
+            { time: 68.0, text: "Stay しがちなイメージだらけの 頼りない翼でも", romaji: "Stay shigachi na imeeji darake no tayorinai tsubasa demo", translation_es: "Incluso con estas alas poco fiables, llenas de imágenes de estancamiento.", translation_en: "Even with these unreliable wings, full of images of staying still." },
+            { time: 75.0, text: "きっと飛べるさ On my love", romaji: "kitto toberu sa On my love", translation_es: "Seguro que podré volar, con mi amor.", translation_en: "I'm sure I can fly, on my love." }
         ],
         vocab: [
             { jp: "蝶", kana: "ちょう", romaji: "chou", en: "butterfly", es: "mariposa" },
             { jp: "煌めく", kana: "きらめく", romaji: "kirameku", en: "to sparkle", es: "resplandecer" },
-            { jp: "余計", kana: "よけい", romaji: "yokei", en: "unnecessary / extra", es: "innecesario / de más" }
+            { jp: "余計", kana: "よけい", romaji: "yokei", en: "unnecessary / extra", es: "innecesario" },
+            { jp: "無限大", kana: "むげんだい", romaji: "mugendai", en: "infinite / limitless", es: "infinito" },
+            { jp: "翼", kana: "つばさ", romaji: "tsubasa", en: "wings", es: "alas" }
         ]
     },
 
