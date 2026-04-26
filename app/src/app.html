@@ -25,6 +25,13 @@
 		<style>
 			html.pwa-booting > body { opacity: 0; }
 		</style>
+		<script>
+			document.addEventListener('touchstart', function(e) {
+				if (e.touches[0].clientX < 25) {
+					e.preventDefault();
+				}
+			}, { passive: false });
+		</script>
 		
 		<!-- Favicons -->
 		<link rel="icon" type="image/png" href="/favicon.png" />

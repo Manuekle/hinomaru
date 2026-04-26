@@ -15,6 +15,7 @@
 	import { dev } from '$app/environment';
 	import { Toaster } from 'svileo';
 	import 'svileo/styles.css';
+	import { swipeBack } from '$lib/actions/swipeBack';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
@@ -71,6 +72,14 @@
 			if (targetPath !== path || $page.url.searchParams.has('pwa')) {
 				goto(targetPath, { replaceState: true, noScroll: true, keepFocus: true });
 			}
+
+			// History sentinel: prevents browser from reaching "void" and triggering native swipe-back exit
+			history.pushState({ _hm: 1 }, '');
+			window.addEventListener('popstate', () => {
+				if (!history.state?._hm) {
+					history.pushState({ _hm: 1 }, '');
+				}
+			});
 		} else {
 			// If not PWA, we can hide the splash immediately
 			booting = false;
@@ -125,7 +134,7 @@
 	{/if}
 </svelte:head>
 
-<div class="app-container">
+<div class="app-container" use:swipeBack>
 	<Toaster position="top-center" offset={{ top: 'env(safe-area-inset-top, 12px)' }} />
 	{@render children()}
 	<InstallPrompt />
