@@ -12,8 +12,7 @@
 	import {
 		PlayIcon,
 		PauseIcon,
-		ArrowReloadHorizontalIcon,
-		VolumeHighIcon
+		ArrowReloadHorizontalIcon
 	} from '@hugeicons/core-free-icons';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { svileo } from 'svileo';
@@ -410,18 +409,21 @@
 	{#if song.vocab && song.vocab.length > 0}
 		<div class="section" use:fadeUp={{ delay: 0.25, y: 10 }}>
 			<div class="section-title">{t('songs.vocab', $locale)}</div>
-			<div class="vocab-grid">
+			<div class="vocab-list">
 				{#each song.vocab as word}
 					<div class="vocab-card">
 						<div class="vocab-top">
-							<span class="vocab-jp jp">{word.jp}</span>
+							<div class="vocab-jp-group">
+								<span class="vocab-jp jp">{word.jp}</span>
+								<span class="vocab-kana jp">{word.kana}</span>
+							</div>
 							<div class="vocab-actions">
-								<button class="vocab-icon-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
-									<Icon icon={VolumeHighIcon} size={13} />
+								<button class="vocab-action-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
+									🔊
 								</button>
 								<button
-									class="vocab-save-btn"
-									class:saved={savedVocab.has(word.jp)}
+									class="vocab-action-btn"
+									class:vocab-saved={savedVocab.has(word.jp)}
 									disabled={savedVocab.has(word.jp) || savingVocab.has(word.jp)}
 									onclick={() => saveVocabWord(word)}
 									aria-label="Save"
@@ -429,14 +431,13 @@
 									{#if savingVocab.has(word.jp)}
 										<DotLoader size={4} />
 									{:else if savedVocab.has(word.jp)}
-										✓
+										<span style="color:var(--success);font-size:13px;font-weight:700;">✓</span>
 									{:else}
-										+
+										<span style="font-size:16px;font-weight:400;line-height:1;">+</span>
 									{/if}
 								</button>
 							</div>
 						</div>
-						<div class="vocab-kana">{word.kana}</div>
 						{#if $showRomaji && word.romaji}
 							<div class="vocab-romaji">{word.romaji}</div>
 						{/if}
@@ -760,106 +761,82 @@
 	}
 
 	/* Vocab */
-	.vocab-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	.vocab-list {
+		display: flex;
+		flex-direction: column;
 		gap: 8px;
 	}
 
 	.vocab-card {
-		background: transparent;
+		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 12px;
-		padding: 12px;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		text-align: left;
-		transition: border-color 150ms, background 150ms;
-		width: 100%;
-	}
-	.vocab-card:hover {
-		border-color: var(--ink-300);
-		background: var(--ink-50);
+		border-radius: 16px;
+		padding: 14px 16px;
+		box-shadow: var(--shadow-sm);
 	}
 
 	.vocab-top {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 6px;
-		margin-bottom: 2px;
+		gap: 8px;
+		margin-bottom: 4px;
+	}
+
+	.vocab-jp-group {
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+		min-width: 0;
 	}
 
 	.vocab-jp {
 		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-primary);
-		line-height: 1;
+		line-height: 1.2;
+		flex-shrink: 0;
+	}
+
+	.vocab-kana {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		white-space: nowrap;
 	}
 
 	.vocab-actions {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 6px;
 		flex-shrink: 0;
 	}
 
-	.vocab-icon-btn {
-		background: none;
+	.vocab-action-btn {
+		background: var(--ink-100);
 		border: none;
-		padding: 4px;
-		cursor: pointer;
-		color: var(--fg-tertiary);
-		display: flex;
-		align-items: center;
-		transition: color 150ms;
-		border-radius: 6px;
-	}
-	.vocab-icon-btn:hover { color: var(--hinomaru-red); }
-
-	.vocab-save-btn {
-		background: none;
-		border: 1px solid var(--ink-200);
-		border-radius: 6px;
-		width: 22px;
-		height: 22px;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 13px;
-		font-weight: 700;
 		cursor: pointer;
-		color: var(--fg-tertiary);
-		transition: all 150ms;
-		line-height: 1;
-	}
-	.vocab-save-btn:hover:not(:disabled) {
-		border-color: var(--hinomaru-red);
-		color: var(--hinomaru-red);
-	}
-	.vocab-save-btn.saved {
-		border-color: var(--success);
-		color: var(--success);
-		cursor: default;
-	}
-	.vocab-save-btn:disabled:not(.saved) { opacity: 0.5; }
-
-	.vocab-kana {
-		font-size: 12px;
 		color: var(--fg-secondary);
-		font-family: var(--font-jp);
+		transition: background 150ms, color 150ms;
 	}
+	.vocab-action-btn:hover:not(:disabled) { background: var(--ink-200); }
+	.vocab-action-btn:disabled { opacity: 0.5; cursor: default; }
+	.vocab-action-btn.vocab-saved { background: var(--success-wash); cursor: default; }
 
 	.vocab-romaji {
 		font-size: 11px;
 		color: var(--fg-tertiary);
+		margin-bottom: 2px;
 	}
 
 	.vocab-meaning {
-		font-size: 13px;
+		font-size: 14px;
 		color: var(--fg-secondary);
-		margin-top: 3px;
-		line-height: 1.3;
+		line-height: 1.4;
 	}
 </style>
