@@ -433,22 +433,6 @@ export const jlptSongs: SongLesson[] = [
     },
     {
         level: "N1",
-        title: "紅蓮華",
-        artist: "LiSA",
-        start: "00:00",
-        end: "01:00",
-        focus: { es: "Fortaleza y superación", en: "Strength and overcoming" },
-        difficulty: 5,
-        youtubeId: "mpwigqY7570", // ✅ verificado
-        lyrics: [
-            { time: 5.0, text: "強くなれる理由を知った", romaji: "tsuyoku nareru riyuu wo shitta", translation_es: "He conocido la razón por la que puedo volverme fuerte", translation_en: "I've learned the reason I can become strong" }
-        ],
-        vocab: [
-            { jp: "理由", kana: "りゆう", romaji: "riyuu", en: "reason", es: "razón" }
-        ]
-    },
-    {
-        level: "N1",
         title: "残酷な天使のテーゼ",
         artist: "高橋洋子",
         start: "00:00",
@@ -463,20 +447,4 @@ export const jlptSongs: SongLesson[] = [
             { jp: "残酷", kana: "ざんこく", romaji: "zankoku", en: "cruel", es: "cruel" }
         ]
     },
-    {
-        level: "N1",
-        title: "The Rumbling",
-        artist: "SiM",
-        start: "00:00",
-        end: "01:00",
-        focus: { es: "Caos y destrucción", en: "Chaos and destruction" },
-        difficulty: 5,
-        youtubeId: "OBqw818mQ1E", // ✅ MV oficial SiM (Attack on Titan Final Season Part 2)
-        lyrics: [
-            { time: 10.0, text: "RUMBLING, RUMBLING, IT'S COMING!", romaji: "rumbling, rumbling, it's coming", translation_es: "¡El retumbar, el retumbar, ya viene!", translation_en: "Rumbling, rumbling, it's coming!" }
-        ],
-        vocab: [
-            { jp: "来る", kana: "くる", romaji: "kuru", en: "to come", es: "venir" }
-        ]
-    }
 ];
