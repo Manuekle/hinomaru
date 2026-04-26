@@ -345,15 +345,27 @@ export const jlptSongs: SongLesson[] = [
         title: "Re:Re:",
         artist: "ASIAN KUNG-FU GENERATION",
         start: "00:00",
-        end: "01:00",
+        end: "01:29",
         focus: { es: "Pasado y arrepentimiento", en: "Past and regret" },
         difficulty: 4,
-        youtubeId: "vRP5j8ne_9s", // ✅ verificado
+        youtubeId: "fodAJ-1dN3I", // ✅ verificado
         lyrics: [
-            { time: 60.0, text: "君を待った 僕は待った", romaji: "kimi wo matta boku wa matta", translation_es: "Te esperé, yo esperé", translation_en: "I waited for you, I waited" }
+            { time: 13.0, text: "君を待った 僕は待った 途切れない明日も過ぎて行って", romaji: "kimi wo matta boku wa matta togirenai ashita mo sugite itte", translation_es: "Te esperé, te esperé, mientras los mañanas ininterrumpidos seguían pasando.", translation_en: "I waited for you, I waited, as the continuous tomorrows kept passing by." },
+            { time: 19.0, text: "立ち止まって振り返って とめどない hoy を嘆き合った", romaji: "tachidomatte furikaette tomedonai kyou wo nagekiatta", translation_es: "Deteniéndome y mirando atrás, lamentamos juntos este hoy sin fin.", translation_en: "Stopping and looking back, we lamented this endless today together." },
+            { time: 25.0, text: "記憶だって永遠になんて 残らないものと思い知って", romaji: "kioku datte eien ni nante nokoranai mono to omoishitte", translation_es: "Comprendiendo que incluso los recuerdos no son algo que dure para siempre.", translation_en: "Realizing that even memories aren't something that remains forever." },
+            { time: 31.0, text: "僕はずっと掻きむしって 心の隅っこで泣いた", romaji: "boku wa zutto kakimushitte kokoro no sumikko de naita", translation_es: "Me desgarré por dentro y lloré en un rincón de mi corazón.", translation_en: "I kept tearing at myself and cried in a corner of my heart." },
+            { time: 36.5, text: "そしてどうかなくさないでよって 高架下、過ぎる日々を", romaji: "soshite douka nakusanaide yo tte koukashita sugiru hibi wo", translation_es: "Y rogando: 'por favor, no los pierdas', a los días que pasan bajo el paso elevado.", translation_en: "And pleading 'please don't lose them', to the days passing under the elevated tracks." },
+            { time: 44.0, text: "後悔してんだよってそう言い逃したあの日", romaji: "koukai shite nda yo tte sou iinogashita ano hi", translation_es: "Diciendo: 'me arrepiento', aquel día que perdí la oportunidad de hablar.", translation_en: "Saying 'I regret it', that day I missed the chance to say it." },
+            { time: 50.0, text: "君を待った 僕は待った 途切れない明日も過ぎて行って", romaji: "kimi wo matta boku wa matta togirenai ashita mo sugite itte", translation_es: "Te esperé, te esperé, mientras los mañanas ininterrumpidos seguían pasando.", translation_en: "I waited for you, I waited, as the continuous tomorrows kept passing by." },
+            { time: 56.0, text: "僕は今日も掻きむしって 忘れない傷をつけているんだよ", romaji: "boku wa kyou mo kakimushitte wasurenai kizu wo tsukete iru nda yo", translation_es: "Hoy también me desgarro, dejándome una herida que no olvidaré.", translation_en: "Today too I'm tearing at myself, leaving a wound I'll never forget." },
+            { time: 67.0, text: "君じゃないとさ", romaji: "kimi ja nai to sa", translation_es: "Si no eres tú...", translation_en: "If it's not you..." }
         ],
         vocab: [
-            { jp: "待つ", kana: "まつ", romaji: "matsu", en: "to wait", es: "esperar" }
+            { jp: "途切れる", kana: "とぎれる", romaji: "togireru", en: "to be interrupted / break off", es: "interrumpirse / cortarse" },
+            { jp: "嘆く", kana: "なげく", romaji: "nageku", en: "to lament / grieve", es: "lamentar / llorar" },
+            { jp: "掻きむしる", kana: "かきむしる", romaji: "kakimushiru", en: "to tear at / scratch hard", es: "desgarrar / arañar con fuerza" },
+            { jp: "後悔", kana: "こうかい", romaji: "koukai", en: "regret / remorse", es: "arrepentimiento / remordimiento" },
+            { jp: "言い逃す", kana: "いいのがす", romaji: "iinogasu", en: "to miss the chance to say", es: "perder la oportunidad de decir" }
         ]
     },
     {
