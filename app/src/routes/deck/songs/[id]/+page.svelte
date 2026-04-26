@@ -7,6 +7,7 @@
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { jlptSongs, parseTime } from '$lib/utils/jlptSongs';
 	import Mascot from '$lib/components/Mascot.svelte';
+	import ScrollingWaveform from '$lib/components/ScrollingWaveform.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import {
 		PlayIcon,
@@ -293,7 +294,7 @@
 					disabled={!playerReady}
 					aria-label={isPlaying ? 'Pause' : 'Play'}
 				>
-					<Icon icon={isPlaying ? PauseIcon : PlayIcon} size={20} variant="solid" />
+					<Icon icon={PlayIcon} altIcon={PauseIcon} showAlt={isPlaying} size={20} variant="solid" />
 				</button>
 
 				<button class="icon-btn" onclick={replay} disabled={!playerReady} aria-label="Replay">
@@ -307,13 +308,24 @@
 				</div>
 			</div>
 
-			<!-- Progress row -->
-			<div class="progress-row">
-				<span class="time">{clipElapsed}</span>
-				<div class="bar" role="progressbar" aria-valuenow={clipProgress} aria-valuemin={0} aria-valuemax={100}>
-					<div class="bar-fill" style="width:{clipProgress}%"></div>
+			<!-- Waveform + time -->
+			<div class="waveform-row">
+				<ScrollingWaveform
+					height={48}
+					barWidth={3}
+					barGap={2}
+					speed={30}
+					fadeEdges={true}
+					barColor="var(--hinomaru-red)"
+					playing={isPlaying}
+				/>
+				<div class="progress-row">
+					<span class="time">{clipElapsed}</span>
+					<div class="bar" role="progressbar" aria-valuenow={clipProgress} aria-valuemin={0} aria-valuemax={100}>
+						<div class="bar-fill" style="width:{clipProgress}%"></div>
+					</div>
+					<span class="time">{clipTotal}</span>
 				</div>
-				<span class="time">{clipTotal}</span>
 			</div>
 		</div>
 
@@ -599,7 +611,13 @@
 	}
 	.speed-btn:not(.active):hover { color: var(--fg-primary); border-color: var(--ink-300); }
 
-	/* Progress */
+	/* Waveform + progress */
+	.waveform-row {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
 	.progress-row {
 		display: flex;
 		align-items: center;

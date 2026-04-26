@@ -8,6 +8,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import Confetti from '$lib/components/Confetti.svelte';
+	import { svileo } from 'svileo';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -144,6 +146,11 @@
 				total: allCards.length
 			});
 		}
+
+		svileo.success({
+			title: t('session.wellDone', $locale) || '¡Muy bien!',
+			description: `${allCards.length} ${t('home.cards', $locale) || 'cartas'} completadas en ${formatTime(finalTime)}`
+		});
 	}
 
 	function goBack() {
@@ -263,6 +270,10 @@
 				</StickyFooter>
 			</div>
 		</div>
+	{/if}
+
+	{#if finished}
+		<Confetti fireOnMount={true} />
 	{/if}
 </div>
 

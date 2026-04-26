@@ -35,408 +35,374 @@ export function parseTime(mmss: string): number {
 }
 
 export const jlptSongs: SongLesson[] = [
-    // 🟢 N5
+    // 🟢 Nivel N5 (Muy básico)
     {
         level: "N5",
-        title: "ありがとう",
+        title: "アンパンマンのマーチ",
+        artist: "ドリーミング",
+        start: "00:00",
+        end: "01:10",
+        focus: { es: "Frases de aliento y propósito", en: "Encouragement and purpose" },
+        difficulty: 1,
+        youtubeId: "5mLape5F0Fw",
+        lyrics: [
+            { time: 3.0, text: "そうだ おそれないで みんなのために 愛と勇気だけが ともだちさ", romaji: "sou da osorenaide minna no tame ni ai to yuuki dake ga tomodachi sa", translation_es: "¡Así es! No tengas miedo, hazlo por todos. El amor y el valor son tus únicos amigos.", translation_en: "Yes, that’s right! Don’t be afraid Stand up for everyone Only love and your courage will be your friend" },
+            { time: 23.0, text: "なにが君の しあわせ なにをして よろこぶ", romaji: "nani ga kimi no shiawase nani wo shite yorokobu", translation_es: "¿Qué es lo que te hace feliz? ¿Qué es lo que te da alegría?", translation_en: "Do you know what your happiness is? Do you know what brings you joy?" },
+            { time: 28.0, text: "わからないまま おわる そんなのは いやだ！", romaji: "wakaranai mama owaru sonna no wa iya da!", translation_es: "No quiero terminar sin haberlo descubierto.", translation_en: "If you don’t know ‘til the end You can’t stand it, no, no!" },
+            { time: 33.0, text: "忘れないで 夢を こぼさないで 涙 だから 君は とぶんだ どこまでも", romaji: "wasurenaide yume wo kobosanaide namida dakara kimi wa tobunda doko made mo", translation_es: "No olvides tus sueños ni derrames tus lágrimas; por eso volarás a donde quieras.", translation_en: "Don’t forget you have a dream Don’t you shed anymore tears That is why you fly away to" },
+            { time: 40.0, text: "どこまでも そうだ おそれないで みんなのために", romaji: "doko made mo sou da osorenaide minna no tame ni", translation_es: "A donde quieras. ¡Así es! No tengas miedo, hazlo por todos.", translation_en: "Anywhere you want Yes, that’s right! Don’t be afraid Stand up for everyone" },
+            { time: 48.0, text: "愛と勇気だけが ともだちさ ああ アンパンマン", romaji: "ai to yuuki dake ga tomodachi sa aa Anpanman", translation_es: "El amor y el valor son tus únicos amigos. ¡Ah, ah! Anpanman.", translation_en: "Only love and your courage will be your friend Ah, ah! Anpanman" },
+            { time: 55.0, text: "優しい君は 行け！みんなの夢 まもるため", romaji: "yasashii kimi wa ike! minna no yume mamoru tame", translation_es: "Tú que eres tan amable, ¡ve! Ve a proteger los sueños de todos.", translation_en: "You have such a loving heart Go! Go! You go on to save all our dreams" }
+        ],
+        vocab: [
+            { jp: "幸せ", kana: "しあわせ", romaji: "shiawase", en: "happiness", es: "felicidad" },
+            { jp: "喜び", kana: "よろこび", romaji: "yorokobi", en: "joy", es: "alegría" },
+            { jp: "夢", kana: "ゆめ", romaji: "yume", en: "dream", es: "sueño" },
+            { jp: "涙", kana: "なみだ", romaji: "namida", en: "tears", es: "lágrimas" },
+            { jp: "守る", kana: "まもる", romaji: "mamoru", en: "to protect", es: "proteger" }
+        ]
+    },
+    {
+        level: "N5",
+        title: "おどるポンポコリン",
+        artist: "Ado",
+        start: "00:00",
+        end: "01:25",
+        focus: { es: "Onomatopeyas y vocabulario cotidiano", en: "Onomatopoeia and everyday vocabulary" },
+        difficulty: 1,
+        youtubeId: "TZYqDl19qLQ",
+        lyrics: [
+            { time: 14.0, text: "なんでもかんでも みんな おどっているよ", romaji: "nan demo kan demo minna odotte iru yo", translation_es: "Cualquier cosa, todo el mundo está bailando.", translation_en: "Anything and everything, everyone is dancing." },
+            { time: 21.0, text: "おなべの中から ボワっと インチキおじさん 登場", romaji: "onabe no naka kara bowatto inchiki ojisan toujou", translation_es: "Desde adentro de la olla, ¡puf! aparece el hombre tramposo.", translation_en: "From inside the pot, poof! The phony old man appears." },
+            { time: 30.0, text: "いつだって 忘れない エジソンは 偉い人", romaji: "itsu datte wasurenai Ejison wa erai hito", translation_es: "Siempre recordaremos que Edison fue un gran hombre.", translation_en: "We'll never forget that Edison was a great man." },
+            { time: 35.0, text: "そんなの常識 タッタタラリラ", romaji: "sonna no joushiki tatta tararira", translation_es: "Eso es de sentido común. ¡Tatta-tararira!", translation_en: "That's just common sense. Tatta-tararira!" },
+            { time: 40.0, text: "ピーヒャラ ピーヒャラ パッパパラパ", romaji: "piihyara piihyara pappaparapa", translation_es: "¡Pii-hyara pii-hyara! ¡Pappa-parapa!", translation_en: "Pii-hyara pii-hyara! Pappa-parapa!" },
+            { time: 50.0, text: "おどるポンポコリン ピーヒャラ ピー", romaji: "odoru ponpokorin piihyara pii", translation_es: "Bailando el Ponpokorin, pii-hyara pii.", translation_en: "Dancing the Ponpokorin, pii-hyara pii." },
+            { time: 55.0, text: "おなかがへったよ", romaji: "onaka ga hetta yo", translation_es: "Tengo hambre.", translation_en: "I'm hungry." }
+        ],
+        vocab: [
+            { jp: "踊る", kana: "おどる", romaji: "odoru", en: "to dance", es: "bailar" },
+            { jp: "登場", kana: "とうじょう", romaji: "toujou", en: "appearance", es: "aparición" },
+            { jp: "常識", kana: "じょうしき", romaji: "joushiki", en: "common sense", es: "sentido común" },
+            { jp: "偉い", kana: "えらい", romaji: "erai", en: "great / admirable", es: "admirable / gran persona" },
+            { jp: "お腹が空く", kana: "おなかがすく", romaji: "onaka ga suku", en: "to get hungry", es: "tener hambre" }
+        ]
+    },
+    {
+        level: "N5",
+        title: "ウィーアー！ (We Are!)",
+        artist: "きただにひろし",
+        start: "00:30",
+        end: "01:51",
+        focus: { es: "Verbos de movimiento y búsqueda", en: "Verbs of movement and search" },
+        difficulty: 1,
+        youtubeId: "0OdExTY2D8M",
+        lyrics: [
+            { time: 30.0, text: "ありったけの夢をかき集め 捜し物を捜しに行くのさ ONE PIECE!", romaji: "arittake no yume wo kakiatsume sagashimono wo sagashi ni yuku no sa ONE PIECE!", translation_es: "Reuniendo todos mis sueños, voy en busca de lo que estoy buscando. ¡One Piece!", translation_en: "Gathering all my dreams, I'm going in search of what I'm looking for. One Piece!" },
+            { time: 48.0, text: "羅針盤なんて 渋滞のもと 熱にうかされ 舵をとるのさ", romaji: "rashinban nante juutai no moto netsu ni ukasare kaji wo toru no sa", translation_es: "Una brújula solo causaría retrasos, así que tomo el timón guiado por mi pasión.", translation_en: "A compass would only cause delays, so I take the helm driven by my passion." },
+            { time: 59.0, text: "ホコリかぶってた 宝の地図も 確かめたのなら 伝説じゃない！", romaji: "hokori kabutteta takara no chizu mo tashikameta no nara densetsu ja nai!", translation_es: "Si confirmamos ese mapa del tesoro lleno de polvo, dejará de ser una leyenda.", translation_en: "If we confirm that dusty treasure map, it won't be a legend anymore." },
+            { time: 72.0, text: "個人的な嵐は 誰かの バイオリズム乗っかって 思い過ごせばいい！", romaji: "kojinteki na arashi wa dareka no baiorizumu nokkatte omoisugoseba ii!", translation_es: "Si una tormenta personal llega, solo súbete al biorritmo de alguien más y déjala pasar.", translation_en: "If a personal storm comes, just ride someone else's biorhythm and let it pass." },
+            { time: 86.0, text: "ありったけの夢をかき集め 捜し物を捜しに行くのさ", romaji: "arittake no yume wo kakiatsume sagashimono wo sagashi ni yuku no sa", translation_es: "Reuniendo todos mis sueños, voy en busca de lo que estoy buscando.", translation_en: "Gathering all my dreams, I'm going in search of what I'm looking for." },
+            { time: 97.0, text: "ポケットのコイン それと you wanna be my friend?", romaji: "poketto no koin soreto you wanna be my friend?", translation_es: "Monedas en el bolsillo, y además... ¿quieres ser mi amigo?", translation_en: "Coins in my pocket, and besides... you wanna be my friend?" },
+            { time: 103.0, text: "We are, we are on the cruise! ウィーアー！", romaji: "We are, we are on the cruise! Wiiaa!", translation_es: "¡Estamos, estamos en el crucero! ¡WE ARE!", translation_en: "We are, we are on the cruise! WE ARE!" }
+        ],
+        vocab: [
+            { jp: "夢", kana: "ゆめ", romaji: "yume", en: "dream", es: "sueño" },
+            { jp: "捜す", kana: "さがす", romaji: "sagasu", en: "to search for", es: "buscar" },
+            { jp: "宝", kana: "たから", romaji: "takara", en: "treasure", es: "tesoro" },
+            { jp: "地図", kana: "ちず", romaji: "chizu", en: "map", es: "mapa" },
+            { jp: "伝説", kana: "でんせつ", romaji: "densetsu", en: "legend", es: "leyenda" }
+        ]
+    },
+
+    // 🟢 Nivel N4 (Básico)
+    {
+        level: "N4",
+        title: "ムーンライト伝説",
+        artist: "DALI",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Estructuras de deseo y sentimientos", en: "Desire structures and feelings" },
+        difficulty: 2,
+        youtubeId: "6KYk5a93OC8", // ✅ CORREGIDO — TV Asahi Music / TOEI ANIMATION oficial
+        lyrics: [
+            { time: 5.0, text: "ごめんね 素直じゃなくて", romaji: "gomen ne sunao janakute", translation_es: "Perdón por no ser honesta", translation_en: "I'm sorry for not being honest" },
+            { time: 10.0, text: "夢の中なら言える", romaji: "yume no naka nara ieru", translation_es: "Si es en sueños, puedo decirlo", translation_en: "If it's in a dream, I can say it" },
+            { time: 15.0, text: "思考回路はショート寸前", romaji: "shikou kairo wa shooto sunzen", translation_es: "Mis circuitos de pensamiento están a punto de hacer corto", translation_en: "My thought circuits are on the verge of shorting" },
+            { time: 20.0, text: "今すぐ会いたいよ", romaji: "ima sugu aitai yo", translation_es: "Quiero verte ahora mismo", translation_en: "I want to see you right now" }
+        ],
+        vocab: [
+            { jp: "素直", kana: "すなお", romaji: "sunao", en: "honest / frank", es: "honesto / franco" },
+            { jp: "思考回路", kana: "しこうかいろ", romaji: "shikoukairo", en: "thought process", es: "circuito de pensamiento" },
+            { jp: "寸前", kana: "すんぜん", romaji: "sunzen", en: "on the verge", es: "a punto de" }
+        ]
+    },
+    {
+        level: "N4",
+        title: "CHANGE THE WORLD",
+        artist: "V6",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Forma potencial y determinación", en: "Potential form and determination" },
+        difficulty: 2,
+        youtubeId: "Hok551J0Cbc", // ✅ CORREGIDO — versión original referenciada por covers oficiales
+        lyrics: [
+            { time: 15.0, text: "I WANT TO CHANGE THE WORLD", romaji: "I want to change the world", translation_es: "Quiero cambiar el mundo", translation_en: "I want to change the world" },
+            { time: 18.0, text: "風を駆け抜けて 何も恐れずに", romaji: "kaze wo kakenukete nani mo osorezu ni", translation_es: "Atravesando el viento sin temer a nada", translation_en: "Running through the wind without fearing anything" },
+            { time: 22.0, text: "今 勇気と 笑顔の欠片抱いて", romaji: "ima yuuki to egao no kakera daite", translation_es: "Ahora, abrazando fragmentos de valor y sonrisas", translation_en: "Now, holding fragments of courage and smiles" }
+        ],
+        vocab: [
+            { jp: "駆け抜ける", kana: "かけぬける", romaji: "kakenukeru", en: "to run through", es: "atravesar corriendo" },
+            { jp: "恐れる", kana: "おそれる", romaji: "osoreru", en: "to fear", es: "temer" },
+            { jp: "欠片", kana: "かけら", romaji: "kakera", en: "fragment / piece", es: "fragmento / pedazo" }
+        ]
+    },
+    {
+        level: "N4",
+        title: "Butter-Fly",
+        artist: "和田光司",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Intención y futuro", en: "Intent and future" },
+        difficulty: 2,
+        youtubeId: "32JTFI0alPk", // ✅ CORREGIDO — Canal oficial Digimon (Digimon Adventure Opening Video)
+        lyrics: [
+            { time: 10.0, text: "ゴキゲンな蝶になって きらめく風に乗って", romaji: "gokigen na chou ni natte kirameku kaze ni notte", translation_es: "Convirtiéndome en una mariposa alegre, montando el viento resplandeciente", translation_en: "Becoming a cheerful butterfly, riding the sparkling wind" },
+            { time: 18.0, text: "今すぐ キミに会いに行こう", romaji: "ima sugu kimi ni ai ni ikou", translation_es: "Iré a verte ahora mismo", translation_en: "I'll go see you right now" },
+            { time: 24.0, text: "余計な事なんて 忘れた方がマシさ", romaji: "yokei na koto nante wasureta hou ga mashi sa", translation_es: "Es mejor olvidar las cosas innecesarias", translation_en: "It's better to forget about unnecessary things" }
+        ],
+        vocab: [
+            { jp: "蝶", kana: "ちょう", romaji: "chou", en: "butterfly", es: "mariposa" },
+            { jp: "煌めく", kana: "きらめく", romaji: "kirameku", en: "to sparkle", es: "resplandecer" },
+            { jp: "余計", kana: "よけい", romaji: "yokei", en: "unnecessary / extra", es: "innecesario / de más" }
+        ]
+    },
+
+    // 🟡 Nivel N3 (Intermedio)
+    {
+        level: "N3",
+        title: "ブルーバード",
         artist: "いきものがかり",
         start: "00:00",
-        end: "06:00",
-        focus: { es: "Expresiones básicas y agradecimiento", en: "Basic expressions and gratitude" },
-        difficulty: 1,
-        youtubeId: "VZBU8LvZ91Q",  // Official MV - Verificado ✓
+        end: "01:00",
+        focus: { es: "Expresiones de vuelo y libertad", en: "Expressions of flight and freedom" },
+        difficulty: 3,
+        youtubeId: "KpsJWFuVTdI", // ✅ verificado
         lyrics: [
-            { time: 15.0, text: "「ありがとう」って伝えたくて あなたを見つめるけど", romaji: "arigatou tte tsutaetakute anata wo mitsumeru kedo", translation_es: "Quiero decirte 'gracias' mientras te miro, pero...", translation_en: "I want to tell you 'thank you' while I look at you, but..." },
-            { time: 45.0, text: "まぶしい朝に 苦笑いしてさ", romaji: "mabushii asa ni nigawarai shite sa", translation_es: "Sonriendo con amargura en la mañana deslumbrante", translation_en: "Smiling wryly in the dazzling morning" },
-            { time: 68.0, text: "「ありがとう」って伝えたくて あなたを見つめるけど", romaji: "arigatou tte tsutaetakute anata wo mitsumeru kedo", translation_es: "Quiero decirte 'gracias' mientras te miro, pero...", translation_en: "I want to tell you 'thank you' while I look at you, but..." },
-            { time: 99.0, text: "でこぼこなまま 積み上げてきた", romaji: "dekoboko na mama tsumiagete kita", translation_es: "Hemos ido construyendo esto, aun con sus altibajos", translation_en: "We've been building this up, even with all the bumps" },
-            { time: 122.0, text: "「あなたの夢」がいつからか…", romaji: "anata no yume ga itsu kara ka", translation_es: "Desde cuándo tus sueños se volvieron...", translation_en: "Since when your dreams became..." },
-            { time: 135.0, text: "今日だって いつか 大切な 瞬間", romaji: "kyou datte itsuka taisetsu na shunkan", translation_es: "Incluso el día de hoy se volverá un momento importante algún día", translation_en: "Even today will become a precious moment someday" },
-            { time: 145.0, text: "青空も 泣き空も 晴れわたるように", romaji: "aozora mo nakizora mo harewataru you ni", translation_es: "Para que tanto el cielo azul como el cielo de llanto se despejen", translation_en: "So that both the blue sky and the crying sky clear up" },
-            { time: 166.0, text: "「ありがとう」って伝えたくて あなたを見つめるけど", romaji: "arigatou tte tsutaetakute anata wo mitsumeru kedo", translation_es: "Quiero decirte 'gracias' mientras te miro, pero...", translation_en: "I want to tell you 'thank you' while I look at you, but..." },
-            { time: 197.0, text: "いつまでも ただ いつまでも あなたと笑っていたいから", romaji: "itsu mademo tada itsu mademo anata to waratte itai kara", translation_es: "Porque quiero estar riendo contigo para siempre", translation_en: "Because I want to keep laughing with you forever" },
-            { time: 242.0, text: "ケンカした日も 泣きあった日も", romaji: "kenka shita hi mo naki atta hi mo", translation_es: "Tanto los días que peleamos como los días que lloramos juntos", translation_en: "Both the days we fought and the days we cried together" },
-            { time: 264.0, text: "真っ白なこころに 描かれた未来を", romaji: "masshiro na kokoro ni egakareta mirai wo", translation_es: "El futuro dibujado en un corazón puramente blanco", translation_en: "The future drawn on a pure white heart" },
-            { time: 285.0, text: "「ありがとう」って伝えたくて あなたを見つめるけど", romaji: "arigatou tte tsutaetakute anata wo mitsumeru kedo", translation_es: "Quiero decirte 'gracias' mientras te miro, pero...", translation_en: "I want to tell you 'thank you' while I look at you, but..." },
-            { time: 316.0, text: "いつまでも ただ いつまでも あなたと笑っていたいから", romaji: "itsu mademo tada itsu mademo anata to waratte itai kara", translation_es: "Porque quiero estar riendo contigo para siempre", translation_en: "Because I want to keep laughing with you forever" }
+            { time: 15.0, text: "羽ばたいたら 戻れないと言って", romaji: "habataitara modorenai to itte", translation_es: "Dijo que una vez que extiendas las alas, no podrás volver", translation_en: "You said if you spread your wings, you can't come back" },
+            { time: 20.0, text: "目指したのは 蒼い 蒼い あの空", romaji: "mezashita no wa aoi aoi ano sora", translation_es: "Lo que buscabas era aquel cielo azul, tan azul", translation_en: "What you aimed for was that blue, blue sky" },
+            { time: 25.0, text: "「悲しみ」はまだ覚えられず 「切なさ」は今つかみはじめた", romaji: "kanashimi wa mada oboerarezu setsunasa wa ima tsukami hajimeta", translation_es: "Aún no puedo recordar la tristeza, pero he empezado a comprender la nostalgia", translation_en: "I can't yet remember 'sadness', but I've started to grasp 'pain'" }
         ],
         vocab: [
-            { jp: "伝える", kana: "つたえる", romaji: "tsutaeru", en: "to convey / tell", es: "transmitir / comunicar" },
-            { jp: "見つめる", kana: "みつめる", romaji: "mitsumeru", en: "to stare at", es: "mirar fijamente" },
-            { jp: "優しい", kana: "やさしい", romaji: "yasashii", en: "kind / gentle", es: "amable / gentil" },
-            { jp: "瞬間", kana: "しゅんかん", romaji: "shunkan", en: "moment", es: "momento" },
-            { jp: "大切", kana: "たいせつ", romaji: "taisetsu", en: "important / precious", es: "importante / valioso" }
+            { jp: "羽ばたく", kana: "はばたく", romaji: "habataku", en: "to flap wings", es: "aletear" },
+            { jp: "目指す", kana: "めざす", romaji: "mezasu", en: "to aim for", es: "apuntar a / dirigirse a" },
+            { jp: "切なさ", kana: "せつなさ", romaji: "setsunasa", en: "sadness / pain", es: "tristeza / dolor emocional" }
         ]
     },
     {
-        level: "N5",
-        title: "恋するフォーチュンクッキー",
-        artist: "AKB48",
-        start: "00:45",
-        end: "04:55",
-        focus: { es: "Frases repetitivas y vocabulario cotidiano", en: "Repetitive phrases and everyday vocabulary" },
-        difficulty: 1,
-        youtubeId: "dFf4AgBNR1E",  // Official MV - Verificado ✓
-        lyrics: [
-            { time: 48.0, text: "あなたのことが好きなのに 私に興味はないみたい", romaji: "anata no koto ga suki na no ni watashi ni kyoumi wa nai mitai", translation_es: "Aunque me gustas, parece que no tienes interés en mí", translation_en: "Although I love you so, you do not care at all" },
-            { time: 55.0, text: "何回目かの失恋の準備 Yeah! Yeah! Yeah!", romaji: "nankaime ka no shitsuren no junbi Yeah! Yeah! Yeah!", translation_es: "Preparándome para mi enésimo desamor", translation_en: "Again I prepare a logbook of my lost loves Yeah! Yeah! Yeah!" },
-            { time: 63.0, text: "まわりを見れば大勢の 可愛いコたちがいるんだもん", romaji: "mawari wo mireba oozei no kawaii ko-tachi ga irun da mon", translation_es: "Si miro a mi alrededor, hay un montón de chicas lindas", translation_en: "Just looking around I see many pretty girls" },
-            { time: 71.0, text: "地味な花は気づいてくれない Yeah! Yeah! Yeah!", romaji: "jimi na hana wa kizuite kurenai Yeah! Yeah! Yeah!", translation_es: "Nadie se fija en una flor tan sencilla", translation_en: "I'm shadowed, and nobody cares Yeah! Yeah! Yeah!" },
-            { time: 80.0, text: "カフェテリアに流れるMusic ぼんやり聴いていたら", romaji: "kafeteria ni nagareru Music bonyari kiite itara", translation_es: "Escuchaba distraída la música que sonaba en la cafetería", translation_en: "Sound of music in cafeteria I was hearing absent-minded" },
-            { time: 88.0, text: "知らぬ間にリズムに合わせて つま先から動き出す", romaji: "shiranu ma ni rizumu ni awasete tsumasaki kara ugokidasu", translation_es: "Sin darme cuenta, mis pies empezaron a moverse al ritmo", translation_en: "Then my tiptoe began to move unconsciously along the music" },
-            { time: 95.0, text: "止められない今の気持ち カモン カモン カモン カモン ベイビー 占ってよ", romaji: "tomerarenai ima no kimochi kamon kamon kamon kamon beibi- uranatte yo", translation_es: "No puedo contener este sentimiento, vamos, vamos, léeme la fortuna", translation_en: "I can't hold my emotion any more Come on, come on, come on, come on Baby Tell me my fortune" },
-            { time: 103.0, text: "恋するフォーチュンクッキー! 未来は そんな悪くないよ", romaji: "koisuru fo-chun kukki-! mirai wa sonna warukunai yo", translation_es: "¡Galleta de la fortuna enamorada! El futuro no es tan malo", translation_en: "Fortune cookie in love Future Won't be that bad" },
-            { time: 114.0, text: "Hey! Hey! Hey! ツキを呼ぶには 笑顔を見せること", romaji: "Hey! Hey! Hey! tsuki wo yobu ni wa egao wo miseru koto", translation_es: "¡Hey! ¡Hey! ¡Hey! Para atraer la suerte, hay que mostrar una sonrisa", translation_en: "Hey! Hey! Hey! To capture good luck Show a smile" },
-            { time: 123.0, text: "ハートのフォーチュンクッキー 運勢 今日よりも良くしよう", romaji: "haato no fo-chun kukki- unsei kyou yori mo yoku shiyou", translation_es: "Galleta de la fortuna de mi corazón, hagamos que la suerte sea mejor que hoy", translation_en: "Fortune cookie of my heart Fortune Make it better than today" },
-            { time: 132.0, text: "Hey! Hey! Hey! Hey! Hey! Hey! 人生捨てたもんじゃないよね", romaji: "Hey! Hey! Hey! Hey! Hey! Hey! jinsei suteta mon janai yo ne", translation_es: "La vida no es tan miserable, ¿verdad?", translation_en: "Hey! Hey! Hey! Hey! Hey! Hey! Life is not so miserable" },
-            { time: 140.0, text: "あっと驚く奇跡が起きる あなたとどこかで愛し合える予感", romaji: "atto odoroku kiseki ga okiru anata to dokoka de aishiaeru yokan", translation_es: "Un milagro sorprendente ocurrirá, tengo el presentimiento de que nos amaremos en algún lugar", translation_en: "Amazing miracle may happen Feeling of loving each other, somewhere" },
-            { time: 152.0, text: "告白したいけど 自分に自信がないの", romaji: "kokuhaku shitai kedo jibun ni jishin ga nai no", translation_es: "Quiero confesarme, pero no tengo confianza en mí misma", translation_en: "I want to confess clearly But I'm not so confident of myself" },
-            { time: 160.0, text: "リアクション 想像しちゃうから Yeah! Yeah! Yeah!", romaji: "riakushon souzou shichau kara Yeah! Yeah! Yeah!", translation_es: "Porque me imagino tu reacción", translation_en: "Coz. I can imagine your reaction Yeah! Yeah! Yeah!" },
-            { time: 168.0, text: "性格いいコがいいなんて 男のコは言うけれど", romaji: "seikaku ii ko ga ii nante otoko no ko wa iu keredo", translation_es: "Aunque los chicos dicen que lo importante es tener buen carácter", translation_en: "Though boys say Good nature is important" },
-            { time: 176.0, text: "ルックスがアドバンテージ いつだって可愛いコが", romaji: "rukkusu ga adobante-ji itsudatte kawaii ko ga", translation_es: "La apariencia siempre es una ventaja, las chicas lindas siempre...", translation_en: "Appearance is always an advantage Pretty girls are" },
-            { time: 183.0, text: "選ばれる 1位になる お願い お願い お願い 占い師 私も見てよ", romaji: "erabareru ichii ni naru onegai onegai onegai uranaishi watashi mo mite yo", translation_es: "son elegidas como la opción número uno, por favor léeme la fortuna a mí también", translation_en: "Always selected No.1 choice Please, please, please, Oh Baby Look at me, too" },
-            { time: 196.0, text: "恋するフォーチュンクッキー! その殻 さあ壊してみよう", romaji: "koisuru fo-chun kukki-! sono kara saa kowashite miyou", translation_es: "¡Galleta de la fortuna enamorada! Vamos a romper ese cascarón", translation_en: "Fortune cookie in love! Break the shell Let's break it now!" },
-            { time: 202.0, text: "Hey! Hey! Hey! 先のことなんて 誰もわからない", romaji: "Hey! Hey! Hey! saki no koto nante daremo wakaranai", translation_es: "¡Hey! ¡Hey! ¡Hey! Nadie sabe qué pasará después", translation_en: "Hey! Hey! Hey! Even God won't know What's coming next" },
-            { time: 212.0, text: "涙のフォーチュンクッキー そんなにネガティブにならずに", romaji: "namida no fo-chun kukki- sonna ni negateibu ni narazu ni", translation_es: "Galleta de la fortuna de lágrimas, no seas tan negativa", translation_en: "Fortune cookie in tears Don't take it So negative" },
-            { time: 221.0, text: "Hey! Hey! Hey! Hey! Hey! Hey! 世界は愛で溢れているよ", romaji: "Hey! Hey! Hey! Hey! Hey! Hey! sekai wa ai de afurete iru yo", translation_es: "El mundo está lleno de amor", translation_en: "Hey! Hey! Hey! Hey! Hey! Hey! The world is filled with love" },
-            { time: 228.0, text: "悲しいことなんて 忘れてしまう明日への風が 吹くはずさ", romaji: "kanashii koto nante wasurete shimau ashita e no kaze ga fuku hazu sa", translation_es: "Olvidarás las tristezas, soplara un viento hacia el mañana", translation_en: "And let us forget sadness By the new wind that will blow tomorrow" },
-            { time: 246.0, text: "カモン カモン カモン カモン ベイビー 占ってよ 恋するフォーチュンクッキー!", romaji: "kamon kamon kamon kamon beibi- uranatte yo koisuru fo-chun kukki-!", translation_es: "Vamos, vamos, vamos, vamos baby, léeme la fortuna, ¡galleta de la fortuna enamorada!", translation_en: "Come on, come on, come on, come on Baby Tell me my fortune Fortune cookie in love!" },
-            { time: 255.0, text: "未来は そんな悪くないよ Hey! Hey! Hey!", romaji: "mirai wa sonna warukunai yo Hey! Hey! Hey!", translation_es: "El futuro no es tan malo ¡Hey! ¡Hey! ¡Hey!", translation_en: "Future Won't be that bad Hey! Hey! Hey!" },
-            { time: 261.0, text: "ツキを呼ぶには 笑顔を見せること ハートのフォーチュンクッキー", romaji: "tsuki wo yobu ni wa egao wo miseru koto haato no fo-chun kukki-", translation_es: "Para atraer la suerte, hay que mostrar una sonrisa, galleta de la fortuna de mi corazón", translation_en: "To capture good luck Show a smile Fortune cookie of my heart" },
-            { time: 271.0, text: "運勢 今日よりも良くしよう Hey! Hey! Hey! Hey! Hey! Hey!", romaji: "unsei kyou yori mo yoku shiyou Hey! Hey! Hey! Hey! Hey! Hey!", translation_es: "Hagamos que la suerte sea mejor que hoy", translation_en: "Fortune Make it better than today Hey! Hey! Hey! Hey! Hey! Hey!" },
-            { time: 280.0, text: "人生捨てたもんじゃないよね あっと驚く奇跡が起きる", romaji: "jinsei suteta mon janai yo ne atto odoroku kiseki ga okiru", translation_es: "La vida no es tan miserable, un milagro sorprendente ocurrirá", translation_en: "Life is not so miserable Amazing miracle may happen" },
-            { time: 287.0, text: "あなたとどこかで愛し合える予感", romaji: "anata to dokoka de aishiaeru yokan", translation_es: "Tengo el presentimiento de que nos amaremos en algún lugar", translation_en: "Feeling of loving each other, somewhere" }
-        ],
-        vocab: [
-            { jp: "恋する", kana: "こいする", romaji: "koisuru", en: "to fall in love", es: "enamorarse" },
-            { jp: "未来", kana: "みらい", romaji: "mirai", en: "future", es: "futuro" },
-            { jp: "笑顔", kana: "えがお", romaji: "egao", en: "smile", es: "sonrisa" },
-            { jp: "占う", kana: "うらなう", romaji: "uranau", en: "to tell fortune", es: "predecir el futuro" },
-            { jp: "奇跡", kana: "きせき", romaji: "kiseki", en: "miracle", es: "milagro" }
-        ]
-    },
-    {
-        level: "N5",
-        title: "ドラえもん",
-        artist: "星野源",
+        level: "N3",
+        title: "Catch the Moment",
+        artist: "LiSA",
         start: "00:00",
-        end: "04:00",
-        focus: { es: "Vocabulario simple y pronunciación", en: "Simple vocabulary and pronunciation" },
-        difficulty: 1,
-        youtubeId: "ypRTzt1KrF8",  // Official Video - Verificado ✓
-        lyrics: [
-            { time: 10.66, text: "少しだけ不思議な普段のお話", romaji: "sukoshi dake fushigi na fudan no ohanashi", translation_es: "Una historia cotidiana un poco misteriosa", translation_en: "A slightly mysterious everyday story" },
-            { time: 16.30, text: "指先と机の間に事件、落ちこぼれた君も、できすぎあの子も、同じ雲下で暮らした事件", romaji: "yubisaki to tsukue no aida ni jiken ochikoboreta kimi mo dekisugi ano ko mo onaji kumo shita de kurashita jiken", translation_es: "Un incidente entre la punta de los dedos y el escritorio; tanto tú que te quedaste atrás como ese niño tan perfecto vivieron bajo la misma nube", translation_en: "An incident between fingertips and desk; both you who fell behind and that overachieving child lived under the same cloud" },
-            { time: 34.0, text: "そこに落っこちる機械だって、涙を流して震えながら勇気を叫ぶだろう", romaji: "soko ni okkochiru kikai datte namida wo nagashite furue nagara yuuki wo sakebu darou", translation_es: "Incluso una máquina que caiga allí derramará lágrimas y, mientras tiembla, gritará con valor", translation_en: "Even a machine that falls there would shed tears and shout with courage while trembling" },
-            { time: 50.60, text: "だからここにおいでよ", romaji: "dakara koko ni oide yo", translation_es: "Así que ven aquí", translation_en: "So come here" },
-            { time: 53.38, text: "一緒に冒険しよう", romaji: "isshou ni bouken shiyou", translation_es: "Vamos a tener una aventura juntos", translation_en: "Let's have an adventure together" },
-            { time: 57.18, text: "何者でもなくても、世界を救おう", romaji: "nanimono demo nakute mo sekai wo sukuou", translation_es: "Aunque no seamos nadie, salvemos el mundo", translation_en: "Even if we are nobody, let's save the world" },
-            { time: 62.64, text: "いつか時が流れて必ずたどり着くから、君に会えるよ", romaji: "itsuka toki ga nagarete kanarazu tadoritsuku kara kimi ni aeru yo", translation_es: "Algún día, cuando pase el tiempo, llegaremos sin falta, así que podré encontrarte", translation_en: "One day as time flows, we will surely arrive, so I can meet you" },
-            { time: 72.16, text: "ドドドドドドドドドドラえもん", romaji: "dododododododododo doraemon", translation_es: "Dododododododododo Doraemon", translation_en: "Dododododododododo Doraemon" },
-            { time: 85.60, text: "背中越しの過去と輝やく未来を、新たい血の流れる今で繋ごう", romaji: "senaka goshi no kako to kagayaku mirai wo aratai chi no nagareru ima de tsunagou", translation_es: "Conectemos el pasado a nuestras espaldas y el futuro brillante con este presente donde fluye sangre nueva", translation_en: "Let's connect the past behind us and the shining future with this present where new blood flows" },
-            { time: 97.64, text: "僕ら繋ごう", romaji: "bokura tsunagou", translation_es: "Conectémonos", translation_en: "Let's connect" },
-            { time: 100.72, text: "拗ねた君も、静かなあの子も、彼の歌も、誰かを救うだろう", romaji: "suneta kimi mo shizuka na ano ko mo kare no uta mo dareka wo sukuu darou", translation_es: "Tú que estás de mal humor, ese niño tan callado y su canción, seguramente salvarán a alguien", translation_en: "Even the sulking you, the quiet child, and his song will surely save someone" },
-            { time: 113.66, text: "だからここにおいでよ、一緒に冒険しよう", romaji: "dakara koko ni oide yo isshou ni bouken shiyou", translation_es: "Así que ven aquí, vamos a tener una aventura juntos", translation_en: "So come here, let's have an adventure together" },
-            { time: 120.14, text: "何者でもなくても世界を救おう", romaji: "nanimono demo nakute mo sekai wo sukuou", translation_es: "Aunque no seamos nadie, salvemos el mundo", translation_en: "Even if we are nobody, let's save the world" },
-            { time: 125.66, text: "いつか時が流れて必ず辿り着くから、君に会えるよ", romaji: "itsuka toki ga nagarete kanarazu tadoritsuku kara kimi ni aeru yo", translation_es: "Algún día, cuando pase el tiempo, llegaremos sin falta, así que podré encontrarte", translation_en: "One day as time flows, we will surely arrive, so I can meet you" },
-            { time: 135.16, text: "ドドドドドドドドドドラえもん", romaji: "dododododododododo doraemon", translation_es: "Dododododododododo Doraemon", translation_en: "Dododododododododo Doraemon" },
-            { time: 159.74, text: "大工だって心を痛めて愛を込めてさよならするだろう", romaji: "daiku datte kokoro wo itamete ai wo komete sayonara suru darou", translation_es: "Incluso un carpintero le dolería el corazón y diría adiós con todo su amor", translation_en: "Even a carpenter would feel heartache and say goodbye with love" },
-            { time: 172.66, text: "君が残したもの、探し続けること、浮かぶ空想からまた未来が生まれる", romaji: "kimi ga nokoshita mono sagashi tsuzukeru koto ukabu kuusou kara mata mirai ga umareru", translation_es: "Lo que dejaste atrás, seguir buscándolo; de esas fantasías que flotan nacerá de nuevo el futuro", translation_en: "Continuing to search for what you left behind; from those floating fantasies, the future will be born again" },
-            { time: 193.64, text: "ここにおいでよ、一緒に冒険しよう", romaji: "koko ni oide yo isshou ni bouken shiyou", translation_es: "Ven aquí, vamos a tener una aventura juntos", translation_en: "Come here, let's have an adventure together" },
-            { time: 199.64, text: "何者でもなくても世界を救おう", romaji: "nanimono demo nakute mo sekai wo sukuou", translation_es: "Aunque no seamos nadie, salvemos el mundo", translation_en: "Even if we are nobody, let's save the world" },
-            { time: 205.10, text: "いつか時が流れて必ずたどり着くから、君を作るよ", romaji: "itsuka toki ga nagarete kanarazu tadoritsuku kara kimi wo tsukuru yo", translation_es: "Algún día, cuando pase el tiempo, llegaremos sin falta, así que te crearé", translation_en: "One day as time flows, we will surely arrive, so I will make you" },
-            { time: 214.70, text: "ドドドドドドドドドドラえもん", romaji: "dododododododododo doraemon", translation_es: "Dododododododododo Doraemon", translation_en: "Dododododododododo Doraemon" },
-            { time: 217.70, text: "ドドドドドドドドドドラえもん", romaji: "dododododododododo doraemon", translation_es: "Dododododododododo Doraemon", translation_en: "Dododododododododo Doraemon" },
-            { time: 220.70, text: "ドドドドドドドドドドラえもん", romaji: "dododododododododo doraemon", translation_es: "Dododododododododo Doraemon", translation_en: "Dododododododododo Doraemon" }
-        ],
-        vocab: [
-            { jp: "作る", kana: "つくる", romaji: "tsukuru", en: "to make", es: "hacer / crear" },
-            { jp: "心", kana: "こころ", romaji: "kokoro", en: "heart", es: "corazón" },
-            { jp: "冒険", kana: "ぼうけん", romaji: "bouken", en: "adventure", es: "aventura" },
-            { jp: "救う", kana: "すくう", romaji: "sukuu", en: "to save", es: "salvar" },
-            { jp: "未来", kana: "みらい", romaji: "mirai", en: "future", es: "futuro" }
-        ]
-    },
-
-    // 🟡 N4
-    {
-        level: "N4",
-        title: "ひまわりの約束",
-        artist: "秦基博",
-        start: "01:10",
-        end: "01:40",
-        focus: { es: "Frases emocionales + gramática básica", en: "Emotional phrases + basic grammar" },
-        difficulty: 2,
-        youtubeId: "rKsQ-3N-Bks",  // Official MV - Verificado ✓
-        lyrics: [
-            { time: 72.0, text: "どうして君が泣くの", romaji: "doushite kimi ga naku no", translation_es: "¿Por qué lloras?", translation_en: "Why are you crying?" },
-            { time: 78.0, text: "まだ僕も泣いていないのに", romaji: "mada boku mo naite inai noni", translation_es: "Si yo todavía no he llorado...", translation_en: "Even though I haven't cried yet..." },
-            { time: 84.0, text: "自分より 悲しむから", romaji: "jibun yori kanashimu kara", translation_es: "Como te entristeces más que yo mismo,", translation_en: "Because you get sadder than myself," },
-            { time: 89.0, text: "辛いのがどっちか わからなくなるよ", romaji: "tsurai no ga dotchi ka wakaranaku naru yo", translation_es: "ya no sé quién de los dos está sufriendo más", translation_en: "I don't know which of us is hurting more" }
-        ],
-        vocab: [
-            { jp: "泣く", kana: "なく", romaji: "naku", en: "to cry", es: "llorar" },
-            { jp: "悲しむ", kana: "かなしむ", romaji: "kanashimu", en: "to feel sad", es: "entristecerse" },
-            { jp: "辛い", kana: "つらい", romaji: "tsurai", en: "painful / hard", es: "doloroso / difícil" }
-        ]
-    },
-    {
-        level: "N4",
-        title: "世界に一つだけの花",
-        artist: "SMAP",
-        start: "01:08",
-        end: "01:38",
-        focus: { es: "Estructuras simples + vocabulario descriptivo", en: "Simple structures + descriptive vocabulary" },
-        difficulty: 2,
-        youtubeId: "qZq-q75KeMw",  // Video con letras - Verificado ✓
-        lyrics: [
-            { time: 70.0, text: "そうさ 僕らは", romaji: "sou sa bokura wa", translation_es: "Así es, nosotros somos", translation_en: "That's right, we are" },
-            { time: 72.0, text: "世界に一つだけの花", romaji: "sekai ni hitotsu dake no hana", translation_es: "la única flor en el mundo", translation_en: "the only flower in the world" },
-            { time: 78.0, text: "一人一人違う種を持つ", romaji: "hitori hitori chigau tane wo motsu", translation_es: "Cada uno tiene una semilla diferente", translation_en: "Each person holds a different seed" },
-            { time: 84.0, text: "その花を咲かせることだけに", romaji: "sono hana wo sakaseru koto dake ni", translation_es: "Solo en hacer florecer esa flor", translation_en: "Just in making that flower bloom" },
-            { time: 90.0, text: "一生懸命になればいい", romaji: "isshoukenmei ni nareba ii", translation_es: "deberíamos esforzarnos al máximo", translation_en: "we should try our best" }
-        ],
-        vocab: [
-            { jp: "世界", kana: "せかい", romaji: "sekai", en: "world", es: "mundo" },
-            { jp: "種", kana: "たね", romaji: "tane", en: "seed", es: "semilla" },
-            { jp: "一生懸命", kana: "いっしょうけんめい", romaji: "isshoukenmei", en: "with all one's effort", es: "con todo el esfuerzo" }
-        ]
-    },
-    {
-        level: "N4",
-        title: "小さな恋のうた",
-        artist: "MONGOL800",
-        start: "01:03",
-        end: "01:33",
-        focus: { es: "Frases cortas + repetición", en: "Short phrases + repetition" },
-        difficulty: 2,
-        youtubeId: "u8EkSB9zSpE",  // Official MV - Verificado ✓
-        lyrics: [
-            { time: 65.0, text: "ほら あなたにとって", romaji: "hora anata ni totte", translation_es: "Mira, para ti", translation_en: "Look, for you" },
-            { time: 69.0, text: "大事な人ほど すぐそばにいるの", romaji: "daiji na hito hodo sugu soba ni iru no", translation_es: "la persona más importante está justo a tu lado", translation_en: "the most important person is right by your side" },
-            { time: 76.0, text: "ただ あなたにだけ 届いて欲しい", romaji: "tada anata ni dake todoite hoshii", translation_es: "Solo quiero que te llegue a ti", translation_en: "I just want it to reach only you" },
-            { time: 83.0, text: "響け恋の歌", romaji: "hibike koi no uta", translation_es: "Que resuene la canción de amor", translation_en: "Let the love song echo" }
-        ],
-        vocab: [
-            { jp: "大事", kana: "だいじ", romaji: "daiji", en: "important", es: "importante" },
-            { jp: "届く", kana: "とどく", romaji: "todoku", en: "to reach", es: "alcanzar / llegar" },
-            { jp: "響く", kana: "ひびく", romaji: "hibiku", en: "to echo / resound", es: "resonar" }
-        ]
-    },
-
-    // 🟠 N3
-    {
-        level: "N3",
-        title: "チェリー",
-        artist: "スピッツ",
-        start: "01:03",
-        end: "01:33",
-        focus: { es: "Vocabulario intermedio + expresiones naturales", en: "Intermediate vocabulary + natural expressions" },
+        end: "01:00",
+        focus: { es: "Atesorar el presente", en: "Treasuring the present" },
         difficulty: 3,
-        youtubeId: "uqWeX2vD2xU",  // Official MV - Ya verificado en documento original
+        youtubeId: "LJkn2qqtijk", // ✅ CORREGIDO — Canal oficial LiSA, full MV
         lyrics: [
-            { time: 65.0, text: "「愛してる」の響きだけで", romaji: "\"aishiteru\" no hibiki dake de", translation_es: "Solo con el eco de un 'te amo'", translation_en: "Just with the echo of 'I love you'" },
-            { time: 71.0, text: "強くなれる気がしたよ", romaji: "tsuyoku nareru ki ga shita yo", translation_es: "Sentí que podía volverme más fuerte", translation_en: "I felt I could become stronger" },
-            { time: 76.0, text: "ささやかな喜びを", romaji: "sasayaka na yorokobi wo", translation_es: "Una pequeña alegría", translation_en: "A modest joy" },
-            { time: 82.0, text: "つぶれるほど抱きしめて", romaji: "tsubureru hodo dakishimete", translation_es: "abrazándola hasta casi aplastarla", translation_en: "hugging it until it almost crushes" }
+            { time: 10.0, text: "あと何回キミと笑えるの？", romaji: "ato nankai kimi to waraeru no?", translation_es: "¿Cuántas veces más podré reír contigo?", translation_en: "How many more times can I laugh with you?" },
+            { time: 15.0, text: "不確かな未来ならば いらない", romaji: "futashika na mirai naraba iranai", translation_es: "Si es un futuro incierto, no lo quiero", translation_en: "If it's an uncertain future, I don't need it" }
         ],
         vocab: [
-            { jp: "響き", kana: "ひびき", romaji: "hibiki", en: "echo / sound", es: "eco / sonido" },
-            { jp: "ささやか", kana: "ささやか", romaji: "sasayaka", en: "modest / small", es: "modesto / pequeño" },
-            { jp: "抱きしめる", kana: "だきしめる", romaji: "dakishimeru", en: "to hug tightly", es: "abrazar fuerte" }
+            { jp: "笑える", kana: "わらえる", romaji: "waraeru", en: "can laugh", es: "poder reír" },
+            { jp: "不確か", kana: "ふたしか", romaji: "futashika", en: "uncertain", es: "incierto" }
         ]
     },
     {
         level: "N3",
-        title: "打上花火",
-        artist: "DAOKO × 米津玄師",
-        start: "00:56",
-        end: "01:26",
-        focus: { es: "Escucha + ritmo intermedio", en: "Listening + intermediate rhythm" },
+        title: "紅蓮の弓矢",
+        artist: "Linked Horizon",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Vocabulario de combate y épica", en: "Combat and epic vocabulary" },
         difficulty: 3,
-        youtubeId: "-tKVN2mAKRI",  // Official MV - Ya verificado en documento original
+        youtubeId: "8OkpRK2_gU8", // ✅ verificado
         lyrics: [
-            { time: 58.0, text: "パッと光って咲いた 花火を見ていた", romaji: "patto hikatte saita hanabi wo miteita", translation_es: "Miraba los fuegos artificiales que brillaron y florecieron de repente", translation_en: "I was watching the fireworks that suddenly flashed and bloomed" },
-            { time: 65.0, text: "きっとまだ 終わらない夏が", romaji: "kitto mada owaranai natsu ga", translation_es: "Seguramente, este verano que aún no termina", translation_en: "Surely, this summer that hasn't ended yet" },
-            { time: 72.0, text: "曖昧な心を 解かして繋いだ", romaji: "aimai na kokoro wo tokashite tsunaida", translation_es: "Derritió y unió nuestros corazones ambiguos", translation_en: "Melted and connected our ambiguous hearts" },
-            { time: 79.0, text: "この夜が 続いて欲しかった", romaji: "kono yoru ga tsuzuitte hoshikatta", translation_es: "Quería que esta noche continuara", translation_en: "I wanted this night to continue" }
+            { time: 60.0, text: "踏まれた花の 名前も知らずに", romaji: "fumareta hana no namae mo shirazu ni", translation_es: "Sin saber siquiera el nombre de la flor pisoteada", translation_en: "Without even knowing the name of the trampled flower" },
+            { time: 65.0, text: "地に堕ちた鳥は 風を待ちわびる", romaji: "chi ni ochita tori wa kaze wo machiwabiru", translation_es: "El ave que cayó a tierra espera ansiosa el viento", translation_en: "The bird that fell to earth waits anxiously for the wind" }
         ],
         vocab: [
-            { jp: "花火", kana: "はなび", romaji: "hanabi", en: "fireworks", es: "fuegos artificiales" },
-            { jp: "曖昧", kana: "あいまい", romaji: "aimai", en: "ambiguous", es: "ambiguo" },
-            { jp: "解かす", kana: "とかす", romaji: "tokasu", en: "to melt", es: "derretir" }
+            { jp: "踏む", kana: "ふむ", romaji: "fumu", en: "to step on", es: "pisar" },
+            { jp: "堕ちる", kana: "おちる", romaji: "ochiru", en: "to fall", es: "caer" },
+            { jp: "待ちわびる", kana: "まちわびる", romaji: "machiwabiru", en: "to wait anxiously", es: "esperar con ansias" }
         ]
     },
     {
         level: "N3",
-        title: "Lemon",
-        artist: "米津玄師",
-        start: "01:04",
-        end: "01:34",
-        focus: { es: "Gramática intermedia + comprensión", en: "Intermediate grammar + comprehension" },
+        title: "FLY HIGH!!",
+        artist: "BURNOUT SYNDROMES",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Superación y esfuerzo", en: "Overcoming and effort" },
         difficulty: 3,
-        youtubeId: "SX_ViT4Ra7k",  // Official MV - Ya verificado en documento original
+        youtubeId: "txgg-fbVjf4", // ✅ MV oficial Epic Records Japan
         lyrics: [
-            { time: 66.0, text: "あの日の悲しみさえ", romaji: "ano hi no kanashimi sae", translation_es: "Incluso la tristeza de aquel día", translation_en: "Even the sadness of that day" },
-            { time: 70.0, text: "あの日の苦しみさえ", romaji: "ano hi no kurushimi sae", translation_es: "Incluso el sufrimiento de aquel día", translation_en: "Even the suffering of that day" },
-            { time: 73.0, text: "そのすべてを愛してた あなたと共に", romaji: "sono subete wo aishiteta anata to tomo ni", translation_es: "Amé todo eso, junto a ti", translation_en: "I loved all of it, together with you" },
-            { time: 80.0, text: "胸に残り離れない 苦いレモンの匂い", romaji: "mune ni nokori hanarenai nigai remon no nioi", translation_es: "El amargo olor a limón se queda en mi pecho y no se va", translation_en: "The bitter smell of lemon remains in my chest and won't leave" },
-            { time: 87.0, text: "雨が降り止むまでは帰れない", romaji: "ame ga furiyamu made wa kaerenai", translation_es: "No puedo regresar hasta que deje de llover", translation_en: "I can't return until the rain stops falling" }
+            { time: 10.0, text: "飛べ FLY HIGH!! 汗と血と涙の", romaji: "tobe FLY HIGH!! ase to chi to namida no", translation_es: "¡Vuela, vuela alto! De sudor, sangre y lágrimas", translation_en: "Fly, FLY HIGH!! Of sweat, blood, and tears" }
         ],
         vocab: [
-            { jp: "悲しみ", kana: "かなしみ", romaji: "kanashimi", en: "sadness", es: "tristeza" },
-            { jp: "苦しみ", kana: "くるしみ", romaji: "kurushimi", en: "suffering", es: "sufrimiento" },
-            { jp: "匂い", kana: "におい", romaji: "nioi", en: "smell / scent", es: "olor / aroma" }
+            { jp: "飛ぶ", kana: "とぶ", romaji: "tobu", en: "to fly", es: "volar" },
+            { jp: "汗", kana: "あせ", romaji: "ase", en: "sweat", es: "sudor" }
+        ]
+    },
+    {
+        level: "N3",
+        title: "Again",
+        artist: "YUI",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Remordimiento y nuevos comienzos", en: "Regret and new beginnings" },
+        difficulty: 3,
+        youtubeId: "MLfMrBfqCu8", // ✅ MV oficial YUI
+        lyrics: [
+            { time: 5.0, text: "この想いを消してしまうには まだ早すぎるわ", romaji: "kono omoi wo keshite shimau ni wa mada hayasugiru wa", translation_es: "Es demasiado pronto para borrar estos sentimientos", translation_en: "It's too early to erase these feelings" }
+        ],
+        vocab: [
+            { jp: "想い", kana: "おもい", romaji: "omoi", en: "thought / feeling", es: "pensamiento / sentimiento" },
+            { jp: "消す", kana: "けす", romaji: "kesu", en: "to erase / extinguish", es: "borrar / apagar" }
         ]
     },
 
-    // 🔵 N2
+    // 🟠 Nivel N2 (Intermedio alto)
     {
         level: "N2",
-        title: "Pretender",
-        artist: "Official髭男dism",
-        start: "01:02",
-        end: "01:32",
-        focus: { es: "Gramática compleja + emociones", en: "Complex grammar + emotions" },
+        title: "午夜の待ち合わせ",
+        artist: "Hello Sleepwalkers",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Vocabulario urbano y nocturno", en: "Urban and nightly vocabulary" },
         difficulty: 4,
-        youtubeId: "TQ8WlA2GXbk",  // Official MV - Verificado ✓
+        youtubeId: "J69oCCM1EcI", // ✅ MV oficial Hello Sleepwalkers (Noragami OP)
         lyrics: [
-            { time: 64.0, text: "君の運命の人は僕じゃない", romaji: "kimi no unmei no hito wa boku janai", translation_es: "La persona de tu destino no soy yo", translation_en: "The person of your destiny is not me" },
-            { time: 70.0, text: "辛いけど否めない でも離れ難いのさ", romaji: "tsurai kedo inamenai demo hanaregatai no sa", translation_es: "Duele pero es innegable, aun así es difícil alejarse", translation_en: "It hurts but it's undeniable, yet it's hard to let go" },
-            { time: 76.0, text: "その髪に触れただけで 痛いや いやでも", romaji: "sono kami ni fureta dake de itai ya iya demo", translation_es: "Solo con tocar ese cabello, duele, oye, pero...", translation_en: "Just touching that hair hurts, hey, but..." },
-            { time: 83.0, text: "甘いな いやいや", romaji: "amai na iyaiya", translation_es: "es dulce, no, no...", translation_en: "it's sweet, no, no..." }
+            { time: 10.0, text: "午前零時を過ぎた頃 待ち合わせ場所で", romaji: "gozen reiji wo sugita koro machiawase basho de", translation_es: "Cerca de las doce de la noche, en el lugar de encuentro", translation_en: "Around midnight, at the meeting place" }
         ],
         vocab: [
-            { jp: "運命", kana: "うんめい", romaji: "unmei", en: "destiny / fate", es: "destino" },
-            { jp: "否めない", kana: "いなめない", romaji: "inamenai", en: "undeniable", es: "innegable" },
-            { jp: "難い", kana: "がたい", romaji: "gatai", en: "difficult to...", es: "difícil de..." }
+            { jp: "午前零時", kana: "ごぜんれいじ", romaji: "gozenreiji", en: "midnight", es: "medianoche" },
+            { jp: "待ち合わせ", kana: "まちあわせ", romaji: "machiawase", en: "meeting / appointment", es: "encuentro / cita" }
         ]
     },
     {
         level: "N2",
-        title: "残酷な天使のテーゼ",
-        artist: "高橋洋子",
-        start: "01:24",
-        end: "01:54",
-        focus: { es: "Expresiones abstractas", en: "Abstract expressions" },
+        title: "Re:Re:",
+        artist: "ASIAN KUNG-FU GENERATION",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Pasado y arrepentimiento", en: "Past and regret" },
         difficulty: 4,
-        youtubeId: "o6wtDPVkKqI",  // Official MV - Verificado ✓
+        youtubeId: "vRP5j8ne_9s", // ✅ verificado
         lyrics: [
-            { time: 86.0, text: "残酷な天使のテーゼ", romaji: "zankoku na tenshi no te-ze", translation_es: "La tesis de un ángel cruel", translation_en: "A cruel angel's thesis" },
-            { time: 89.0, text: "窓辺からやがて飛び立つ", romaji: "madobe kara yagate tobitatsu", translation_es: "que pronto volará desde la ventana", translation_en: "will soon take flight from the window" },
-            { time: 93.0, text: "ほとばしる熱いパトスで", romaji: "hotobashiru atsui patosu de", translation_es: "Con un ardiente y desbordante pathos", translation_en: "With a surging hot pathos" },
-            { time: 97.0, text: "思い出を裏切るなら", romaji: "omoide wo uragiru nara", translation_es: "si vas a traicionar tus recuerdos", translation_en: "if you're going to betray your memories" },
-            { time: 100.0, text: "この宇宙を抱いて輝く", romaji: "kono sora wo daite kagayaku", translation_es: "abraza este universo y brilla", translation_en: "embrace this universe and shine" },
-            { time: 105.0, text: "少年よ 神話になれ", romaji: "shounen yo shinwa ni nare", translation_es: "¡Joven, conviértete en una leyenda!", translation_en: "Boy, become a myth!" }
+            { time: 60.0, text: "君を待った 僕は待った", romaji: "kimi wo matta boku wa matta", translation_es: "Te esperé, yo esperé", translation_en: "I waited for you, I waited" }
         ],
         vocab: [
-            { jp: "残酷", kana: "ざんこく", romaji: "zankoku", en: "cruel", es: "cruel" },
-            { jp: "裏切る", kana: "うらぎる", romaji: "uragiru", en: "to betray", es: "traicionar" },
-            { jp: "神話", kana: "しんわ", romaji: "shinwa", en: "myth / legend", es: "mito / leyenda" }
+            { jp: "待つ", kana: "まつ", romaji: "matsu", en: "to wait", es: "esperar" }
         ]
     },
     {
         level: "N2",
-        title: "群青",
-        artist: "YOASOBI",
-        start: "01:21",
-        end: "01:51",
-        focus: { es: "Listening rápido + vocabulario avanzado", en: "Fast listening + advanced vocabulary" },
-        difficulty: 4,
-        youtubeId: "Y4nEEZwckuU",  // Official MV - Verificado ✓
-        lyrics: [
-            { time: 83.0, text: "嗚呼、知らず知らず隠してた", romaji: "aa, shirazu shirazu kakushiteta", translation_es: "Ah, lo escondía sin darme cuenta", translation_en: "Ah, I was hiding it without realizing" },
-            { time: 87.0, text: "本当の声を響かせてよ、ほら", romaji: "hontou no koe wo hibikasete yo, hora", translation_es: "Haz resonar tu verdadera voz, vamos", translation_en: "Make your true voice echo, come on" },
-            { time: 92.0, text: "見ないふりしていても", romaji: "minai furi shite ite mo", translation_es: "Aunque finjas no verlo", translation_en: "Even if you pretend not to see it" },
-            { time: 95.0, text: "確かにそこにある", romaji: "tashika ni soko ni aru", translation_es: "Ciertamente está ahí", translation_en: "It is certainly there" }
-        ],
-        vocab: [
-            { jp: "知らず知らず", kana: "しらずしらず", romaji: "shirazushirazu", en: "unconsciously / without realizing", es: "inconscientemente / sin darse cuenta" },
-            { jp: "隠す", kana: "かくす", romaji: "kakusu", en: "to hide", es: "esconder / ocultar" },
-            { jp: "確か", kana: "たしか", romaji: "tashika", en: "certain / sure", es: "cierto / seguro" }
-        ]
-    },
-
-    // 🔴 N1
-    {
-        level: "N1",
-        title: "夜に駆ける",
-        artist: "YOASOBI",
-        start: "01:02",
-        end: "01:32",
-        focus: { es: "Narrativa rápida + comprensión avanzada", en: "Fast narrative + advanced comprehension" },
-        difficulty: 5,
-        youtubeId: "x8VYWazR5mE",  // Official MV - Verificado ✓
-        lyrics: [
-            { time: 64.0, text: "沈むように溶けてゆくように", romaji: "shizumu you ni tokete yuku you ni", translation_es: "Como si nos hundiéramos, como si nos derritiéramos", translation_en: "Like sinking, like melting away" },
-            { time: 68.0, text: "二人だけの空が広がる夜に", romaji: "futari dake no sora ga hirogaru yoru ni", translation_es: "En una noche donde el cielo se expande solo para nosotros dos", translation_en: "In a night where the sky spreads only for the two of us" },
-            { time: 73.0, text: "「さよなら」だけだった", romaji: "\"sayonara\" dake datta", translation_es: "Fue solo un \"adiós\"", translation_en: "It was only a \"goodbye\"" },
-            { time: 76.0, text: "その一言で全てが分かった", romaji: "sono hitokoto de subete ga wakatta", translation_es: "Con esa sola palabra lo entendí todo", translation_en: "With that one word I understood everything" },
-            { time: 79.0, text: "日が沈み出した空と君の姿", romaji: "hi ga shizumidashita sora to kimi no sugata", translation_es: "El cielo al atardecer y tu figura", translation_en: "The setting sun's sky and your figure" }
-        ],
-        vocab: [
-            { jp: "沈む", kana: "しずむ", romaji: "shizumu", en: "to sink", es: "hundirse" },
-            { jp: "溶ける", kana: "とける", romaji: "tokeru", en: "to melt", es: "derretirse / disolverse" },
-            { jp: "姿", kana: "すがた", romaji: "sugata", en: "figure / appearance", es: "figura / apariencia" }
-        ]
-    },
-    {
-        level: "N1",
-        title: "白日",
-        artist: "King Gnu",
-        start: "01:03",
-        end: "01:33",
-        focus: { es: "Vocabulario avanzado + interpretación", en: "Advanced vocabulary + interpretation" },
-        difficulty: 5,
-        youtubeId: "ony539T074w",  // Official MV - Verificado ✓
-        lyrics: [
-            { time: 65.0, text: "時には誰かを 知らず知らずのうちに", romaji: "toki ni wa dareka wo shirazushirazu no uchi ni", translation_es: "A veces, sin darnos cuenta", translation_en: "Sometimes, without realizing it" },
-            { time: 71.0, text: "傷つけてしまったり", romaji: "kizutsukete shimattari", translation_es: "terminamos lastimando a alguien", translation_en: "we end up hurting someone" },
-            { time: 75.0, text: "失ったりして初めて", romaji: "ushinattari shite hajimete", translation_es: "y solo al perderlo por primera vez", translation_en: "and only upon losing them for the first time" },
-            { time: 79.0, text: "犯した罪を知る", romaji: "okashita tsumi wo shiru", translation_es: "conocemos el pecado que hemos cometido", translation_en: "we realize the sin we committed" },
-            { time: 83.0, text: "戻れないよ、昔のようには", romaji: "modorenai yo, mukashi no you ni wa", translation_es: "Ya no podemos regresar a como era antes", translation_en: "We can't go back to how it was before" }
-        ],
-        vocab: [
-            { jp: "傷つける", kana: "きずつける", romaji: "kizutsukeru", en: "to hurt / wound", es: "herir / lastimar" },
-            { jp: "失う", kana: "うしなう", romaji: "ushinau", en: "to lose", es: "perder" },
-            { jp: "罪", kana: "つみ", romaji: "tsumi", en: "sin / crime", es: "pecado / crimen" }
-        ]
-    },
-    {
-        level: "N1",
         title: "unravel",
         artist: "TK from 凛として時雨",
         start: "00:00",
-        end: "01:20",
-        focus: { es: "Velocidad + emoción + listening complejo", en: "Speed + emotion + complex listening" },
-        difficulty: 5,
-        youtubeId: "7aMOurgDB-o",  // Official MV - Verificado ✓
+        end: "01:00",
+        focus: { es: "Psicología y distorsión", en: "Psychology and distortion" },
+        difficulty: 4,
+        youtubeId: "7aMOurgDB-o", // ✅ verificado
         lyrics: [
-            { time: 0.4, text: "教えて教えてよその仕組みを", romaji: "oshiete oshiete yo sono shikumi wo", translation_es: "Dime, dime cómo funciona esto", translation_en: "Tell me, tell me the way it works" },
-            { time: 7.58, text: "僕の中に誰がいるの", romaji: "boku no naka ni dare ga iru no", translation_es: "¿Quién hay dentro de mí?", translation_en: "Who is inside of me?" },
-            { time: 14.68, text: "壊れた壊れたよこの世界で", romaji: "kowareta kowareta yo kono sekai de", translation_es: "Me rompí, me rompí en este mundo", translation_en: "I broke, I broke in this world" },
-            { time: 21.8, text: "君が笑う", romaji: "kimi ga warau", translation_es: "Tú sonríes", translation_en: "You smile" },
-            { time: 41.76, text: "何も見えずに", romaji: "nani mo miezu ni", translation_es: "Sin ver nada", translation_en: "Without seeing anything" },
-            { time: 42.38, text: "壊れた僕だってさ", romaji: "kowareta boku datte sa", translation_es: "Incluso para alguien roto como yo", translation_en: "Even for a broken me" },
-            { time: 45.44, text: "息を止めてフリーズ", romaji: "iki wo tomete furiizu", translation_es: "Detén la respiración y congélate", translation_en: "Hold your breath and freeze" },
-            { time: 48.78, text: "壊せる", romaji: "kowaseru", translation_es: "Puedo romper", translation_en: "I can break" },
-            { time: 49.66, text: "壊せない", romaji: "kowasenai", translation_es: "No puedo romper", translation_en: "I can't break" },
-            { time: 50.38, text: "狂える", romaji: "kurueru", translation_es: "Puedo enloquecer", translation_en: "I can go mad" },
-            { time: 51.42, text: "狂えない", romaji: "kuruenai", translation_es: "No puedo enloquecer", translation_en: "I can't go mad" },
-            { time: 52.02, text: "あなたを見つけて", romaji: "anata wo mitsukete", translation_es: "Al encontrarte...", translation_en: "Finding you..." },
-            { time: 54.86, text: "揺れた歪んだ世界にいたんだ", romaji: "yureta yuganda sekai ni itanda", translation_es: "Estaba en un mundo agitado y distorsionado", translation_en: "I was in a shaken, distorted world" },
-            { time: 58.28, text: "僕は", romaji: "boku wa", translation_es: "Yo...", translation_en: "I..." },
-            { time: 59.32, text: "透き通って見えなくなって", romaji: "sukitootte mienaku natte", translation_es: "volviéndome transparente e invisible", translation_en: "becoming transparent and invisible" },
-            { time: 62.66, text: "見つけないで僕のことを", romaji: "mitsukenaide boku no koto wo", translation_es: "No me busques", translation_en: "Don't find me" },
-            { time: 68.3, text: "見つめないで", romaji: "mitsumenaide", translation_es: "No me mires fijamente", translation_en: "Don't stare at me" },
-            { time: 69.94, text: "誰かが描いた世界の中であなたを傷つけたくはないよ", romaji: "dareka ga egaita sekai no naka de anata wo kizutsuketaku wa nai yo", translation_es: "En un mundo que alguien más dibujó, no quiero lastimarte", translation_en: "In a world someone else imagined, I don't want to hurt you" },
-            { time: 77.6, text: "覚えてて僕のこと", romaji: "oboetete boku no koto", translation_es: "Recuérdame", translation_en: "Remember me" }
+            { time: 0.0, text: "教えて教えてよ その仕組みを", romaji: "oshiete oshiete yo sono shikumi wo", translation_es: "Dime, dime cómo funciona esto", translation_en: "Tell me, tell me the way it works" }
         ],
         vocab: [
-            { jp: "壊れる", kana: "こわれる", romaji: "kowareru", en: "to break / shatter", es: "romperse / hacerse pedazos" },
-            { jp: "狂う", kana: "くるう", romaji: "kuruu", en: "to go mad", es: "enloquecer" },
-            { jp: "真実", kana: "しんじつ", romaji: "shinjitsu", en: "truth", es: "verdad" },
-            { jp: "揺れる", kana: "ゆれる", romaji: "yureru", en: "to shake / tremble", es: "temblar / agitarse" }
+            { jp: "教える", kana: "おしえる", romaji: "oshieru", en: "to tell / teach", es: "contar / enseñar" },
+            { jp: "仕組み", kana: "しくみ", romaji: "shikumi", en: "mechanism / structure", es: "mecanismo / estructura" }
+        ]
+    },
+
+    // 🔴 Nivel N1 (Avanzado)
+    {
+        level: "N1",
+        title: "廻廻奇譚",
+        artist: "Eve",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Vocabulario abstracto y complejo", en: "Abstract and complex vocabulary" },
+        difficulty: 5,
+        youtubeId: "1tk1pqwrOys", // ✅ MV oficial Eve (Jujutsu Kaisen OP)
+        lyrics: [
+            { time: 10.0, text: "闇を祓って 闇を祓って", romaji: "yami wo haratte yami wo haratte", translation_es: "Exorcizando la oscuridad, expulsando la oscuridad", translation_en: "Exorcising the darkness, driving out the darkness" }
+        ],
+        vocab: [
+            { jp: "闇", kana: "やみ", romaji: "yami", en: "darkness", es: "oscuridad" },
+            { jp: "祓う", kana: "はらう", romaji: "harau", en: "to exorcise / drive away", es: "exorcizar / expulsar" }
+        ]
+    },
+    {
+        level: "N1",
+        title: "アイドル",
+        artist: "YOASOBI",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Crítica social y fama", en: "Social criticism and fame" },
+        difficulty: 5,
+        youtubeId: "ZRtdQ81jPUQ", // ✅ verificado
+        lyrics: [
+            { time: 5.0, text: "無敵の笑顔で荒らすメディア", romaji: "muteki no egao de arasu media", translation_es: "Arrasando los medios con una sonrisa invencible", translation_en: "Wrecking the media with an invincible smile" }
+        ],
+        vocab: [
+            { jp: "無敵", kana: "むてき", romaji: "muteki", en: "invincible", es: "invencible" }
+        ]
+    },
+    {
+        level: "N1",
+        title: "紅蓮華",
+        artist: "LiSA",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Fortaleza y superación", en: "Strength and overcoming" },
+        difficulty: 5,
+        youtubeId: "mpwigqY7570", // ✅ verificado
+        lyrics: [
+            { time: 5.0, text: "強くなれる理由を知った", romaji: "tsuyoku nareru riyuu wo shitta", translation_es: "He conocido la razón por la que puedo volverme fuerte", translation_en: "I've learned the reason I can become strong" }
+        ],
+        vocab: [
+            { jp: "理由", kana: "りゆう", romaji: "riyuu", en: "reason", es: "razón" }
+        ]
+    },
+    {
+        level: "N1",
+        title: "残酷な天使のテーゼ",
+        artist: "高橋洋子",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Metáforas religiosas y filosóficas", en: "Religious and philosophical metaphors" },
+        difficulty: 5,
+        youtubeId: "o6wtDPVkKqI", // ✅ verificado
+        lyrics: [
+            { time: 86.0, text: "残酷な天使のテーゼ", romaji: "zankoku na tenshi no te-ze", translation_es: "La tesis de un ángel cruel", translation_en: "A cruel angel's thesis" }
+        ],
+        vocab: [
+            { jp: "残酷", kana: "ざんこく", romaji: "zankoku", en: "cruel", es: "cruel" }
+        ]
+    },
+    {
+        level: "N1",
+        title: "The Rumbling",
+        artist: "SiM",
+        start: "00:00",
+        end: "01:00",
+        focus: { es: "Caos y destrucción", en: "Chaos and destruction" },
+        difficulty: 5,
+        youtubeId: "OBqw818mQ1E", // ✅ MV oficial SiM (Attack on Titan Final Season Part 2)
+        lyrics: [
+            { time: 10.0, text: "RUMBLING, RUMBLING, IT'S COMING!", romaji: "rumbling, rumbling, it's coming", translation_es: "¡El retumbar, el retumbar, ya viene!", translation_en: "Rumbling, rumbling, it's coming!" }
+        ],
+        vocab: [
+            { jp: "来る", kana: "くる", romaji: "kuru", en: "to come", es: "venir" }
         ]
     }
 ];

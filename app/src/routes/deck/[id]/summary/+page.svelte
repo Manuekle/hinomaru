@@ -6,6 +6,8 @@
 	import { fadeUp, staggerChildren, popIn, animateNumber } from '$lib/motion';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Mascot from '$lib/components/Mascot.svelte';
+	import Confetti from '$lib/components/Confetti.svelte';
+	import { svileo } from 'svileo';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -36,6 +38,15 @@
 	onMount(() => {
 		animateNumber((v) => (displayScore = v), correct, { duration: 0.9, delay: 0.4 });
 		animateNumber((v) => (displayTotal = v), total, { duration: 0.7, delay: 0.3 });
+
+		if (pct >= 70) {
+			setTimeout(() => {
+				svileo.success({
+					title: t('summary.complete', $locale),
+					description: message
+				});
+			}, 1000);
+		}
 	});
 </script>
 
@@ -113,6 +124,10 @@
 	</div>
 
 	<Mascot mood={mascotMood} message={mascotMessage} position="bottom-right" size={120} />
+	
+	{#if pct >= 90}
+		<Confetti fireOnMount={true} />
+	{/if}
 </div>
 
 <style>

@@ -12,15 +12,23 @@
 	import { isBrowser } from '$lib/supabase';
 	import { inject } from '@vercel/analytics';
 	import { dev } from '$app/environment';
+	import { Toaster } from 'svileo';
+	import 'svileo/styles.css';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
 
 	// Init locale from server cookie so SSR and client agree — prevents locale flash
-	locale.set(data.initialLocale ?? 'es');
+	$effect.pre(() => {
+		locale.set(data.initialLocale ?? 'es');
+	});
 
-	let booting = $state(data.isPWA ?? false);
+	let booting = $state(false);
 	let isPWA = $state(false);
+
+	$effect.pre(() => {
+		booting = data.isPWA ?? false;
+	});
 
 	onMount(() => {
 		inject({ mode: dev ? 'development' : 'production' });
@@ -113,6 +121,7 @@
 </svelte:head>
 
 <div class="app-container">
+	<Toaster position="top-right" />
 	{@render children()}
 	<InstallPrompt />
 	<PWASplash visible={booting} />
