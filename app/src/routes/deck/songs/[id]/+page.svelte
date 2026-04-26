@@ -266,6 +266,7 @@
 
 	<!-- Song title -->
 	<div class="song-header" use:fadeUp={{ delay: 0.06, y: 14 }}>
+		<div class="song-label">{t('songs.focus', $locale)}</div>
 		<h1 class="song-title jp">{song.title}</h1>
 		<p class="song-artist">{song.artist}</p>
 		<p class="song-focus">{$locale === 'es' ? song.focus.es : song.focus.en}</p>
@@ -416,9 +417,9 @@
 
 <style>
 	.player-page {
-		max-width: 680px;
+		max-width: 720px;
 		margin: 0 auto;
-		padding: calc(20px + env(safe-area-inset-top)) 20px calc(60px + env(safe-area-inset-bottom));
+		padding: calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
 		display: flex;
 		flex-direction: column;
 		gap: 0;
@@ -429,10 +430,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 20px;
+		margin-bottom: 8px;
 	}
 
 	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 		font-size: 13px;
 		color: var(--fg-secondary);
 		text-decoration: none;
@@ -447,15 +451,16 @@
 	}
 
 	.level-pill {
-		font-size: 11px;
-		font-weight: 700;
+		font-size: 10px;
+		font-weight: 600;
 		color: var(--paper);
-		padding: 3px 9px;
-		border-radius: 99px;
+		padding: 2px 8px;
+		border-radius: 6px;
+		letter-spacing: 0.04em;
 	}
 
 	.diff-pill {
-		font-size: 9px;
+		font-size: 8px;
 		letter-spacing: 1.5px;
 		color: var(--hinomaru-red);
 		font-weight: 700;
@@ -464,6 +469,15 @@
 	/* ── Song header ── */
 	.song-header {
 		margin-bottom: 20px;
+	}
+
+	.song-label {
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--hinomaru-red);
+		margin-bottom: 4px;
 	}
 
 	.song-title {
@@ -478,17 +492,14 @@
 	.song-artist {
 		font-size: 15px;
 		color: var(--fg-secondary);
-		margin: 0 0 6px;
+		margin: 0 0 4px;
 	}
 
 	.song-focus {
 		font-size: 13px;
 		color: var(--fg-tertiary);
 		margin: 0;
-		padding: 6px 12px;
-		background: var(--ink-100);
-		border-radius: 8px;
-		display: inline-block;
+		line-height: 1.4;
 	}
 
 	/* ── Coming soon ── */
