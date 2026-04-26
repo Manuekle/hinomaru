@@ -22,7 +22,11 @@ export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 	let profile = null;
 	if (user) {
 		try {
-			const { data: p, error: pErr } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+			const { data: p, error: pErr } = await supabase
+				.from('profiles')
+				.select('*')
+				.eq('id', user.id)
+				.single();
 			if (!pErr) profile = p;
 		} catch (e) {
 			console.error('Error fetching profile:', e);

@@ -21,10 +21,22 @@
 		background: var(--c);
 		animation: db 1.2s infinite ease-in-out;
 	}
-	.dot:nth-child(2) { animation-delay: 0.18s; }
-	.dot:nth-child(3) { animation-delay: 0.36s; }
+	.dot:nth-child(2) {
+		animation-delay: 0.18s;
+	}
+	.dot:nth-child(3) {
+		animation-delay: 0.36s;
+	}
 	@keyframes db {
-		0%, 80%, 100% { transform: scale(0.5); opacity: 0.35; }
-		40%            { transform: scale(1);   opacity: 1; }
+		0%,
+		80%,
+		100% {
+			transform: scale(0.5);
+			opacity: 0.35;
+		}
+		40% {
+			transform: scale(1);
+			opacity: 1;
+		}
 	}
 </style>

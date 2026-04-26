@@ -9,11 +9,15 @@
 	import VoiceStep from './VoiceStep.svelte';
 	import GoalStep from './GoalStep.svelte';
 	import SummaryStep from './SummaryStep.svelte';
-	import { fly } from 'svelte/transition';
-	import { cubicOut, cubicIn } from 'svelte/easing';
+	import { fly, fade } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 	import { preferredVoice, dailyGoal, srsEnabled as srsStore } from '$lib/stores/settings';
+	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
+	import Icon from '$lib/Icon.svelte';
+	import { ArrowLeft02Icon } from '@hugeicons/core-free-icons';
 
-	let { onFinish } = $props();
+	let { onFinish } = $props<{ onFinish: (selections: any) => void }>();
 
 	let step = $state(1);
 	const totalSteps = 10;
@@ -26,10 +30,14 @@
 	});
 
 	function nextStep() {
-		step = step + 1;
+		step += 1;
 	}
 
-	const progress = $derived((step / totalSteps) * 100);
+	function prevStep() {
+		if (step > 1) step -= 1;
+	}
+
+	let progress = $derived((step / 10) * 100);
 
 	function handleMotivation(val: string) {
 		selections.motivation = val;
@@ -58,41 +66,60 @@
 		dailyGoal.set(val);
 		nextStep();
 	}
+
+	let finishing = $state(false);
+
+	async function handleComplete() {
+		finishing = true;
+		try {
+			await onFinish(selections);
+		} finally {
+			finishing = false;
+		}
+	}
 </script>
 
 <div class="onboarding-container">
 	<!-- Progress Bar -->
 	<div class="progress-wrapper">
-		<div class="progress-bar" style="width: {progress}%"></div>
+		<div 
+			class="progress-bar-fill" 
+			style="width: {(step / 10) * 100}%"
+		></div>
+	</div>
+
+	<!-- Header (Minimal) -->
+	<div class="onboarding-header">
+		<div class="back-placeholder"></div>
 	</div>
 
 	<div class="step-wrapper">
 		{#key step}
 			<div
 				class="step-inner"
-				in:fly={{ x: 48, duration: 360, easing: cubicOut }}
-				out:fly={{ x: -32, duration: 240, easing: cubicIn }}
+				in:fly={{ y: 12, duration: 300, easing: cubicOut }}
+				out:fade={{ duration: 150 }}
 			>
 				{#if step === 1}
 					<WelcomeStep onNext={nextStep} />
 				{:else if step === 2}
-					<FeaturesStep onNext={nextStep} />
+					<FeaturesStep onNext={nextStep} onBack={prevStep} />
 				{:else if step === 3}
-					<MotivationStep onSelect={handleMotivation} />
+					<MotivationStep onSelect={handleMotivation} onBack={prevStep} />
 				{:else if step === 4}
-					<ExperienceStep onSelect={handleExperience} />
+					<ExperienceStep onSelect={handleExperience} onBack={prevStep} />
 				{:else if step === 5}
-					<PracticeStep onNext={nextStep} />
+					<PracticeStep onNext={nextStep} onBack={prevStep} />
 				{:else if step === 6}
-					<StoriesStep onNext={nextStep} />
+					<StoriesStep onNext={nextStep} onBack={prevStep} />
 				{:else if step === 7}
 					<SRSStep onNext={handleSRS} />
 				{:else if step === 8}
-					<VoiceStep onSelect={handleVoice} />
+					<VoiceStep onSelect={handleVoice} onBack={prevStep} />
 				{:else if step === 9}
-					<GoalStep onSelect={handleGoal} />
+					<GoalStep onSelect={handleGoal} onBack={prevStep} />
 				{:else if step === 10}
-					<SummaryStep {selections} onComplete={onFinish} />
+					<SummaryStep {selections} onComplete={handleComplete} onBack={prevStep} loading={finishing} />
 				{/if}
 			</div>
 		{/key}
@@ -110,18 +137,31 @@
 		padding-top: env(safe-area-inset-top);
 		padding-bottom: env(safe-area-inset-bottom);
 		touch-action: none;
+		--step-title: clamp(24px, 7vw, 32px);
+		--step-subtitle: clamp(15px, 4vw, 20px);
+		--step-body: clamp(13px, 3.5vw, 17px);
+	}
+
+	.onboarding-header {
+		height: 32px;
+		display: flex;
+		align-items: center;
+		padding: 0 24px;
+	}
+
+	.back-placeholder {
+		height: 20px;
 	}
 
 	.progress-wrapper {
 		height: 4px;
 		background: var(--ink-100);
-		width: calc(100% - 48px);
-		margin: 20px 24px;
-		border-radius: 2px;
+		width: 100%;
 		overflow: hidden;
+		flex-shrink: 0;
 	}
 
-	.progress-bar {
+	.progress-bar-fill {
 		height: 100%;
 		background: var(--hinomaru-red);
 		transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -140,5 +180,16 @@
 		flex-direction: column;
 		overflow-y: auto;
 		overflow-x: hidden;
+		max-width: 600px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 100%;
+		padding-bottom: 20px;
+	}
+
+	@media (max-height: 600px) and (orientation: landscape) {
+		.progress-wrapper {
+			margin: 12px 24px;
+		}
 	}
 </style>

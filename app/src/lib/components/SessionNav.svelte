@@ -1,5 +1,4 @@
 <script lang="ts">
-
 	let {
 		progress = 0,
 		current = 0,

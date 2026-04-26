@@ -22,10 +22,7 @@
 	</div>
 
 	<StickyFooter>
-		<button
-			class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
-			onclick={onNext}
-		>
+		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={onNext}>
 			{t('onboarding.welcome.btn', $locale)}
 		</button>
 	</StickyFooter>
@@ -45,7 +42,7 @@
 	}
 
 	.title {
-		font-size: 36px;
+		font-size: var(--step-title, clamp(24px, 7vw, 36px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0;
@@ -77,7 +74,7 @@
 	}
 
 	.subtitle {
-		font-size: 17px;
+		font-size: var(--step-body, clamp(13px, 3.5vw, 17px));
 		color: var(--fg-secondary);
 		line-height: 1.5;
 		max-width: 300px;

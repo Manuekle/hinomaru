@@ -2,16 +2,40 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import {
+		Clock01Icon,
+		Calendar01Icon,
+		Calendar02Icon,
+		Calendar03Icon,
+		BrainIcon,
+		Idea01Icon
+	} from '@hugeicons/core-free-icons';
 
+	import { page } from '$app/stores';
 	let { onNext } = $props();
 
+	async function handleNext(enabled: boolean) {
+		if (enabled && $page.data.isPWA) {
+			try {
+				if ('Notification' in window) {
+					await Notification.requestPermission();
+				}
+			} catch (e) {
+				console.warn('Failed to request notification permission:', e);
+			}
+		}
+		onNext(enabled);
+	}
+
 	const intervals = [
-		{ label: '2 hrs', icon: '🕒' },
-		{ label: '1 day', icon: '📅' },
-		{ label: '6 days', icon: '🗓️' },
-		{ label: '25 days', icon: '📆' },
-		{ label: '5 mo', icon: '🧠' },
-		{ label: '11 mo', icon: '💡' }
+		{ label: '2 hrs', icon: Clock01Icon },
+		{ label: '1 day', icon: Calendar01Icon },
+		{ label: '6 days', icon: Calendar02Icon },
+		{ label: '25 days', icon: Calendar03Icon },
+		{ label: '5 mo', icon: BrainIcon },
+		{ label: '11 mo', icon: Idea01Icon }
 	];
 </script>
 
@@ -29,7 +53,7 @@
 			{#each intervals as interval, i (interval.label)}
 				<div class="interval-item">
 					<div class="icon-box">
-						<span class="icon">{interval.icon}</span>
+						<Icon icon={interval.icon} size={20} color="var(--washi)" strokeWidth={1.5} />
 					</div>
 					<span class="label">{interval.label}</span>
 				</div>
@@ -40,15 +64,14 @@
 		</div>
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.4, y: 10 }}>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={() => onNext(true)}>
-			<span class="btn-icon">🧠</span>
+	<StickyFooter>
+		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={() => handleNext(true)}>
 			{t('onboarding.srs.enable', $locale)}
 		</button>
-		<button class="hm-btn hm-btn-ghost hm-btn-full" onclick={() => onNext(false)}>
+		<button class="hm-btn hm-btn-ghost hm-btn-lg" style="flex: 1" onclick={() => handleNext(false)}>
 			{t('onboarding.srs.later', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>
@@ -56,16 +79,16 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
 		text-align: center;
-		margin-bottom: 60px;
+		margin-bottom: clamp(24px, 8vw, 60px);
 	}
 
 	.title {
-		font-size: 32px;
+		font-size: var(--step-title, clamp(24px, 7vw, 32px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
@@ -114,10 +137,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-
-	.icon {
-		font-size: 20px;
+		color: var(--washi);
 	}
 
 	.label {
@@ -131,16 +151,5 @@
 		color: var(--ink-300);
 		font-size: 18px;
 		margin-bottom: 20px;
-	}
-
-	.footer {
-		margin-top: auto;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
-	.btn-icon {
-		margin-right: 8px;
 	}
 </style>

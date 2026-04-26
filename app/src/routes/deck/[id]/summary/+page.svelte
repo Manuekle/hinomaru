@@ -5,7 +5,6 @@
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren, popIn, animateNumber } from '$lib/motion';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import Mascot from '$lib/components/Mascot.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import { svileo } from 'svileo';
 	import type { PageData } from './$types';
@@ -22,13 +21,6 @@
 			: pct >= 70
 				? t('summary.solid', $locale)
 				: t('summary.retry', $locale)
-	);
-
-	const mascotMood = $derived(pct >= 90 ? 'happy' : 'encouraging');
-	const mascotMessage = $derived(
-		pct >= 90 
-			? t('mascot.correct', $locale) 
-			: t('mascot.wrong', $locale)
 	);
 
 	// Animated score counter
@@ -120,8 +112,6 @@
 		</StickyFooter>
 	</div>
 
-	<Mascot mood={mascotMood} message={mascotMessage} position="bottom-right" size={120} />
-	
 	{#if pct >= 70}
 		<Confetti fireOnMount={true} />
 	{/if}

@@ -4,7 +4,9 @@
 	import { locale } from '$lib/stores/locale';
 </script>
 
-<div style="max-width:800px; margin:0 auto; padding:calc(40px + env(safe-area-inset-top)) 24px 100px; min-height:100vh;">
+<div
+	style="max-width:800px; margin:0 auto; padding:calc(40px + env(safe-area-inset-top)) 24px 100px; min-height:100vh;"
+>
 	<h1
 		use:fadeUp
 		style="font-size:40px; font-weight:800; margin-bottom:40px; letter-spacing:-0.02em;"
@@ -18,19 +20,29 @@
 	>
 		<p>{t('privacy.updated', $locale)}</p>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">{t('privacy.s1.title', $locale)}</h2>
+		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
+			{t('privacy.s1.title', $locale)}
+		</h2>
 		<p>{t('privacy.s1.desc', $locale)}</p>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">{t('privacy.s2.title', $locale)}</h2>
+		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
+			{t('privacy.s2.title', $locale)}
+		</h2>
 		<p>{t('privacy.s2.desc', $locale)}</p>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">{t('privacy.s3.title', $locale)}</h2>
+		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
+			{t('privacy.s3.title', $locale)}
+		</h2>
 		<p>{t('privacy.s3.desc', $locale)}</p>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">{t('privacy.s4.title', $locale)}</h2>
+		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
+			{t('privacy.s4.title', $locale)}
+		</h2>
 		<p>{t('privacy.s4.desc', $locale)}</p>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">{t('privacy.s5.title', $locale)}</h2>
+		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
+			{t('privacy.s5.title', $locale)}
+		</h2>
 		<p>{t('privacy.s5.desc', $locale)}</p>
 	</div>
 

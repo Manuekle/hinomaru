@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		.select('*')
 		.eq('id', params.id)
 		.single();
-    
+
 	if (!deck) throw error(404);
 
 	const { data: cards } = await locals.supabase

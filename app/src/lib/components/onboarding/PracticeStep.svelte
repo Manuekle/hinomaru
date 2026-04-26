@@ -2,10 +2,12 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
-	import { Eraser01Icon } from '@hugeicons/core-free-icons';
+	import { CleanIcon } from '@hugeicons/core-free-icons';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 
-	let { onNext } = $props();
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+
+	let { onNext, onBack } = $props();
 
 	let hanziContainer = $state<HTMLDivElement | null>(null);
 
@@ -168,7 +170,7 @@
 			<!-- Controls -->
 			<div class="card-controls">
 				<button class="clear-btn" onclick={clearCanvas} aria-label="Clear strokes">
-					<Icon icon={Eraser01Icon} size={14} strokeWidth={2.5} />
+					<Icon icon={CleanIcon} size={14} strokeWidth={2.5} />
 				</button>
 			</div>
 
@@ -188,16 +190,17 @@
 	</div>
 
 	<!-- Footer -->
-	<footer class="footer">
+	<StickyFooter {onBack}>
 		<button
-			class="hm-btn hm-btn-full hm-btn-lg"
+			class="hm-btn hm-btn-lg"
+			style="flex: 1"
 			class:hm-btn-dark={completed}
 			class:btn-muted={!completed}
 			onclick={() => onNext()}
 		>
 			{t('onboarding.continue', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>

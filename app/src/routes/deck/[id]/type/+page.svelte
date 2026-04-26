@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Icon from '$lib/Icon.svelte';
+	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -6,6 +8,7 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
@@ -27,10 +30,14 @@
 
 	const card = $derived(cards[i]);
 	const pct = $derived(((i + 1) / cards.length) * 100);
-	
+
 	const isCorrect = $derived.by(() => {
 		if (!card || !answer) return false;
-		const clean = (s: string) => s.trim().toLowerCase().replace(/^to\s+/, '');
+		const clean = (s: string) =>
+			s
+				.trim()
+				.toLowerCase()
+				.replace(/^to\s+/, '');
 		const userAns = clean(answer);
 		const targetEn = clean(card.en);
 		const targetEs = clean(card.es || '');
@@ -51,7 +58,7 @@
 			const {
 				data: { user }
 			} = await supabase.auth.getUser();
-			if (user)
+			if (user) {
 				await supabase.from('sessions').insert({
 					user_id: user.id,
 					deck_id: data.deck.id,
@@ -59,6 +66,8 @@
 					correct,
 					total: cards.length
 				});
+				await updateStreak(supabase, user.id);
+			}
 			const params = new URLSearchParams({
 				correct: String(correct),
 				total: String(cards.length),
@@ -106,15 +115,17 @@
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
-	<SessionNav 
-		progress={pct} 
-		current={i + 1} 
-		total={cards.length} 
+	<SessionNav
+		progress={pct}
+		current={i + 1}
+		total={cards.length}
 		onClose={() => goto(`/deck/${data.deck.id}`)}
 	/>
 
 	{#if cards.length === 0}
-		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+		<div
+			style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;"
+		>
 			<div style="font-size:48px;margin-bottom:16px;">📭</div>
 			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
 			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
@@ -134,7 +145,7 @@
 					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 				>
-					🔊
+					<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 				</button>
 				<div class="label-meta" style="margin-bottom:16px;">{t('session.typeMean', $locale)}</div>
 				<div class="jp" style="font-size:72px;line-height:1;">{card.jp}</div>
@@ -168,26 +179,38 @@
 							? 'var(--success)'
 							: 'var(--hinomaru-red-ink)'
 						: 'var(--sumi)'};
-            border-radius:16px;font-size:18px;font-family:var(--font-ui);font-weight:500;outline:none;"
+            border-radius:16px;font-size:18px;font-family:var(--font-ui);font-weight:500;outline:none;text-align:center;"
 				/>
 				{#if submitted}
-					<div 
-						style="margin-top:16px;padding:20px;border-radius:20px;background:{isCorrect ? 'var(--success-wash)' : 'var(--hinomaru-red-wash)'};
-							   border:1.5px solid {isCorrect ? 'var(--success)' : 'var(--hinomaru-red-ink)'};display:flex;flex-direction:column;gap:12px;"
+					<div
+						style="margin-top:16px;padding:20px;border-radius:20px;background:{isCorrect
+							? 'var(--success-wash)'
+							: 'var(--hinomaru-red-wash)'};
+							   border:1.5px solid {isCorrect
+							? 'var(--success)'
+							: 'var(--hinomaru-red-ink)'};display:flex;flex-direction:column;gap:12px;"
 					>
 						{#if !isCorrect}
 							<div style="font-size:14px;color:var(--hinomaru-red-ink);font-weight:600;">
 								{t('session.answerIs', $locale, { a: card.en })}
 							</div>
 						{/if}
-						
+
 						{#if card.example}
-							<div style="padding-top:12px;border-top:1px solid {isCorrect ? 'rgba(0,128,0,0.1)' : 'rgba(188,0,45,0.1)'};">
+							<div
+								style="padding-top:12px;border-top:1px solid {isCorrect
+									? 'rgba(0,128,0,0.1)'
+									: 'rgba(188,0,45,0.1)'};"
+							>
 								<div style="display:flex;align-items:flex-start;gap:8px;">
 									<div style="flex:1;">
-										<div class="jp" style="font-size:15px;line-height:1.4;color:var(--sumi);">{card.example}</div>
+										<div class="jp" style="font-size:15px;line-height:1.4;color:var(--sumi);">
+											{card.example}
+										</div>
 										{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-											<div style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.7;margin-top:2px;font-weight:600;">
+											<div
+												style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.7;margin-top:2px;font-weight:600;"
+											>
 												{card.example_romaji || card.extra?.example_romaji || ''}
 											</div>
 										{/if}
@@ -201,7 +224,7 @@
 											   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
 											   justify-content:center;font-size:12px;color:var(--fg-tertiary);flex-shrink:0;"
 									>
-										🔊
+										<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 									</button>
 								</div>
 							</div>
@@ -219,21 +242,23 @@
 						</button>
 					{:else}
 						{#if !isCorrect}
-							<button 
-								class="hm-btn hm-btn-secondary touch-action-manip" 
-								onclick={() => { 
-									submitted = false; 
-									answer = ''; 
+							<button
+								class="hm-btn hm-btn-secondary touch-action-manip"
+								onclick={() => {
+									submitted = false;
+									answer = '';
 									struggled = true;
 									setTimeout(() => inputEl?.focus(), 50);
-								}} 
+								}}
 								style="flex:1;"
 							>
 								✕ {t('session.again', $locale)}
 							</button>
 						{/if}
 						<button
-							class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} hm-btn-full hm-btn-lg touch-action-manip"
+							class="hm-btn {isCorrect
+								? 'hm-btn-primary'
+								: 'hm-btn-dark'} hm-btn-full hm-btn-lg touch-action-manip"
 							onclick={next}
 							style="flex:1;"
 						>

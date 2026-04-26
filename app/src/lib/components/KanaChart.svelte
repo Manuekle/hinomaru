@@ -15,11 +15,22 @@
 	<!-- Pill Toggle inspired by design ref -->
 	<div class="toggle-container" use:fadeUp={{ delay: 0, y: 10 }}>
 		<div class="pill-track">
-			<div class="pill-glider" style="transform: translateX({mode === 'hiragana' ? '0' : '100%'})"></div>
-			<button class="pill-btn" class:active={mode === 'hiragana'} onclick={() => mode = 'hiragana'}>
+			<div
+				class="pill-glider"
+				style="transform: translateX({mode === 'hiragana' ? '0' : '100%'})"
+			></div>
+			<button
+				class="pill-btn"
+				class:active={mode === 'hiragana'}
+				onclick={() => (mode = 'hiragana')}
+			>
 				Hiragana
 			</button>
-			<button class="pill-btn" class:active={mode === 'katakana'} onclick={() => mode = 'katakana'}>
+			<button
+				class="pill-btn"
+				class:active={mode === 'katakana'}
+				onclick={() => (mode = 'katakana')}
+			>
 				Katakana
 			</button>
 		</div>
@@ -135,7 +146,11 @@
 	}
 
 	@media (max-width: 400px) {
-		.kana-grid { gap: 8px; }
-		.kana-char { font-size: 24px; }
+		.kana-grid {
+			gap: 8px;
+		}
+		.kana-char {
+			font-size: 24px;
+		}
 	}
 </style>

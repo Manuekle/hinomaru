@@ -62,7 +62,9 @@
 		ctx.save();
 		ctx.scale(dpr, dpr);
 		ctx.fillStyle = barColor.startsWith('var(')
-			? getComputedStyle(canvas).getPropertyValue(barColor.slice(4, -1).split(',')[0].trim()).trim() || '#bc002d'
+			? getComputedStyle(canvas)
+					.getPropertyValue(barColor.slice(4, -1).split(',')[0].trim())
+					.trim() || '#bc002d'
 			: barColor;
 
 		for (let i = 0; i < count + 1; i++) {
@@ -121,7 +123,4 @@
 	});
 </script>
 
-<canvas
-	bind:this={canvas}
-	style="width:100%;height:{height}px;display:block;"
-></canvas>
+<canvas bind:this={canvas} style="width:100%;height:{height}px;display:block;"></canvas>

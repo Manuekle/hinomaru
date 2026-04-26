@@ -2,9 +2,11 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { SparklesIcon } from '@hugeicons/core-free-icons';
 
-	let { onSelect } = $props();
+	let { onSelect, onBack } = $props();
 
 	const options = $derived([
 		{ value: 3, label: t('onboarding.goal.wordsDay', $locale, { n: 3 }) },
@@ -56,12 +58,12 @@
 	</div>
 
 	<div class="tip-section" use:fadeUp={{ delay: 0.5 }}>
-		<span class="sparkle">✨</span>
+		<Icon icon={SparklesIcon} size={16} color="var(--fg-secondary)" />
 		<p class="tip-text">{t('onboarding.goal.tip', $locale)}</p>
 	</div>
 
-	<StickyFooter>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={handleNext}>
+	<StickyFooter {onBack}>
+		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={handleNext}>
 			{t('onboarding.next', $locale)}
 		</button>
 	</StickyFooter>
@@ -77,18 +79,18 @@
 
 	.header {
 		text-align: center;
-		margin-bottom: 80px;
+		margin-bottom: clamp(24px, 8vw, 80px);
 	}
 
 	.title {
-		font-size: 32px;
+		font-size: var(--step-title, clamp(24px, 7vw, 32px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
-		margin: 0 0 40px;
+		margin: 0 0 clamp(16px, 5vw, 40px);
 	}
 
 	.subtitle {
-		font-size: 17px;
+		font-size: var(--step-body, clamp(13px, 3.5vw, 17px));
 		color: var(--fg-tertiary);
 		line-height: 1.5;
 		max-width: 300px;
@@ -178,6 +180,7 @@
 		padding: 12px;
 		background: var(--ink-50);
 		border-radius: 12px;
+		color: var(--fg-secondary);
 	}
 
 	.tip-text {

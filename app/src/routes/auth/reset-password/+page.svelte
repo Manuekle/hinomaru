@@ -149,7 +149,9 @@
 							type="button"
 							class="pw-toggle"
 							onclick={() => (showPassword = !showPassword)}
-							aria-label={showPassword ? t('auth.reset.hide', $locale) : t('auth.reset.show', $locale)}
+							aria-label={showPassword
+								? t('auth.reset.hide', $locale)
+								: t('auth.reset.show', $locale)}
 						>
 							{#if showPassword}
 								<svg
@@ -203,7 +205,9 @@
 
 				<!-- Confirm -->
 				<div class="field">
-					<div class="label-meta" style="margin-bottom:8px;">{t('auth.confirmPassword', $locale)}</div>
+					<div class="label-meta" style="margin-bottom:8px;">
+						{t('auth.confirmPassword', $locale)}
+					</div>
 					<div class="pw-wrap">
 						<input
 							type={showConfirm ? 'text' : 'password'}
@@ -216,7 +220,9 @@
 							type="button"
 							class="pw-toggle"
 							onclick={() => (showConfirm = !showConfirm)}
-							aria-label={showConfirm ? t('auth.reset.hide', $locale) : t('auth.reset.show', $locale)}
+							aria-label={showConfirm
+								? t('auth.reset.hide', $locale)
+								: t('auth.reset.show', $locale)}
 						>
 							{#if showConfirm}
 								<svg

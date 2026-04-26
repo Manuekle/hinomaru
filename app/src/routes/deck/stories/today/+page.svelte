@@ -12,7 +12,11 @@
 		<div class="empty-state" use:fadeUp={{ delay: 0, y: 16 }}>
 			<div class="empty-icon">📭</div>
 			<p>{t('stories.noStory', $locale)}</p>
-			<a href="/deck/stories" class="hm-btn hm-btn-dark" style="text-decoration:none;margin-top:24px;">
+			<a
+				href="/deck/stories"
+				class="hm-btn hm-btn-dark"
+				style="text-decoration:none;margin-top:24px;"
+			>
 				{t('stories.back', $locale)}
 			</a>
 		</div>
@@ -29,6 +33,12 @@
 		align-items: center;
 		justify-content: center;
 	}
-	.empty-state { text-align: center; color: var(--fg-tertiary); }
-	.empty-icon { font-size: 48px; margin-bottom: 16px; }
+	.empty-state {
+		text-align: center;
+		color: var(--fg-tertiary);
+	}
+	.empty-icon {
+		font-size: 48px;
+		margin-bottom: 16px;
+	}
 </style>

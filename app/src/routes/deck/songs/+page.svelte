@@ -45,7 +45,7 @@
 
 	<!-- Level chips -->
 	<div class="chips hide-scrollbar" use:fadeIn={{ delay: 0.14 }}>
-		{#each levels as lvl}
+		{#each levels as lvl (lvl)}
 			<button class="chip" class:on={activeLevel === lvl} onclick={() => (activeLevel = lvl)}>
 				{lvl}
 			</button>

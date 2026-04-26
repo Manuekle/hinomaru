@@ -4,13 +4,20 @@
 	import { createClient } from '$lib/supabase';
 	const supabase = createClient();
 
-	async function handleFinish() {
+	async function handleFinish(selections: any) {
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (user) {
 				await supabase.from('profiles').upsert({
 					id: user.id,
 					onboarding_completed: true,
+					motivation: selections.motivation,
+					experience: selections.experience,
+					srs_enabled: selections.srsEnabled,
+					voice: selections.voice,
+					daily_goal: selections.goal,
 					updated_at: new Date().toISOString()
 				});
 			}

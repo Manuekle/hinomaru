@@ -2,34 +2,43 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import {
+		PencilEdit01Icon,
+		Cards02Icon,
+		BookOpen01Icon,
+		BookOpenIcon,
+		News01Icon
+	} from '@hugeicons/core-free-icons';
 
-	let { onNext } = $props();
+	let { onNext, onBack } = $props();
 
 	const features = $derived([
 		{
 			title: t('onboarding.features.write.title', $locale),
 			desc: t('onboarding.features.write.desc', $locale),
-			icon: '✍️'
+			icon: PencilEdit01Icon
 		},
 		{
 			title: t('onboarding.features.srs.title', $locale),
 			desc: t('onboarding.features.srs.desc', $locale),
-			icon: '🎴'
+			icon: CardExchange01Icon
 		},
 		{
 			title: t('onboarding.features.decks.title', $locale),
 			desc: t('onboarding.features.decks.desc', $locale),
-			icon: '📚'
+			icon: BookOpen01Icon
 		},
 		{
 			title: t('onboarding.features.grammar.title', $locale),
 			desc: t('onboarding.features.grammar.desc', $locale),
-			icon: '📖'
+			icon: BookOpenIcon
 		},
 		{
 			title: t('onboarding.features.stories.title', $locale),
 			desc: t('onboarding.features.stories.desc', $locale),
-			icon: '📰'
+			icon: News01Icon
 		}
 	]);
 </script>
@@ -42,9 +51,9 @@
 
 	<div class="features-list">
 		{#each features as feature, i (feature.title)}
-			<div class="feature-item" use:fadeUp={{ delay: 0.1 + i * 0.05, y: 12 }}>
+			<div class="feature-item" use:fadeUp={{ delay: 0.1 + i * 0.08, y: 12 }}>
 				<div class="icon-box">
-					<span class="icon">{feature.icon}</span>
+					<Icon icon={feature.icon} size={22} color="var(--washi)" strokeWidth={1.5} />
 				</div>
 				<div class="text-content">
 					<h3 class="feature-title">{feature.title}</h3>
@@ -54,11 +63,11 @@
 		{/each}
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.4, y: 10 }}>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={onNext}>
+	<StickyFooter {onBack}>
+		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={onNext}>
 			{t('onboarding.continue', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>
@@ -66,7 +75,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
@@ -75,7 +84,7 @@
 	}
 
 	.title {
-		font-size: 32px;
+		font-size: var(--step-title, clamp(24px, 7vw, 32px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
@@ -83,7 +92,7 @@
 	}
 
 	.subtitle {
-		font-size: 20px;
+		font-size: var(--step-subtitle, clamp(15px, 4vw, 20px));
 		color: var(--fg-tertiary);
 		font-weight: 600;
 		margin: 0;
@@ -111,10 +120,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-
-	.icon {
-		font-size: 24px;
+		color: var(--washi);
 	}
 
 	.text-content {
@@ -124,19 +130,15 @@
 	}
 
 	.feature-title {
-		font-size: 17px;
+		font-size: var(--step-body, clamp(13px, 3.5vw, 17px));
 		font-weight: 700;
 		margin: 0;
 	}
 
 	.feature-desc {
-		font-size: 14px;
+		font-size: clamp(12px, 3vw, 14px);
 		color: var(--fg-secondary);
 		margin: 0;
 		line-height: 1.4;
-	}
-
-	.footer {
-		margin-top: auto;
 	}
 </style>

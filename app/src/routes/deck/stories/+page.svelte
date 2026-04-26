@@ -9,7 +9,7 @@
 	const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state('N5');
 
-	const filteredStories = $derived(data.stories.filter((s) => s.level === activeLevel));
+	const filteredStories = $derived(data.stories.filter((s: any) => s.level === activeLevel));
 </script>
 
 <svelte:head>
@@ -219,7 +219,9 @@
 	.row-arrow {
 		font-size: 14px;
 		color: var(--fg-tertiary);
-		transition: color 150ms, transform 150ms;
+		transition:
+			color 150ms,
+			transform 150ms;
 	}
 
 	.empty-state {

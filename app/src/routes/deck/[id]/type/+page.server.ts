@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!deck) throw error(404);
 	const { data: cards } = await locals.supabase
 		.from('cards')
-		.select('*, progress(easiness, interval, repetitions, next_review)')
+		.select('*, progress(easiness, interval_days, repetitions, next_review)')
 		.eq('deck_id', params.id)
 		.order('sort_order', { ascending: true })
 		.limit(50);

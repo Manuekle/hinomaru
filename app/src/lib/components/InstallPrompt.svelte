@@ -71,11 +71,11 @@
 				<span style="width:18px; height:18px; background:#bc002d; border-radius:50%;"></span>
 			</div>
 			<div>
-				<div style="font-weight:700; font-size:15px; line-height:1.2;">{t('pwa.install.title', $locale)}</div>
+				<div style="font-weight:700; font-size:15px; line-height:1.2;">
+					{t('pwa.install.title', $locale)}
+				</div>
 				<div style="font-size:13px; color:var(--fg-secondary); line-height:1.3; margin-top:1px;">
-					{isIOS 
-						? t('pwa.install.ios', $locale) 
-						: t('pwa.install.desc', $locale)}
+					{isIOS ? t('pwa.install.ios', $locale) : t('pwa.install.desc', $locale)}
 				</div>
 			</div>
 		</div>
@@ -87,8 +87,8 @@
 					style="background:var(--sumi); color:var(--washi); border:none; padding:8px 16px; 
                            border-radius:12px; font-weight:700; font-size:13px; cursor:pointer;
                            transition: transform 0.1s ease;"
-                    onmousedown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
-                    onmouseup={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+					onmousedown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
+					onmouseup={(e) => (e.currentTarget.style.transform = 'scale(1)')}
 				>
 					{t('pwa.install.btn', $locale)}
 				</button>
@@ -99,14 +99,14 @@
 				style="background:var(--ink-100); color:var(--fg-tertiary); border:none; width:44px; height:44px;
                        border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
                        transition: background 0.2s ease, color 0.2s ease;"
-                onmouseenter={(e) => {
-                    e.currentTarget.style.background = 'var(--ink-200)';
-                    e.currentTarget.style.color = 'var(--fg-primary)';
-                }}
-                onmouseleave={(e) => {
-                    e.currentTarget.style.background = 'var(--ink-100)';
-                    e.currentTarget.style.color = 'var(--fg-tertiary)';
-                }}
+				onmouseenter={(e) => {
+					e.currentTarget.style.background = 'var(--ink-200)';
+					e.currentTarget.style.color = 'var(--fg-primary)';
+				}}
+				onmouseleave={(e) => {
+					e.currentTarget.style.background = 'var(--ink-100)';
+					e.currentTarget.style.color = 'var(--fg-tertiary)';
+				}}
 			>
 				<Icon icon={Cancel01Icon} size={14} strokeWidth={2.5} />
 			</button>

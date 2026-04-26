@@ -7,8 +7,7 @@ const PREFIX_PUBLIC = ['/auth/callback', '/auth/reset-password'];
 export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	const { session, user } = await locals.safeGetSession();
 	const isPublic =
-		EXACT_PUBLIC.has(url.pathname) ||
-		PREFIX_PUBLIC.some((p) => url.pathname.startsWith(p));
+		EXACT_PUBLIC.has(url.pathname) || PREFIX_PUBLIC.some((p) => url.pathname.startsWith(p));
 
 	if (!session && !isPublic) throw redirect(303, '/login');
 	if (session && url.pathname === '/login') throw redirect(303, '/');

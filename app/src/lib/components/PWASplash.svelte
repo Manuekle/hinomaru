@@ -107,7 +107,15 @@
 		opacity: 0.5;
 	}
 	@keyframes sd {
-		0%, 80%, 100% { transform: scale(0.5); opacity: 0.25; }
-		40%            { transform: scale(1);   opacity: 0.75; }
+		0%,
+		80%,
+		100% {
+			transform: scale(0.5);
+			opacity: 0.25;
+		}
+		40% {
+			transform: scale(1);
+			opacity: 0.75;
+		}
 	}
 </style>

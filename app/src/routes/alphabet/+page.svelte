@@ -9,11 +9,10 @@
 	<title>{t('alphabet.title', $locale) || 'Alfabeto'} — Hinomaru</title>
 </svelte:head>
 
-<div style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));">
-	<div
-		use:fadeUp={{ delay: 0, y: 12 }}
-		style="margin-bottom:8px;"
-	>
+<div
+	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+>
+	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
 		<a href="/" class="back-link-beautiful">
 			← {t('deck.back', $locale)}
 		</a>
@@ -25,9 +24,9 @@
 	>
 		{t('alphabet.title', $locale) || 'Kana Chart'}
 	</h1>
-	
-	<p 
-		use:fadeUp={{ delay: 0.12, y: 12 }} 
+
+	<p
+		use:fadeUp={{ delay: 0.12, y: 12 }}
 		style="font-size:16px;color:var(--fg-secondary);margin:0 0 48px;"
 	>
 		{t('alphabet.subtitle', $locale) || 'Aprende y repasa Hiragana y Katakana.'}
@@ -48,7 +47,9 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover { color: var(--sumi); }
+	.back-link-beautiful:hover {
+		color: var(--sumi);
+	}
 
 	.chart-section {
 		background: var(--bg-surface);

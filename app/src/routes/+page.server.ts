@@ -30,9 +30,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	const { data: streakData } = user
-		? await locals.supabase.rpc('get_user_streak')
-		: { data: 0 };
+	const { data: streakData } = user ? await locals.supabase.rpc('get_user_streak') : { data: 0 };
 	const streakDays = streakData ?? 0;
 
 	// Historia del día — la más reciente con publish_date <= hoy

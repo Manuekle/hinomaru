@@ -8,10 +8,10 @@
 		colors?: string[];
 	}
 
-	let { 
-		fireOnMount = false, 
-		duration = 3000, 
-		colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1'] 
+	let {
+		fireOnMount = false,
+		duration = 3000,
+		colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
 	} = $props<Props>();
 
 	export const fire = () => {

@@ -22,16 +22,12 @@
 
 	// Init locale once from server cookie — untrack prevents reactive re-runs that override user selection
 	$effect.pre(() => {
-		const initial = untrack(() => data.initialLocale ?? 'es');
+		const initial = untrack(() => (data as any).initialLocale ?? 'es');
 		locale.set(initial);
 	});
 
-	let booting = $state(false);
+	let booting = $derived(data.isPWA ?? false);
 	let isPWA = $state(false);
-
-	$effect.pre(() => {
-		booting = data.isPWA ?? false;
-	});
 
 	onMount(() => {
 		inject({ mode: dev ? 'development' : 'production' });
@@ -39,9 +35,7 @@
 
 		// Detect PWA mode first, set booting state before revealing body
 		const nav = window.navigator as Navigator & { standalone?: boolean };
-		const clientPWA =
-			window.matchMedia('(display-mode: standalone)').matches ||
-			!!nav.standalone;
+		const clientPWA = window.matchMedia('(display-mode: standalone)').matches || !!nav.standalone;
 
 		isPWA = data.isPWA || clientPWA;
 		booting = isPWA;
@@ -135,7 +129,13 @@
 </svelte:head>
 
 <div class="app-container" use:swipeBack>
-	<Toaster position="top-center" offset={{ top: 'env(safe-area-inset-top, 12px)' }} />
+	<Toaster 
+		position="top-center" 
+		offset={{ top: 'env(safe-area-inset-top, 24px)' }} 
+		expand={true}
+		richColors
+		closeButton
+	/>
 	{@render children()}
 	<InstallPrompt />
 	<PWASplash visible={booting} />

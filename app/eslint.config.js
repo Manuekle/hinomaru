@@ -5,6 +5,16 @@ import globals from 'globals';
 import ts from 'typescript-eslint';
 
 export default ts.config(
+	{
+		ignores: [
+			'build/',
+			'.svelte-kit/',
+			'dist/',
+			'.vercel/',
+			'node_modules/',
+			'package-lock.json'
+		]
+	},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs['flat/recommended'],
@@ -31,8 +41,5 @@ export default ts.config(
 			'@typescript-eslint/no-explicit-any': 'warn',
 			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
 		}
-	},
-	{
-		ignores: ['build/', '.svelte-kit/', 'dist/']
 	}
 );

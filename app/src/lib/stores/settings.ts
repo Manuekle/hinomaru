@@ -36,6 +36,10 @@ function createPersistedStore<T>(key: string, initialValue: T) {
 }
 
 export const showRomaji = createPersistedStore('hinomaru_show_romaji', true);
-export const preferredVoice = createPersistedStore<'standard' | 'kaito'>('hinomaru_preferred_voice', 'standard');
+export const preferredVoice = createPersistedStore<'standard' | 'kaito'>(
+	'hinomaru_preferred_voice',
+	'standard'
+);
 export const dailyGoal = createPersistedStore('hinomaru_daily_goal', 5);
 export const srsEnabled = createPersistedStore('hinomaru_srs_enabled', true);
+export const notificationsEnabled = createPersistedStore('hinomaru_notifications_enabled', true);

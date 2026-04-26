@@ -49,14 +49,15 @@ export function speakJapanese(text: string, rate = 0.85): void {
 
 	// Prefer a Japanese voice if available
 	const voices = window.speechSynthesis.getVoices();
-	const japaneseVoices = voices.filter(
-		(v) => v.lang === 'ja-JP' || v.lang.startsWith('ja')
-	);
+	const japaneseVoices = voices.filter((v) => v.lang === 'ja-JP' || v.lang.startsWith('ja'));
 
 	if (voiceMode === 'kaito') {
 		// Kaito effect: deeper pitch and try to find a male-sounding voice
 		utterance.pitch = 0.8;
-		const kaitoVoice = japaneseVoices.find(v => !v.name.toLowerCase().includes('kyoko')) || japaneseVoices[1] || japaneseVoices[0];
+		const kaitoVoice =
+			japaneseVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) ||
+			japaneseVoices[1] ||
+			japaneseVoices[0];
 		if (kaitoVoice) utterance.voice = kaitoVoice;
 	} else {
 		// Standard voice

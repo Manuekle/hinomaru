@@ -2,15 +2,25 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import {
+		BookOpen01Icon,
+		Briefcase01Icon,
+		Airplane01Icon,
+		Message01Icon,
+		SparklesIcon
+	} from '@hugeicons/core-free-icons';
 
-	let { onSelect } = $props();
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+
+	let { onSelect, onBack } = $props();
 
 	const options = $derived([
-		{ id: 'education', label: t('onboarding.motivation.education', $locale), icon: '📚' },
-		{ id: 'career', label: t('onboarding.motivation.career', $locale), icon: '💼' },
-		{ id: 'travel', label: t('onboarding.motivation.travel', $locale), icon: '✈️' },
-		{ id: 'partner', label: t('onboarding.motivation.partner', $locale), icon: '💬' },
-		{ id: 'fun', label: t('onboarding.motivation.fun', $locale), icon: '✨' }
+		{ id: 'education', label: t('onboarding.motivation.education', $locale), icon: BookOpen01Icon },
+		{ id: 'career', label: t('onboarding.motivation.career', $locale), icon: Briefcase01Icon },
+		{ id: 'travel', label: t('onboarding.motivation.travel', $locale), icon: Airplane01Icon },
+		{ id: 'partner', label: t('onboarding.motivation.partner', $locale), icon: Message01Icon },
+		{ id: 'fun', label: t('onboarding.motivation.fun', $locale), icon: SparklesIcon }
 	]);
 
 	let selected = $state<string | null>(null);
@@ -32,14 +42,16 @@
 			<button
 				class="option-btn"
 				class:selected={selected === option.id}
-				use:fadeUp={{ delay: 0.1 + i * 0.05, y: 12 }}
+				use:fadeUp={{ delay: 0.1 + i * 0.08, y: 12 }}
 				onclick={() => handleSelect(option.id)}
 			>
-				<span class="icon">{option.icon}</span>
+				<span class="icon"><Icon icon={option.icon} size={20} color="currentColor" /></span>
 				<span class="label">{option.label}</span>
 			</button>
 		{/each}
 	</div>
+
+	<StickyFooter {onBack} />
 </div>
 
 <style>
@@ -52,11 +64,11 @@
 
 	.header {
 		text-align: center;
-		margin-bottom: 60px;
+		margin-bottom: clamp(24px, 8vw, 60px);
 	}
 
 	.title {
-		font-size: 32px;
+		font-size: var(--step-title, clamp(24px, 7vw, 32px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
@@ -64,7 +76,7 @@
 	}
 
 	.subtitle {
-		font-size: 20px;
+		font-size: var(--step-subtitle, clamp(15px, 4vw, 20px));
 		color: var(--fg-tertiary);
 		font-weight: 600;
 		margin: 0;
@@ -103,11 +115,15 @@
 	}
 
 	.icon {
-		font-size: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		flex-shrink: 0;
 	}
 
 	.label {
-		font-size: 17px;
+		font-size: var(--step-body, clamp(13px, 3.5vw, 17px));
 		font-weight: 600;
 		color: var(--fg-primary);
 	}

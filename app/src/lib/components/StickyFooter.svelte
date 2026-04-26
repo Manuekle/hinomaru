@@ -1,10 +1,28 @@
 <script lang="ts">
-	let { children } = $props();
+	import { t } from '$lib/i18n';
+	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { ArrowLeft02Icon } from '@hugeicons/core-free-icons';
+
+	let { children, onBack } = $props<{ children?: any; onBack?: () => void }>();
 </script>
 
 <div class="sticky-footer">
 	<div class="footer-content">
-		{@render children()}
+		{#if onBack}
+			<button 
+				class="hm-btn hm-btn-secondary hm-btn-lg" 
+				style={!children ? 'width: 100%' : 'flex: 0 0 auto'} 
+				onclick={onBack} 
+				aria-label="Back"
+			>
+				<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
+				<span class="back-text">{t('onboarding.back', $locale)}</span>
+			</button>
+		{/if}
+		{#if children}
+			{@render children()}
+		{/if}
 	</div>
 </div>
 
@@ -15,12 +33,7 @@
 		left: 0;
 		right: 0;
 		z-index: 100;
-		background: linear-gradient(
-			to top,
-			var(--bg-page) 0%,
-			var(--bg-page) 70%,
-			transparent 100%
-		);
+		background: linear-gradient(to top, var(--bg-page) 0%, var(--bg-page) 70%, transparent 100%);
 		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
 		display: flex;
 		justify-content: center;
@@ -44,4 +57,16 @@
 		}
 	}
 	*/
+	.back-text {
+		display: inline;
+	}
+
+	@media (max-width: 400px) {
+		.back-text {
+			display: none;
+		}
+		.footer-content {
+			gap: 8px;
+		}
+	}
 </style>

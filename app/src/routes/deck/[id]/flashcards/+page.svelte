@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Icon from '$lib/Icon.svelte';
+	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
@@ -8,6 +10,7 @@
 	import { animate } from 'motion';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
@@ -41,7 +44,9 @@
 	}
 
 	async function updateCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
 		if (!user) return;
 		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
 		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
@@ -115,21 +120,22 @@
 		await supabase
 			.from('sessions')
 			.insert({ user_id: user.id, deck_id: data.deck.id, mode: 'flashcards', correct: c, total });
+		await updateStreak(supabase, user.id);
 	}
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
-	<SessionNav 
-		progress={pct} 
-		current={i + 1} 
-		total={cards.length} 
+	<SessionNav
+		progress={pct}
+		current={i + 1}
+		total={cards.length}
 		onClose={() => goto(`/deck/${data.deck.id}`)}
 	/>
 
 	{#if data.cards.length === 0}
 		<div
-	style="min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;position:relative;overflow:hidden;"
->
+			style="min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;position:relative;overflow:hidden;"
+		>
 			<div style="font-size:48px;margin-bottom:16px;">📭</div>
 			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
 			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
@@ -168,7 +174,7 @@
 								((e.currentTarget as HTMLElement).style.transform = 'scale(1.1)')}
 							onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 						>
-							🔊
+							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 						</button>
 						<div style="margin-top:16px;font-size:12px;color:var(--fg-tertiary);">
 							{t('session.flip', $locale)}
@@ -198,12 +204,14 @@
 										   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
 										   justify-content:center;font-size:12px;color:var(--fg-tertiary);flex-shrink:0;"
 								>
-									🔊
+									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 								</button>
 							</div>
-							
+
 							{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-								<div style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;font-weight:600;letter-spacing:0.02em;">
+								<div
+									style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;font-weight:600;letter-spacing:0.02em;"
+								>
 									{card.example_romaji || card.extra?.example_romaji || ''}
 								</div>
 							{/if}
@@ -218,9 +226,9 @@
 
 			<StickyFooter>
 				{#if flipped}
-					<button 
-						class="hm-btn hm-btn-secondary touch-action-manip" 
-						onclick={retry} 
+					<button
+						class="hm-btn hm-btn-secondary touch-action-manip"
+						onclick={retry}
 						style="flex:1;"
 					>
 						✕ {t('session.again', $locale)}

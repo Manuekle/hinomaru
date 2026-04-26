@@ -8,6 +8,8 @@
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 	import { svileo } from 'svileo';
+	import Icon from '$lib/Icon.svelte';
+	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 
 	interface Word {
 		id?: string;
@@ -19,7 +21,7 @@
 		level?: string;
 	}
 
-	let { word, initiallySaved = false } = $props<{ word: Word | null, initiallySaved?: boolean }>();
+	let { word, initiallySaved = false } = $props<{ word: Word | null; initiallySaved?: boolean }>();
 	let saved = $state(initiallySaved);
 	let saving = $state(false);
 
@@ -33,7 +35,9 @@
 		if (!word || saved || saving) return;
 		saving = true;
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (!user) return;
 
 			const { error } = await supabase.from('user_saved_words').insert({
@@ -82,7 +86,7 @@
 			</div>
 
 			<button class="audio-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
-				🔊
+				<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 			</button>
 		</div>
 
@@ -91,7 +95,7 @@
 		</p>
 
 		{#if !saved}
-			<div class="wotd-actions" use:fadeUp={{y: 5}}>
+			<div class="wotd-actions" use:fadeUp={{ y: 5 }}>
 				<button class="save-btn" onclick={saveWord} disabled={saving}>
 					{saving ? '…' : t('wotd.save', $locale)}
 				</button>
@@ -221,5 +225,4 @@
 	.save-btn:hover:not(:disabled) {
 		background: var(--ink-200);
 	}
-
 </style>

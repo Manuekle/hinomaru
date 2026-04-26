@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -9,6 +10,8 @@
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
+	import Icon from '$lib/Icon.svelte';
+	import { Award01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import { svileo } from 'svileo';
 	import type { PageData } from './$types';
 
@@ -23,8 +26,8 @@
 
 	// Track selection by unique key = id+type
 	let selectedKey = $state<string | null>(null);
-	let matchedIds = $state<Set<string>>(new Set());
-	let wrongKeys = $state<Set<string>>(new Set()); // flash red on wrong pick
+	let matchedIds = new SvelteSet<string>();
+	let wrongKeys = new SvelteSet<string>(); // flash red on wrong pick
 
 	// Timer
 	let elapsed = $state(0);
@@ -66,9 +69,9 @@
 			items.push({ id: c.id, text: c.en, type: 'en', romaji: c.romaji });
 		});
 		currentSet = items.sort(() => Math.random() - 0.5);
-		matchedIds = new Set();
+		matchedIds.clear();
 		selectedKey = null;
-		wrongKeys = new Set();
+		wrongKeys.clear();
 		transitioning = false;
 	}
 
@@ -99,11 +102,9 @@
 
 		if (prevId === item.id && prevType !== item.type) {
 			// ✅ Correct match!
-			const newMatched = new Set(matchedIds);
-			newMatched.add(item.id);
-			matchedIds = newMatched;
+			matchedIds.add(item.id);
 			selectedKey = null;
-			wrongKeys = new Set();
+			wrongKeys.clear();
 
 			// Check if the round is complete
 			const roundSize = Math.min(SET_SIZE, sessionCards.length - currentIndex);
@@ -116,14 +117,12 @@
 			}
 		} else {
 			// ❌ Wrong match — flash red briefly
-			const wrongSet = new Set<string>();
-			wrongSet.add(selectedKey);
-			wrongSet.add(key);
-			wrongKeys = wrongSet;
+			wrongKeys.add(selectedKey);
+			wrongKeys.add(key);
 			selectedKey = null;
 
 			setTimeout(() => {
-				wrongKeys = new Set();
+				wrongKeys.clear();
 			}, 600);
 		}
 	}
@@ -216,7 +215,9 @@
 								<div class="romaji-hint">{item.romaji}</div>
 							{/if}
 							{#if item.type === 'jp'}
-								<div class="audio-hint">🔊</div>
+								<div class="audio-hint">
+									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+								</div>
 							{/if}
 						</div>
 					{:else}
@@ -235,7 +236,9 @@
 		<!-- Finish screen -->
 		<div class="finish-overlay">
 			<div class="finish-card">
-				<div class="finish-icon">🏆</div>
+				<div class="finish-icon">
+					<Icon icon={Award01Icon} size={48} color="var(--sumi)" strokeWidth={1.5} />
+				</div>
 				<h2>{t('session.wellDone', $locale) || '¡Muy bien!'}</h2>
 				<div class="finish-time">{formatTime(finalTime)}</div>
 				<p style="color:var(--fg-secondary);font-size:15px;margin-bottom:32px;">
@@ -478,7 +481,8 @@
 	}
 
 	.finish-icon {
-		font-size: 72px;
+		display: flex;
+		justify-content: center;
 		margin-bottom: 16px;
 	}
 

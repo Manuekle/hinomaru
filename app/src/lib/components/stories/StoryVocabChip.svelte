@@ -1,7 +1,13 @@
 <script lang="ts">
 	import type { Locale } from '$lib/i18n';
 
-	let { jp, kana, en, es, locale }: {
+	let {
+		jp,
+		kana,
+		en,
+		es,
+		locale
+	}: {
 		jp: string;
 		kana: string;
 		en: string;
@@ -21,7 +27,6 @@
 		{jp}
 	</button>
 	{#if open}
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div class="vocab-popup" role="tooltip">
 			<div class="popup-kana">{kana}</div>
 			<div class="popup-trans">{locale === 'es' ? es : en}</div>
@@ -45,7 +50,9 @@
 		border-radius: 6px;
 		padding: 0 4px;
 		cursor: pointer;
-		transition: background 120ms ease, border-color 120ms ease;
+		transition:
+			background 120ms ease,
+			border-color 120ms ease;
 		line-height: inherit;
 	}
 

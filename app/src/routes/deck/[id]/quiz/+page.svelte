@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Icon from '$lib/Icon.svelte';
+	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -26,21 +28,23 @@
 	const options = $derived.by(() => {
 		if (!card) return [];
 		// Filter out the correct answer and duplicates by meaning
-		const pool = Array.from(new Set(
-			cards
-				.filter((c) => c.en !== card.en && c.es !== card.es)
-				.map((c) => $locale === 'es' ? c.es : c.en)
-		));
+		const pool = Array.from(
+			new Set(
+				cards
+					.filter((c) => c.en !== card.en && c.es !== card.es)
+					.map((c) => ($locale === 'es' ? c.es : c.en))
+			)
+		);
 
 		// Fisher-Yates partial shuffle to pick 2 random distractors
 		for (let k = pool.length - 1; k > pool.length - 3 && k > 0; k--) {
 			const r = Math.floor(Math.random() * (k + 1));
 			[pool[k], pool[r]] = [pool[r], pool[k]];
 		}
-		
+
 		const distractors = pool.slice(-2);
 		const result = [...distractors, $locale === 'es' ? card.es : card.en];
-		
+
 		// Fisher-Yates shuffle final options
 		for (let k = result.length - 1; k > 0; k--) {
 			const r = Math.floor(Math.random() * (k + 1));
@@ -108,15 +112,17 @@
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
-	<SessionNav 
-		progress={pct} 
-		current={i + 1} 
-		total={cards.length} 
+	<SessionNav
+		progress={pct}
+		current={i + 1}
+		total={cards.length}
 		onClose={() => goto(`/deck/${data.deck.id}`)}
 	/>
 
 	{#if cards.length === 0}
-		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+		<div
+			style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;"
+		>
 			<div style="font-size:48px;margin-bottom:16px;">📭</div>
 			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
 			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
@@ -136,7 +142,7 @@
 					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 				>
-					🔊
+					<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 				</button>
 				<div class="label-meta" style="margin-bottom:16px;">{t('session.whatMean', $locale)}</div>
 				<div class="jp" style="font-size:64px;line-height:1;">{card.jp}</div>
@@ -175,7 +181,7 @@
 									? 'var(--hinomaru-red-ink)'
 									: 'var(--sumi)'
 							: 'var(--sumi)'};
-              cursor:{picked ? 'default' : 'pointer'};text-align:left;font-family:var(--font-ui);
+              cursor:{picked ? 'default' : 'pointer'};text-align:center;font-family:var(--font-ui);
               opacity:{picked && !isThisCorrect && !isThisPicked ? 0.5 : 1};
               transition:all 120ms var(--ease-brand);"
 					>
@@ -206,12 +212,20 @@
 					</div>
 
 					{#if card.example}
-						<div style="padding-top:16px;border-top:1.5px solid {isCorrect ? 'rgba(0,128,0,0.1)' : 'rgba(188,0,45,0.1)'};">
+						<div
+							style="padding-top:16px;border-top:1.5px solid {isCorrect
+								? 'rgba(0,128,0,0.1)'
+								: 'rgba(188,0,45,0.1)'};"
+						>
 							<div style="display:flex;align-items:flex-start;gap:8px;">
 								<div style="flex:1;">
-									<div class="jp" style="font-size:16px;line-height:1.4;color:var(--sumi);">{card.example}</div>
+									<div class="jp" style="font-size:16px;line-height:1.4;color:var(--sumi);">
+										{card.example}
+									</div>
 									{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-										<div style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.7;margin-top:2px;font-weight:600;">
+										<div
+											style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.7;margin-top:2px;font-weight:600;"
+										>
 											{card.example_romaji || card.extra?.example_romaji || ''}
 										</div>
 									{/if}
@@ -225,7 +239,7 @@
 										   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
 										   justify-content:center;font-size:14px;color:var(--fg-tertiary);flex-shrink:0;margin-top:2px;"
 								>
-									🔊
+									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 								</button>
 							</div>
 						</div>
@@ -234,15 +248,22 @@
 
 				<StickyFooter>
 					{#if !isCorrect}
-						<button 
-							class="hm-btn hm-btn-secondary touch-action-manip" 
-							onclick={() => { picked = null; struggled = true; }} 
+						<button
+							class="hm-btn hm-btn-secondary touch-action-manip"
+							onclick={() => {
+								picked = null;
+								struggled = true;
+							}}
 							style="flex:1;"
 						>
 							✕ {t('session.again', $locale)}
 						</button>
 					{/if}
-					<button class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} touch-action-manip" onclick={next} style="flex:1;">
+					<button
+						class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} touch-action-manip"
+						onclick={next}
+						style="flex:1;"
+					>
 						{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
 					</button>
 				</StickyFooter>

@@ -9,6 +9,8 @@
 	import { page } from '$app/stores';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
+	import Icon from '$lib/Icon.svelte';
+	import { Award01Icon, BookOpen01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import { svileo } from 'svileo';
 	import type { PageData } from './$types';
 
@@ -22,11 +24,15 @@
 
 	$effect(() => {
 		const v = story?.vocab;
-		if (!v?.length) return;
+		if (!v?.length || !supabase) return;
 		const jpList = v.map((w: any) => w.jp);
 		supabase.auth.getUser().then(({ data: { user } }: any) => {
 			if (!user) return;
-			supabase.from('user_saved_words').select('jp').eq('user_id', user.id).in('jp', jpList)
+			supabase
+				.from('user_saved_words')
+				.select('jp')
+				.eq('user_id', user.id)
+				.in('jp', jpList)
 				.then(({ data: rows }: any) => {
 					if (rows?.length) savedVocab = new Set(rows.map((r: any) => r.jp));
 				});
@@ -34,13 +40,19 @@
 	});
 
 	async function saveVocabWord(word: { jp: string; kana: string; en: string; es: string }) {
-		if (savedVocab.has(word.jp) || savingVocab.has(word.jp)) return;
+		if (savedVocab.has(word.jp) || savingVocab.has(word.jp) || !supabase) return;
 		savingVocab = new Set([...savingVocab, word.jp]);
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (!user) return;
 			const { error } = await supabase.from('user_saved_words').insert({
-				user_id: user.id, jp: word.jp, kana: word.kana, en: word.en, es: word.es
+				user_id: user.id,
+				jp: word.jp,
+				kana: word.kana,
+				en: word.en,
+				es: word.es
 			});
 			if (error) {
 				if (error.code === '23505') {
@@ -52,7 +64,7 @@
 				savedVocab = new Set([...savedVocab, word.jp]);
 			}
 		} finally {
-			savingVocab = new Set([...savingVocab].filter(v => v !== word.jp));
+			savingVocab = new Set([...savingVocab].filter((v) => v !== word.jp));
 		}
 	}
 
@@ -94,7 +106,7 @@
 	}
 
 	async function saveRead() {
-		if (!story) return;
+		if (!story || !supabase) return;
 		try {
 			await supabase.from('user_story_reads').upsert(
 				{
@@ -166,7 +178,7 @@
 						onclick={() => speakJapanese(bodyJp)}
 						title="Escuchar historia"
 					>
-						🔊
+						<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 					</button>
 				</div>
 
@@ -201,8 +213,17 @@
 											<span class="vocab-kana jp">{word.kana}</span>
 										</div>
 										<div class="vocab-actions">
-											<button class="vocab-action-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
-												🔊
+											<button
+												class="vocab-action-btn"
+												onclick={() => speakJapanese(word.jp)}
+												aria-label="Audio"
+											>
+												<Icon
+													icon={VolumeHighIcon}
+													size={18}
+													color="currentColor"
+													strokeWidth={1.5}
+												/>
 											</button>
 											<button
 												class="vocab-action-btn"
@@ -214,7 +235,8 @@
 												{#if savingVocab.has(word.jp)}
 													<DotLoader size={4} />
 												{:else if savedVocab.has(word.jp)}
-													<span style="color:var(--success);font-size:13px;font-weight:700;">✓</span>
+													<span style="color:var(--success);font-size:13px;font-weight:700;">✓</span
+													>
 												{:else}
 													<span style="font-size:16px;font-weight:400;line-height:1;">+</span>
 												{/if}
@@ -292,7 +314,12 @@
 		{:else if phase === 'result'}
 			<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
 				<div class="result-badge">
-					<span class="badge-icon">{score === quiz.length ? '🏆' : '📚'}</span>
+					<Icon
+						icon={score === quiz.length ? Award01Icon : BookOpen01Icon}
+						size={48}
+						color="var(--sumi)"
+						strokeWidth={1.5}
+					/>
 				</div>
 				<h2 class="result-headline">
 					{score === quiz.length ? '¡Perfecto!' : 'Lectura completada'}
@@ -339,8 +366,6 @@
 		gap: 8px;
 		margin-bottom: 16px;
 	}
-
-
 
 	.date-badge {
 		font-size: 12px;
@@ -515,11 +540,21 @@
 		justify-content: center;
 		cursor: pointer;
 		color: var(--fg-secondary);
-		transition: background 150ms, color 150ms;
+		transition:
+			background 150ms,
+			color 150ms;
 	}
-	.vocab-action-btn:hover:not(:disabled) { background: var(--ink-200); }
-	.vocab-action-btn:disabled { opacity: 0.5; cursor: default; }
-	.vocab-action-btn.vocab-saved { background: var(--success-wash); cursor: default; }
+	.vocab-action-btn:hover:not(:disabled) {
+		background: var(--ink-200);
+	}
+	.vocab-action-btn:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+	.vocab-action-btn.vocab-saved {
+		background: var(--success-wash);
+		cursor: default;
+	}
 
 	.vocab-romaji {
 		font-size: 11px;
@@ -648,7 +683,7 @@
 		align-items: center;
 		justify-content: center;
 		margin: 0 auto 24px;
-		font-size: 40px;
+		color: var(--washi);
 	}
 
 	.result-headline {

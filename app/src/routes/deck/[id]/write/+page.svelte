@@ -8,17 +8,19 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { animate } from 'motion';
 	import { calculateNextReview, mapPerformanceToQuality, type SRSState } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import {
-		Eraser01Icon,
+		CleanIcon,
 		EyeIcon,
 		ViewOffIcon,
 		Cancel01Icon,
 		CheckmarkCircle01Icon,
-		InboxIcon
+		InboxIcon,
+		VolumeHighIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -57,7 +59,9 @@
 	let setupIteration = 0;
 
 	// Whether we use sequential (one-at-a-time) mode
-	const sequential = $derived(card ? (Array.from(card.jp) as string[]).filter(isKanjiKana).length > 2 : false);
+	const sequential = $derived(
+		card ? (Array.from(card.jp) as string[]).filter(isKanjiKana).length > 2 : false
+	);
 
 	function isKanjiKana(ch: string): boolean {
 		const code = ch.codePointAt(0)!;
@@ -348,11 +352,8 @@
 				goto(`/deck/${data.deck.id}/summary?${params}`);
 			} else {
 				if (cardEl) {
-					await animate(
-						cardEl,
-						{ opacity: [1, 0], x: [0, -40] },
-						{ duration: 0.2, ease: 'easeIn' }
-					).finished;
+					await animate(cardEl, { opacity: [1, 0], x: [0, -40] }, { duration: 0.2, ease: 'easeIn' })
+						.finished;
 					i++;
 					struggled = false;
 					await animate(
@@ -410,6 +411,7 @@
 			correct: c,
 			total
 		});
+		await updateStreak(supabase, user.id);
 	}
 
 	function playAudio() {
@@ -435,7 +437,6 @@
 		</div>
 	{:else if card}
 		<div class="card-wrapper" bind:this={cardEl}>
-
 			<!-- Prompt -->
 			<div class="prompt-row">
 				<div class="prompt-group">
@@ -448,7 +449,7 @@
 					{/if}
 				</div>
 				<button onclick={playAudio} class="audio-btn" aria-label="Play pronunciation">
-					🔊
+					<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 				</button>
 			</div>
 
@@ -458,10 +459,14 @@
 				<div class="canvas-toolbar">
 					{#if sequential && writableChars.length > 0}
 						<div class="char-progress" bind:this={charProgressEl}>
-							{#each writableChars as ch, idx}
+							{#each writableChars as ch, idx (idx)}
 								<div
 									class="char-dot"
-									data-state={idx < currentQuizIndex ? 'done' : idx === currentQuizIndex ? 'active' : 'pending'}
+									data-state={idx < currentQuizIndex
+										? 'done'
+										: idx === currentQuizIndex
+											? 'active'
+											: 'pending'}
 								>
 									<span class="char-dot-label jp">{ch}</span>
 								</div>
@@ -481,7 +486,7 @@
 							/>
 						</button>
 						<button onclick={clearCanvas} class="toolbar-btn" aria-label="Clear">
-							<Icon icon={Eraser01Icon} size={18} strokeWidth={1.8} color="var(--fg-secondary)" />
+							<Icon icon={CleanIcon} size={18} strokeWidth={1.8} color="var(--fg-secondary)" />
 						</button>
 					</div>
 				</div>
@@ -514,7 +519,7 @@
 								class="example-audio-btn"
 								aria-label="Play example"
 							>
-								🔊
+								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 							</button>
 						</div>
 					</div>
@@ -528,19 +533,11 @@
 					{t('session.finishDrawing', $locale)}
 				</button>
 			{:else}
-				<button
-					class="hm-btn hm-btn-secondary"
-					onclick={() => next(false)}
-					style="flex:1;"
-				>
+				<button class="hm-btn hm-btn-secondary" onclick={() => next(false)} style="flex:1;">
 					<Icon icon={Cancel01Icon} size={18} strokeWidth={2} />
 					{t('session.again', $locale)}
 				</button>
-				<button
-					class="hm-btn hm-btn-primary"
-					onclick={() => next(true)}
-					style="flex:1;"
-				>
+				<button class="hm-btn hm-btn-primary" onclick={() => next(true)} style="flex:1;">
 					<Icon icon={CheckmarkCircle01Icon} size={18} strokeWidth={2} />
 					{t('session.gotIt', $locale)}
 				</button>
@@ -588,9 +585,10 @@
 	.prompt-row {
 		width: 100%;
 		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 12px;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 16px;
 	}
 
 	.prompt-group {
@@ -617,8 +615,9 @@
 
 	.prompt-romaji {
 		font-size: 14px;
-		color: var(--fg-tertiary);
+		color: var(--hinomaru-red);
 		margin-top: 2px;
+		font-weight: 500;
 	}
 
 	.audio-btn {
@@ -783,7 +782,7 @@
 	.example-romaji {
 		font-size: 11px;
 		color: var(--hinomaru-red);
-		opacity: 0.7;
+		opacity: 0.85;
 		font-weight: 600;
 	}
 

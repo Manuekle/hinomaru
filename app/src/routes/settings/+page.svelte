@@ -1,12 +1,22 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { theme, type ThemeType } from '$lib/stores/theme';
-	import { showRomaji, preferredVoice } from '$lib/stores/settings';
+	import { showRomaji, preferredVoice, notificationsEnabled } from '$lib/stores/settings';
+	import { svileo } from 'svileo';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
+	import { fade, fly } from 'svelte/transition';
 	import { goto, invalidate } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
 	import supportImg from '$lib/assets/support.png';
+	import Icon from '$lib/Icon.svelte';
+	import {
+		SparklesIcon,
+		MonitorDotIcon,
+		Sun01Icon,
+		Moon01Icon,
+		VolumeHighIcon
+	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -44,7 +54,40 @@
 		// Play a small sample to confirm
 		speakJapanese('こんにちは');
 	}
+
+	const japaneseEmojis = ['🎎', '🏮', '⛩️', '🍣', '🍡', '🍵', '🏯', '🗻', '🎏', '🎴', '🌸', '🎋', '🦊', '👺', '👹', '🍱'];
+	let showEmojiPicker = $state(false);
+
+	async function setAvatar(emoji: string) {
+		if (!user) return;
+		const { error } = await supabase.from('profiles').update({ avatar: emoji }).eq('id', user.id);
+		if (!error) {
+			svileo.success({ title: t('settings.avatar.success', $locale) });
+			// Trigger data refresh
+			await invalidate('supabase:auth');
+		} else {
+			svileo.error({ title: t('settings.avatar.error', $locale) });
+			console.error('Avatar update error:', error);
+		}
+		showEmojiPicker = false;
+	}
+
+	// Close on click outside or Escape
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && showEmojiPicker) {
+			showEmojiPicker = false;
+		}
+	}
+
+	function handleOutsideClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (showEmojiPicker && !target.closest('.avatar-wrapper')) {
+			showEmojiPicker = false;
+		}
+	}
 </script>
+
+<svelte:window onclick={handleOutsideClick} onkeydown={handleKeydown} />
 
 <svelte:head>
 	<title>{t('settings.title', $locale)} — Hinomaru</title>
@@ -67,32 +110,70 @@
 	</h1>
 
 	<div use:fadeUp={{ delay: 0.1, y: 16 }} style="display:flex;flex-direction:column;gap:40px;">
-		<!-- Profile Section -->
-		<section class="settings-group">
-			<h2 class="group-label">{t('settings.profile', $locale)}</h2>
-			<div class="profile-card">
-				<div class="avatar">
-					{user?.email?.charAt(0).toUpperCase() || 'U'}
-				</div>
-				<div class="profile-info">
-					<div class="email-label">{t('settings.email', $locale)}</div>
-					<div class="email-value">{user?.email}</div>
-				</div>
+	<!-- Profile Section -->
+	<section class="settings-group">
+		<h2 class="group-label">{t('settings.profile', $locale)}</h2>
+		<div class="profile-card">
+			<div class="avatar-wrapper">
+				<button
+					class="avatar"
+					onclick={() => (showEmojiPicker = !showEmojiPicker)}
+					aria-label={t('settings.avatar', $locale)}
+					aria-expanded={showEmojiPicker}
+					aria-haspopup="true"
+				>
+					<span class="avatar-emoji">{data.profile?.avatar || '🎏'}</span>
+					<div class="avatar-edit-badge" aria-hidden="true">✎</div>
+				</button>
+				{#if showEmojiPicker}
+					<div
+						class="emoji-picker-popover"
+						transition:fly={{ duration: 200, y: 10, opacity: 0 }}
+						role="menu"
+					>
+						<div class="emoji-grid" role="menu" aria-label={t('settings.avatar', $locale)}>
+							{#snippet emojiBtn(emoji)}
+								<button
+									class="emoji-btn"
+									onclick={() => setAvatar(emoji)}
+									type="button"
+									aria-label={emoji}
+								>
+									{emoji}
+								</button>
+							{/snippet}
+							{#each japaneseEmojis as emoji (emoji)}
+								{@render emojiBtn(emoji)}
+							{/each}
+						</div>
+					</div>
+				{/if}
 			</div>
+			<div class="profile-info">
+				<div class="email-label">{t('settings.email', $locale)}</div>
+				<div class="email-value">{user?.email}</div>
+			</div>
+		</div>
+	</section>
 
-			{#if import.meta.env.DEV}
-				<div style="margin-top: 12px; display: flex; justify-content: flex-end;">
-					<button onclick={debugResetOnboarding} class="debug-btn">
-						Reset Onboarding (Debug)
-					</button>
-				</div>
-			{/if}
-		</section>
+	{#snippet settingsItem(icon, title, subtext, active, onclick)}
+		<button class="list-item" {onclick} role="switch" aria-checked={active}>
+			<div class="item-icon-box" aria-hidden="true">{icon}</div>
+			<div class="item-text-stack">
+				<span class="item-text">{title}</span>
+				{#if subtext}<span class="item-subtext">{subtext}</span>{/if}
+			</div>
+			<div class="hm-switch" class:active aria-hidden="true">
+				<div class="switch-handle"></div>
+			</div>
+		</button>
+	{/snippet}
 
+	<div style="display:flex;flex-direction:column;gap:32px;">
 		<!-- Theme Section (Premium Pill Toggle) -->
 		<section class="settings-group">
 			<h2 class="group-label">{t('settings.theme', $locale)}</h2>
-			<div class="segmented-pill-track">
+			<div class="segmented-pill-track" role="radiogroup" aria-label={t('settings.theme', $locale)}>
 				<div
 					class="pill-glider"
 					style="width: calc(33.333% - 4px); transform: translateX({$theme === 'system'
@@ -105,33 +186,38 @@
 					class="pill-option"
 					class:active={$theme === 'system'}
 					onclick={() => setTheme('system')}
+					role="radio"
+					aria-checked={$theme === 'system'}
 				>
-					<span class="pill-icon">💻</span>
+					<Icon icon={MonitorDotIcon} size={14} color="currentColor" />
 					{t('settings.theme.system', $locale)}
 				</button>
 				<button
 					class="pill-option"
 					class:active={$theme === 'light'}
 					onclick={() => setTheme('light')}
+					role="radio"
+					aria-checked={$theme === 'light'}
 				>
-					<span class="pill-icon">☀️</span>
+					<Icon icon={Sun01Icon} size={14} color="currentColor" />
 					{t('settings.theme.light', $locale)}
 				</button>
 				<button
 					class="pill-option"
 					class:active={$theme === 'dark'}
 					onclick={() => setTheme('dark')}
+					role="radio"
+					aria-checked={$theme === 'dark'}
 				>
-					<span class="pill-icon">🌙</span>
+					<Icon icon={Moon01Icon} size={14} color="currentColor" />
 					{t('settings.theme.dark', $locale)}
 				</button>
 			</div>
 		</section>
 
-		<!-- Voice Section -->
 		<section class="settings-group">
 			<h2 class="group-label">{t('onboarding.voice.title', $locale)}</h2>
-			<div class="segmented-pill-track">
+			<div class="segmented-pill-track" role="radiogroup" aria-label={t('onboarding.voice.title', $locale)}>
 				<div
 					class="pill-glider"
 					style="width: calc(50% - 4px); transform: translateX({$preferredVoice === 'standard'
@@ -142,61 +228,71 @@
 					class="pill-option"
 					class:active={$preferredVoice === 'standard'}
 					onclick={() => setVoice('standard')}
+					role="radio"
+					aria-checked={$preferredVoice === 'standard'}
 				>
-					<span class="pill-icon">🔊</span>
+					<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
 					{t('onboarding.voice.standard.name', $locale)}
 				</button>
 				<button
 					class="pill-option"
 					class:active={$preferredVoice === 'kaito'}
 					onclick={() => setVoice('kaito')}
+					role="radio"
+					aria-checked={$preferredVoice === 'kaito'}
 				>
-					<span class="pill-icon">✨</span>
+					<Icon icon={SparklesIcon} size={14} color="currentColor" />
 					{t('onboarding.voice.kaito.name', $locale)}
 				</button>
 			</div>
 		</section>
 
-		<!-- General Settings -->
+		<!-- Preferences -->
 		<section class="settings-group">
 			<h2 class="group-label">{t('settings.preferences', $locale)}</h2>
 			<div class="settings-list">
-				<button class="list-item" onclick={() => showRomaji.toggle()}>
-					<div class="item-left">
-						<span class="item-icon">🔤</span>
-						<span class="item-text">{t('settings.showRomaji', $locale)}</span>
-					</div>
-					<div class="hm-switch" class:active={$showRomaji}>
-						<div class="switch-handle"></div>
-					</div>
-				</button>
+				{@render settingsItem('🇯🇵', t('settings.showRomaji', $locale), null, $showRomaji, () =>
+					showRomaji.toggle()
+				)}
+				{@render settingsItem(
+					'🔔',
+					t('settings.notifications', $locale),
+					t('settings.notifications.desc', $locale),
+					$notificationsEnabled,
+					() => notificationsEnabled.toggle()
+				)}
 			</div>
 		</section>
 
-		<!-- Language Section -->
 		<section class="settings-group">
 			<h2 class="group-label">{t('settings.language', $locale)}</h2>
-			<div class="language-grid">
-				<button class="lang-card" class:active={$locale === 'es'} onclick={() => setLanguage('es')}>
-					<span class="lang-flag">🇪🇸</span>
+			<div class="language-grid" role="radiogroup" aria-label={t('settings.language', $locale)}>
+				<button
+					class="lang-card"
+					class:active={$locale === 'es'}
+					onclick={() => setLanguage('es')}
+					role="radio"
+					aria-checked={$locale === 'es'}
+				>
+					<span class="lang-flag" aria-hidden="true">🇪🇸</span>
 					<div class="lang-info">
 						<span class="lang-name">{t('settings.spanish', $locale)}</span>
 						<span class="lang-native">Español</span>
 					</div>
-					{#if $locale === 'es'}
-						<div class="check-icon">✓</div>
-					{/if}
 				</button>
 
-				<button class="lang-card" class:active={$locale === 'en'} onclick={() => setLanguage('en')}>
-					<span class="lang-flag">🇺🇸</span>
+				<button
+					class="lang-card"
+					class:active={$locale === 'en'}
+					onclick={() => setLanguage('en')}
+					role="radio"
+					aria-checked={$locale === 'en'}
+				>
+					<span class="lang-flag" aria-hidden="true">🇺🇸</span>
 					<div class="lang-info">
 						<span class="lang-name">{t('settings.english', $locale)}</span>
 						<span class="lang-native">English</span>
 					</div>
-					{#if $locale === 'en'}
-						<div class="check-icon">✓</div>
-					{/if}
 				</button>
 			</div>
 		</section>
@@ -206,19 +302,33 @@
 			<h2 class="group-label">{t('settings.support.title', $locale)}</h2>
 			<div class="support-container">
 				<p class="support-text">{t('settings.support.desc', $locale)}</p>
-				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="support-image-btn">
+				<a
+					href="https://ko-fi.com/manujsx"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="support-image-btn"
+				>
 					<img src={supportImg} alt="Support on Ko-fi" />
 				</a>
 			</div>
 		</section>
 
-		<!-- Sign Out Section -->
-		<section style="margin-top:20px;">
+		<!-- Danger/Signout Zone -->
+		<section class="settings-group">
 			<button onclick={signOut} class="signout-btn">
 				{t('nav.signout', $locale)}
 			</button>
+
+			{#if import.meta.env.DEV}
+				<div style="margin-top: 24px; text-align: center;">
+					<button onclick={debugResetOnboarding} class="debug-btn">
+						{t('settings.debugReset', $locale)}
+					</button>
+				</div>
+			{/if}
 		</section>
 	</div>
+</div>
 </div>
 
 <style>
@@ -263,17 +373,116 @@
 		box-shadow: var(--shadow-sm);
 	}
 
+	.avatar-wrapper {
+		position: relative;
+	}
+
 	.avatar {
-		width: 56px;
-		height: 56px;
+		width: 72px;
+		height: 72px;
 		border-radius: 50%;
-		background: var(--sumi);
-		color: white;
+		background: var(--ink-100);
+		color: var(--sumi);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-weight: 700;
-		font-size: 22px;
+		font-size: 38px;
+		border: 2px solid var(--ink-200);
+		cursor: pointer;
+		transition:
+			transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+		position: relative;
+		padding: 0;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.avatar-emoji {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1;
+		width: 100%;
+		height: 100%;
+	}
+
+	.avatar:hover {
+		transform: scale(1.05);
+		border-color: var(--hinomaru-red);
+		box-shadow: var(--shadow-md);
+	}
+
+	.avatar-edit-badge {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 24px;
+		height: 24px;
+		background: var(--hinomaru-red);
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		font-size: 11px;
+		border: 2px solid var(--bg-surface);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.emoji-picker-popover {
+		position: absolute;
+		top: calc(100% + 12px);
+		left: 0;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-300);
+		border-radius: 16px;
+		padding: 12px;
+		box-shadow: var(--shadow-lg);
+		z-index: 1000;
+		width: 210px;
+		transform-origin: top left;
+	}
+
+	.emoji-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 8px;
+	}
+
+	.emoji-btn {
+		background: var(--ink-100);
+		border: 1px solid var(--ink-200);
+		font-size: 24px;
+		aspect-ratio: 1;
+		padding: 0;
+		cursor: pointer;
+		border-radius: 12px;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.emoji-btn:hover {
+		background: var(--paper);
+		border-color: var(--hinomaru-red);
+		transform: scale(1.05);
+	}
+
+	.item-text-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		flex: 1;
+	}
+
+	.item-subtext {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		font-weight: 400;
+		line-height: 1.3;
 	}
 
 	.email-label {
@@ -345,29 +554,32 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 20px;
+		padding: 18px 20px;
 		background: none;
 		border: none;
 		cursor: pointer;
 		transition: background 0.2s;
+		gap: 16px;
+		text-align: left;
 	}
+
 	.list-item:hover {
 		background: var(--ink-50);
 	}
 
-	.item-left {
+	.item-icon-box {
+		width: 32px;
+		height: 32px;
 		display: flex;
 		align-items: center;
-		gap: 16px;
+		justify-content: center;
+		font-size: 20px;
 	}
-	.item-icon {
-		font-size: 18px;
-	}
+
 	.item-text {
 		font-weight: 600;
 		color: var(--fg-primary);
-		font-size: 15px;
+		font-size: 16px;
 	}
 
 	/* Custom Switch */
@@ -408,30 +620,43 @@
 	.lang-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 16px;
+		border-radius: 24px;
+		padding: 20px;
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 16px;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 		position: relative;
 		text-align: left;
+		box-shadow: var(--shadow-sm);
 	}
 
 	.lang-card:hover {
 		border-color: var(--ink-300);
-		background: var(--ink-50);
+		background: var(--paper);
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-md);
 	}
+
 	.lang-card.active {
-		border-color: var(--sumi);
-		border-width: 2px;
-		padding: 15px;
+		border-color: var(--hinomaru-red);
+		background: var(--bg-surface);
+		box-shadow:
+			0 0 0 1px var(--hinomaru-red),
+			var(--shadow-md);
+		transform: scale(1.02);
+		z-index: 1;
+	}
+
+	.lang-card.active .lang-name {
+		color: var(--hinomaru-red);
 	}
 
 	.lang-flag {
 		font-size: 24px;
 	}
+
 	.lang-info {
 		display: flex;
 		flex-direction: column;
@@ -444,14 +669,6 @@
 	.lang-native {
 		font-size: 12px;
 		color: var(--fg-tertiary);
-	}
-
-	.check-icon {
-		position: absolute;
-		top: 12px;
-		right: 12px;
-		color: var(--success);
-		font-weight: 600;
 	}
 
 	/* Support Section */

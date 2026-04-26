@@ -6,6 +6,8 @@
 	import { cubicOut, cubicIn } from 'svelte/easing';
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
+	import Icon from '$lib/Icon.svelte';
+	import { BookOpenIcon, BookOpen01Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -14,9 +16,8 @@
 	const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state('N5');
 
-	const filtered = $derived(data.decks.filter((d) => d.level === activeLevel));
-	const totalLearned = $derived(data.decks.reduce((s, d) => s + (d.learned ?? 0), 0));
-
+	const filtered = $derived(data.decks.filter((d: any) => d.level === activeLevel));
+	const totalLearned = $derived(data.decks.reduce((s: number, d: any) => s + (d.learned ?? 0), 0));
 </script>
 
 {#if !data.user}
@@ -32,8 +33,19 @@
 		>
 			<div class="label-meta">{t('home.streak', $locale, { n: data.streak })}</div>
 			<a href="/settings" class="dashboard-settings-btn" aria-label="Settings">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path
+						d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+					></path>
 					<circle cx="12" cy="12" r="3"></circle>
 				</svg>
 			</a>
@@ -62,7 +74,7 @@
 				class:story-read={data.storyRead}
 			>
 				<div class="story-card-left">
-					<div class="story-card-icon">📖</div>
+					<div class="story-card-icon">🏮</div>
 					<div>
 						<div class="story-card-label">{t('stories.today', $locale)}</div>
 						<div class="story-card-title">
@@ -90,16 +102,20 @@
 		<!-- Quick Actions / Tools -->
 		<div class="quick-tools" use:fadeUp={{ delay: 0.22, y: 12 }}>
 			<a href="/alphabet" class="tool-btn">
-				<span class="tool-icon">あ</span>
-				<span>{t('nav.alphabet', $locale) || 'Alfabeto'}</span>
+				<span class="tool-icon">⛩️</span>
+				<span>{t('nav.alphabet', $locale)}</span>
 			</a>
 			<a href="/vocabulary" class="tool-btn">
 				<span class="tool-icon">📚</span>
-				<span>{t('nav.vocabulary', $locale) || 'Vocabulario'}</span>
+				<span>{t('nav.vocabulary', $locale)}</span>
+			</a>
+			<a href="/deck/stories" class="tool-btn">
+				<span class="tool-icon">📜</span>
+				<span>{t('stories.title', $locale)}</span>
 			</a>
 			<a href="/deck/songs" class="tool-btn">
-				<span class="tool-icon">♪</span>
-				<span>{t('nav.songs', $locale) || 'Canciones'}</span>
+				<span class="tool-icon">🎧</span>
+				<span>{t('nav.songs', $locale)}</span>
 			</a>
 		</div>
 
@@ -218,7 +234,9 @@
 		</div>
 		<div style="margin-top:40px;">
 			<section class="settings-group">
-				<h2 class="group-label" style="text-align:center;">{t('settings.support.title', $locale)}</h2>
+				<h2 class="group-label" style="text-align:center;">
+					{t('settings.support.title', $locale)}
+				</h2>
 				<div class="support-container">
 					<p class="support-text">{t('settings.support.desc', $locale)}</p>
 					<a
@@ -337,7 +355,6 @@
 	}
 
 	.story-card-icon {
-		font-size: 28px;
 		flex-shrink: 0;
 		width: 44px;
 		height: 44px;
@@ -346,6 +363,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--washi);
 	}
 
 	.story-card-label {
@@ -412,28 +430,50 @@
 
 	.quick-tools {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 10px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 8px;
 		margin: 24px 0;
+	}
+
+	@media (min-width: 540px) {
+		.quick-tools {
+			grid-template-columns: repeat(4, 1fr);
+			gap: 10px;
+		}
 	}
 
 	.tool-btn {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 16px;
-		height: 52px;
+		height: 48px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0 10px;
-		gap: 8px;
+		padding: 0 8px;
+		gap: 6px;
 		text-decoration: none;
 		color: var(--sumi);
 		font-weight: 700;
-		font-size: 13px;
+		font-size: 12px;
 		box-shadow: var(--shadow-sm);
 		transition: all 0.2s;
 		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	@media (min-width: 380px) {
+		.tool-btn {
+			padding: 0 12px;
+			gap: 8px;
+			font-size: 13px;
+		}
+	}
+
+	@media (min-width: 540px) {
+		.tool-btn {
+			height: 52px;
+		}
 	}
 
 	.tool-btn:hover {
@@ -451,7 +491,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 13px;
+		font-size: 17px;
+		font-family: var(--font-jp);
+		color: var(--sumi);
+		line-height: 1;
 	}
 
 	.dashboard-settings-btn {

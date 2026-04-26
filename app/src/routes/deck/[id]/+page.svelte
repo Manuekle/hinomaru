@@ -2,6 +2,14 @@
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren, fadeIn } from '$lib/motion';
+	import Icon from '$lib/Icon.svelte';
+	import {
+		Cards02Icon,
+		Target01Icon,
+		KeyboardIcon,
+		PencilEdit01Icon,
+		PuzzleIcon
+	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -15,16 +23,23 @@
 			id: 'flashcards',
 			titleKey: 'mode.flashcards.title',
 			descKey: 'mode.flashcards.desc',
-			icon: '🃏'
+			icon: Cards02Icon
 		},
-		{ id: 'quiz', titleKey: 'mode.quiz.title', descKey: 'mode.quiz.desc', icon: '✓' },
-		{ id: 'type', titleKey: 'mode.type.title', descKey: 'mode.type.desc', icon: 'T' },
-		{ id: 'write', titleKey: 'mode.write.title', descKey: 'mode.write.desc', icon: '✍️' },
-		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: '🧩' }
+		{ id: 'quiz', titleKey: 'mode.quiz.title', descKey: 'mode.quiz.desc', icon: Target01Icon },
+		{ id: 'type', titleKey: 'mode.type.title', descKey: 'mode.type.desc', icon: KeyboardIcon },
+		{
+			id: 'write',
+			titleKey: 'mode.write.title',
+			descKey: 'mode.write.desc',
+			icon: PencilEdit01Icon
+		},
+		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: PuzzleIcon }
 	];
 </script>
 
-<div style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));">
+<div
+	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+>
 	<a
 		use:fadeIn={{ delay: 0 }}
 		href="/"
@@ -100,9 +115,9 @@
 				}}
 			>
 				<div
-					style="width:40px;height:40px;background:var(--ink-100);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;"
+					style="width:40px;height:40px;background:var(--ink-100);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--sumi);"
 				>
-					{mode.icon}
+					<Icon icon={mode.icon} size={20} strokeWidth={1.5} color="currentColor" />
 				</div>
 				<div style="flex:1;">
 					<div style="font-size:16px;font-weight:600;">{t(mode.titleKey, $locale)}</div>

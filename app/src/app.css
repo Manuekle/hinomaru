@@ -1,8 +1,8 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/noto-sans";
-@import "@fontsource-variable/playfair-display";
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/noto-sans';
+@import '@fontsource-variable/playfair-display';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -95,6 +95,7 @@
 	--dur-base: 240ms;
 	--dur-flip: 480ms;
 	--bg-header: rgba(255, 255, 255, 0.85);
+	--bg-surface-glass: rgba(255, 255, 255, 0.9);
 	/* Safe area helpers */
 	--safe-top: env(safe-area-inset-top, 0px);
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -156,12 +157,20 @@
 	--success-wash: rgba(46, 125, 91, 0.2);
 	--warning-wash: rgba(168, 116, 26, 0.2);
 	--bg-header: color-mix(in srgb, var(--washi) 85%, transparent);
+	--bg-surface-glass: rgba(28, 28, 28, 0.9);
 	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.25);
 	--shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .hm-input::placeholder {
 	color: var(--fg-tertiary);
+}
+
+.word-romaji {
+	font-size: 13px;
+	color: var(--hinomaru-red);
+	margin-bottom: 4px;
+	font-weight: 500;
 }
 
 html,
@@ -202,7 +211,7 @@ body {
 	font-family: var(--font-ui);
 	font-size: var(--fs-sm);
 	font-weight: 600;
-	color: var(--fg-secondary);
+	color: var(--hinomaru-red);
 	letter-spacing: var(--tracking-wide);
 }
 
@@ -495,13 +504,13 @@ body {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+	* {
+		@apply border-border outline-ring/50;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
 	}
-  html {
-    @apply font-sans;
+	html {
+		@apply font-sans;
 	}
 }

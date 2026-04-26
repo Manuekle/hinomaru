@@ -2,21 +2,24 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
+	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
-	let { onSelect } = $props();
+	let { onSelect, onBack } = $props();
 
 	const voices = $derived([
 		{
 			id: 'standard',
 			name: t('onboarding.voice.standard.name', $locale),
 			desc: t('onboarding.voice.standard.desc', $locale),
-			icon: '🔊'
+			icon: VolumeHighIcon
 		},
 		{
 			id: 'kaito',
 			name: t('onboarding.voice.kaito.name', $locale),
 			desc: t('onboarding.voice.kaito.desc', $locale),
-			icon: '✨'
+			icon: VolumeHighIcon
 		}
 	]);
 
@@ -92,7 +95,9 @@
 					type="button"
 					aria-label="Play voice sample"
 				>
-					<span class="play-icon">🔊</span>
+					<span class="play-icon"
+						><Icon icon={VolumeHighIcon} size={16} color="currentColor" /></span
+					>
 				</button>
 
 				<!-- Select trigger: also a real <button> for accessibility -->
@@ -102,9 +107,7 @@
 				</button>
 
 				{#if selected === voice.id}
-					<div class="check" aria-label="Selected">
-						✓
-					</div>
+					<div class="check" aria-label="Selected">✓</div>
 				{/if}
 			</div>
 		{/each}
@@ -113,11 +116,11 @@
 		</p>
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.4, y: 10 }}>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={handleNext} type="button">
+	<StickyFooter {onBack}>
+		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={handleNext} type="button">
 			{t('onboarding.next', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>
@@ -125,7 +128,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 32px 24px 24px;
+		padding: 32px 24px 140px;
 	}
 
 	.header {
@@ -206,9 +209,10 @@
 	}
 
 	.play-icon {
-		font-size: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		color: var(--sumi);
-		line-height: 1;
 	}
 
 	.selected .play-icon {
@@ -258,10 +262,5 @@
 		font-size: 13px;
 		color: var(--fg-tertiary);
 		margin-top: 8px;
-	}
-
-	.footer {
-		margin-top: auto;
-		padding-bottom: env(safe-area-inset-bottom);
 	}
 </style>

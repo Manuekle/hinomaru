@@ -9,8 +9,9 @@
 		ChartUpIcon,
 		BookOpen01Icon
 	} from '@hugeicons/core-free-icons';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
-	let { onNext } = $props();
+	let { onNext, onBack } = $props();
 
 	const points = $derived([
 		{
@@ -84,11 +85,11 @@
 		{/each}
 	</div>
 
-	<footer class="footer" use:fadeUp={{ delay: 0.5, y: 10 }}>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={onNext}>
+	<StickyFooter {onBack}>
+		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={onNext}>
 			{t('onboarding.next', $locale)}
 		</button>
-	</footer>
+	</StickyFooter>
 </div>
 
 <style>
@@ -96,7 +97,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
@@ -238,9 +239,5 @@
 		color: var(--fg-secondary);
 		margin: 0;
 		line-height: 1.4;
-	}
-
-	.footer {
-		margin-top: auto;
 	}
 </style>

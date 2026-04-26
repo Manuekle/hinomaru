@@ -7,20 +7,22 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 	} = await supabase.auth.getUser();
 	if (!user) throw error(401, 'Unauthorized');
 
-	const { data: savedWords } = await supabase
+	const { data: words } = await supabase
 		.from('user_saved_words')
 		.select('*')
 		.eq('user_id', user.id)
-		.order('created_at', { ascending: false });
+		.lte('next_review', new Date().toISOString())
+		.order('next_review', { ascending: true })
+		.limit(50);
 
-	const { count: dueCount } = await supabase
-		.from('user_saved_words')
-		.select('*', { count: 'exact', head: true })
-		.eq('user_id', user.id)
-		.lte('next_review', new Date().toISOString());
+	if (!words || words.length === 0) {
+		return {
+			words: [],
+			status: 'empty'
+		};
+	}
 
 	return {
-		savedWords: savedWords ?? [],
-		dueCount: dueCount ?? 0
+		words: words ?? []
 	};
 };

@@ -2,9 +2,18 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import {
+		FavouriteIcon,
+		GraduationScrollIcon,
+		VolumeHighIcon,
+		FireIcon,
+		BrainIcon
+	} from '@hugeicons/core-free-icons';
+	import ButtonLoader from '$lib/components/ButtonLoader.svelte';
 
-	let { selections, onComplete } = $props();
+	let { selections, onComplete, onBack, loading = false } = $props();
 
 	const items = $derived([
 		{
@@ -13,7 +22,7 @@
 			value: selections.motivation
 				? t(`onboarding.motivation.${selections.motivation}`, $locale)
 				: '...',
-			icon: '❤️'
+			icon: FavouriteIcon
 		},
 		{
 			id: 'level',
@@ -21,7 +30,7 @@
 			value: selections.experience
 				? t(`onboarding.experience.${selections.experience}`, $locale)
 				: '...',
-			icon: '🎓'
+			icon: GraduationScrollIcon
 		},
 		{
 			id: 'voice',
@@ -30,13 +39,13 @@
 				selections.voice === 'kaito'
 					? t('onboarding.voice.kaito.name', $locale)
 					: t('onboarding.voice.standard.name', $locale),
-			icon: '🔊'
+			icon: VolumeHighIcon
 		},
 		{
 			id: 'goal',
 			label: t('onboarding.summary.goal', $locale),
 			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }),
-			icon: '🔥'
+			icon: FireIcon
 		},
 		{
 			id: 'srs',
@@ -44,7 +53,7 @@
 			value: selections.srsEnabled
 				? t('onboarding.summary.enabled', $locale)
 				: t('onboarding.summary.disabled', $locale) || 'Disabled',
-			icon: '🧠'
+			icon: BrainIcon
 		}
 	]);
 </script>
@@ -58,7 +67,7 @@
 		{#each items as item, i (item.id)}
 			<div class="summary-item" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
 				<div class="icon-box">
-					<span class="icon">{item.icon}</span>
+					<Icon icon={item.icon} size={22} color="var(--washi)" strokeWidth={1.5} />
 				</div>
 				<div class="text">
 					<div class="label">{item.label}</div>
@@ -71,9 +80,13 @@
 		{/each}
 	</div>
 
-	<StickyFooter>
-		<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={onComplete}>
-			{t('onboarding.summary.start', $locale)}
+	<StickyFooter {onBack}>
+		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={onComplete} disabled={loading}>
+			{#if loading}
+				<ButtonLoader size={20} />
+			{:else}
+				{t('onboarding.summary.start', $locale)}
+			{/if}
 		</button>
 	</StickyFooter>
 </div>
@@ -88,11 +101,11 @@
 
 	.header {
 		text-align: center;
-		margin-bottom: 60px;
+		margin-bottom: clamp(24px, 8vw, 60px);
 	}
 
 	.title {
-		font-size: 32px;
+		font-size: var(--step-title, clamp(24px, 7vw, 32px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
 		margin: 0;
@@ -118,10 +131,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
-
-	.icon {
-		font-size: 24px;
+		color: var(--washi);
 	}
 
 	.text {
