@@ -4,17 +4,14 @@
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
-	import { fadeUp, fadeIn, scaleIn } from '$lib/motion';
+	import { fadeUp, fadeIn } from '$lib/motion';
 	import { jlptSongs, parseTime } from '$lib/utils/jlptSongs';
 	import Mascot from '$lib/components/Mascot.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		PlayIcon, 
-		PauseIcon, 
-		ArrowReloadHorizontalIcon, 
-		ArrowLeft02Icon,
-		Tick01Icon,
-		Cancel01Icon,
+	import {
+		PlayIcon,
+		PauseIcon,
+		ArrowReloadHorizontalIcon,
 		VolumeHighIcon
 	} from '@hugeicons/core-free-icons';
 	import { speakJapanese } from '$lib/utils/tts';
@@ -42,7 +39,6 @@
 	let showCompletionToast = $state(false);
 	let mascotMood = $derived((isPlaying || completed ? 'happy' : 'thinking') as 'happy' | 'thinking');
 
-	// Interval for time tracking
 	let trackInterval: ReturnType<typeof setInterval> | null = null;
 
 	// ── Lyric state ────────────────────────────────────────────────
@@ -59,7 +55,7 @@
 		const m = Math.floor(s / 60);
 		return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 	});
-	
+
 	const clipTotal = $derived.by(() => {
 		const s = clipDuration;
 		const m = Math.floor(s / 60);
@@ -158,10 +154,8 @@
 
 	function initYT() {
 		if (!hasVideo || !song) return;
-		// Destroy existing player if any
 		try { player?.destroy(); player = null; playerReady = false; } catch {}
 
-		// @ts-ignore
 		const YT = (window as any).YT;
 		if (!YT) return;
 
@@ -183,7 +177,6 @@
 				onReady: () => {
 					playerReady = true;
 					player.setPlaybackRate(speed);
-					// Force seek to start position to avoid starting at 0
 					player.seekTo(startSec, true);
 				},
 				onStateChange: (e: any) => {
@@ -221,7 +214,6 @@
 		};
 
 		if (win.YT && win.YT.Player) {
-			// Small delay only when switching songs (not first load)
 			if (prevSongId !== -1) {
 				setTimeout(doInit, 60);
 			} else {
@@ -240,7 +232,7 @@
 
 	onDestroy(() => {
 		stopTracking();
-		try { player?.destroy(); } catch { }
+		try { player?.destroy(); } catch {}
 	});
 </script>
 
@@ -249,104 +241,98 @@
 </svelte:head>
 
 {#if !song}
-	<div style="padding:40px;text-align:center;color:var(--fg-secondary);">
-		Song not found. <a href="/deck/songs">← Back</a>
+	<div style="padding:80px 24px;text-align:center;color:var(--fg-secondary);max-width:680px;margin:0 auto;">
+		Song not found. <a href="/deck/songs" style="color:var(--hinomaru-red);">← Back</a>
 	</div>
 {:else}
-<div class="player-page">
+<div class="page">
 
-	<!-- Header -->
-	<div class="page-header" use:fadeIn={{ delay: 0 }}>
-		<a href="/deck/songs" class="back-link">← {t('deck.back', $locale)}</a>
-		<div class="header-pills">
-			<span class="level-pill" style="background:{levelColors[song.level] ?? '#bc002d'}">{song.level}</span>
-			<span class="diff-pill">{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span>
-		</div>
+	<!-- Back link -->
+	<div use:fadeIn={{ delay: 0 }}>
+		<a href="/deck/songs" class="back">← {t('deck.back', $locale)}</a>
 	</div>
 
-	<!-- Song title -->
-	<div class="song-header" use:fadeUp={{ delay: 0.06, y: 14 }}>
-		<div class="song-label">{t('songs.focus', $locale)}</div>
+	<!-- Song hero -->
+	<div class="hero" use:fadeUp={{ delay: 0.05, y: 14 }}>
+		<div class="hero-meta">
+			<span class="level-tag" style="background:{levelColors[song.level] ?? '#bc002d'}">{song.level}</span>
+			<span class="diff-dots">{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span>
+		</div>
 		<h1 class="song-title jp">{song.title}</h1>
 		<p class="song-artist">{song.artist}</p>
 		<p class="song-focus">{$locale === 'es' ? song.focus.es : song.focus.en}</p>
 	</div>
 
 	{#if !hasVideo}
-		<!-- Coming soon state -->
-		<div class="coming-soon" use:scaleIn={{ delay: 0.12 }}>
-			<Mascot mood={mascotMood} size={120} position="center" />
+		<!-- Coming soon -->
+		<div class="coming-soon" use:fadeIn={{ delay: 0.1 }}>
+			<Mascot mood={mascotMood} size={100} position="center" />
 			<p class="cs-title">{t('songs.comingSoon', $locale)}</p>
 			<p class="cs-desc">{t('songs.comingSoonDesc', $locale)}</p>
 		</div>
 	{:else}
-		<!-- YouTube player -->
-		<div class="video-wrapper" use:fadeUp={{ delay: 0.1, y: 16 }}>
+		<!-- Video -->
+		<div class="video-wrap" use:fadeUp={{ delay: 0.1, y: 16 }}>
 			<div class="video-ratio">
 				<div id={playerContainerId} class="yt-embed"></div>
 				{#if !playerReady}
 					<div class="video-loading">
-						<div class="video-loading-inner">
-							<div class="spinner"></div>
-							<span class="loading-note">♪</span>
-						</div>
+						<div class="spinner"></div>
 					</div>
 				{/if}
 			</div>
 		</div>
 
 		<!-- Controls -->
-		<div class="controls" use:fadeUp={{ delay: 0.16, y: 12 }}>
-			<div class="ctrl-buttons">
-				<!-- Play / Pause -->
+		<div class="controls" use:fadeUp={{ delay: 0.15, y: 10 }}>
+			<!-- Buttons row -->
+			<div class="ctrl-row">
 				<button
-					class="ctrl-btn ctrl-main"
+					class="play-btn"
 					onclick={isPlaying ? pause : play}
 					disabled={!playerReady}
 					aria-label={isPlaying ? 'Pause' : 'Play'}
 				>
-					<Icon icon={isPlaying ? PauseIcon : PlayIcon} size={22} variant="solid" />
+					<Icon icon={isPlaying ? PauseIcon : PlayIcon} size={20} variant="solid" />
 				</button>
 
-				<!-- Replay -->
-				<button class="ctrl-btn" onclick={replay} disabled={!playerReady} aria-label="Replay">
-					<Icon icon={ArrowReloadHorizontalIcon} size={18} />
-					{t('songs.replay', $locale)}
+				<button class="icon-btn" onclick={replay} disabled={!playerReady} aria-label="Replay">
+					<Icon icon={ArrowReloadHorizontalIcon} size={16} />
+					<span>{t('songs.replay', $locale)}</span>
 				</button>
 
-				<!-- Speed -->
-				<div class="speed-group">
+				<div class="speed-wrap">
 					<button class="speed-btn" class:active={speed === 0.75} onclick={() => setSpeed(0.75)}>0.75×</button>
 					<button class="speed-btn" class:active={speed === 1} onclick={() => setSpeed(1)}>1×</button>
 				</div>
 			</div>
 
-			<!-- Progress bar -->
+			<!-- Progress row -->
 			<div class="progress-row">
-				<span class="time-label">{clipElapsed}</span>
-				<div class="clip-bar">
-					<div class="clip-fill" style="width:{clipProgress}%"></div>
+				<span class="time">{clipElapsed}</span>
+				<div class="bar" role="progressbar" aria-valuenow={clipProgress} aria-valuemin={0} aria-valuemax={100}>
+					<div class="bar-fill" style="width:{clipProgress}%"></div>
 				</div>
-				<span class="time-label">{clipTotal}</span>
+				<span class="time">{clipTotal}</span>
 			</div>
 		</div>
 
 		<!-- Completion toast -->
 		{#if showCompletionToast}
-			<div class="completion-toast" use:scaleIn={{ delay: 0 }}>
-				<span class="toast-emoji">🎉</span>
+			<div class="toast" use:fadeIn={{ delay: 0 }}>
+				<span>🎉</span>
 				<span>{t('songs.doneBravo', $locale)}</span>
-				<button class="toast-close" onclick={() => (showCompletionToast = false)}>✕</button>
+				<button class="toast-x" onclick={() => (showCompletionToast = false)}>✕</button>
 			</div>
 		{/if}
 	{/if}
 
-	<!-- Lyrics section -->
+	<!-- Lyrics -->
 	{#if hasLyrics}
-		<div class="section" use:fadeUp={{ delay: 0.2, y: 12 }}>
-			<div class="section-label">{t('songs.lyrics', $locale)}</div>
+		<div class="section" use:fadeUp={{ delay: 0.2, y: 10 }}>
+			<div class="section-title">{t('songs.lyrics', $locale)}</div>
 			<div class="lyrics-scroll" bind:this={lyricsContainer}>
-				<div class="lyrics-spacer-top"></div>
+				<div class="spacer"></div>
 				{#each song.lyrics as line, idx}
 					{@const dist = idx - currentLyricIndex}
 					{@const isActive = dist === 0 && currentLyricIndex >= 0}
@@ -357,7 +343,7 @@
 						class="lyric-line"
 						class:active={isActive}
 						class:past={isPast}
-						class:near={isNear && !isActive}
+						class:near={isNear}
 						onclick={() => {
 							if (player && playerReady) {
 								player.seekTo(line.time, true);
@@ -370,42 +356,38 @@
 							<div class="lyric-romaji">{line.romaji}</div>
 						{/if}
 						{#if isActive}
-							<div class="lyric-translation">
+							<div class="lyric-tl">
 								{$locale === 'es' ? line.translation_es : line.translation_en}
 							</div>
 						{/if}
 					</button>
 				{/each}
-				<div class="lyrics-spacer-bottom"></div>
+				<div class="spacer"></div>
 			</div>
 		</div>
 	{:else if hasVideo}
-		<div class="section no-lyrics" use:fadeIn={{ delay: 0.22 }}>
-			<div class="section-label">{t('songs.lyrics', $locale)}</div>
+		<div class="section" use:fadeIn={{ delay: 0.22 }}>
+			<div class="section-title">{t('songs.lyrics', $locale)}</div>
 			<p class="muted">{t('songs.noLyrics', $locale)}</p>
 		</div>
 	{/if}
 
-	<!-- Vocabulary section -->
+	<!-- Vocabulary -->
 	{#if song.vocab && song.vocab.length > 0}
 		<div class="section" use:fadeUp={{ delay: 0.25, y: 10 }}>
-			<div class="section-label">{t('songs.vocab', $locale)}</div>
+			<div class="section-title">{t('songs.vocab', $locale)}</div>
 			<div class="vocab-grid">
 				{#each song.vocab as word}
 					<button class="vocab-card" onclick={() => speakJapanese(word.jp)}>
-						<div class="vocab-header">
-							<div class="vocab-jp jp">{word.jp}</div>
-							<div class="vocab-play-btn">
-								<Icon icon={VolumeHighIcon} size={14} />
-							</div>
+						<div class="vocab-top">
+							<span class="vocab-jp jp">{word.jp}</span>
+							<span class="vocab-icon"><Icon icon={VolumeHighIcon} size={13} /></span>
 						</div>
 						<div class="vocab-kana">{word.kana}</div>
 						{#if $showRomaji && word.romaji}
 							<div class="vocab-romaji">{word.romaji}</div>
 						{/if}
-						<div class="vocab-meaning">
-							{$locale === 'es' ? word.es : word.en}
-						</div>
+						<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
 					</button>
 				{/each}
 			</div>
@@ -416,77 +398,54 @@
 {/if}
 
 <style>
-	.player-page {
-		max-width: 720px;
+	.page {
+		max-width: 680px;
 		margin: 0 auto;
 		padding: calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
-		display: flex;
-		flex-direction: column;
-		gap: 0;
 	}
 
-	/* ── Header ── */
-	.page-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 8px;
-	}
-
-	.back-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
+	.back {
 		font-size: 13px;
 		color: var(--fg-secondary);
 		text-decoration: none;
-		transition: color 150ms ease;
+		display: inline-block;
+		margin-bottom: 20px;
+		transition: color 150ms;
 	}
-	.back-link:hover { color: var(--sumi); }
+	.back:hover { color: var(--fg-primary); }
 
-	.header-pills {
+	/* Hero */
+	.hero { margin-bottom: 20px; }
+
+	.hero-meta {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 10px;
+		margin-bottom: 8px;
 	}
 
-	.level-pill {
+	.level-tag {
 		font-size: 10px;
-		font-weight: 600;
-		color: var(--paper);
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		color: #fff;
 		padding: 2px 8px;
 		border-radius: 6px;
-		letter-spacing: 0.04em;
 	}
 
-	.diff-pill {
+	.diff-dots {
 		font-size: 8px;
 		letter-spacing: 1.5px;
 		color: var(--hinomaru-red);
-		font-weight: 700;
-	}
-
-	/* ── Song header ── */
-	.song-header {
-		margin-bottom: 20px;
-	}
-
-	.song-label {
-		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--hinomaru-red);
-		margin-bottom: 4px;
 	}
 
 	.song-title {
-		font-size: 32px;
+		font-size: 38px;
 		font-weight: 700;
-		letter-spacing: -0.02em;
-		margin: 0 0 4px;
+		letter-spacing: -0.03em;
+		line-height: 1.1;
 		color: var(--fg-primary);
-		line-height: 1.15;
+		margin: 0 0 4px;
 	}
 
 	.song-artist {
@@ -502,48 +461,32 @@
 		line-height: 1.4;
 	}
 
-	/* ── Coming soon ── */
+	/* Coming soon */
 	.coming-soon {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 12px;
-		padding: 40px 24px;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 24px;
+		gap: 10px;
+		padding: 48px 24px;
 		text-align: center;
+		border-top: 1px solid var(--ink-100);
+		border-bottom: 1px solid var(--ink-100);
 		margin-bottom: 24px;
 	}
+	.cs-title { font-size: 18px; font-weight: 700; margin: 0; color: var(--fg-primary); }
+	.cs-desc  { font-size: 14px; color: var(--fg-secondary); margin: 0; line-height: 1.5; max-width: 260px; }
 
-	.cs-title {
-		font-size: 20px;
-		font-weight: 700;
-		margin: 0;
-		color: var(--fg-primary);
-	}
-
-	.cs-desc {
-		font-size: 14px;
-		color: var(--fg-secondary);
-		margin: 0;
-		line-height: 1.5;
-		max-width: 280px;
-	}
-
-	/* ── Video ── */
-	.video-wrapper {
-		margin-bottom: 16px;
-	}
+	/* Video */
+	.video-wrap { margin-bottom: 16px; }
 
 	.video-ratio {
 		position: relative;
 		width: 100%;
 		aspect-ratio: 16 / 9;
-		background: var(--sumi);
-		border-radius: 20px;
+		background: #0a0a0a;
+		border-radius: 16px;
 		overflow: hidden;
-		box-shadow: var(--shadow-md);
+		box-shadow: 0 4px 24px rgba(0,0,0,0.18);
 	}
 
 	.yt-embed {
@@ -553,7 +496,6 @@
 		height: 100%;
 	}
 
-	/* YouTube iframe injected by API needs explicit sizing */
 	:global(.yt-embed iframe) {
 		width: 100% !important;
 		height: 100% !important;
@@ -566,130 +508,105 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #0c0c0c;
-	}
-
-	.video-loading-inner {
-		position: relative;
-		width: 56px;
-		height: 56px;
+		background: #0a0a0a;
 	}
 
 	.spinner {
-		position: absolute;
-		inset: 0;
+		width: 28px;
+		height: 28px;
 		border-radius: 50%;
-		border: 2px solid rgba(255, 255, 255, 0.08);
+		border: 2px solid rgba(255,255,255,0.1);
 		border-top-color: var(--hinomaru-red);
-		animation: spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+		animation: spin 0.8s linear infinite;
 	}
+	@keyframes spin { to { transform: rotate(360deg); } }
 
-	.loading-note {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 20px;
-		color: rgba(255, 255, 255, 0.35);
-		animation: note-pulse 2s ease-in-out infinite;
-	}
-
-	@keyframes note-pulse {
-		0%, 100% { opacity: 0.3; transform: scale(0.92); }
-		50%       { opacity: 0.7; transform: scale(1.06); }
-	}
-
-	@keyframes spin {
-		to { transform: rotate(360deg); }
-	}
-
-	/* ── Controls ── */
+	/* Controls — minimal, no card wrapper */
 	.controls {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 16px;
 		margin-bottom: 24px;
 		display: flex;
 		flex-direction: column;
-		gap: 14px;
-		box-shadow: var(--shadow-sm);
-	}
-
-	.ctrl-buttons {
-		display: flex;
-		align-items: center;
 		gap: 12px;
 	}
 
-	.ctrl-btn {
+	.ctrl-row {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 0 16px;
-		height: 40px;
-		border-radius: 12px;
-		border: 1px solid var(--ink-200);
-		background: var(--ink-100);
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--fg-primary);
-		cursor: pointer;
-		transition: all 150ms ease;
-		font-family: var(--font-ui);
+		gap: 10px;
 	}
-	.ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-	.ctrl-btn:not(:disabled):hover { background: var(--ink-200); }
-	.ctrl-btn:not(:disabled):active { transform: scale(0.96); }
 
-	.ctrl-main {
+	.play-btn {
 		width: 44px;
 		height: 44px;
-		padding: 0;
+		border-radius: 50%;
+		background: var(--fg-primary);
+		color: var(--bg-page);
+		border: none;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
 		justify-content: center;
-		background: var(--hinomaru-red);
-		border-color: transparent;
-		color: var(--paper);
-		border-radius: 14px;
+		flex-shrink: 0;
+		transition: opacity 150ms, transform 120ms;
 	}
-	.ctrl-main:not(:disabled):hover {
-		filter: brightness(0.88);
-	}
+	.play-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+	.play-btn:not(:disabled):hover { opacity: 0.85; }
+	.play-btn:not(:disabled):active { transform: scale(0.93); }
 
-	.speed-group {
+	.icon-btn {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		padding: 0 14px;
+		height: 36px;
+		border-radius: 999px;
+		border: 1.5px solid var(--ink-200);
+		background: transparent;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		transition: all 150ms;
+		font-family: var(--font-ui);
+	}
+	.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+	.icon-btn:not(:disabled):hover { color: var(--fg-primary); border-color: var(--ink-300); }
+
+	.speed-wrap {
 		display: flex;
 		gap: 4px;
 		margin-left: auto;
 	}
 
 	.speed-btn {
-		padding: 6px 11px;
-		border-radius: 8px;
-		border: 1px solid var(--ink-200);
+		padding: 0 11px;
+		height: 32px;
+		border-radius: 999px;
+		border: 1.5px solid var(--ink-200);
 		background: transparent;
-		font-size: 12px;
-		font-weight: 600;
-		color: var(--fg-secondary);
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
 		cursor: pointer;
-		transition: all 150ms ease;
+		transition: all 150ms;
 		font-family: var(--font-ui);
+		letter-spacing: 0.02em;
 	}
 	.speed-btn.active {
-		background: var(--sumi);
-		border-color: transparent;
-		color: var(--paper);
+		background: var(--fg-primary);
+		border-color: var(--fg-primary);
+		color: var(--bg-page);
 	}
-	.speed-btn:not(.active):hover { background: var(--ink-100); }
+	.speed-btn:not(.active):hover { color: var(--fg-primary); border-color: var(--ink-300); }
 
-	/* Progress bar */
+	/* Progress */
 	.progress-row {
 		display: flex;
 		align-items: center;
 		gap: 10px;
 	}
 
-	.time-label {
+	.time {
 		font-size: 11px;
 		font-weight: 600;
 		color: var(--fg-tertiary);
@@ -697,86 +614,73 @@
 		min-width: 36px;
 	}
 
-	.clip-bar {
+	.bar {
 		flex: 1;
-		height: 4px;
+		height: 3px;
 		background: var(--ink-200);
 		border-radius: 99px;
 		overflow: hidden;
 	}
-
-	.clip-fill {
+	.bar-fill {
 		height: 100%;
 		background: var(--hinomaru-red);
 		border-radius: 99px;
 		transition: width 100ms linear;
 	}
 
-	/* ── Completion toast ── */
-	.completion-toast {
+	/* Toast */
+	.toast {
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		background: var(--success-wash);
-		border: 1px solid var(--success);
-		border-radius: 16px;
-		padding: 12px 16px;
-		margin-bottom: 24px;
+		gap: 10px;
+		padding: 10px 16px;
+		border-top: 1px solid var(--ink-100);
+		border-bottom: 1px solid var(--ink-100);
 		font-size: 14px;
 		font-weight: 600;
 		color: var(--success);
-		box-shadow: var(--shadow-sm);
+		margin-bottom: 24px;
 	}
-
-	.toast-emoji { font-size: 20px; }
-
-	.toast-close {
+	.toast-x {
 		margin-left: auto;
 		background: none;
 		border: none;
 		cursor: pointer;
-		color: var(--success);
-		font-size: 14px;
+		color: var(--fg-tertiary);
+		font-size: 13px;
 		padding: 0;
-		opacity: 0.7;
 	}
 
-	/* ── Sections ── */
-	.section {
-		margin-bottom: 28px;
-	}
+	/* Sections */
+	.section { margin-bottom: 32px; }
 
-	.section-label {
+	.section-title {
 		font-size: 11px;
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		color: var(--fg-tertiary);
-		margin-bottom: 14px;
+		margin-bottom: 16px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid var(--ink-100);
 	}
 
-	.no-lyrics .muted {
-		font-size: 14px;
-		color: var(--fg-tertiary);
-		margin: 0;
-	}
+	.muted { font-size: 14px; color: var(--fg-tertiary); margin: 0; }
 
-	/* ── Lyrics — Apple Music style ── */
+	/* Lyrics — Apple Music style */
 	.lyrics-scroll {
-		position: relative;
 		height: 360px;
 		overflow-y: scroll;
 		overflow-x: hidden;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 		scroll-behavior: smooth;
-		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
-		mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%);
+		mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%);
 	}
 	.lyrics-scroll::-webkit-scrollbar { display: none; }
 
-	.lyrics-spacer-top    { height: 120px; flex-shrink: 0; }
-	.lyrics-spacer-bottom { height: 120px; flex-shrink: 0; }
+	.spacer { height: 120px; flex-shrink: 0; }
 
 	.lyric-line {
 		display: block;
@@ -784,34 +688,21 @@
 		text-align: left;
 		background: none;
 		border: none;
-		padding: 8px 16px;
+		padding: 8px 4px;
 		cursor: pointer;
 		transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1),
 		            transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
-		opacity: 0.25;
+		opacity: 0.22;
 		transform: scale(0.88);
 		transform-origin: left center;
 		will-change: opacity, transform;
 		font-family: inherit;
 	}
-	.lyric-line:hover { opacity: 0.5; }
+	.lyric-line:hover { opacity: 0.45; }
+	.lyric-line.near  { opacity: 0.5;  transform: scale(0.94); }
+	.lyric-line.past  { opacity: 0.18; transform: scale(0.86); }
+	.lyric-line.active { opacity: 1;   transform: scale(1); }
 
-	.lyric-line.near {
-		opacity: 0.55;
-		transform: scale(0.94);
-	}
-
-	.lyric-line.past {
-		opacity: 0.2;
-		transform: scale(0.86);
-	}
-
-	.lyric-line.active {
-		opacity: 1;
-		transform: scale(1);
-	}
-
-	/* Fixed font-size — no layout reflow on line change */
 	.lyric-jp {
 		font-size: 22px;
 		font-weight: 600;
@@ -825,83 +716,72 @@
 		margin-top: 3px;
 		line-height: 1.3;
 	}
-
 	.lyric-line.active .lyric-romaji {
 		color: var(--hinomaru-red);
 		opacity: 0.85;
 	}
 
-	.lyric-translation {
+	.lyric-tl {
 		font-size: 13px;
 		color: var(--fg-secondary);
 		margin-top: 5px;
 		line-height: 1.4;
-		animation: fadeSlideIn 260ms cubic-bezier(0.4, 0, 0.2, 1) both;
+		animation: fadeUp 240ms cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
-
-	@keyframes fadeSlideIn {
-		from { opacity: 0; transform: translateY(3px); }
+	@keyframes fadeUp {
+		from { opacity: 0; transform: translateY(4px); }
 		to   { opacity: 1; transform: translateY(0); }
 	}
 
-	/* ── Vocabulary ── */
+	/* Vocab */
 	.vocab-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-		gap: 10px;
+		gap: 8px;
 	}
 
 	.vocab-card {
-		background: var(--bg-surface);
+		background: transparent;
 		border: 1px solid var(--ink-200);
-		border-radius: 16px;
-		padding: 14px;
+		border-radius: 12px;
+		padding: 12px;
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
-		box-shadow: var(--shadow-sm);
+		gap: 2px;
 		text-align: left;
 		cursor: pointer;
-		transition: all 150ms ease;
+		transition: border-color 150ms, background 150ms;
 		width: 100%;
 		font-family: inherit;
 	}
 	.vocab-card:hover {
 		border-color: var(--hinomaru-red);
-		transform: translateY(-2px);
-		box-shadow: var(--shadow-md);
+		background: var(--ink-100);
 	}
-	.vocab-card:active { transform: scale(0.98); }
+	.vocab-card:active { opacity: 0.8; }
 
-	.vocab-header {
+	.vocab-top {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 8px;
+		gap: 6px;
+		margin-bottom: 2px;
 	}
 
 	.vocab-jp {
-		font-size: 22px;
+		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1;
 	}
 
-	.vocab-play-btn {
-		width: 24px;
-		height: 24px;
+	.vocab-icon {
+		color: var(--fg-tertiary);
+		transition: color 150ms;
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		background: var(--ink-100);
-		border-radius: 50%;
-		color: var(--fg-tertiary);
-		transition: all 150ms ease;
 	}
-	.vocab-card:hover .vocab-play-btn {
-		background: var(--hinomaru-red-wash);
-		color: var(--hinomaru-red);
-	}
+	.vocab-card:hover .vocab-icon { color: var(--hinomaru-red); }
 
 	.vocab-kana {
 		font-size: 12px;
@@ -917,7 +797,7 @@
 	.vocab-meaning {
 		font-size: 13px;
 		color: var(--fg-secondary);
-		margin-top: 4px;
+		margin-top: 3px;
 		line-height: 1.3;
 	}
 </style>
