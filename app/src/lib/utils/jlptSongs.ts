@@ -373,16 +373,27 @@ export const jlptSongs: SongLesson[] = [
         title: "unravel",
         artist: "TK from 凛として時雨",
         start: "00:00",
-        end: "01:00",
+        end: "01:25",
         focus: { es: "Psicología y distorsión", en: "Psychology and distortion" },
         difficulty: 4,
-        youtubeId: "7aMOurgDB-o", // ✅ verificado
+        youtubeId: "7aMOurgDB-o", // ✅ Tokyo Ghoul OP (TV Size)
         lyrics: [
-            { time: 0.0, text: "教えて教えてよ その仕組みを", romaji: "oshiete oshiete yo sono shikumi wo", translation_es: "Dime, dime cómo funciona esto", translation_en: "Tell me, tell me the way it works" }
+            { time: 0.0, text: "教えて 教えてよ その仕組みを 僕の中に誰がいるの?", romaji: "oshiete oshiete yo sono shikumi wo boku no naka ni dare ga iru no?", translation_es: "Dime, dime cómo funciona esto, ¿quién hay dentro de mí?", translation_en: "Tell me, tell me how it works, who is inside of me?" },
+            { time: 14.0, text: "壊れた 壊れたよ この世界で 君が笑う 何も見えずに", romaji: "kowareta kowareta yo kono sekai de kimi ga warau nani mo miezu ni", translation_es: "Se rompió, se rompió este mundo en el que tú te ríes sin ver nada.", translation_en: "It broke, this world broke where you laugh without seeing anything." },
+            { time: 41.0, text: "壊れた僕なんてさ 息を止めて", romaji: "kowareta boku nante sa iki wo tomete", translation_es: "Alguien tan roto como yo... deteniendo el aliento.", translation_en: "Someone as broken as me... holding my breath." },
+            { time: 47.0, text: "Freeze", romaji: "Freeze", translation_es: "Congélate", translation_en: "Freeze" },
+            { time: 48.0, text: "壊せる 壊せない 狂える 狂えない あなたを見つけて 揺れた", romaji: "kowaseru kowasenai kurueru kuruenai anata wo mitsukete yureta", translation_es: "Puedo romperlo, no puedo, puedo enloquecer, no puedo; te encontré y mi mundo tembló.", translation_en: "I can break it, I can't, I can go mad, I can't; I found you and I wavered." },
+            { time: 55.0, text: "歪んだ世界にだんだん 僕は透き通って見えなくなって", romaji: "yuganda sekai ni dandan boku wa sukitootte mienakunatte", translation_es: "En este mundo distorsionado, poco a poco me vuelvo transparente hasta desaparecer.", translation_en: "In this distorted world, I'm gradually becoming transparent and invisible." },
+            { time: 62.0, text: "見つけないで 僕のことを 見つめないで", romaji: "mitsukenaide boku no koto wo mitsumenaide", translation_es: "No me encuentres, no me mires fijamente.", translation_en: "Don't find me, don't look at me." },
+            { time: 69.0, text: "誰かが描いた世界の中で あなたを傷つけたくはないよ", romaji: "dareka ga egaita sekai no naka de anata wo kizutsuketaku wa nai yo", translation_es: "En este mundo que alguien dibujó, no quiero herirte.", translation_en: "In this world that someone drew, I don't want to hurt you." },
+            { time: 76.5, text: "覚えていて 僕のことを", romaji: "oboete ite boku no koto wo", translation_es: "Recuérdame, por favor.", translation_en: "Please, remember me." }
         ],
         vocab: [
-            { jp: "教える", kana: "おしえる", romaji: "oshieru", en: "to tell / teach", es: "contar / enseñar" },
-            { jp: "仕組み", kana: "しくみ", romaji: "shikumi", en: "mechanism / structure", es: "mecanismo / estructura" }
+            { jp: "仕組み", kana: "しくみ", romaji: "shikumi", en: "mechanism / structure", es: "mecanismo / estructura" },
+            { jp: "狂う", kana: "くるう", romaji: "kuruu", en: "to go mad / go insane", es: "enloquecer / volverse loco" },
+            { jp: "揺れる", kana: "ゆれる", romaji: "yureru", en: "to shake / sway", es: "temblar / oscilar" },
+            { jp: "歪む", kana: "ゆがむ", romaji: "yugamu", en: "to be distorted / warped", es: "distorsionarse / torcerse" },
+            { jp: "透き通る", kana: "すきとおる", romaji: "sukitooru", en: "to be transparent", es: "ser transparente / traslúcido" }
         ]
     },
 
