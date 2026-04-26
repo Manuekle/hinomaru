@@ -350,7 +350,7 @@
 					{@const dist = idx - currentLyricIndex}
 					{@const isActive = dist === 0 && currentLyricIndex >= 0}
 					{@const isPast = idx < currentLyricIndex}
-					{@const isNear = dist === 1 || dist === -1}
+					{@const isNear = currentLyricIndex >= 0 && !isActive && (dist === 1 || dist === -1)}
 					<button
 						bind:this={lyricEls[idx]}
 						class="lyric-line"
@@ -449,7 +449,7 @@
 	.level-pill {
 		font-size: 11px;
 		font-weight: 700;
-		color: white;
+		color: var(--paper);
 		padding: 3px 9px;
 		border-radius: 99px;
 	}
@@ -639,11 +639,11 @@
 		justify-content: center;
 		background: var(--hinomaru-red);
 		border-color: transparent;
-		color: white;
+		color: var(--paper);
 		border-radius: 14px;
 	}
 	.ctrl-main:not(:disabled):hover {
-		background: var(--hinomaru-red-ink);
+		filter: brightness(0.88);
 	}
 
 	.speed-group {
@@ -667,7 +667,7 @@
 	.speed-btn.active {
 		background: var(--sumi);
 		border-color: transparent;
-		color: white;
+		color: var(--paper);
 	}
 	.speed-btn:not(.active):hover { background: var(--ink-100); }
 
@@ -753,19 +753,19 @@
 	/* ── Lyrics — Apple Music style ── */
 	.lyrics-scroll {
 		position: relative;
-		height: 420px;
+		height: 360px;
 		overflow-y: scroll;
 		overflow-x: hidden;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 		scroll-behavior: smooth;
-		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
-		mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+		mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
 	}
 	.lyrics-scroll::-webkit-scrollbar { display: none; }
 
-	.lyrics-spacer-top  { height: 160px; }
-	.lyrics-spacer-bottom { height: 200px; }
+	.lyrics-spacer-top    { height: 120px; flex-shrink: 0; }
+	.lyrics-spacer-bottom { height: 120px; flex-shrink: 0; }
 
 	.lyric-line {
 		display: block;
@@ -773,27 +773,26 @@
 		text-align: left;
 		background: none;
 		border: none;
-		padding: 7px 16px;
+		padding: 8px 16px;
 		cursor: pointer;
-		transition:
-			opacity 380ms cubic-bezier(0.4, 0, 0.2, 1),
-			transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
-		opacity: 0.28;
-		transform: scale(0.9);
+		transition: opacity 350ms cubic-bezier(0.4, 0, 0.2, 1),
+		            transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+		opacity: 0.25;
+		transform: scale(0.88);
 		transform-origin: left center;
 		will-change: opacity, transform;
 		font-family: inherit;
 	}
-	.lyric-line:hover { opacity: 0.55; }
+	.lyric-line:hover { opacity: 0.5; }
 
 	.lyric-line.near {
 		opacity: 0.55;
-		transform: scale(0.95);
+		transform: scale(0.94);
 	}
 
 	.lyric-line.past {
-		opacity: 0.22;
-		transform: scale(0.88);
+		opacity: 0.2;
+		transform: scale(0.86);
 	}
 
 	.lyric-line.active {
@@ -801,47 +800,36 @@
 		transform: scale(1);
 	}
 
+	/* Fixed font-size — no layout reflow on line change */
 	.lyric-jp {
-		font-size: 20px;
+		font-size: 22px;
 		font-weight: 600;
 		color: var(--fg-primary);
 		line-height: 1.35;
-		transition: font-size 380ms cubic-bezier(0.4, 0, 0.2, 1), color 380ms ease;
-	}
-
-	.lyric-line.active .lyric-jp {
-		font-size: 26px;
-		font-weight: 700;
-		color: var(--fg-primary);
-	}
-
-	.lyric-line.past .lyric-jp {
-		font-size: 17px;
 	}
 
 	.lyric-romaji {
-		font-size: 12px;
+		font-size: 13px;
 		color: var(--fg-tertiary);
 		margin-top: 3px;
 		line-height: 1.3;
 	}
 
 	.lyric-line.active .lyric-romaji {
-		font-size: 14px;
 		color: var(--hinomaru-red);
-		opacity: 0.8;
+		opacity: 0.85;
 	}
 
 	.lyric-translation {
-		font-size: 14px;
+		font-size: 13px;
 		color: var(--fg-secondary);
-		margin-top: 6px;
+		margin-top: 5px;
 		line-height: 1.4;
-		animation: fadeSlideIn 280ms cubic-bezier(0.4, 0, 0.2, 1) both;
+		animation: fadeSlideIn 260ms cubic-bezier(0.4, 0, 0.2, 1) both;
 	}
 
 	@keyframes fadeSlideIn {
-		from { opacity: 0; transform: translateY(4px); }
+		from { opacity: 0; transform: translateY(3px); }
 		to   { opacity: 1; transform: translateY(0); }
 	}
 

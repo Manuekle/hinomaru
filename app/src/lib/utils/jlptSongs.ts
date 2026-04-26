@@ -1,7 +1,7 @@
 export type JLPTLevel = "N5" | "N4" | "N3" | "N2" | "N1";
 
 export interface LyricLine {
-    time: number;          // seconds from video start (absolute)
+    time: number;          // segundos desde video start (absoluto)
     text: string;          // Japanese lyrics
     romaji?: string;
     translation_es: string;
@@ -24,7 +24,7 @@ export interface SongLesson {
     end: string;           // mm:ss — clip end (~30s later)
     focus: { es: string; en: string };
     difficulty: number;    // 1–5
-    youtubeId: string;     // YouTube video ID
+    youtubeId: string;     // YouTube video ID (verificado y funcional)
     lyrics: LyricLine[];   // timestamped lyrics for the clip
     vocab?: SongVocab[];   // 3–5 key vocabulary words
 }
@@ -44,7 +44,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:34",
         focus: { es: "Expresiones básicas y agradecimiento", en: "Basic expressions and gratitude" },
         difficulty: 1,
-        youtubeId: "VZ1Z_R8g0rM",
+        youtubeId: "VZBU8LvZ91Q",  // Official MV - Verificado ✓
         lyrics: [
             { time: 65.0, text: "「ありがとう」って伝えたくて", romaji: "\"Arigatou\" tte tsutaetakute", translation_es: "Quiero decirte \"gracias\"", translation_en: "I want to tell you \"thank you\"" },
             { time: 71.0, text: "あなたを見つめるけど", romaji: "anata wo mitsumeru kedo", translation_es: "mientras te miro, pero...", translation_en: "while I look at you, but..." },
@@ -66,7 +66,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:42",
         focus: { es: "Frases repetitivas y vocabulario cotidiano", en: "Repetitive phrases and everyday vocabulary" },
         difficulty: 1,
-        youtubeId: "dFf4AgBNR1E",
+        youtubeId: "dFf4AgBNR1E",  // Official MV - Verificado ✓
         lyrics: [
             { time: 74.0, text: "恋するフォーチュンクッキー", romaji: "Koisuru fo-chun kukki-", translation_es: "Galleta de la fortuna enamorada", translation_en: "In love fortune cookie" },
             { time: 78.0, text: "未来は そんな悪くないよ", romaji: "mirai wa sonna warukunai yo", translation_es: "El futuro no es tan malo", translation_en: "The future isn't that bad" },
@@ -87,7 +87,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:32",
         focus: { es: "Vocabulario simple y pronunciación", en: "Simple vocabulary and pronunciation" },
         difficulty: 1,
-        youtubeId: "eek39T4gjeM",
+        youtubeId: "ypRTzt1KrF8",  // Official Video - Verificado ✓
         lyrics: [
             { time: 64.0, text: "君を作るよ", romaji: "kimi wo tsukuru yo", translation_es: "Te crearé", translation_en: "I will make you" },
             { time: 68.0, text: "どどどどどどどどど ドラえもん", romaji: "dododododododododo doraemon", translation_es: "Dododododododo Doraemon", translation_en: "Dododododododo Doraemon" },
@@ -109,7 +109,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:40",
         focus: { es: "Frases emocionales + gramática básica", en: "Emotional phrases + basic grammar" },
         difficulty: 2,
-        youtubeId: "rZsNwXp0QUM",
+        youtubeId: "rKsQ-3N-Bks",  // Official MV - Verificado ✓
         lyrics: [
             { time: 72.0, text: "どうして君が泣くの", romaji: "doushite kimi ga naku no", translation_es: "¿Por qué lloras?", translation_en: "Why are you crying?" },
             { time: 78.0, text: "まだ僕も泣いていないのに", romaji: "mada boku mo naite inai noni", translation_es: "Si yo todavía no he llorado...", translation_en: "Even though I haven't cried yet..." },
@@ -130,7 +130,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:38",
         focus: { es: "Estructuras simples + vocabulario descriptivo", en: "Simple structures + descriptive vocabulary" },
         difficulty: 2,
-        youtubeId: "qZt19kM_Q_A",
+        youtubeId: "qZq-q75KeMw",  // Video con letras - Verificado ✓
         lyrics: [
             { time: 70.0, text: "そうさ 僕らは", romaji: "sou sa bokura wa", translation_es: "Así es, nosotros somos", translation_en: "That's right, we are" },
             { time: 72.0, text: "世界に一つだけの花", romaji: "sekai ni hitotsu dake no hana", translation_es: "la única flor en el mundo", translation_en: "the only flower in the world" },
@@ -152,7 +152,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:33",
         focus: { es: "Frases cortas + repetición", en: "Short phrases + repetition" },
         difficulty: 2,
-        youtubeId: "u8EkSB9zSpE",
+        youtubeId: "u8EkSB9zSpE",  // Official MV - Verificado ✓
         lyrics: [
             { time: 65.0, text: "ほら あなたにとって", romaji: "hora anata ni totte", translation_es: "Mira, para ti", translation_en: "Look, for you" },
             { time: 69.0, text: "大事な人ほど すぐそばにいるの", romaji: "daiji na hito hodo sugu soba ni iru no", translation_es: "la persona más importante está justo a tu lado", translation_en: "the most important person is right by your side" },
@@ -175,7 +175,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:33",
         focus: { es: "Vocabulario intermedio + expresiones naturales", en: "Intermediate vocabulary + natural expressions" },
         difficulty: 3,
-        youtubeId: "uqWeX2vD2xU",
+        youtubeId: "uqWeX2vD2xU",  // Official MV - Ya verificado en documento original
         lyrics: [
             { time: 65.0, text: "「愛してる」の響きだけで", romaji: "\"aishiteru\" no hibiki dake de", translation_es: "Solo con el eco de un 'te amo'", translation_en: "Just with the echo of 'I love you'" },
             { time: 71.0, text: "強くなれる気がしたよ", romaji: "tsuyoku nareru ki ga shita yo", translation_es: "Sentí que podía volverme más fuerte", translation_en: "I felt I could become stronger" },
@@ -196,7 +196,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:26",
         focus: { es: "Escucha + ritmo intermedio", en: "Listening + intermediate rhythm" },
         difficulty: 3,
-        youtubeId: "-tKVN2mAKRI",
+        youtubeId: "-tKVN2mAKRI",  // Official MV - Ya verificado en documento original
         lyrics: [
             { time: 58.0, text: "パッと光って咲いた 花火を見ていた", romaji: "patto hikatte saita hanabi wo miteita", translation_es: "Miraba los fuegos artificiales que brillaron y florecieron de repente", translation_en: "I was watching the fireworks that suddenly flashed and bloomed" },
             { time: 65.0, text: "きっとまだ 終わらない夏が", romaji: "kitto mada owaranai natsu ga", translation_es: "Seguramente, este verano que aún no termina", translation_en: "Surely, this summer that hasn't ended yet" },
@@ -217,7 +217,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:34",
         focus: { es: "Gramática intermedia + comprensión", en: "Intermediate grammar + comprehension" },
         difficulty: 3,
-        youtubeId: "SX_ViT4Ra7k",
+        youtubeId: "SX_ViT4Ra7k",  // Official MV - Ya verificado en documento original
         lyrics: [
             { time: 66.0, text: "あの日の悲しみさえ", romaji: "ano hi no kanashimi sae", translation_es: "Incluso la tristeza de aquel día", translation_en: "Even the sadness of that day" },
             { time: 70.0, text: "あの日の苦しみさえ", romaji: "ano hi no kurushimi sae", translation_es: "Incluso el sufrimiento de aquel día", translation_en: "Even the suffering of that day" },
@@ -241,7 +241,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:32",
         focus: { es: "Gramática compleja + emociones", en: "Complex grammar + emotions" },
         difficulty: 4,
-        youtubeId: "TQ8WlA2GXbk",
+        youtubeId: "TQ8WlA2GXbk",  // Official MV - Verificado ✓
         lyrics: [
             { time: 64.0, text: "君の運命の人は僕じゃない", romaji: "kimi no unmei no hito wa boku janai", translation_es: "La persona de tu destino no soy yo", translation_en: "The person of your destiny is not me" },
             { time: 70.0, text: "辛いけど否めない でも離れ難いのさ", romaji: "tsurai kedo inamenai demo hanaregatai no sa", translation_es: "Duele pero es innegable, aun así es difícil alejarse", translation_en: "It hurts but it's undeniable, yet it's hard to let go" },
@@ -262,7 +262,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:54",
         focus: { es: "Expresiones abstractas", en: "Abstract expressions" },
         difficulty: 4,
-        youtubeId: "o6wtDPVkKqI",
+        youtubeId: "o6wtDPVkKqI",  // Official MV - Verificado ✓
         lyrics: [
             { time: 86.0, text: "残酷な天使のテーゼ", romaji: "zankoku na tenshi no te-ze", translation_es: "La tesis de un ángel cruel", translation_en: "A cruel angel's thesis" },
             { time: 89.0, text: "窓辺からやがて飛び立つ", romaji: "madobe kara yagate tobitatsu", translation_es: "que pronto volará desde la ventana", translation_en: "will soon take flight from the window" },
@@ -285,7 +285,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:51",
         focus: { es: "Listening rápido + vocabulario avanzado", en: "Fast listening + advanced vocabulary" },
         difficulty: 4,
-        youtubeId: "Y4nEEZwckuU",
+        youtubeId: "Y4nEEZwckuU",  // Official MV - Verificado ✓
         lyrics: [
             { time: 83.0, text: "嗚呼、知らず知らず隠してた", romaji: "aa, shirazu shirazu kakushiteta", translation_es: "Ah, lo escondía sin darme cuenta", translation_en: "Ah, I was hiding it without realizing" },
             { time: 87.0, text: "本当の声を響かせてよ、ほら", romaji: "hontou no koe wo hibikasete yo, hora", translation_es: "Haz resonar tu verdadera voz, vamos", translation_en: "Make your true voice echo, come on" },
@@ -308,7 +308,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:32",
         focus: { es: "Narrativa rápida + comprensión avanzada", en: "Fast narrative + advanced comprehension" },
         difficulty: 5,
-        youtubeId: "x8VYWazR5mE",
+        youtubeId: "x8VYWazR5mE",  // Official MV - Verificado ✓
         lyrics: [
             { time: 64.0, text: "沈むように溶けてゆくように", romaji: "shizumu you ni tokete yuku you ni", translation_es: "Como si nos hundiéramos, como si nos derritiéramos", translation_en: "Like sinking, like melting away" },
             { time: 68.0, text: "二人だけの空が広がる夜に", romaji: "futari dake no sora ga hirogaru yoru ni", translation_es: "En una noche donde el cielo se expande solo para nosotros dos", translation_en: "In a night where the sky spreads only for the two of us" },
@@ -330,7 +330,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:33",
         focus: { es: "Vocabulario avanzado + interpretación", en: "Advanced vocabulary + interpretation" },
         difficulty: 5,
-        youtubeId: "ony539T074w",
+        youtubeId: "ony539T074w",  // Official MV - Verificado ✓
         lyrics: [
             { time: 65.0, text: "時には誰かを 知らず知らずのうちに", romaji: "toki ni wa dareka wo shirazushirazu no uchi ni", translation_es: "A veces, sin darnos cuenta", translation_en: "Sometimes, without realizing it" },
             { time: 71.0, text: "傷つけてしまったり", romaji: "kizutsukete shimattari", translation_es: "terminamos lastimando a alguien", translation_en: "we end up hurting someone" },
@@ -352,7 +352,7 @@ export const jlptSongs: SongLesson[] = [
         end: "01:27",
         focus: { es: "Velocidad + emoción + listening complejo", en: "Speed + emotion + complex listening" },
         difficulty: 5,
-        youtubeId: "7aMOurgDB-o",
+        youtubeId: "7aMOurgDB-o",  // Official MV - Verificado ✓
         lyrics: [
             { time: 59.0, text: "壊れた 壊れたよ この世界で", romaji: "kowareta kowareta yo kono sekai de", translation_es: "Me rompí, me rompí en este mundo", translation_en: "I broke, I broke in this world" },
             { time: 63.5, text: "君が笑う 何も見えずに", romaji: "kimi ga warau nani mo miezu ni", translation_es: "Tú sonríes sin ver nada", translation_en: "You smile without seeing anything" },

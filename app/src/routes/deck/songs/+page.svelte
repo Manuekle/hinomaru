@@ -192,7 +192,7 @@
 		border-radius: 12px;
 	}
 	.level-tab.active {
-		color: white;
+		color: var(--paper);
 	}
 
 	/* Song list */
