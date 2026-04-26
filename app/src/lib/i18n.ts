@@ -143,6 +143,12 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.footer.crafted': 'Crafted for the love of language.',
 		'landing.hero.dailyGoal': 'Daily Goal',
 		'landing.cta.subtitle': 'Free forever for beginners. Pro tools for masters.',
+		'landing.immersion.title': 'Deep Cultural Immersion',
+		'landing.immersion.desc': 'Read daily stories and learn with your favorite J-pop songs. Language learning is better with context.',
+		'landing.gamification.title': 'Stay Motivated',
+		'landing.gamification.desc': 'Earn XP, level up, and maintain your streak. Turn your study habit into a rewarding game.',
+		'landing.srs.title': 'Science of Memory',
+		'landing.srs.desc': 'Our Spaced Repetition System (SRS) ensures you never forget what you\'ve learned.',
 		'landing.testimonial':
 			"The most beautiful Japanese study tool I've ever used. It makes Kanji practice feel like a meditation.",
 		'landing.testimonial.author': 'SATO-SAN, TOKYO',
@@ -491,6 +497,12 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.hero.dailyGoal': 'Meta del día',
 		'landing.cta.subtitle':
 			'Gratis para siempre para principiantes. Herramientas pro para maestros.',
+		'landing.immersion.title': 'Inmersión Cultural Profunda',
+		'landing.immersion.desc': 'Lee historias diarias y aprende con tus canciones favoritas de J-pop. El idioma se aprende mejor con contexto.',
+		'landing.gamification.title': 'Mantén la Motivación',
+		'landing.gamification.desc': 'Gana XP, sube de nivel y mantén tu racha. Convierte tu hábito de estudio en un juego gratificante.',
+		'landing.srs.title': 'Ciencia de la Memoria',
+		'landing.srs.desc': 'Nuestro Sistema de Repetición Espaciada (SRS) asegura que nunca olvides lo que has aprendido.',
 		'landing.testimonial':
 			'La herramienta de estudio de japonés más bonita que he usado. El kanji se siente como una meditación.',
 		'landing.testimonial.author': 'SATO-SAN, TOKIO',

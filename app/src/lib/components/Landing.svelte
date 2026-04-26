@@ -9,7 +9,9 @@
 		BrainIcon,
 		PencilEdit01Icon,
 		Target01Icon,
-		Download02Icon
+		Download02Icon,
+		BookOpen01Icon,
+		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 	import AppDownloadDrawer from '$lib/components/AppDownloadDrawer.svelte';
 
@@ -122,10 +124,11 @@
 				<!-- Floating UI preview cards -->
 				<div
 					use:fadeUp={{ delay: 0.8, y: 10 }}
-					style="position:absolute; bottom:20px; left:-30px; background:var(--bg-surface); padding:16px 24px; border-radius:20px; box-shadow:var(--shadow-lg); border:1px solid var(--ink-200); display:flex; align-items:center; gap:12px;"
+					class="daily-goal-card"
+					style="position:absolute; bottom:20px; left:-30px; background:var(--bg-surface); padding:16px 24px; border-radius:20px; box-shadow:var(--shadow-lg); border:1px solid var(--ink-200); display:flex; align-items:center; gap:12px; z-index:10;"
 				>
 					<span style="font-size:24px;">あ</span>
-					<div>
+					<div style="text-align:left;">
 						<div style="font-size:12px; font-weight:700;">
 							{t('landing.hero.dailyGoal', $locale)}
 						</div>
@@ -138,160 +141,98 @@
 		</div>
 	</section>
 
-	<!-- Features Grid -->
-	<section
-		style="padding:60px 24px; max-width:1100px; margin:0 auto; background:rgba(0,0,0,0.02); border-radius:48px; margin-bottom:80px;"
-	>
-		<div style="text-align:center; margin-bottom:60px;">
-			<h2 use:fadeUp style="font-size:36px; font-weight:800; letter-spacing:-0.02em;">
-				{t('landing.features.title', $locale)}
-			</h2>
+	<!-- Experience Section (Refined) -->
+	<section class="info-section" style="padding:100px 24px; max-width:1100px; margin:0 auto;">
+		<div style="text-align:center; margin-bottom:80px;">
+			<div class="label-meta" style="color:var(--hinomaru-red); margin-bottom:16px; letter-spacing:0.1em;">ESTUDIO INTELIGENTE</div>
+			<h2 use:fadeUp style="font-size:clamp(32px, 5vw, 48px); font-weight:800; letter-spacing:-0.04em;">{t('landing.features.title', $locale)}</h2>
 		</div>
-		<div
-			style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:24px;"
-		>
-			{#each features as feature, i (feature.key)}
-				<div
-					use:fadeUp={{ delay: 0.2 + i * 0.1 }}
-					role="article"
-					style="background:var(--bg-surface); border:1px solid var(--ink-200); border-radius:32px; padding:40px; box-shadow:var(--shadow-sm); transition:transform 200ms ease;"
-					onmouseenter={(e) => (e.currentTarget.style.transform = 'translateY(-4px)')}
-					onmouseleave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-				>
-					<div
-						style="width:64px; height:64px; background:var(--paper); border-radius:18px; display:flex; align-items:center; justify-content:center; margin-bottom:24px; border:1px solid var(--ink-100);"
-					>
-						<Icon icon={feature.icon} size={30} color="var(--sumi)" strokeWidth={1.5} />
-					</div>
-					<h3 style="font-size:22px; font-weight:700; margin-bottom:16px;">
-						{t(feature.key + '.title', $locale)}
-					</h3>
-					<p style="font-size:16px; color:var(--fg-secondary); line-height:1.6; margin:0;">
-						{t(feature.key + '.desc', $locale)}
-					</p>
-				</div>
-			{/each}
+
+		<div class="experience-grid">
+			<div use:fadeUp={{ delay: 0.1 }} class="experience-card">
+				<div class="minimal-icon-box"><Icon icon={BookOpen01Icon} size={28} color="var(--hinomaru-red)" /></div>
+				<h3>{t('landing.immersion.title', $locale)}</h3>
+				<p>{t('landing.immersion.desc', $locale)}</p>
+			</div>
+			<div use:fadeUp={{ delay: 0.2 }} class="experience-card">
+				<div class="minimal-icon-box"><Icon icon={SparklesIcon} size={28} color="var(--sumi)" /></div>
+				<h3>{t('landing.gamification.title', $locale)}</h3>
+				<p>{t('landing.gamification.desc', $locale)}</p>
+			</div>
+			<div use:fadeUp={{ delay: 0.3 }} class="experience-card">
+				<div class="minimal-icon-box"><Icon icon={BrainIcon} size={28} color="var(--sumi)" /></div>
+				<h3>{t('landing.srs.title', $locale)}</h3>
+				<p>{t('landing.srs.desc', $locale)}</p>
+			</div>
+		</div>
+
+		<!-- Simplified Streak Preview -->
+		<div use:fadeUp={{ delay: 0.4 }} style="margin-top:80px; text-align:center;">
+			<div style="display:inline-flex; align-items:center; gap:16px; background:var(--bg-surface); border:1px solid var(--ink-200); padding:16px 32px; border-radius:100px; box-shadow:var(--shadow-sm);">
+				<span style="font-size:28px;">🔥</span>
+				<span style="font-weight:800; color:var(--sumi); font-size:18px;">
+					{t('home.streak', $locale).replace('{n}', '15')}
+				</span>
+			</div>
 		</div>
 	</section>
 
-	<!-- Public Preview Section (SEO) -->
+	<!-- Simplified Deck Preview -->
 	{#if previewDecks.length > 0}
-		<section style="padding:40px 24px 120px; max-width:1100px; margin:0 auto; text-align:center;">
-			<div class="label-meta" style="margin-bottom:16px; opacity:0.5;">
-				{t('landing.preview.label', $locale)}
+		<section style="padding:100px 24px; max-width:800px; margin:0 auto;">
+			<div style="text-align:center; margin-bottom:48px;">
+				<div class="label-meta" style="margin-bottom:12px; opacity:0.5;">CURRÍCULO JLPT</div>
+				<h2 style="font-size:32px; font-weight:800; letter-spacing:-0.02em;">{t('landing.preview.title', $locale)}</h2>
 			</div>
-			<h2
-				use:fadeUp
-				style="font-size:40px; font-weight:800; margin-bottom:48px; letter-spacing:-0.02em;"
-			>
-				{t('landing.preview.title', $locale)}
-			</h2>
-			<div
-				style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"
-			>
+			
+			<div class="decks-list">
 				{#each previewDecks as deck (deck.id)}
-					<div
-						use:fadeUp
-						style="background:var(--bg-surface); border:1px solid var(--ink-200); border-radius:28px; padding:24px; text-align:left; position:relative; overflow:hidden;"
-					>
-						<div
-							style="position:absolute; top:-10px; right:-10px; font-size:80px; opacity:0.03; font-weight:900; pointer-events:none;"
-						>
-							{deck.level}
+					<a href="/login" class="deck-item-minimal">
+						<span class="deck-level">{deck.level}</span>
+						<div class="deck-info">
+							<h4>{$locale === 'es' ? deck.title_es || deck.title_en : deck.title_en}</h4>
+							<p>{deck.card_count} {t('home.cards', $locale).split(' ')[1]}</p>
 						</div>
-						<span class="hm-pill hm-pill-red" style="margin-bottom:16px; display:inline-block;"
-							>{deck.level}</span
-						>
-						<h4 style="font-size:20px; font-weight:700; margin:0;">
-							{$locale === 'es' ? deck.title_es || deck.title_en : deck.title_en}
-						</h4>
-						<p style="font-size:15px; color:var(--fg-secondary); margin-top:8px; line-height:1.5;">
-							{$locale === 'es' ? deck.desc_es || deck.desc_en : deck.desc_en}
-						</p>
-						<div
-							style="margin-top:20px; display:flex; justify-content:space-between; align-items:center;"
-						>
-							<span style="font-size:12px; color:var(--fg-tertiary);"
-								>{deck.card_count} {t('home.cards', $locale).split(' ')[1]}</span
-							>
-							<a
-								href="/login"
-								style="font-size:13px; font-weight:700; color:var(--hinomaru-red); text-decoration:none;"
-								>{t('landing.preview.btn', $locale)}</a
-							>
-						</div>
-					</div>
+						<Icon icon={Target01Icon} size={20} color="var(--fg-tertiary)" />
+					</a>
 				{/each}
 			</div>
-			<div style="margin-top:60px;">
-				<a
-					href="/login"
-					style="font-size:18px; color:var(--sumi); font-weight:700; text-decoration:none; border-bottom:2px solid var(--hinomaru-red); padding-bottom:4px;"
-				>
+
+			<div style="text-align:center; margin-top:40px;">
+				<a href="/login" style="font-size:15px; font-weight:700; color:var(--hinomaru-red); text-decoration:none; border-bottom:1.5px solid var(--hinomaru-red); padding-bottom:2px; transition:opacity 0.2s;" onmouseenter={(e) => e.currentTarget.style.opacity = '0.7'} onmouseleave={(e) => e.currentTarget.style.opacity = '1'}>
 					{t('landing.preview.all', $locale)}
 				</a>
 			</div>
 		</section>
 	{/if}
 
-	<!-- Testimonial / Social Proof -->
-	<section
-		style="padding:100px 24px; background:var(--sumi); color:var(--bg-surface); text-align:center; position:relative;"
-	>
-		<div style="max-width:800px; margin:0 auto;">
-			<div style="font-size:40px; margin-bottom:32px;">"</div>
-			<p
-				style="font-size:24px; font-weight:500; line-height:1.6; margin-bottom:32px; font-style:italic;"
-			>
+	<!-- Testimonial (Clean) -->
+	<section style="padding:100px 24px; text-align:center; background:rgba(0,0,0,0.015);">
+		<div style="max-width:700px; margin:0 auto;">
+			<p style="font-size:22px; font-weight:500; line-height:1.6; color:var(--sumi); font-style:italic;">
 				"{t('landing.testimonial', $locale)}"
 			</p>
-			<div class="label-meta" style="color:var(--hinomaru-red); opacity:1;">
+			<div class="label-meta" style="color:var(--hinomaru-red); margin-top:32px; font-size:12px;">
 				{t('landing.testimonial.author', $locale)}
 			</div>
 		</div>
 	</section>
 
-	<!-- Final CTA -->
+	<!-- Minimal Final CTA -->
 	<section style="padding:120px 24px; text-align:center;">
-		<h2
-			use:fadeUp
-			style="font-size:48px; font-weight:800; margin-bottom:24px; letter-spacing:-0.03em;"
-		>
-			{t('home.title', $locale)}
-		</h2>
-		<p use:fadeUp style="font-size:18px; color:var(--fg-secondary); margin-bottom:48px;">
-			{t('landing.cta.subtitle', $locale)}
-		</p>
-		<a
-			href="/login"
-			class="hm-btn hm-btn-primary hm-btn-lg"
-			style="padding:0 50px; height:68px; font-size:20px; box-shadow:0 20px 40px rgba(188,0,45,0.3);"
-		>
-			{t('auth.signup', $locale)}
-		</a>
-
-		<div style="margin-top:20px;">
-			<button
-				onclick={() => (showDownload = true)}
-				class="hm-btn hm-btn-ghost mobile-only-btn"
-				style="padding:0 28px; height:52px; font-size:16px; display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--ink-200);"
-			>
-				<Icon icon={Download02Icon} size={18} strokeWidth={1.5} />
-				Descargar app
-			</button>
-		</div>
-
-		<div style="margin-top:40px; max-width:400px; margin-left:auto; margin-right:auto;">
-			<a
-				href="https://ko-fi.com/manujsx"
-				target="_blank"
-				rel="noopener noreferrer"
-				style="display:inline-block; transition:transform 0.2s;"
-				onmouseenter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-				onmouseleave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-			>
-				<img src={supportImg} alt="Support on Ko-fi" style="height:48px; width:auto;" />
+		<h2 use:fadeUp style="font-size:42px; font-weight:800; margin-bottom:16px; letter-spacing:-0.03em;">{t('home.title', $locale)}</h2>
+		<p use:fadeUp style="font-size:18px; color:var(--fg-secondary); margin-bottom:48px;">{t('landing.cta.subtitle', $locale)}</p>
+		
+		<div style="display:flex; flex-direction:column; align-items:center; gap:32px;">
+			<a href="/login" class="hm-btn hm-btn-primary hm-btn-lg" style="padding:0 60px; height:64px; font-size:18px; box-shadow:var(--shadow-lg);">
+				{t('auth.signup', $locale)}
 			</a>
+			
+			<div style="display:flex; align-items:center; gap:24px; border-top:1px solid var(--ink-100); padding-top:32px; width:100%; max-width:400px; justify-content:center;">
+				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" style="transition:transform 0.2s;" onmouseenter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onmouseleave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+					<img src={supportImg} alt="Support on Ko-fi" style="height:40px; width:auto;" />
+				</a>
+			</div>
 		</div>
 	</section>
 
@@ -332,6 +273,91 @@
 <AppDownloadDrawer bind:open={showDownload} />
 
 <style>
+	.experience-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 32px;
+		text-align: center;
+	}
+	.experience-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 32px;
+		padding: 40px 32px;
+		box-shadow: var(--shadow-sm);
+		transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	.experience-card:hover {
+		transform: translateY(-8px);
+		border-color: var(--sumi);
+		box-shadow: var(--shadow-lg);
+	}
+	.experience-grid h3 {
+		font-size: 20px;
+		font-weight: 800;
+		margin: 24px 0 16px;
+		color: var(--sumi);
+	}
+	.experience-grid p {
+		font-size: 16px;
+		color: var(--fg-secondary);
+		line-height: 1.6;
+	}
+	.minimal-icon-box {
+		width: 54px;
+		height: 54px;
+		background: var(--paper);
+		border: 1px solid var(--ink-200);
+		border-radius: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 auto;
+	}
+
+	.decks-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		max-width: 600px;
+		margin: 0 auto;
+	}
+	.deck-item-minimal {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		padding: 20px 24px;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		text-decoration: none;
+		transition: all 0.2s ease;
+	}
+	.deck-item-minimal:hover {
+		border-color: var(--sumi);
+		transform: translateX(4px);
+	}
+	.deck-level {
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		font-size: 18px;
+		min-width: 40px;
+	}
+	.deck-info {
+		flex: 1;
+	}
+	.deck-info h4 {
+		margin: 0;
+		font-size: 17px;
+		font-weight: 700;
+		color: var(--sumi);
+	}
+	.deck-info p {
+		margin: 4px 0 0;
+		font-size: 13px;
+		color: var(--fg-tertiary);
+	}
+
 	@media (max-width: 900px) {
 		.hero-section {
 			grid-template-columns: 1fr !important;
@@ -339,9 +365,9 @@
 			gap: 48px !important;
 			padding-top: calc(60px + env(safe-area-inset-top)) !important;
 		}
-		p {
-			margin-left: auto;
-			margin-right: auto;
+		.experience-grid {
+			grid-template-columns: 1fr;
+			gap: 60px;
 		}
 		.stats {
 			justify-content: center !important;
@@ -350,20 +376,52 @@
 		.hero-btns {
 			justify-content: center !important;
 		}
+		section {
+			padding: 60px 24px !important;
+		}
+		h2 {
+			font-size: 32px !important;
+		}
+		.daily-goal-card {
+			left: 50% !important;
+			transform: translateX(-50%) !important;
+			bottom: -20px !important;
+		}
 	}
 
-	@media (max-width: 480px) {
+	@media (max-width: 640px) {
 		h1 {
 			font-size: 40px !important;
 		}
+		h2 {
+			font-size: 28px !important;
+		}
+		p {
+			font-size: 16px !important;
+		}
 		.stats {
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 20px !important;
+		}
+		.hero-btns {
 			flex-direction: column;
-			gap: 16px !important;
+			width: 100%;
+		}
+		.hm-btn {
+			width: 100% !important;
+			justify-content: center;
 		}
 	}
-	@media (min-width: 768px) {
-		.mobile-only-btn {
-			display: none !important;
+
+	@media (max-width: 480px) {
+		.stats {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px !important;
+		}
+		.stats > div:last-child {
+			grid-column: span 2;
 		}
 	}
 </style>
