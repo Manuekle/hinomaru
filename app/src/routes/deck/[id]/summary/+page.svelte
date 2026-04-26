@@ -125,7 +125,7 @@
 
 	<Mascot mood={mascotMood} message={mascotMessage} position="bottom-right" size={120} />
 	
-	{#if pct >= 90}
+	{#if pct >= 70}
 		<Confetti fireOnMount={true} />
 	{/if}
 </div>

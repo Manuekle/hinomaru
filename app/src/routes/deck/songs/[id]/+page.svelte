@@ -16,6 +16,8 @@
 		VolumeHighIcon
 	} from '@hugeicons/core-free-icons';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { svileo } from 'svileo';
+	import Confetti from '$lib/components/Confetti.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
 	let songId = $derived(Number($page.params.id));
@@ -37,7 +39,7 @@
 	let currentTime = $state(0);
 	let speed = $state(1);
 	let completed = $state(false);
-	let showCompletionToast = $state(false);
+	let fireConfetti = $state(false);
 	let mascotMood = $derived((isPlaying || completed ? 'happy' : 'thinking') as 'happy' | 'thinking');
 
 	let trackInterval: ReturnType<typeof setInterval> | null = null;
@@ -116,7 +118,8 @@
 		stopTracking();
 		if (!completed) {
 			completed = true;
-			showCompletionToast = true;
+			fireConfetti = true;
+			svileo.success({ title: t('songs.doneBravo', $locale), description: song?.title ?? '' });
 			try {
 				const raw = localStorage.getItem('hinomaru_songs_completed');
 				const ids: number[] = raw ? JSON.parse(raw) : [];
@@ -203,7 +206,7 @@
 		completed = false;
 		currentTime = startSec;
 		currentLyricIndex = -1;
-		showCompletionToast = false;
+		fireConfetti = false;
 		lyricEls = [];
 
 		if (!hasVideo) { prevSongId = id; return; }
@@ -329,13 +332,8 @@
 			</div>
 		</div>
 
-		<!-- Completion toast -->
-		{#if showCompletionToast}
-			<div class="toast" use:fadeIn={{ delay: 0 }}>
-				<span>🎉</span>
-				<span>{t('songs.doneBravo', $locale)}</span>
-				<button class="toast-x" onclick={() => (showCompletionToast = false)}>✕</button>
-			</div>
+		{#if fireConfetti}
+			<Confetti fireOnMount={true} />
 		{/if}
 	{/if}
 
@@ -644,29 +642,6 @@
 		background: var(--hinomaru-red);
 		border-radius: 99px;
 		transition: width 100ms linear;
-	}
-
-	/* Toast */
-	.toast {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		padding: 10px 16px;
-		border-top: 1px solid var(--ink-100);
-		border-bottom: 1px solid var(--ink-100);
-		font-size: 14px;
-		font-weight: 600;
-		color: var(--success);
-		margin-bottom: 24px;
-	}
-	.toast-x {
-		margin-left: auto;
-		background: none;
-		border: none;
-		cursor: pointer;
-		color: var(--fg-tertiary);
-		font-size: 13px;
-		padding: 0;
 	}
 
 	/* Sections */

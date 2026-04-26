@@ -434,15 +434,33 @@ export const jlptSongs: SongLesson[] = [
         title: "アイドル",
         artist: "YOASOBI",
         start: "00:00",
-        end: "01:00",
+        end: "01:30",
         focus: { es: "Crítica social y fama", en: "Social criticism and fame" },
         difficulty: 5,
-        youtubeId: "ZRtdQ81jPUQ", // ✅ verificado
+        youtubeId: "PgBvV9ofjmA", // ✅ MV oficial YOASOBI
         lyrics: [
-            { time: 5.0, text: "無敵の笑顔で荒らすメディア", romaji: "muteki no egao de arasu media", translation_es: "Arrasando los medios con una sonrisa invencible", translation_en: "Wrecking the media with an invincible smile" }
+            { time: 0.0, text: "無敵の笑顔で荒らすメディア 知りたいその秘密ミステリアス", romaji: "muteki no egao de arasu media shiritai sono himitsu misuteriasu", translation_es: "Arrasando los medios con una sonrisa invencible, quiero conocer ese secreto misterioso.", translation_en: "Wrecking the media with an invincible smile, I want to know that mysterious secret." },
+            { time: 6.0, text: "抜けてるとこさえ彼女のエリア", romaji: "nuketeru toko sae kanojo no eria", translation_es: "Incluso sus despistes son parte de su encanto.", translation_en: "Even her clumsy side is part of her territory." },
+            { time: 9.0, text: "完璧で嘘つきな君は 天才的なアイドル様", romaji: "kanpeki de usotsuki na kimi wa tensaiteki na aidoru-sama", translation_es: "Tú, perfecta y mentirosa, eres una ídolo con un talento natural.", translation_en: "You, perfect and a liar, are a genius-like idol." },
+            { time: 17.0, text: "今日何食べた？ 好きな本は？ 遊びに行くならどこに行くの？", romaji: "kyou nani tabeta? suki na hon wa? asobi ni iku nara doko ni iku no?", translation_es: "¿Qué comiste hoy? ¿Cuál es tu libro favorito? Si fueras a salir, ¿a dónde irías?", translation_en: "What did you eat today? What's your favorite book? If you go out, where do you go?" },
+            { time: 23.0, text: "何も食べてない それは内緒", romaji: "nani mo tabetenai sore wa naisho", translation_es: "No he comido nada, eso es un secreto.", translation_en: "I haven't eaten anything, that's a secret." },
+            { time: 26.0, text: "何を聞かれてものらりくらり", romaji: "nani wo kikaretemo norari kurari", translation_es: "No importa lo que me pregunten, siempre esquivo la respuesta.", translation_en: "No matter what I'm asked, I dodge the question." },
+            { time: 29.0, text: "そう淡々と だけど燦々と 見えそうで見えない蜜は蜜の味", romaji: "sou tantan to dakedo sansan to miesou de mienai mitsu wa mitsu no aji", translation_es: "Tan tranquila, pero tan radiante; el néctar que parece verse pero no, sabe a gloria.", translation_en: "So coolly, yet so brilliantly; the nectar that seems visible but isn't, tastes like honey." },
+            { time: 34.5, text: "あれもないないない これもないないない 好きなタイプは？ 相手は？ さあ答えて", romaji: "are mo nai nai nai kore mo nai nai nai suki na taipu wa? aite wa? saa kotaete", translation_es: "No tengo aquello, ni esto tampoco; ¿cuál es tu tipo? ¿tienes a alguien? Vamos, responde.", translation_en: "Don't have that, don't have this; what's your type? Who is it? Come on, answer." },
+            { time: 40.5, text: "『誰かを好きになることなんて私分からなくてさ』", romaji: "dareka wo suki ni naru koto nante watashi wakaranakute sa", translation_es: "'Eso de enamorarse de alguien es algo que yo no entiendo'.", translation_en: "'I don't really understand what it's like to fall in love with someone'." },
+            { time: 46.0, text: "嘘か本当か知り得ない そんな言葉にまた一人落ちる", romaji: "uso ka hontou ka shirienai sonna kobota ni mata hitori ochiru", translation_es: "Sin saber si es mentira o verdad, otra persona cae rendida ante esas palabras.", translation_en: "Without knowing if it's a lie or the truth, another person falls for those words again." },
+            { time: 53.0, text: "また好きにさせる", romaji: "mata suki ni saseru", translation_es: "Me haces enamorarme de ti otra vez", translation_en: "You make me fall in love with you again" },
+            { time: 55.0, text: "誰もが目を奪われていく 君は完璧で究極のアイドル", romaji: "daremo ga me wo ubawarete iku kimi wa kanpeki de kyuukyoku no aidoru", translation_es: "Robas la mirada de todo el mundo, eres la ídolo perfecta y definitiva.", translation_en: "Everyone is captivated by you, the perfect and ultimate idol." },
+            { time: 61.0, text: "金輪際現れない 一番星の生まれ変わり", romaji: "konrinzai arawarenai ichibanboshi no umarekawari", translation_es: "Nunca volverá a aparecer alguien así, eres la reencarnación de la estrella más brillante.", translation_en: "Someone like you will never appear again, the reincarnation of the first star." },
+            { time: 67.5, text: "その笑顔で愛してるで 誰も彼も虜にしていく", romaji: "sono egao de aishiteru de daremo kare mo toriko ni shite iku", translation_es: "Con esa sonrisa y tus 'te quiero', haces prisionero a todo el mundo.", translation_en: "With that smile and your 'I love you', you make everyone your captive." },
+            { time: 73.0, text: "その瞳が その言葉が 嘘でもそれは完全なアイ", romaji: "sono hitomi ga sono kobota ga uso demo sore wa kanzen na ai", translation_es: "Esos ojos, esas palabras, aunque sean mentira, son amor puro.", translation_en: "Those eyes, those words, even if they're lies, it's perfect love." }
         ],
         vocab: [
-            { jp: "無敵", kana: "むてき", romaji: "muteki", en: "invincible", es: "invencible" }
+            { jp: "無敵", kana: "むてき", romaji: "muteki", en: "invincible", es: "invencible" },
+            { jp: "燦々と", kana: "さんさんと", romaji: "sansan to", en: "brilliantly / radiantly", es: "radiante / brillantemente" },
+            { jp: "究極", kana: "きゅうきょく", romaji: "kyuukyoku", en: "ultimate / extreme", es: "definitivo / extremo" },
+            { jp: "金輪際", kana: "こんりんざい", romaji: "konrinzai", en: "never / by no means", es: "nunca / jamás" },
+            { jp: "虜", kana: "とりこ", romaji: "toriko", en: "captive / prisoner / slave (to love)", es: "cautivo / prisionero / esclavo (del amor)" }
         ]
     },
     {
