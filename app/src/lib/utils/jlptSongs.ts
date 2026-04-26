@@ -118,43 +118,56 @@ export const jlptSongs: SongLesson[] = [
     // 🟢 Nivel N4 (Básico)
     {
         level: "N4",
-        title: "ムーンライト伝説",
-        artist: "DALI",
+        title: "ブルーバード",
+        artist: "いきものがかり",
         start: "00:00",
-        end: "01:00",
-        focus: { es: "Estructuras de deseo y sentimientos", en: "Desire structures and feelings" },
-        difficulty: 2,
-        youtubeId: "6KYk5a93OC8", // ✅ CORREGIDO — TV Asahi Music / TOEI ANIMATION oficial
+        end: "01:29",
+        focus: { es: "Expresiones de vuelo y libertad", en: "Expressions of flight and freedom" },
+        difficulty: 3,
+        youtubeId: "KpsJWFuVTdI", // ✅ verificado
         lyrics: [
-            { time: 5.0, text: "ごめんね 素直じゃなくて", romaji: "gomen ne sunao janakute", translation_es: "Perdón por no ser honesta", translation_en: "I'm sorry for not being honest" },
-            { time: 10.0, text: "夢の中なら言える", romaji: "yume no naka nara ieru", translation_es: "Si es en sueños, puedo decirlo", translation_en: "If it's in a dream, I can say it" },
-            { time: 15.0, text: "思考回路はショート寸前", romaji: "shikou kairo wa shooto sunzen", translation_es: "Mis circuitos de pensamiento están a punto de hacer corto", translation_en: "My thought circuits are on the verge of shorting" },
-            { time: 20.0, text: "今すぐ会いたいよ", romaji: "ima sugu aitai yo", translation_es: "Quiero verte ahora mismo", translation_en: "I want to see you right now" }
+            { time: 1.0, text: "羽ばたいたら 戻れないと言って 目指したのは 蒼い 蒼い あの空", romaji: "habataitara modorenai to itte mezashita no wa aoi aoi ano sora", translation_es: "Dijiste que al volar no volverías. Lo que buscabas era aquel cielo azul, tan azul.", translation_en: "You said if you spread your wings, you can't come back. What you aimed for was that blue, blue sky." },
+            { time: 26.0, text: "悲しみはまだ覚えられず 切なさは今つかみはじめた", romaji: "kanashimi wa mada oboerarezu setsunasa wa ima tsukami hajimeta", translation_es: "Aún no puedo recordar la tristeza, pero he empezado a comprender la nostalgia.", translation_en: "I can't yet remember 'sadness', but I've started to grasp 'pain'." },
+            { time: 32.0, text: "あなたへと抱くこの感情も 今言葉に変わっていく", romaji: "anata e to idaku kono kanjou mo ima kotoba ni kawatte iku", translation_es: "Este sentimiento que tengo por ti, ahora se está convirtiendo en palabras.", translation_en: "This feeling I have for you is now turning into words." },
+            { time: 39.0, text: "未知なる世界の夢から目覚めて この羽を広げ飛び立つ", romaji: "michi naru sekai no yume kara mezamete kono hane wo hiroge tobitatsu", translation_es: "Despertando del sueño de un mundo desconocido, extiendo mis alas y emprendo el vuelo.", translation_en: "Waking from a dream of an unknown world, I spread these wings and fly away." },
+            { time: 51.0, text: "羽ばたいたら 戻れないと言って 目指したのは 白い 白い あの雲", romaji: "habataitara modorenai to itte mezashita no wa shiroi shiroi ano kumo", translation_es: "Dijiste que al volar no volverías. Lo que buscabas era aquella nube blanca, tan blanca.", translation_en: "You said if you spread your wings, you can't come back. What you aimed for was that white, white cloud." },
+            { time: 64.0, text: "突き抜けたら 見つかると知って 振り切るほど 蒼い 蒼い あの空", romaji: "tsukinuketara mitsukaru to shitte furikiru hodo aoi aoi ano sora", translation_es: "Sabiendo que lo encontraré si lo atravieso, aquel cielo azul, tan azul, que parece sacudirse de encima.", translation_en: "Knowing I'll find it if I break through, that blue, blue sky, enough to shake everything off." },
+            { time: 77.0, text: "蒼い 蒼い あの空 蒼い 蒼い あの空", romaji: "aoi aoi ano sora aoi aoi ano sora", translation_es: "Aquel cielo azul, tan azul. Aquel cielo azul, tan azul.", translation_en: "That blue, blue sky. That blue, blue sky." }
         ],
         vocab: [
-            { jp: "素直", kana: "すなお", romaji: "sunao", en: "honest / frank", es: "honesto / franco" },
-            { jp: "思考回路", kana: "しこうかいろ", romaji: "shikoukairo", en: "thought process", es: "circuito de pensamiento" },
-            { jp: "寸前", kana: "すんぜん", romaji: "sunzen", en: "on the verge", es: "a punto de" }
+            { jp: "羽ばたく", kana: "はばたく", romaji: "habataku", en: "to flap wings", es: "aletear" },
+            { jp: "目指す", kana: "めざす", romaji: "mezasu", en: "to aim for", es: "apuntar a" },
+            { jp: "切なさ", kana: "せつなさ", romaji: "setsunasa", en: "sadness / pain", es: "tristeza / dolor emocional" },
+            { jp: "鼓動", kana: "こどう", romaji: "kodou", en: "heartbeat", es: "latido / pulsación" },
+            { jp: "飛び立つ", kana: "とびたつ", romaji: "tobitatsu", en: "to take flight", es: "emprender el vuelo" }
         ]
     },
     {
         level: "N4",
-        title: "CHANGE THE WORLD",
-        artist: "V6",
-        start: "00:00",
-        end: "01:00",
-        focus: { es: "Forma potencial y determinación", en: "Potential form and determination" },
+        title: "光るなら (Hikaru Nara)",
+        artist: "Goose house",
+        start: "00:04.5",
+        end: "01:33",
+        focus: { es: "Estados emocionales y naturaleza", en: "Emotional states and nature" },
         difficulty: 2,
-        youtubeId: "Hok551J0Cbc", // ✅ CORREGIDO — versión original referenciada por covers oficiales
+        youtubeId: "IeJTNN8_jLI",
         lyrics: [
-            { time: 15.0, text: "I WANT TO CHANGE THE WORLD", romaji: "I want to change the world", translation_es: "Quiero cambiar el mundo", translation_en: "I want to change the world" },
-            { time: 18.0, text: "風を駆け抜けて 何も恐れずに", romaji: "kaze wo kakenukete nani mo osorezu ni", translation_es: "Atravesando el viento sin temer a nada", translation_en: "Running through the wind without fearing anything" },
-            { time: 22.0, text: "今 勇気と 笑顔の欠片抱いて", romaji: "ima yuuki to egao no kakera daite", translation_es: "Ahora, abrazando fragmentos de valor y sonrisas", translation_en: "Now, holding fragments of courage and smiles" }
+            { time: 21.5, text: "雨上がりの虹も 凛と咲いた花も", romaji: "ameagari no niji mo rin to saita hana mo", translation_es: "Tanto el arcoíris tras la lluvia como la flor que floreció valiente.", translation_en: "Both the rainbow after the rain and the flower that bloomed bravely." },
+            { time: 28.0, text: "色付きあふれだす 茜色の空 仰ぐ君に あの日恋に落ちた", romaji: "irozuki afuredasu akaneiro no sora aogu kimi ni ano hi koi ni ochita", translation_es: "Aquel día me enamoré de ti, mientras mirabas el cielo carmesí que se llenaba de colores.", translation_en: "That day I fell in love with you, as you looked up at the crimson sky filling with color." },
+            { time: 45.0, text: "瞬間のドラマティック フィルムの中のひとこまも", romaji: "shunkan no doramatikku firumu no naka no hitokoma mo", translation_es: "Incluso este momento es dramático, como una escena en una película.", translation_en: "Even this moment is dramatic, like a scene in a film." },
+            { time: 51.0, text: "消えないよ 心に刻むから", romaji: "kienai yo kokoro ni kizamu kara", translation_es: "No desaparecerá, porque lo grabaré en mi corazón.", translation_en: "It won't disappear, because I'll carve it into my heart." },
+            { time: 60.0, text: "君だよ 君なんだよ 教えてくれた", romaji: "kimi da yo kimi nan da yo oshiete kureta", translation_es: "Eres tú, eres tú quien me lo enseñó.", translation_en: "It's you, it was you who taught me." },
+            { time: 66.0, text: "暗闇も光るなら 星空になる", romaji: "kurayami mo hikaru nara hoshizora ni naru", translation_es: "Si la oscuridad también brilla, se convertirá en un cielo estrellado.", translation_en: "If even the darkness shines, it'll become a starry sky." },
+            { time: 72.0, text: "悲しみを笑顔に もう隠さないで", romaji: "kanashimi wo egao ni mou kakusanaide", translation_es: "Convirtiendo la tristeza en sonrisas, ya no la escondas más.", translation_en: "Turning sadness into smiles, don't hide it anymore." },
+            { time: 78.0, text: "煌めく どんな星も 君を照らすから", romaji: "kirameku donna hoshi mo kimi wo terasu kara", translation_es: "Porque cualquier estrella que brille te iluminará.", translation_en: "Because any star that sparkles will shine on you." },
+            { time: 86.0, text: "眠りも忘れて 迎えた朝日が", romaji: "nemuri mo wasurete mukaeta asahi ga", translation_es: "Olvidando el sueño, el sol de la mañana que recibí.", translation_en: "Forgetting sleep, the morning sun I greeted." },
         ],
         vocab: [
-            { jp: "駆け抜ける", kana: "かけぬける", romaji: "kakenukeru", en: "to run through", es: "atravesar corriendo" },
-            { jp: "恐れる", kana: "おそれる", romaji: "osoreru", en: "to fear", es: "temer" },
-            { jp: "欠片", kana: "かけら", romaji: "kakera", en: "fragment / piece", es: "fragmento / pedazo" }
+            { jp: "光る", kana: "ひかる", romaji: "hikaru", en: "to shine", es: "brillar" },
+            { jp: "星空", kana: "ほしぞら", romaji: "hoshizora", en: "starry sky", es: "cielo estrellado" },
+            { jp: "笑顔", kana: "えがお", romaji: "egao", en: "smile", es: "sonrisa" },
+            { jp: "瞬間", kana: "しゅんかん", romaji: "shunkan", en: "moment / instant", es: "momento / instante" },
+            { jp: "震える", kana: "ふるえる", romaji: "furueru", en: "to tremble", es: "temblar" }
         ]
     },
     {
@@ -179,26 +192,6 @@ export const jlptSongs: SongLesson[] = [
     },
 
     // 🟡 Nivel N3 (Intermedio)
-    {
-        level: "N3",
-        title: "ブルーバード",
-        artist: "いきものがかり",
-        start: "00:00",
-        end: "01:00",
-        focus: { es: "Expresiones de vuelo y libertad", en: "Expressions of flight and freedom" },
-        difficulty: 3,
-        youtubeId: "KpsJWFuVTdI", // ✅ verificado
-        lyrics: [
-            { time: 15.0, text: "羽ばたいたら 戻れないと言って", romaji: "habataitara modorenai to itte", translation_es: "Dijo que una vez que extiendas las alas, no podrás volver", translation_en: "You said if you spread your wings, you can't come back" },
-            { time: 20.0, text: "目指したのは 蒼い 蒼い あの空", romaji: "mezashita no wa aoi aoi ano sora", translation_es: "Lo que buscabas era aquel cielo azul, tan azul", translation_en: "What you aimed for was that blue, blue sky" },
-            { time: 25.0, text: "「悲しみ」はまだ覚えられず 「切なさ」は今つかみはじめた", romaji: "kanashimi wa mada oboerarezu setsunasa wa ima tsukami hajimeta", translation_es: "Aún no puedo recordar la tristeza, pero he empezado a comprender la nostalgia", translation_en: "I can't yet remember 'sadness', but I've started to grasp 'pain'" }
-        ],
-        vocab: [
-            { jp: "羽ばたく", kana: "はばたく", romaji: "habataku", en: "to flap wings", es: "aletear" },
-            { jp: "目指す", kana: "めざす", romaji: "mezasu", en: "to aim for", es: "apuntar a / dirigirse a" },
-            { jp: "切なさ", kana: "せつなさ", romaji: "setsunasa", en: "sadness / pain", es: "tristeza / dolor emocional" }
-        ]
-    },
     {
         level: "N3",
         title: "Catch the Moment",
