@@ -63,54 +63,30 @@
 				</div>
 			</div>
 
-			<div
-				style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px;"
-			>
-				<div
-					style="font-size:24px;font-weight:400;color:var(--sumi);line-height:1;display:flex;align-items:center;gap:4px;"
-				>
-					{data.streak} <span style="font-size:18px;">🔥</span>
+			<div style="text-align:right;display:flex;align-items:center;gap:12px;">
+				<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+					<div style="font-size:24px;font-weight:800;color:var(--sumi);line-height:1;display:flex;align-items:center;gap:4px;">
+						{data.streak} <span style="font-size:18px;">🔥</span>
+					</div>
+					<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-tertiary);">
+						{t('home.streak', $locale, { n: '' }).replace(':', '').trim()}
+					</div>
 				</div>
-				<div
-					style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-tertiary);"
-				>
-					{t('home.streak', $locale, { n: '' }).replace(':', '').trim()}
-				</div>
+				<a href="/settings" class="dashboard-settings-btn" aria-label="Settings" style="margin-right:-10px;">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+						<circle cx="12" cy="12" r="3"></circle>
+					</svg>
+				</a>
 			</div>
 		</div>
 
-		<div
-			style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;"
+		<h1
+			use:fadeUp={{ delay: 0.06, y: 16 }}
+			style="font-size:36px;font-weight:800;letter-spacing:-0.03em;margin:0 0 4px;"
 		>
-			<h1
-				use:fadeUp={{ delay: 0.06, y: 16 }}
-				style="font-size:36px;font-weight:800;letter-spacing:-0.03em;margin:0;"
-			>
-				{t('home.title', $locale)}
-			</h1>
-			<a
-				href="/settings"
-				class="dashboard-settings-btn"
-				aria-label="Settings"
-				style="margin-top:-6px;"
-			>
-				<svg
-					width="20"
-					height="20"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path
-						d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
-					></path>
-					<circle cx="12" cy="12" r="3"></circle>
-				</svg>
-			</a>
-		</div>
+			{t('home.title', $locale)}
+		</h1>
 
 		<p
 			use:fadeUp={{ delay: 0.12, y: 12 }}
