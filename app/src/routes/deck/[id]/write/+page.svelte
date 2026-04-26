@@ -10,7 +10,7 @@
 	import { calculateNextReview, mapPerformanceToQuality, type SRSState } from '$lib/srs';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import Mascot from '$lib/components/Mascot.svelte';
+	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import {
 		Eraser01Icon,
@@ -486,15 +486,9 @@
 					</div>
 				</div>
 
-				<!-- HanziWriter Canvas -->
 				{#if loadingWriters}
 					<div class="loading-state">
-						<Mascot
-							mood="thinking"
-							message={t('session.loadingStroke', $locale)}
-							position="center"
-							size={140}
-						/>
+						<DotLoader size={7} />
 					</div>
 				{/if}
 

@@ -14,7 +14,9 @@
 		try {
 			const raw = localStorage.getItem('hinomaru_songs_completed');
 			if (raw) completedIds = JSON.parse(raw);
-		} catch { completedIds = []; }
+		} catch {
+			completedIds = [];
+		}
 	});
 
 	const filtered = $derived(
@@ -61,9 +63,7 @@
 				<div class="row-body">
 					<div class="row-top">
 						<span class="row-title jp">{song.title}</span>
-						{#if done}
-							<span class="tag tag-done">✓</span>
-						{:else if !ready}
+						{#if !ready}
 							<span class="tag tag-soon">{t('songs.comingSoon', $locale)}</span>
 						{/if}
 					</div>
@@ -72,7 +72,9 @@
 				</div>
 
 				<div class="row-meta">
-					<span class="row-diff">{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span>
+					<span class="row-diff"
+						>{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span
+					>
 					<span class="row-arrow">→</span>
 				</div>
 			</a>
@@ -95,10 +97,14 @@
 		margin-bottom: 20px;
 		transition: color 150ms;
 	}
-	.back:hover { color: var(--fg-primary); }
+	.back:hover {
+		color: var(--fg-primary);
+	}
 
 	/* Hero */
-	.hero { margin-bottom: 28px; }
+	.hero {
+		margin-bottom: 28px;
+	}
 
 	.hero h1 {
 		font-size: 38px;
@@ -147,7 +153,10 @@
 	}
 
 	/* List */
-	.list { display: flex; flex-direction: column; }
+	.list {
+		display: flex;
+		flex-direction: column;
+	}
 
 	.row {
 		display: flex;
@@ -160,10 +169,19 @@
 		transition: background 150ms;
 		border-radius: 4px;
 	}
-	.row:first-child { border-top: 1px solid var(--ink-100); }
-	.row:hover .row-title { color: var(--hinomaru-red); }
-	.row:hover .row-arrow { color: var(--hinomaru-red); transform: translateX(3px); }
-	.row.done .row-num { color: var(--success); }
+	.row:first-child {
+		border-top: 1px solid var(--ink-100);
+	}
+	.row:hover .row-title {
+		color: var(--hinomaru-red);
+	}
+	.row:hover .row-arrow {
+		color: var(--hinomaru-red);
+		transform: translateX(3px);
+	}
+	.row.done .row-num {
+		color: var(--success);
+	}
 
 	.row-num {
 		font-size: 11px;
@@ -175,7 +193,10 @@
 		letter-spacing: 0.02em;
 	}
 
-	.row-body { flex: 1; min-width: 0; }
+	.row-body {
+		flex: 1;
+		min-width: 0;
+	}
 
 	.row-top {
 		display: flex;
@@ -243,6 +264,8 @@
 	.row-arrow {
 		font-size: 14px;
 		color: var(--fg-tertiary);
-		transition: color 150ms, transform 150ms;
+		transition:
+			color 150ms,
+			transform 150ms;
 	}
 </style>

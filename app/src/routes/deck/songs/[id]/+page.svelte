@@ -18,6 +18,7 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { svileo } from 'svileo';
 	import Confetti from '$lib/components/Confetti.svelte';
+	import DotLoader from '$lib/components/DotLoader.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
 	let songId = $derived(Number($page.params.id));
@@ -44,9 +45,36 @@
 
 	let trackInterval: ReturnType<typeof setInterval> | null = null;
 
+	// ── Vocab saving ───────────────────────────────────────────────
+	const supabase = $derived($page.data.supabase);
+	let savedVocab = $state(new Set<string>());
+	let savingVocab = $state(new Set<string>());
+
+	async function saveVocabWord(word: { jp: string; kana: string; romaji?: string; en: string; es: string }) {
+		if (savedVocab.has(word.jp) || savingVocab.has(word.jp)) return;
+		savingVocab = new Set([...savingVocab, word.jp]);
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (!user) return;
+			const { error } = await supabase.from('user_saved_words').insert({
+				user_id: user.id,
+				jp: word.jp,
+				kana: word.kana,
+				en: word.en,
+				es: word.es
+			});
+			if (error) {
+				svileo.error({ title: 'Error', description: error.message });
+			} else {
+				savedVocab = new Set([...savedVocab, word.jp]);
+			}
+		} finally {
+			savingVocab = new Set([...savingVocab].filter(v => v !== word.jp));
+		}
+	}
+
 	// ── Lyric state ────────────────────────────────────────────────
 	let currentLyricIndex = $state(-1);
-	let lyricEls = $state<HTMLElement[]>([]);
 	let lyricsContainer = $state<HTMLElement | null>(null);
 
 	const clipProgress = $derived(
@@ -106,11 +134,11 @@
 	}
 
 	function scrollToActiveLyric(idx: number) {
-		if (idx < 0 || !lyricEls[idx] || !lyricsContainer) return;
-		const el = lyricEls[idx];
-		const container = lyricsContainer;
-		const targetScroll = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
-		container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+		if (idx < 0 || !lyricsContainer) return;
+		const buttons = lyricsContainer.querySelectorAll<HTMLElement>('.lyric-line');
+		const el = buttons[idx];
+		if (!el) return;
+		el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	}
 
 	function onClipEnd() {
@@ -207,7 +235,6 @@
 		currentTime = startSec;
 		currentLyricIndex = -1;
 		fireConfetti = false;
-		lyricEls = [];
 
 		if (!hasVideo) { prevSongId = id; return; }
 
@@ -281,7 +308,7 @@
 				<div id={playerContainerId} class="yt-embed"></div>
 				{#if !playerReady}
 					<div class="video-loading">
-						<div class="spinner"></div>
+						<DotLoader size={7} color="var(--hinomaru-red)" />
 					</div>
 				{/if}
 			</div>
@@ -342,14 +369,12 @@
 		<div class="section" use:fadeUp={{ delay: 0.2, y: 10 }}>
 			<div class="section-title">{t('songs.lyrics', $locale)}</div>
 			<div class="lyrics-scroll" bind:this={lyricsContainer}>
-				<div class="spacer"></div>
 				{#each song.lyrics as line, idx}
 					{@const dist = idx - currentLyricIndex}
 					{@const isActive = dist === 0 && currentLyricIndex >= 0}
 					{@const isPast = idx < currentLyricIndex}
 					{@const isNear = currentLyricIndex >= 0 && !isActive && (dist === 1 || dist === -1)}
 					<button
-						bind:this={lyricEls[idx]}
 						class="lyric-line"
 						class:active={isActive}
 						class:past={isPast}
@@ -372,7 +397,6 @@
 						{/if}
 					</button>
 				{/each}
-				<div class="spacer"></div>
 			</div>
 		</div>
 	{:else if hasVideo}
@@ -388,17 +412,36 @@
 			<div class="section-title">{t('songs.vocab', $locale)}</div>
 			<div class="vocab-grid">
 				{#each song.vocab as word}
-					<button class="vocab-card" onclick={() => speakJapanese(word.jp)}>
+					<div class="vocab-card">
 						<div class="vocab-top">
 							<span class="vocab-jp jp">{word.jp}</span>
-							<span class="vocab-icon"><Icon icon={VolumeHighIcon} size={13} /></span>
+							<div class="vocab-actions">
+								<button class="vocab-icon-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
+									<Icon icon={VolumeHighIcon} size={13} />
+								</button>
+								<button
+									class="vocab-save-btn"
+									class:saved={savedVocab.has(word.jp)}
+									disabled={savedVocab.has(word.jp) || savingVocab.has(word.jp)}
+									onclick={() => saveVocabWord(word)}
+									aria-label="Save"
+								>
+									{#if savingVocab.has(word.jp)}
+										<DotLoader size={4} />
+									{:else if savedVocab.has(word.jp)}
+										✓
+									{:else}
+										+
+									{/if}
+								</button>
+							</div>
 						</div>
 						<div class="vocab-kana">{word.kana}</div>
 						{#if $showRomaji && word.romaji}
 							<div class="vocab-romaji">{word.romaji}</div>
 						{/if}
 						<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
-					</button>
+					</div>
 				{/each}
 			</div>
 		</div>
@@ -521,15 +564,6 @@
 		background: #0a0a0a;
 	}
 
-	.spinner {
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		border: 2px solid rgba(255,255,255,0.1);
-		border-top-color: var(--hinomaru-red);
-		animation: spin 0.8s linear infinite;
-	}
-	@keyframes spin { to { transform: rotate(360deg); } }
 
 	/* Controls — minimal, no card wrapper */
 	.controls {
@@ -662,18 +696,17 @@
 
 	/* Lyrics — Apple Music style */
 	.lyrics-scroll {
-		height: 360px;
-		overflow-y: scroll;
+		position: relative;
+		max-height: 400px;
+		overflow-y: auto;
 		overflow-x: hidden;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
-		scroll-behavior: smooth;
-		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%);
-		mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%);
+		padding: 8px 0;
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+		mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
 	}
 	.lyrics-scroll::-webkit-scrollbar { display: none; }
-
-	.spacer { height: 120px; flex-shrink: 0; }
 
 	.lyric-line {
 		display: block;
@@ -742,16 +775,13 @@
 		flex-direction: column;
 		gap: 2px;
 		text-align: left;
-		cursor: pointer;
 		transition: border-color 150ms, background 150ms;
 		width: 100%;
-		font-family: inherit;
 	}
 	.vocab-card:hover {
-		border-color: var(--hinomaru-red);
-		background: var(--ink-100);
+		border-color: var(--ink-300);
+		background: var(--ink-50);
 	}
-	.vocab-card:active { opacity: 0.8; }
 
 	.vocab-top {
 		display: flex;
@@ -768,13 +798,52 @@
 		line-height: 1;
 	}
 
-	.vocab-icon {
-		color: var(--fg-tertiary);
-		transition: color 150ms;
+	.vocab-actions {
 		display: flex;
 		align-items: center;
+		gap: 4px;
+		flex-shrink: 0;
 	}
-	.vocab-card:hover .vocab-icon { color: var(--hinomaru-red); }
+
+	.vocab-icon-btn {
+		background: none;
+		border: none;
+		padding: 4px;
+		cursor: pointer;
+		color: var(--fg-tertiary);
+		display: flex;
+		align-items: center;
+		transition: color 150ms;
+		border-radius: 6px;
+	}
+	.vocab-icon-btn:hover { color: var(--hinomaru-red); }
+
+	.vocab-save-btn {
+		background: none;
+		border: 1px solid var(--ink-200);
+		border-radius: 6px;
+		width: 22px;
+		height: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 13px;
+		font-weight: 700;
+		cursor: pointer;
+		color: var(--fg-tertiary);
+		transition: all 150ms;
+		line-height: 1;
+	}
+	.vocab-save-btn:hover:not(:disabled) {
+		border-color: var(--hinomaru-red);
+		color: var(--hinomaru-red);
+	}
+	.vocab-save-btn.saved {
+		border-color: var(--success);
+		color: var(--success);
+		cursor: default;
+	}
+	.vocab-save-btn:disabled:not(.saved) { opacity: 0.5; }
 
 	.vocab-kana {
 		font-size: 12px;

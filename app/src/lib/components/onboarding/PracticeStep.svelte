@@ -2,7 +2,8 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
-	import { Eraser01Icon, Loading03Icon } from '@hugeicons/core-free-icons';
+	import { Eraser01Icon } from '@hugeicons/core-free-icons';
+	import DotLoader from '$lib/components/DotLoader.svelte';
 
 	let { onNext } = $props();
 
@@ -171,15 +172,9 @@
 				</button>
 			</div>
 
-			<!-- Loading spinner -->
 			{#if loadingWriters}
 				<div class="loading-state">
-					<Icon
-						icon={Loading03Icon}
-						size={20}
-						strokeWidth={2}
-						style="animation:spin 1s linear infinite;"
-					/>
+					<DotLoader size={7} />
 				</div>
 			{/if}
 

@@ -7,6 +7,7 @@
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
+	import { svileo } from 'svileo';
 
 	interface Word {
 		id?: string;
@@ -20,6 +21,7 @@
 
 	let { word, initiallySaved = false } = $props<{ word: Word | null, initiallySaved?: boolean }>();
 	let saved = $state(initiallySaved);
+	let saving = $state(false);
 
 	$effect(() => {
 		if (initiallySaved) saved = true;
@@ -28,24 +30,29 @@
 	const supabase = $derived($page.data.supabase);
 
 	async function saveWord() {
-		if (!word || saved) return;
-		const {
-			data: { user }
-		} = await supabase.auth.getUser();
-		if (!user) return;
+		if (!word || saved || saving) return;
+		saving = true;
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (!user) return;
 
-		const { error } = await supabase.from('user_saved_words').insert({
-			user_id: user.id,
-			jp: word.jp,
-			kana: word.kana,
-			romaji: word.romaji || kanaToRomaji(word.kana),
-			en: word.en,
-			es: word.es
-		});
+			const { error } = await supabase.from('user_saved_words').insert({
+				user_id: user.id,
+				jp: word.jp,
+				kana: word.kana,
+				en: word.en,
+				es: word.es
+			});
 
-		if (!error) {
-			saved = true;
-			await invalidateAll();
+			if (error) {
+				console.error('save vocab error:', error);
+				svileo.error({ title: 'Error', description: error.message });
+			} else {
+				saved = true;
+				await invalidateAll();
+			}
+		} finally {
+			saving = false;
 		}
 	}
 </script>
@@ -79,8 +86,8 @@
 
 		{#if !saved}
 			<div class="wotd-actions" use:fadeUp={{y: 5}}>
-				<button class="save-btn" onclick={saveWord}>
-					{t('wotd.save', $locale)}
+				<button class="save-btn" onclick={saveWord} disabled={saving}>
+					{saving ? '…' : t('wotd.save', $locale)}
 				</button>
 			</div>
 		{/if}

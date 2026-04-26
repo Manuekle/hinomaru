@@ -6,6 +6,7 @@
 	import { locale } from '$lib/stores/locale';
 	import { theme } from '$lib/stores/theme';
 	import { t } from '$lib/i18n';
+	import { untrack } from 'svelte';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
@@ -18,9 +19,10 @@
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
 
-	// Init locale from server cookie so SSR and client agree — prevents locale flash
+	// Init locale once from server cookie — untrack prevents reactive re-runs that override user selection
 	$effect.pre(() => {
-		locale.set(data.initialLocale ?? 'es');
+		const initial = untrack(() => data.initialLocale ?? 'es');
+		locale.set(initial);
 	});
 
 	let booting = $state(false);
@@ -34,7 +36,7 @@
 		inject({ mode: dev ? 'development' : 'production' });
 		theme.init();
 
-		// Detect PWA mode - combine server-side hint with client-side detection
+		// Detect PWA mode first, set booting state before revealing body
 		const nav = window.navigator as Navigator & { standalone?: boolean };
 		const clientPWA =
 			window.matchMedia('(display-mode: standalone)').matches ||
@@ -42,6 +44,9 @@
 
 		isPWA = data.isPWA || clientPWA;
 		booting = isPWA;
+
+		// Reveal body — was hidden by CSS in app.html to prevent SSR flash before splash renders
+		document.documentElement.classList.remove('pwa-booting');
 
 		const {
 			data: { subscription }
@@ -125,26 +130,7 @@
 	{@render children()}
 	<InstallPrompt />
 	<PWASplash visible={booting} />
-	{#if $navigating}
-		<div class="nav-bar"></div>
-	{/if}
 </div>
 
 <style>
-	.nav-bar {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 2px;
-		background: linear-gradient(90deg, transparent 0%, var(--hinomaru-red) 40%, rgba(188, 0, 45, 0.6) 60%, transparent 100%);
-		background-size: 300% 100%;
-		z-index: 10000;
-		animation: nav-shimmer 1.1s linear infinite;
-		pointer-events: none;
-	}
-	@keyframes nav-shimmer {
-		0%   { background-position: 200% 0; }
-		100% { background-position: -100% 0; }
-	}
 </style>
