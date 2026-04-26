@@ -16,7 +16,6 @@
 	let formEl = $state<HTMLElement | null>(null);
 
 	onMount(() => {
-		console.log('Login component mounted');
 		try {
 			if (brandEl)
 				animate(
@@ -114,8 +113,6 @@
 	// ── Handlers ──────────────────────────────────────────────
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
-		console.log('Submitting form in mode:', mode);
-		
 		if (!validate()) return;
 		if (!supabase) {
 			globalError = 'Supabase client not initialized';
@@ -168,7 +165,6 @@
 	}
 
 	function toggleMode(newMode: Mode) {
-		console.log('Switching to mode:', newMode);
 		mode = newMode;
 		fieldErrors = {};
 		globalError = '';
@@ -208,7 +204,7 @@
 			></span>
 			<div style="font-size:24px;font-weight:700;letter-spacing:-0.02em;">Hinomaru</div>
 			<div style="font-size:14px;color:var(--fg-secondary);text-align:center;">
-				{#if mode === 'signin'}{t('auth.signin.desc', $locale)}{:else if mode === 'signup'}{t('auth.signup.desc', $locale)}{:else}{t('auth.reset.desc', $locale)}{/if}
+				{#if mode === 'signin'}{t('auth.signin.subtitle', $locale)}{:else if mode === 'signup'}{t('auth.signup.subtitle', $locale)}{:else if mode === 'forgot'}{t('auth.forgot.subtitle', $locale)}{:else}{t('auth.magic.subtitle', $locale)}{/if}
 			</div>
 		</div>
 
@@ -217,7 +213,7 @@
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
 			>
 				<div style="font-size:40px;margin-bottom:16px;">📧</div>
-				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">{t('auth.signup.done', $locale)}</h2>
+				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">{t('auth.signup.done.title', $locale)}</h2>
 				<p style="font-size:14px;color:var(--fg-secondary);line-height:1.5;">
 					{t('auth.signup.done.desc', $locale, { email })}
 				</p>
@@ -229,14 +225,31 @@
 					{t('auth.signin', $locale)}
 				</button>
 			</div>
-		{:else if forgotDone || magicDone}
+		{:else if forgotDone}
+			<div
+				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
+			>
+				<div style="font-size:40px;margin-bottom:16px;">✉️</div>
+				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">{t('auth.forgot.done.title', $locale)}</h2>
+				<p style="font-size:14px;color:var(--fg-secondary);line-height:1.5;">
+					{t('auth.forgot.done.desc', $locale, { email })}
+				</p>
+				<button
+					onclick={() => toggleMode('signin')}
+					class="hm-btn hm-btn-secondary hm-btn-full"
+					style="margin-top:24px;"
+				>
+					{t('auth.signin', $locale)}
+				</button>
+			</div>
+		{:else if magicDone}
 			<div
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
 			>
 				<div style="font-size:40px;margin-bottom:16px;">✨</div>
-				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">{t('auth.linkSent', $locale)}</h2>
+				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">{t('auth.magic.done.title', $locale)}</h2>
 				<p style="font-size:14px;color:var(--fg-secondary);line-height:1.5;">
-					{t('auth.linkSent.desc', $locale)}
+					{t('auth.magic.done.desc', $locale, { email })}
 				</p>
 				<button
 					onclick={() => toggleMode('signin')}
@@ -284,7 +297,7 @@
 
 					<!-- Email -->
 					<div class="field">
-						<div class="label-meta" style="margin-bottom:8px;">{t('contact.email', $locale)}</div>
+						<div class="label-meta" style="margin-bottom:8px;">{t('auth.email', $locale)}</div>
 						<input
 							type="email"
 							bind:value={email}
@@ -353,7 +366,7 @@
 					<!-- Confirm Password (Signup) -->
 					{#if mode === 'signup'}
 						<div class="field">
-							<div class="label-meta" style="margin-bottom:8px;">{t('auth.confirm', $locale)}</div>
+							<div class="label-meta" style="margin-bottom:8px;">{t('auth.confirmPassword', $locale)}</div>
 							<div class="pw-wrap">
 								<input
 									type={showConfirm ? 'text' : 'password'}
@@ -403,7 +416,7 @@
 								onclick={() => toggleMode('forgot')}
 								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;text-decoration:underline;"
 							>
-								{t('auth.forgot', $locale)}
+								{t('auth.forgotPassword', $locale)}
 							</button>
 						</div>
 					{/if}
@@ -420,7 +433,7 @@
 						{:else if mode === 'signup'}
 							{t('auth.signup', $locale)}
 						{:else}
-							{t('auth.reset.btn', $locale)}
+							{#if mode === 'forgot'}{t('auth.forgot.submit', $locale)}{:else}{t('auth.magic.submit', $locale)}{/if}
 						{/if}
 					</button>
 
@@ -432,7 +445,7 @@
 								onclick={() => toggleMode('magic')}
 								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;"
 							>
-								{t('auth.magic.link', $locale)}? <span style="color:var(--sumi);font-weight:600;text-decoration:underline;">{t('auth.magic.btn', $locale)} ✨</span>
+								{t('auth.magic.hint', $locale)}? <span style="color:var(--sumi);font-weight:600;text-decoration:underline;">{t('auth.magic.hintLink', $locale)}</span>
 							</button>
 						</div>
 					{:else}
@@ -442,7 +455,7 @@
 								onclick={() => toggleMode('signin')}
 								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;text-decoration:underline;"
 							>
-								{t('auth.backToLogin', $locale)}
+								{t('auth.backToSigninBtn', $locale)}
 							</button>
 						</div>
 					{/if}

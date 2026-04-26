@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -36,7 +36,7 @@
 	let player: any = null;
 	let playerReady = $state(false);
 	let isPlaying = $state(false);
-	let currentTime = $state(startSec);
+	let currentTime = $state(0);
 	let speed = $state(1);
 	let completed = $state(false);
 	let showCompletionToast = $state(false);
@@ -95,24 +95,23 @@
 	}
 
 	function syncLyrics(time: number) {
-		if (!hasLyrics) return;
+		if (!hasLyrics || !song) return;
 		let active = -1;
-		// Add a tiny offset (0.1s) for smoother transitions
-		const adjustedTime = time + 0.1;
-		
 		for (let i = song.lyrics.length - 1; i >= 0; i--) {
-			if (song.lyrics[i].time <= adjustedTime) { active = i; break; }
+			if (song.lyrics[i].time <= time + 0.15) { active = i; break; }
 		}
-		
 		if (active !== currentLyricIndex) {
 			currentLyricIndex = active;
-			if (active >= 0 && lyricEls[active] && lyricsContainer) {
-				const el = lyricEls[active];
-				const container = lyricsContainer;
-				const targetScroll = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
-				container.scrollTo({ top: targetScroll, behavior: 'smooth' });
-			}
+			scrollToActiveLyric(active);
 		}
+	}
+
+	function scrollToActiveLyric(idx: number) {
+		if (idx < 0 || !lyricEls[idx] || !lyricsContainer) return;
+		const el = lyricEls[idx];
+		const container = lyricsContainer;
+		const targetScroll = el.offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+		container.scrollTo({ top: targetScroll, behavior: 'smooth' });
 	}
 
 	function onClipEnd() {
@@ -202,33 +201,34 @@
 		});
 	}
 
-	$effect(() => {
-		// When songId changes, reset state and re-init player
-		if (songId !== undefined) {
-			isPlaying = false;
-			completed = false;
-			currentTime = startSec;
-			currentLyricIndex = -1;
-			showCompletionToast = false;
-			
-			// Re-init player after a small delay to allow DOM to update
-			setTimeout(() => {
-				const win = window as any;
-				if (win.YT && win.YT.Player) {
-					initYT();
-				}
-			}, 50);
-		}
-	});
+	let prevSongId = -1;
 
-	onMount(() => {
-		if (!hasVideo) return;
+	$effect(() => {
+		const id = songId;
+		isPlaying = false;
+		completed = false;
+		currentTime = startSec;
+		currentLyricIndex = -1;
+		showCompletionToast = false;
+		lyricEls = [];
+
+		if (!hasVideo) { prevSongId = id; return; }
 
 		const win = window as any;
-		if (win.YT && win.YT.Player) {
+		const doInit = () => {
+			prevSongId = id;
 			initYT();
+		};
+
+		if (win.YT && win.YT.Player) {
+			// Small delay only when switching songs (not first load)
+			if (prevSongId !== -1) {
+				setTimeout(doInit, 60);
+			} else {
+				doInit();
+			}
 		} else {
-			win.onYouTubeIframeAPIReady = initYT;
+			win.onYouTubeIframeAPIReady = doInit;
 			if (!document.getElementById('yt-api-script')) {
 				const s = document.createElement('script');
 				s.id = 'yt-api-script';
@@ -285,7 +285,10 @@
 				<div id={playerContainerId} class="yt-embed"></div>
 				{#if !playerReady}
 					<div class="video-loading">
-						<div class="spinner"></div>
+						<div class="video-loading-inner">
+							<div class="spinner"></div>
+							<span class="loading-note">♪</span>
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -342,22 +345,37 @@
 		<div class="section" use:fadeUp={{ delay: 0.2, y: 12 }}>
 			<div class="section-label">{t('songs.lyrics', $locale)}</div>
 			<div class="lyrics-scroll" bind:this={lyricsContainer}>
+				<div class="lyrics-spacer-top"></div>
 				{#each song.lyrics as line, idx}
-					<div
+					{@const dist = idx - currentLyricIndex}
+					{@const isActive = dist === 0 && currentLyricIndex >= 0}
+					{@const isPast = idx < currentLyricIndex}
+					{@const isNear = dist === 1 || dist === -1}
+					<button
 						bind:this={lyricEls[idx]}
 						class="lyric-line"
-						class:active={idx === currentLyricIndex}
-						class:past={idx < currentLyricIndex}
+						class:active={isActive}
+						class:past={isPast}
+						class:near={isNear && !isActive}
+						onclick={() => {
+							if (player && playerReady) {
+								player.seekTo(line.time, true);
+								if (!isPlaying) player.playVideo();
+							}
+						}}
 					>
 						<div class="lyric-jp jp">{line.text}</div>
 						{#if $showRomaji && line.romaji}
 							<div class="lyric-romaji">{line.romaji}</div>
 						{/if}
-						<div class="lyric-translation">
-							{$locale === 'es' ? line.translation_es : line.translation_en}
-						</div>
-					</div>
+						{#if isActive}
+							<div class="lyric-translation">
+								{$locale === 'es' ? line.translation_es : line.translation_en}
+							</div>
+						{/if}
+					</button>
 				{/each}
+				<div class="lyrics-spacer-bottom"></div>
 			</div>
 		</div>
 	{:else if hasVideo}
@@ -537,16 +555,38 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--ink-700);
+		background: #0c0c0c;
+	}
+
+	.video-loading-inner {
+		position: relative;
+		width: 56px;
+		height: 56px;
 	}
 
 	.spinner {
-		width: 32px;
-		height: 32px;
-		border: 3px solid rgba(255,255,255,0.2);
-		border-top-color: var(--hinomaru-red);
+		position: absolute;
+		inset: 0;
 		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
+		border: 2px solid rgba(255, 255, 255, 0.08);
+		border-top-color: var(--hinomaru-red);
+		animation: spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+	}
+
+	.loading-note {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 20px;
+		color: rgba(255, 255, 255, 0.35);
+		animation: note-pulse 2s ease-in-out infinite;
+	}
+
+	@keyframes note-pulse {
+		0%, 100% { opacity: 0.3; transform: scale(0.92); }
+		50%       { opacity: 0.7; transform: scale(1.06); }
 	}
 
 	@keyframes spin {
@@ -710,65 +750,99 @@
 		margin: 0;
 	}
 
-	/* ── Lyrics ── */
+	/* ── Lyrics — Apple Music style ── */
 	.lyrics-scroll {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		max-height: 400px;
+		position: relative;
+		height: 420px;
+		overflow-y: scroll;
 		overflow-x: hidden;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
-		padding: 10px 0 60px;
 		scroll-behavior: smooth;
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+		mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
 	}
 	.lyrics-scroll::-webkit-scrollbar { display: none; }
 
+	.lyrics-spacer-top  { height: 160px; }
+	.lyrics-spacer-bottom { height: 200px; }
+
 	.lyric-line {
-		padding: 14px 18px;
-		border-radius: 16px;
-		transition: all 250ms ease;
-		opacity: 0.5;
-		border: 1px solid transparent;
+		display: block;
+		width: 100%;
+		text-align: left;
+		background: none;
+		border: none;
+		padding: 7px 16px;
+		cursor: pointer;
+		transition:
+			opacity 380ms cubic-bezier(0.4, 0, 0.2, 1),
+			transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+		opacity: 0.28;
+		transform: scale(0.9);
+		transform-origin: left center;
+		will-change: opacity, transform;
+		font-family: inherit;
+	}
+	.lyric-line:hover { opacity: 0.55; }
+
+	.lyric-line.near {
+		opacity: 0.55;
+		transform: scale(0.95);
 	}
 
 	.lyric-line.past {
-		opacity: 0.3;
+		opacity: 0.22;
+		transform: scale(0.88);
 	}
 
 	.lyric-line.active {
 		opacity: 1;
-		background: var(--hinomaru-red-wash);
-		border-color: rgba(188, 0, 45, 0.1);
+		transform: scale(1);
 	}
 
 	.lyric-jp {
 		font-size: 20px;
 		font-weight: 600;
 		color: var(--fg-primary);
-		line-height: 1.3;
+		line-height: 1.35;
+		transition: font-size 380ms cubic-bezier(0.4, 0, 0.2, 1), color 380ms ease;
 	}
 
 	.lyric-line.active .lyric-jp {
-		color: var(--hinomaru-red);
+		font-size: 26px;
+		font-weight: 700;
+		color: var(--fg-primary);
+	}
+
+	.lyric-line.past .lyric-jp {
+		font-size: 17px;
 	}
 
 	.lyric-romaji {
 		font-size: 12px;
 		color: var(--fg-tertiary);
-		margin-top: 2px;
+		margin-top: 3px;
+		line-height: 1.3;
 	}
 
 	.lyric-line.active .lyric-romaji {
-		color: var(--hinomaru-red-ink);
-		opacity: 0.7;
+		font-size: 14px;
+		color: var(--hinomaru-red);
+		opacity: 0.8;
 	}
 
 	.lyric-translation {
-		font-size: 13px;
+		font-size: 14px;
 		color: var(--fg-secondary);
-		margin-top: 4px;
+		margin-top: 6px;
 		line-height: 1.4;
+		animation: fadeSlideIn 280ms cubic-bezier(0.4, 0, 0.2, 1) both;
+	}
+
+	@keyframes fadeSlideIn {
+		from { opacity: 0; transform: translateY(4px); }
+		to   { opacity: 1; transform: translateY(0); }
 	}
 
 	/* ── Vocabulary ── */

@@ -4,6 +4,7 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import SupportKofi from '$lib/components/SupportKofi.svelte';
+	import DotLoader from '$lib/components/DotLoader.svelte';
 	import type { ActionData } from './$types';
 
 	let { form } = $props<{ form: ActionData }>();
@@ -111,9 +112,9 @@
 					type="submit"
 					disabled={loading}
 					class="hm-btn hm-btn-primary hm-btn-full"
-					style="height:56px; font-size:16px; opacity:{loading ? 0.7 : 1};"
+					style="height:56px; font-size:16px;"
 				>
-					{loading ? t('contact.sending', $locale) : t('contact.send', $locale)}
+					{#if loading}<DotLoader color="white" />{:else}{t('contact.send', $locale)}{/if}
 				</button>
 			</form>
 		{/if}

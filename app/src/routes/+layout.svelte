@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { invalidate, goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page, navigating } from '$app/stores';
 	import { locale } from '$lib/stores/locale';
 	import { theme } from '$lib/stores/theme';
 	import { t } from '$lib/i18n';
@@ -116,16 +116,26 @@
 	{@render children()}
 	<InstallPrompt />
 	<PWASplash visible={booting} />
+	{#if $navigating}
+		<div class="nav-bar"></div>
+	{/if}
 </div>
 
 <style>
-	@keyframes dot-pulse {
-		0%,
-		100% {
-			box-shadow: 0 0 0 0 rgba(188, 0, 45, 0);
-		}
-		50% {
-			box-shadow: 0 0 0 5px rgba(188, 0, 45, 0);
-		}
+	.nav-bar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: linear-gradient(90deg, transparent 0%, var(--hinomaru-red) 40%, rgba(188, 0, 45, 0.6) 60%, transparent 100%);
+		background-size: 300% 100%;
+		z-index: 10000;
+		animation: nav-shimmer 1.1s linear infinite;
+		pointer-events: none;
+	}
+	@keyframes nav-shimmer {
+		0%   { background-position: 200% 0; }
+		100% { background-position: -100% 0; }
 	}
 </style>

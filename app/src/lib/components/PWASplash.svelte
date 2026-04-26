@@ -70,20 +70,44 @@
 			></div>
 		</div>
 
-		<div
-			bind:this={textEl}
-			style="font-size:24px;font-weight:700;letter-spacing:-0.03em;color:var(--sumi);"
-		>
-			Hinomaru
+		<div bind:this={textEl} style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+			<div style="font-size:24px;font-weight:700;letter-spacing:-0.03em;color:var(--sumi);">
+				Hinomaru
+			</div>
+			<div class="splash-dots">
+				<span class="splash-dot"></span>
+				<span class="splash-dot" style="animation-delay:0.18s"></span>
+				<span class="splash-dot" style="animation-delay:0.36s"></span>
+			</div>
 		</div>
 
 		<!-- Bottom footer -->
 		<div
 			style="position:absolute;bottom:calc(48px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;
                font-size:12px;font-weight:600;letter-spacing:0.1em;
-               color:var(--fg-tertiary);text-transform:uppercase;opacity:0.6;"
+               color:var(--fg-tertiary);text-transform:uppercase;opacity:0.5;"
 		>
 			Japanese Mastery
 		</div>
 	</div>
 {/if}
+
+<style>
+	.splash-dots {
+		display: flex;
+		gap: 7px;
+		align-items: center;
+	}
+	.splash-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--hinomaru-red);
+		animation: sd 1.2s infinite ease-in-out;
+		opacity: 0.5;
+	}
+	@keyframes sd {
+		0%, 80%, 100% { transform: scale(0.5); opacity: 0.25; }
+		40%            { transform: scale(1);   opacity: 0.75; }
+	}
+</style>

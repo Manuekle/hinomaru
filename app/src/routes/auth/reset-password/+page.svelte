@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import DotLoader from '$lib/components/DotLoader.svelte';
 	import { z } from 'zod';
 
 	let { data } = $props();
@@ -272,7 +273,7 @@
 				{/if}
 
 				<button type="submit" class="hm-btn hm-btn-primary hm-btn-full" disabled={loading}>
-					{#if loading}<span style="opacity:0.7;">…</span>{:else}{t('auth.reset.submit', $locale)}{/if}
+					{#if loading}<DotLoader color="white" />{:else}{t('auth.reset.submit', $locale)}{/if}
 				</button>
 			</form>
 		{/if}

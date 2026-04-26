@@ -8,6 +8,7 @@
 
 	const levels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state<JLPTLevel>('N5');
+	const activeLevelIdx = $derived(levels.indexOf(activeLevel));
 	let completedIds = $state<number[]>([]);
 
 	const levelColors: Record<JLPTLevel, string> = {
@@ -59,11 +60,14 @@
 
 	<!-- Level tabs -->
 	<div class="level-tabs" use:fadeUp={{ delay: 0.14, y: 10 }}>
+		<div
+			class="tab-glider"
+			style="transform: translateX({activeLevelIdx * 100}%); background: {levelColors[activeLevel]};"
+		></div>
 		{#each levels as lvl}
 			<button
 				class="level-tab"
 				class:active={activeLevel === lvl}
-				style={activeLevel === lvl ? `--tab-color: ${levelColors[lvl]}` : ''}
 				onclick={() => (activeLevel = lvl)}
 			>
 				{lvl}
@@ -151,31 +155,43 @@
 
 	/* Level tabs */
 	.level-tabs {
+		position: relative;
 		display: flex;
-		gap: 8px;
+		background: var(--ink-100);
+		border-radius: 16px;
+		padding: 4px;
 		margin-bottom: 28px;
-		overflow-x: auto;
-		scrollbar-width: none;
-		-ms-overflow-style: none;
+		height: 44px;
 	}
-	.level-tabs::-webkit-scrollbar { display: none; }
+
+	.tab-glider {
+		position: absolute;
+		top: 4px;
+		left: 4px;
+		width: calc(20% - 4px);
+		height: calc(100% - 8px);
+		border-radius: 12px;
+		box-shadow: var(--shadow-sm);
+		transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), background 0.3s ease;
+		z-index: 1;
+		pointer-events: none;
+	}
 
 	.level-tab {
-		padding: 6px 16px;
-		border-radius: 99px;
-		border: 1.5px solid var(--ink-200);
-		background: var(--bg-surface);
+		flex: 1;
+		background: none;
+		border: none;
 		font-size: 13px;
 		font-weight: 700;
 		color: var(--fg-secondary);
 		cursor: pointer;
-		white-space: nowrap;
-		transition: all 180ms ease;
-		flex-shrink: 0;
+		position: relative;
+		z-index: 2;
+		transition: color 0.3s ease;
+		font-family: var(--font-ui);
+		border-radius: 12px;
 	}
 	.level-tab.active {
-		background: var(--tab-color, var(--hinomaru-red));
-		border-color: transparent;
 		color: white;
 	}
 
