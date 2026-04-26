@@ -314,7 +314,7 @@
 					height={48}
 					barWidth={3}
 					barGap={2}
-					speed={30}
+					speed={6}
 					fadeEdges={true}
 					barColor="var(--hinomaru-red)"
 					playing={isPlaying}

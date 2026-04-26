@@ -203,39 +203,33 @@ export const jlptSongs: SongLesson[] = [
     // 🟡 Nivel N3 (Intermedio)
     {
         level: "N3",
-        title: "Catch the Moment",
-        artist: "LiSA",
-        start: "00:00",
-        end: "01:00",
-        focus: { es: "Atesorar el presente", en: "Treasuring the present" },
-        difficulty: 3,
-        youtubeId: "LJkn2qqtijk", // ✅ CORREGIDO — Canal oficial LiSA, full MV
-        lyrics: [
-            { time: 10.0, text: "あと何回キミと笑えるの？", romaji: "ato nankai kimi to waraeru no?", translation_es: "¿Cuántas veces más podré reír contigo?", translation_en: "How many more times can I laugh with you?" },
-            { time: 15.0, text: "不確かな未来ならば いらない", romaji: "futashika na mirai naraba iranai", translation_es: "Si es un futuro incierto, no lo quiero", translation_en: "If it's an uncertain future, I don't need it" }
-        ],
-        vocab: [
-            { jp: "笑える", kana: "わらえる", romaji: "waraeru", en: "can laugh", es: "poder reír" },
-            { jp: "不確か", kana: "ふたしか", romaji: "futashika", en: "uncertain", es: "incierto" }
-        ]
-    },
-    {
-        level: "N3",
         title: "紅蓮の弓矢",
         artist: "Linked Horizon",
         start: "00:00",
-        end: "01:00",
+        end: "01:32",
         focus: { es: "Vocabulario de combate y épica", en: "Combat and epic vocabulary" },
         difficulty: 3,
-        youtubeId: "8OkpRK2_gU8", // ✅ verificado
+        youtubeId: "AW5_k_Cf4wM", // ✅ TVアニメ「進撃の巨人」ノンクレジットOP
         lyrics: [
-            { time: 60.0, text: "踏まれた花の 名前も知らずに", romaji: "fumareta hana no namae mo shirazu ni", translation_es: "Sin saber siquiera el nombre de la flor pisoteada", translation_en: "Without even knowing the name of the trampled flower" },
-            { time: 65.0, text: "地に堕ちた鳥は 風を待ちわびる", romaji: "chi ni ochita tori wa kaze wo machiwabiru", translation_es: "El ave que cayó a tierra espera ansiosa el viento", translation_en: "The bird that fell to earth waits anxiously for the wind" }
+            { time: 0.5, text: "Seid ihr das Essen? Nein, wir sind der Jäger!", romaji: "Seid ihr das Essen? Nein, wir sind der Jäger!", translation_es: "¿Sois vosotros la comida? ¡No, nosotros somos los cazadores!", translation_en: "Are you the food? No, we are the hunters!" },
+            { time: 15.0, text: "踏まれた花の 名前も知らずに", romaji: "fumareta hana no namae mo shirazu ni", translation_es: "Sin saber siquiera el nombre de la flor pisoteada.", translation_en: "Without even knowing the name of the trampled flower." },
+            { time: 20.0, text: "地に堕ちた鳥は 風を待ちわびる", romaji: "chi ni ochita tori wa kaze wo machiwabiru", translation_es: "El ave que cayó a tierra espera ansiosa el viento.", translation_en: "The bird that fell to earth waits anxiously for the wind." },
+            { time: 25.0, text: "祈ったところで 何も変わらない", romaji: "inotta tokoro de nanimo kawaranai", translation_es: "Por mucho que reces, nada cambiará.", translation_en: "No matter how much you pray, nothing will change." },
+            { time: 31.0, text: "今を変えるのは 戦う覚悟だ", romaji: "ima wo kaeru no wa tatakau kakugo da", translation_es: "Lo único que puede cambiar el ahora es la determinación de luchar.", translation_en: "What changes the present is the determination to fight." },
+            { time: 36.0, text: "屍踏み越えて 進む意志を 嗤う豚よ", romaji: "shikabane fumikoete susumu ishi wo warau buta yo", translation_es: "Cerdos que se ríen de la voluntad de avanzar sobre los cadáveres.", translation_en: "Oh pigs who mock the will to advance over corpses." },
+            { time: 41.0, text: "家畜の安寧 虚偽の繁栄", romaji: "kachiku no an'nei kyogi no han'ei", translation_es: "La paz del ganado, la prosperidad de las mentiras.", translation_en: "The peace of livestock, the prosperity of lies." },
+            { time: 44.0, text: "死せる餓狼の『自由』を！", romaji: "shiseru garou no 'jiyuu' wo!", translation_es: "¡La 'libertad' del lobo hambriento moribundo!", translation_en: "The 'freedom' of the dying hungry wolf!" },
+            { time: 47.0, text: "囚われた屈辱は 反撃の嚆矢だ", romaji: "torawareta kutsujoku wa hangeki no koushi da", translation_es: "La humillación de estar atrapado es la flecha del contraataque.", translation_en: "The humiliation of being imprisoned is the opening arrow of the counterattack." },
+            { time: 52.0, text: "城壁のその彼方 獲物を屠る イェーガー！", romaji: "jouheki no sono kanata emono wo hofuru Ieegaa!", translation_es: "Más allá de las murallas, masacra a la presa... ¡Jäger!", translation_en: "Beyond those castle walls, slaughter the prey... Jäger!" },
+            { time: 57.0, text: "迸る衝動に その身を灼きながら", romaji: "hotobashiru shoudou ni sono mi wo yakinagara", translation_es: "Mientras ardes en ese impulso que brota.", translation_en: "While burning in that surging impulse." },
+            { time: 63.0, text: "黄昏に緋を穿つ 紅蓮の弓矢", romaji: "tasogare ni hi wo ugatsu guren no yumiya", translation_es: "Perforando el carmesí en el crepúsculo, la flecha de loto carmesí.", translation_en: "Piercing the scarlet into the twilight, the crimson bow and arrow." }
         ],
         vocab: [
-            { jp: "踏む", kana: "ふむ", romaji: "fumu", en: "to step on", es: "pisar" },
-            { jp: "堕ちる", kana: "おちる", romaji: "ochiru", en: "to fall", es: "caer" },
-            { jp: "待ちわびる", kana: "まちわびる", romaji: "machiwabiru", en: "to wait anxiously", es: "esperar con ansias" }
+            { jp: "屍", kana: "しかばね", romaji: "shikabane", en: "corpse", es: "cadáver" },
+            { jp: "家畜", kana: "かちく", romaji: "kachiku", en: "livestock", es: "ganado" },
+            { jp: "自由", kana: "じゆう", romaji: "jiyuu", en: "freedom", es: "libertad" },
+            { jp: "反撃", kana: "はんげき", romaji: "hangeki", en: "counterattack", es: "contraataque" },
+            { jp: "紅蓮", kana: "ぐれん", romaji: "guren", en: "crimson / scarlet", es: "carmesí" }
         ]
     },
     {
@@ -243,16 +237,30 @@ export const jlptSongs: SongLesson[] = [
         title: "FLY HIGH!!",
         artist: "BURNOUT SYNDROMES",
         start: "00:00",
-        end: "01:00",
+        end: "01:27",
         focus: { es: "Superación y esfuerzo", en: "Overcoming and effort" },
         difficulty: 3,
         youtubeId: "txgg-fbVjf4", // ✅ MV oficial Epic Records Japan
         lyrics: [
-            { time: 10.0, text: "飛べ FLY HIGH!! 汗と血と涙の", romaji: "tobe FLY HIGH!! ase to chi to namida no", translation_es: "¡Vuela, vuela alto! De sudor, sangre y lágrimas", translation_en: "Fly, FLY HIGH!! Of sweat, blood, and tears" }
+            { time: 1.0, text: "飛べ FLY HIGH!! 汗と血と涙で", romaji: "tobe FLY HIGH!! ase to chi to namida de", translation_es: "¡Vuela, vuela alto! Con sudor, sangre y lágrimas.", translation_en: "Fly, FLY HIGH!! With sweat, blood, and tears." },
+            { time: 7.0, text: "光る翼で今全部全部置き去って", romaji: "hikaru tsubasa de ima zenbu zenbu okizatte", translation_es: "Con alas brillantes, deja todo atrás ahora mismo.", translation_en: "With shining wings, leave everything behind right now." },
+            { time: 11.5, text: "飛べ FLY 高く FLY 最果ての未来へ", romaji: "tobe FLY takaku FLY saihate no mirai e", translation_es: "Vuela, vuela alto, hacia el futuro más lejano.", translation_en: "Fly, fly high, toward the furthest future." },
+            { time: 23.0, text: "傷だらけの若鳥が 空を睨んでる", romaji: "kizudarake no wakadori ga sora wo niranderu", translation_es: "Un ave joven cubierta de heridas mira fijamente al cielo.", translation_en: "A young bird covered in wounds is glaring at the sky." },
+            { time: 33.0, text: "低空飛行する奴らが 嗤おうと 海の果てが見たい", romaji: "teikuu hikou suru yatsura ga waraou to umi no hate ga mitai", translation_es: "Aunque se rían los que vuelan bajo, quiero ver el fin del mar.", translation_en: "Even if those flying low mock me, I want to see the edge of the sea." },
+            { time: 42.0, text: "心を無にして 向かい風に乗り 助走を付けて", romaji: "kokoro wo mu ni shite mukaikaze ni nori josou wo tsukete", translation_es: "Vaciando mi corazón, montando el viento en contra y tomando impulso.", translation_en: "Emptying my heart, riding the headwind and gaining speed." },
+            { time: 52.0, text: "(Hop step jump で)", romaji: "(Hop step jump de)", translation_es: "(Con un salto, paso y brinco)", translation_en: "(With a hop, step, and jump)" },
+            { time: 56.0, text: "飛べ FLY HIGH!! 汗と血と涙で", romaji: "tobe FLY HIGH!! ase to chi to namida de", translation_es: "¡Vuela, vuela alto! Con sudor, sangre y lágrimas.", translation_en: "Fly, FLY HIGH!! With sweat, blood, and tears." },
+            { time: 62.0, text: "光る翼が君をどこへだって連れて行く", romaji: "hikaru tsubasa ga kimi wo doko e datte tsurete iku", translation_es: "Tus alas brillantes te llevarán a donde sea.", translation_en: "Those shining wings will take you anywhere." },
+            { time: 66.0, text: "青い衝動と本能と爪牙を むき出しにして", romaji: "aoi shoudou to honnou to souga wo mukidashi ni shite", translation_es: "Exponiendo tu impulso azul, tu instinto y tus garras.", translation_en: "Baring your blue impulse, instinct, and fangs." },
+            { time: 72.0, text: "艱難な旅路も 夢叶うまで 何度だって", romaji: "kannan na tabiji mo yume kanau made nando datte", translation_es: "Incluso en este viaje lleno de dificultades, hazlo cuantas veces sea necesario hasta que tu sueño se cumpla.", translation_en: "Even on this arduous journey, do it as many times as it takes until your dream comes true." },
+            { time: 76.5, text: "飛べ FLY 高く FLY 最果ての未来へ", romaji: "tobe FLY takaku FLY saihate no mirai e", translation_es: "Vuela, vuela alto, hacia el futuro más lejano.", translation_en: "Fly, fly high, toward the furthest future." }
         ],
         vocab: [
-            { jp: "飛ぶ", kana: "とぶ", romaji: "tobu", en: "to fly", es: "volar" },
-            { jp: "汗", kana: "あせ", romaji: "ase", en: "sweat", es: "sudor" }
+            { jp: "翼", kana: "つばさ", romaji: "tsubasa", en: "wings", es: "alas" },
+            { jp: "睨む", kana: "にらむ", romaji: "niramu", en: "to glare / stare at", es: "mirar fijamente / fulminar" },
+            { jp: "衝動", kana: "しょうどう", romaji: "shoudou", en: "impulse / urge", es: "impulso" },
+            { jp: "爪牙", kana: "そうが", romaji: "souga", en: "claws and fangs", es: "garras y colmillos" },
+            { jp: "艱難", kana: "かんなん", romaji: "kannan", en: "hardship / trial", es: "dificultad / tribulación" }
         ]
     },
     {
@@ -260,16 +268,34 @@ export const jlptSongs: SongLesson[] = [
         title: "Again",
         artist: "YUI",
         start: "00:00",
-        end: "01:00",
+        end: "01:29",
         focus: { es: "Remordimiento y nuevos comienzos", en: "Regret and new beginnings" },
         difficulty: 3,
-        youtubeId: "MLfMrBfqCu8", // ✅ MV oficial YUI
+        youtubeId: "elyXcwunIYA", // ✅ Fullmetal Alchemist: Brotherhood OP1
         lyrics: [
-            { time: 5.0, text: "この想いを消してしまうには まだ早すぎるわ", romaji: "kono omoi wo keshite shimau ni wa mada hayasugiru wa", translation_es: "Es demasiado pronto para borrar estos sentimientos", translation_en: "It's too early to erase these feelings" }
+            { time: 0.0, text: "この想いを消してしまうには まだ人生長いでしょ", romaji: "kono omoi wo keshite shimau ni wa mada jinsei nagai desho", translation_es: "Todavía queda mucha vida por delante como para borrar estos sentimientos.", translation_en: "You still have too long a life left to erase these feelings completely." },
+            { time: 7.0, text: "やり残してること やり直してみたいから", romaji: "yarinokoshiteru koto yarinaoshite mitai kara", translation_es: "Porque quiero volver a intentar las cosas que dejé sin terminar.", translation_en: "Because I want to try redoing the things I left undone." },
+            { time: 22.0, text: "夢のつづき 追いかけていたはずなのに", romaji: "yume no tsuzuki oikakete ita hazu na noni", translation_es: "A pesar de que se suponía que estaba persiguiendo la continuación de mi sueño.", translation_en: "Even though I was supposed to be chasing the continuation of my dream." },
+            { time: 29.0, text: "曲がりくねった 細い道 人につまずく", romaji: "magarikunetta hosoi michi hito ni tsumazuku", translation_es: "Tropiezo con la gente en este camino estrecho y sinuoso.", translation_en: "I stumble over people on this narrow, winding road." },
+            { time: 35.0, text: "あの頃みたいにって 戻りたいわけじゃないの", romaji: "ano koro mitai ni tte modoritai wake ja nai no", translation_es: "No es que quiera volver a ser como en aquellos días.", translation_en: "It's not that I want to go back to how things were then." },
+            { time: 38.0, text: "無くしてきた空を 探してる", romaji: "nakushite kita sora wo sagashiteru", translation_es: "Estoy buscando el cielo que he perdido.", translation_en: "I'm searching for the sky I've lost." },
+            { time: 42.0, text: "わかってくれますように 犠牲になったような", romaji: "wakatte kuremasu you ni gisei ni natta you na", translation_es: "Espero que lo entiendas, como si me hubiera convertido en un sacrificio.", translation_en: "I hope you understand, as if I had become a sacrifice." },
+            { time: 45.0, text: "悲しい顔はやめてよ", romaji: "kanashii kao wa yamete yo", translation_es: "Deja de poner esa cara triste.", translation_en: "Stop making that sad face." },
+            { time: 48.0, text: "罪の最後は涙じゃないよ ずっと苦しく背負ってくんだ", romaji: "tsumi no saigo wa namida ja nai yo zutto kurushiku seotte kun da", translation_es: "El final del pecado no son las lágrimas; es cargarlo con dolor para siempre.", translation_en: "The end of sin isn't tears; it's carrying it painfully forever." },
+            { time: 52.0, text: "出口見えない感情迷路に 誰を待ってるの", romaji: "deguchi mienai kanjou meiro ni dare wo matteru no", translation_es: "¿A quién esperas en este laberinto emocional sin salida?", translation_en: "Who are you waiting for in this emotional maze with no exit?" },
+            { time: 56.0, text: "白いノートに綴ったように もっと素直に吐き出したいよ", romaji: "shiroi nooto ni tsuzutta you ni motto sunao ni hakidashitai yo", translation_es: "Quiero expresarme con más honestidad, como si estuviera escribiendo en un cuaderno en blanco.", translation_en: "I want to speak out more honestly, like writing in a white notebook." },
+            { time: 59.0, text: "何から 逃れたいんだ 現実ってやつ", romaji: "nani kara nogaretai nda genjitsu tte yatsu", translation_es: "¿De qué quieres escapar? De eso llamado realidad.", translation_en: "What do you want to escape from? That thing called reality." },
+            { time: 62.0, text: "叶えるために 生きてるんだって 叫びたくなるよ 聞こえていますか", romaji: "kanaeru tame ni ikiteru nda tte sakebitaku naru yo kikoete imasu ka", translation_es: "Me dan ganas de gritar que vivo para cumplir mis deseos, ¿puedes oírme?", translation_en: "It makes me want to shout that I live to make them come true, can you hear me?" },
+            { time: 69.0, text: "無難になんて やってられないから 帰る場所も無いの", romaji: "bunan ni nante yatterarenai kara kaeru basho mo nai no", translation_es: "No puedo simplemente ir a lo seguro, porque no tengo un lugar al que volver.", translation_en: "I can't just take it safe, because I have no place to go back to." },
+            { time: 75.8, text: "優しさにはいつも感謝している だから強くなりたい (I'm on the way)", romaji: "yasashisa ni wa itsumo kansha shite iru dakara tsuyoku naritai (I'm on the way)", translation_es: "Siempre estoy agradecida por tu amabilidad, por eso quiero ser fuerte.", translation_en: "I'm always grateful for your kindness, that's why I want to be strong." },
+            { time: 82.7, text: "懐かしくなる こんな痛みも歓迎じゃん", romaji: "natsukashiku naru konna itami mo kangei jan", translation_es: "Incluso este dolor que se siente nostálgico es bienvenido.", translation_en: "Even pain like this that becomes nostalgic is welcome." }
         ],
         vocab: [
             { jp: "想い", kana: "おもい", romaji: "omoi", en: "thought / feeling", es: "pensamiento / sentimiento" },
-            { jp: "消す", kana: "けす", romaji: "kesu", en: "to erase / extinguish", es: "borrar / apagar" }
+            { jp: "曲がりくねる", kana: "まがりくねる", romaji: "magarikuneru", en: "to wind / meander", es: "ser sinuoso / dar vueltas" },
+            { jp: "犠牲", kana: "ぎせい", romaji: "gisei", en: "sacrifice", es: "sacrificio" },
+            { jp: "迷路", kana: "めいろ", romaji: "meiro", en: "maze", es: "laberinto" },
+            { jp: "叫ぶ", kana: "さけぶ", romaji: "sakebu", en: "to shout / yell", es: "gritar" }
         ]
     },
 
@@ -279,16 +305,39 @@ export const jlptSongs: SongLesson[] = [
         title: "午夜の待ち合わせ",
         artist: "Hello Sleepwalkers",
         start: "00:00",
-        end: "01:00",
+        end: "01:30",
         focus: { es: "Vocabulario urbano y nocturno", en: "Urban and nightly vocabulary" },
         difficulty: 4,
-        youtubeId: "J69oCCM1EcI", // ✅ MV oficial Hello Sleepwalkers (Noragami OP)
+        youtubeId: "36rkVIr_hsA", // ✅ MV oficial Hello Sleepwalkers (Full Version)
         lyrics: [
-            { time: 10.0, text: "午前零時を過ぎた頃 待ち合わせ場所で", romaji: "gozen reiji wo sugita koro machiawase basho de", translation_es: "Cerca de las doce de la noche, en el lugar de encuentro", translation_en: "Around midnight, at the meeting place" }
+            { time: 10.5, text: "弾丸込めた小銃を 僕は片手に持っている", romaji: "dangan kometa shoujuu wo boku wa katate ni motte iru", translation_es: "Sostengo un fusil cargado con balas en una mano.", translation_en: "I'm holding a rifle loaded with bullets in one hand." },
+            { time: 15.5, text: "震えた君の居る場所へ 足を早め向かっている", romaji: "furueta kimi no iru basho e ashi wo hayame mukatte iru", translation_es: "Me apresuro hacia el lugar donde estás tú, temblando.", translation_en: "I'm hurrying toward the place where you are, trembling." },
+            { time: 20.0, text: "チクタク 針はチクタクと 焦る心を急かしただけ", romaji: "chikutaku hari wa chikutaku to aseru kokoro wo sekashita dake", translation_es: "Tic-tac, las manecillas solo apresuran mi corazón impaciente.", translation_en: "Tick-tock, the hands just hurried my impatient heart." },
+            { time: 25.0, text: "チクタク 針はチクタクと 留まる気配もなく 進んでいく", romaji: "chikutaku hari wa chikutaku to todomaru kehai mo naku susunde iku", translation_es: "Tic-tac, las manecillas avanzan sin intención de detenerse.", translation_en: "Tick-tock, the hands advance without any sign of stopping." },
+            { time: 31.0, text: "チクタク 針はチクタクと 終わりと始まりの境目", romaji: "chikutaku hari wa chikutaku to owari to hajimari no sakaime", translation_es: "Tic-tac, las manecillas marcan el límite entre el final y el comienzo.", translation_en: "Tick-tock, the hands mark the border between the end and the beginning." },
+            { time: 36.0, text: "チクタク 針はチクタクと 全て重なった", romaji: "chikutaku hari wa chikutaku to subete kasanatta", translation_es: "Tic-tac, las manecillas... todo se superpuso.", translation_en: "Tick-tock, the hands... everything overlapped." },
+            { time: 41.0, text: "並行して 僕は待っていた", romaji: "hekoushite, boku wa matteita", translation_es: "En paralelo, yo estaba esperando.", translation_en: "In parallel, I was waiting." },
+            { time: 43.0, text: "薄暗い部屋 一人きり", romaji: "usugurai heya, hitori kiri", translation_es: "Solo en una habitación tenuemente iluminada.", translation_en: "Alone in a dimly lit room." },
+            { time: 46.0, text: "並行して 僕は待っていた", romaji: "hekoushite, boku wa matteita", translation_es: "En paralelo, yo estaba esperando.", translation_en: "In parallel, I was waiting." },
+            { time: 48.0, text: "ドアを蹴破る その音を", romaji: "doa wo keyaburu, sono oto wo", translation_es: "El sonido de la puerta siendo derribada.", translation_en: "The sound of the door being kicked in." },
+            { time: 51.0, text: "並行して 僕が待っていた", romaji: "hekoushite, boku ga matteita", translation_es: "En paralelo, yo era quien estaba esperando.", translation_en: "In parallel, I was the one waiting." },
+            { time: 53.0, text: "薄暗い部屋 一人きり", romaji: "usugurai heya, hitori kiri", translation_es: "Solo en una habitación tenue.", translation_en: "Alone in a dim room." },
+            { time: 56.0, text: "並行して 僕が待っていた", romaji: "hekoushite, boku ga matteita", translation_es: "En paralelo, yo estaba esperando.", translation_en: "In parallel, I was waiting." },
+            { time: 58.0, text: "もう恐れることはないよ", romaji: "mou osoreru koto wa nai yo", translation_es: "Ya no hay nada que temer.", translation_en: "There's nothing left to fear." },
+            { time: 61.0, text: "弾丸込めた小銃を持って", romaji: "dangan kometa shoujuu wo motte", translation_es: "Con un fusil cargado en mano,", translation_en: "Holding a rifle loaded with bullets," },
+            { time: 63.5, text: "固く閉ざされたドアを蹴破った", romaji: "kataku tozasareta doa wo keyabutta", translation_es: "derribé la puerta firmemente cerrada.", translation_en: "I kicked down the tightly shut door." },
+            { time: 66.0, text: "吸い付いた銃口が跳ねて", romaji: "suitsuita juukou ga hanete", translation_es: "El cañón adherido rebotó,", translation_en: "The clinging gun muzzle bounced," },
+            { time: 69.0, text: "昨日の僕を貫いた", romaji: "kinou no boku wo tsuranuita", translation_es: "y atravesó al yo de ayer.", translation_en: "and pierced the me of yesterday." },
+            { time: 71.0, text: "おやすみ その絶望を受け取って", romaji: "oyasumi, sono zetsubou wo uketotte", translation_es: "Buenas noches, acepta esa desesperación.", translation_en: "Good night, accept that despair." },
+            { time: 74.0, text: "明日への僕は歩き始めた", romaji: "ashita he no boku wa aruki hajimeta", translation_es: "El yo del mañana comenzó a caminar.", translation_en: "The me of tomorrow started to walk." },
+            { time: 77.0, text: "また今夜待ち合わせよう", romaji: "mata kon'ya machiawase you", translation_es: "Volvamos a encontrarnos esta noche.", translation_en: "Let's meet again tonight." },
         ],
         vocab: [
-            { jp: "午前零時", kana: "ごぜんれいじ", romaji: "gozenreiji", en: "midnight", es: "medianoche" },
-            { jp: "待ち合わせ", kana: "まちあわせ", romaji: "machiawase", en: "meeting / appointment", es: "encuentro / cita" }
+            { jp: "弾丸", kana: "だんがん", romaji: "dangan", en: "bullet", es: "bala" },
+            { jp: "小銃", kana: "しょうじゅう", romaji: "shoujuu", en: "rifle / small arms", es: "fusil" },
+            { jp: "境目", kana: "さかいめ", romaji: "sakaime", en: "border / boundary", es: "límite / frontera" },
+            { jp: "絶望", kana: "ぜつぼう", romaji: "zetsubou", en: "despair", es: "desesperación" },
+            { jp: "貫く", kana: "つらぬく", romaji: "tsuranuku", en: "to pierce through", es: "atravesar" }
         ]
     },
     {

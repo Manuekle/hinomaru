@@ -5,7 +5,7 @@
 		height = 80,
 		barWidth = 3,
 		barGap = 2,
-		speed = 30,
+		speed = 6,
 		fadeEdges = true,
 		barColor = 'currentColor',
 		playing = false
@@ -21,53 +21,55 @@
 
 	let canvas: HTMLCanvasElement;
 	let raf: number;
+	let lastTime = 0;
 	let offset = 0;
-	let bars: number[] = [];
 
-	const STEP = barWidth + barGap;
+	const STEP = $derived(barWidth + barGap);
 
-	function generateBars(count: number) {
-		// Smooth noise via multiple sine waves
-		const newBars: number[] = [];
-		for (let i = 0; i < count; i++) {
-			const v =
-				Math.sin(i * 0.18) * 0.38 +
-				Math.sin(i * 0.07) * 0.28 +
-				Math.sin(i * 0.41) * 0.18 +
-				Math.sin(i * 0.9) * 0.09 +
-				0.5;
-			newBars.push(Math.max(0.06, Math.min(1, v)));
-		}
-		return newBars;
+	function getAmplitude(i: number) {
+		const v =
+			Math.sin(i * 0.18) * 0.38 +
+			Math.sin(i * 0.07) * 0.28 +
+			Math.sin(i * 0.41) * 0.18 +
+			Math.sin(i * 0.9) * 0.09 +
+			0.5;
+		return Math.max(0.06, Math.min(1, v));
 	}
 
 	function draw(ts: number) {
 		if (!canvas) return;
-		const ctx = canvas.getContext('2d')!;
-		const w = canvas.width;
-		const h = canvas.height;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
 
-		ctx.clearRect(0, 0, w, h);
+		const dpr = window.devicePixelRatio || 1;
+		const w = canvas.width / dpr;
+		const h = canvas.height / dpr;
 
-		const count = Math.ceil(w / STEP) + 2;
-		if (bars.length < count + 10) bars = generateBars(count + 60);
+		if (lastTime === 0) lastTime = ts;
+		const dt = ts - lastTime;
+		lastTime = ts;
 
-		// Advance offset only when playing
-		if (playing) offset += speed / 1000;
+		if (playing) {
+			offset += (speed * dt) / 1000;
+		}
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		const startBar = Math.floor(offset);
 		const subOffset = (offset - startBar) * STEP;
+		const count = Math.ceil(w / STEP) + 1;
 
+		ctx.save();
+		ctx.scale(dpr, dpr);
 		ctx.fillStyle = barColor;
 
 		for (let i = 0; i < count + 1; i++) {
-			const barIdx = (startBar + i) % bars.length;
-			const amplitude = bars[barIdx];
+			const barIdx = startBar + i;
+			const amplitude = getAmplitude(barIdx);
 			const barH = Math.max(4, amplitude * h);
 			const x = i * STEP - subOffset;
 			const y = (h - barH) / 2;
 
-			// Edge fade opacity
 			let alpha = 1;
 			if (fadeEdges) {
 				const edgeFade = 0.18;
@@ -83,7 +85,7 @@
 			ctx.fill();
 		}
 
-		ctx.globalAlpha = 1;
+		ctx.restore();
 		raf = requestAnimationFrame(draw);
 	}
 
@@ -91,15 +93,24 @@
 		if (!canvas) return;
 		const parent = canvas.parentElement;
 		if (!parent) return;
-		canvas.width = parent.clientWidth;
-		canvas.height = height;
-		bars = generateBars(Math.ceil(canvas.width / STEP) + 60);
+
+		const dpr = window.devicePixelRatio || 1;
+		const rect = parent.getBoundingClientRect();
+		const newW = Math.floor(rect.width * dpr);
+		const newH = Math.floor(height * dpr);
+
+		if (canvas.width !== newW || canvas.height !== newH) {
+			canvas.width = newW;
+			canvas.height = newH;
+		}
 	}
 
 	onMount(() => {
 		resize();
 		raf = requestAnimationFrame(draw);
-		const ro = new ResizeObserver(resize);
+		const ro = new ResizeObserver(() => {
+			resize();
+		});
 		ro.observe(canvas.parentElement!);
 		return () => {
 			ro.disconnect();
