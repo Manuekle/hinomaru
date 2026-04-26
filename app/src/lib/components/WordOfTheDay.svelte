@@ -46,7 +46,7 @@
 
 			if (error) {
 				console.error('save vocab error:', error);
-				svileo.error({ title: 'Error', description: error.message });
+				svileo.error({ title: 'Error' });
 			} else {
 				saved = true;
 				await invalidateAll();

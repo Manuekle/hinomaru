@@ -63,7 +63,7 @@
 				es: word.es
 			});
 			if (error) {
-				svileo.error({ title: 'Error', description: error.message });
+				svileo.error({ title: 'Error' });
 			} else {
 				savedVocab = new Set([...savedVocab, word.jp]);
 			}
@@ -146,7 +146,7 @@
 		if (!completed) {
 			completed = true;
 			fireConfetti = true;
-			svileo.success({ title: t('songs.doneBravo', $locale), description: song?.title ?? '' });
+			svileo.success({ title: t('songs.doneBravo', $locale) });
 			try {
 				const raw = localStorage.getItem('hinomaru_songs_completed');
 				const ids: number[] = raw ? JSON.parse(raw) : [];

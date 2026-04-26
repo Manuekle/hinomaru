@@ -41,10 +41,7 @@
 
 		if (pct >= 70) {
 			setTimeout(() => {
-				svileo.success({
-					title: t('summary.complete', $locale),
-					description: message
-				});
+				svileo.success({ title: t('summary.complete', $locale) });
 			}, 1000);
 		}
 	});

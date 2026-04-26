@@ -147,10 +147,7 @@
 			});
 		}
 
-		svileo.success({
-			title: t('session.wellDone', $locale) || '¡Muy bien!',
-			description: `${allCards.length} ${t('home.cards', $locale) || 'cartas'} completadas en ${formatTime(finalTime)}`
-		});
+		svileo.success({ title: t('session.wellDone', $locale) || '¡Muy bien!' });
 	}
 
 	function goBack() {

@@ -126,7 +126,7 @@
 </svelte:head>
 
 <div class="app-container">
-	<Toaster position="top-right" />
+	<Toaster position="top-center" offset={{ top: 'env(safe-area-inset-top, 12px)' }} />
 	{@render children()}
 	<InstallPrompt />
 	<PWASplash visible={booting} />
