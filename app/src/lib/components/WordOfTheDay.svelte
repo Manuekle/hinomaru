@@ -45,8 +45,12 @@
 			});
 
 			if (error) {
-				console.error('save vocab error:', error);
-				svileo.error({ title: 'Error' });
+				if (error.code === '23505') {
+					saved = true;
+				} else {
+					console.error('save vocab:', error);
+					svileo.error({ title: 'Error' });
+				}
 			} else {
 				saved = true;
 				await invalidateAll();
