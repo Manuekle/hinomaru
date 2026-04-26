@@ -412,26 +412,28 @@
 
 	.quick-tools {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 12px;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 10px;
 		margin: 24px 0;
 	}
 
 	.tool-btn {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 18px;
+		border-radius: 16px;
 		height: 52px;
 		display: flex;
 		align-items: center;
-		padding: 0 16px;
-		gap: 12px;
+		justify-content: center;
+		padding: 0 10px;
+		gap: 8px;
 		text-decoration: none;
 		color: var(--sumi);
 		font-weight: 700;
-		font-size: 14px;
+		font-size: 13px;
 		box-shadow: var(--shadow-sm);
 		transition: all 0.2s;
+		overflow: hidden;
 	}
 
 	.tool-btn:hover {
@@ -441,14 +443,15 @@
 	}
 
 	.tool-icon {
-		width: 32px;
-		height: 32px;
+		width: 28px;
+		height: 28px;
+		flex-shrink: 0;
 		background: var(--ink-100);
-		border-radius: 10px;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 14px;
+		font-size: 13px;
 	}
 
 	.dashboard-settings-btn {

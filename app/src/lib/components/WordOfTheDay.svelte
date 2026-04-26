@@ -73,7 +73,9 @@
 		<div class="wotd-main">
 			<div class="wotd-jp-group">
 				<h2 class="wotd-jp">{word.jp}</h2>
-				<span class="wotd-kana">{word.kana}</span>
+				{#if word.kana && word.kana !== word.jp}
+					<span class="wotd-kana">{word.kana}</span>
+				{/if}
 				{#if $showRomaji}
 					<span class="wotd-romaji">{word.romaji || kanaToRomaji(word.kana)}</span>
 				{/if}
@@ -172,7 +174,8 @@
 
 	.wotd-romaji {
 		font-size: 13px;
-		color: var(--fg-tertiary);
+		color: var(--hinomaru-red);
+		font-weight: 600;
 		display: block;
 		margin-top: 2px;
 	}

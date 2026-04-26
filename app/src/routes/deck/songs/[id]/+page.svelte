@@ -311,7 +311,7 @@
 	<!-- Song hero -->
 	<div class="hero" use:fadeUp={{ delay: 0.05, y: 14 }}>
 		<div class="hero-meta">
-			<span class="level-tag" style="background:{levelColors[song.level] ?? '#bc002d'}">{song.level}</span>
+			<span class="level-tag">{song.level}</span>
 			<span class="diff-dots">{'●'.repeat(song.difficulty)}{'○'.repeat(5 - song.difficulty)}</span>
 		</div>
 		<h1 class="song-title jp">{song.title}</h1>
@@ -507,8 +507,9 @@
 	.level-tag {
 		font-size: 10px;
 		font-weight: 700;
-		letter-spacing: 0.06em;
-		color: #fff;
+		letter-spacing: 0.04em;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
 		padding: 2px 8px;
 		border-radius: 6px;
 	}
@@ -856,7 +857,8 @@
 
 	.vocab-romaji {
 		font-size: 11px;
-		color: var(--fg-tertiary);
+		color: var(--hinomaru-red);
+		font-weight: 600;
 		margin-bottom: 2px;
 	}
 

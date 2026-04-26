@@ -53,39 +53,32 @@
 		{/each}
 	</div>
 
-	<!-- Stories Grid -->
-	<div class="stories-grid" use:staggerChildren={{ delay: 0.25, stagger: 0.08, y: 12 }}>
+	<!-- Stories List -->
+	<div class="list" use:staggerChildren={{ delay: 0.25, stagger: 0.07, y: 10 }}>
 		{#if filteredStories.length === 0}
 			<div class="empty-state">
 				<div class="empty-icon">📭</div>
 				<p>{t('stories.noStory', $locale)}</p>
 			</div>
 		{:else}
-			{#each filteredStories as story (story.id)}
-				<a href="/deck/stories/{story.id}" class="story-card">
-					<div class="story-card-left">
-						<div class="story-card-icon">📖</div>
-						<div class="story-card-info">
-							<div class="story-card-label">{story.level}</div>
-							<div class="story-card-title">
-								{$locale === 'es' ? story.title_es : story.title_en}
-							</div>
-							<div class="story-card-preview">
-								{[...story.body_jp].slice(0, 32).join('')}...
-							</div>
+			{#each filteredStories as story, i (story.id)}
+				<a href="/deck/stories/{story.id}" class="row">
+					<div class="row-num">{i + 1 < 10 ? '0' + (i + 1) : i + 1}</div>
+					<div class="row-body">
+						<div class="row-top">
+							<span class="row-title">{$locale === 'es' ? story.title_es : story.title_en}</span>
 						</div>
-					</div>
-					<div class="story-card-right">
-						<span class="story-date">
+						<div class="row-sub jp">{[...story.body_jp].slice(0, 28).join('')}…</div>
+						<div class="row-date">
 							{new Date(story.publish_date).toLocaleDateString(
 								$locale === 'es' ? 'es-MX' : 'en-US',
-								{
-									month: 'short',
-									day: 'numeric'
-								}
+								{ month: 'short', day: 'numeric' }
 							)}
-						</span>
-						<span class="read-more">{t('stories.read', $locale)} →</span>
+						</div>
+					</div>
+					<div class="row-meta">
+						<span class="row-level">{story.level}</span>
+						<span class="row-arrow">→</span>
 					</div>
 				</a>
 			{/each}
@@ -129,116 +122,104 @@
 		border-color: var(--sumi);
 	}
 
-	.stories-grid {
+	.list {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
 	}
 
-	.story-card {
+	.row {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		align-items: flex-start;
 		gap: 16px;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 16px 20px;
+		padding: 16px 0;
+		border-bottom: 1px solid var(--ink-100);
 		text-decoration: none;
 		color: inherit;
-		box-shadow: var(--shadow-sm);
-		transition:
-			box-shadow 200ms ease,
-			transform 200ms ease;
-		position: relative;
-		overflow: hidden;
+		transition: background 150ms;
+		border-radius: 4px;
 	}
-
-	.story-card::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(135deg, rgba(188, 0, 45, 0.04) 0%, transparent 60%);
-		pointer-events: none;
+	.row:first-child {
+		border-top: 1px solid var(--ink-100);
 	}
-
-	.story-card:hover {
-		box-shadow: var(--shadow-md);
-		transform: translateY(-2px);
-		border-color: var(--ink-300);
-	}
-
-	.story-card-left {
-		display: flex;
-		align-items: center;
-		gap: 14px;
-		min-width: 0;
-	}
-
-	.story-card-icon {
-		font-size: 24px;
-		flex-shrink: 0;
-		width: 44px;
-		height: 44px;
-		background: var(--sumi);
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.story-card-info {
-		min-width: 0;
-	}
-
-	.story-card-label {
-		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+	.row:hover .row-title {
 		color: var(--hinomaru-red);
-		margin-bottom: 2px;
+	}
+	.row:hover .row-arrow {
+		color: var(--hinomaru-red);
+		transform: translateX(3px);
 	}
 
-	.story-card-title {
-		font-size: 16px;
+	.row-num {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		font-variant-numeric: tabular-nums;
+		padding-top: 3px;
+		min-width: 24px;
+		letter-spacing: 0.02em;
+	}
+
+	.row-body {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.row-top {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 3px;
+	}
+
+	.row-title {
+		font-size: 17px;
 		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.2;
-		margin-bottom: 2px;
+		transition: color 150ms;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
-	.story-card-preview {
-		font-family: var(--font-jp);
+	.row-sub {
 		font-size: 13px;
 		color: var(--fg-tertiary);
+		margin-bottom: 3px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
-	.story-card-right {
+	.row-date {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		font-weight: 500;
+	}
+
+	.row-meta {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		gap: 4px;
+		gap: 8px;
+		padding-top: 3px;
 		flex-shrink: 0;
 	}
 
-	.story-date {
-		font-size: 11px;
-		color: var(--fg-tertiary);
-		font-weight: 600;
+	.row-level {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		letter-spacing: 0.04em;
+		background: var(--hinomaru-red-wash);
+		padding: 2px 7px;
+		border-radius: 6px;
 	}
 
-	.read-more {
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--hinomaru-red);
-		white-space: nowrap;
+	.row-arrow {
+		font-size: 14px;
+		color: var(--fg-tertiary);
+		transition: color 150ms, transform 150ms;
 	}
 
 	.empty-state {

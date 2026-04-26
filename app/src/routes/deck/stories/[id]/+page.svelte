@@ -8,11 +8,53 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import DotLoader from '$lib/components/DotLoader.svelte';
+	import { svileo } from 'svileo';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
 
 	const supabase = $derived($page.data.supabase);
+
+	// ── Vocab saving ───────────────────────────────────────────────────────────
+	let savedVocab = $state(new Set<string>());
+	let savingVocab = $state(new Set<string>());
+
+	$effect(() => {
+		const v = story?.vocab;
+		if (!v?.length) return;
+		const jpList = v.map((w: any) => w.jp);
+		supabase.auth.getUser().then(({ data: { user } }: any) => {
+			if (!user) return;
+			supabase.from('user_saved_words').select('jp').eq('user_id', user.id).in('jp', jpList)
+				.then(({ data: rows }: any) => {
+					if (rows?.length) savedVocab = new Set(rows.map((r: any) => r.jp));
+				});
+		});
+	});
+
+	async function saveVocabWord(word: { jp: string; kana: string; en: string; es: string }) {
+		if (savedVocab.has(word.jp) || savingVocab.has(word.jp)) return;
+		savingVocab = new Set([...savingVocab, word.jp]);
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (!user) return;
+			const { error } = await supabase.from('user_saved_words').insert({
+				user_id: user.id, jp: word.jp, kana: word.kana, en: word.en, es: word.es
+			});
+			if (error) {
+				if (error.code === '23505') {
+					savedVocab = new Set([...savedVocab, word.jp]);
+				} else {
+					svileo.error({ title: 'Error' });
+				}
+			} else {
+				savedVocab = new Set([...savedVocab, word.jp]);
+			}
+		} finally {
+			savingVocab = new Set([...savingVocab].filter(v => v !== word.jp));
+		}
+	}
 
 	const story = $derived(data.story);
 	const vocab: any[] = $derived(story?.vocab ?? []);
@@ -92,7 +134,7 @@
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 	>
-		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
+		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;">
 			<a href="/deck/stories" class="back-link-beautiful">
 				← {t('deck.back', $locale)}
 			</a>
@@ -153,24 +195,35 @@
 						<div class="vocab-list">
 							{#each vocab as word (word.jp)}
 								<div class="vocab-card">
-									<div class="vocab-card-main">
+									<div class="vocab-top">
 										<div class="vocab-jp-group">
-											<span class="vocab-jp">{word.jp}</span>
-											<div class="vocab-pronunciation">
-												<span class="vocab-kana">{word.kana}</span>
-												{#if $showRomaji}
-													<span class="vocab-romaji">{kanaToRomaji(word.kana)}</span>
-												{/if}
-											</div>
+											<span class="vocab-jp jp">{word.jp}</span>
+											<span class="vocab-kana jp">{word.kana}</span>
 										</div>
-										<button
-											class="audio-btn"
-											onclick={() => speakJapanese(word.jp)}
-											aria-label="Escuchar"
-										>
-											🔊
-										</button>
+										<div class="vocab-actions">
+											<button class="vocab-action-btn" onclick={() => speakJapanese(word.jp)} aria-label="Audio">
+												🔊
+											</button>
+											<button
+												class="vocab-action-btn"
+												class:vocab-saved={savedVocab.has(word.jp)}
+												disabled={savedVocab.has(word.jp) || savingVocab.has(word.jp)}
+												onclick={() => saveVocabWord(word)}
+												aria-label="Save"
+											>
+												{#if savingVocab.has(word.jp)}
+													<DotLoader size={4} />
+												{:else if savedVocab.has(word.jp)}
+													<span style="color:var(--success);font-size:13px;font-weight:700;">✓</span>
+												{:else}
+													<span style="font-size:16px;font-weight:400;line-height:1;">+</span>
+												{/if}
+											</button>
+										</div>
 									</div>
+									{#if $showRomaji}
+										<div class="vocab-romaji">{kanaToRomaji(word.kana)}</div>
+									{/if}
 									<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
 								</div>
 							{/each}
@@ -391,70 +444,67 @@
 	}
 
 	.section-title {
-		font-size: 12px;
-		font-weight: 600;
+		font-size: 11px;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 		color: var(--fg-tertiary);
 		margin-bottom: 16px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid var(--ink-100);
 	}
 
 	.vocab-list {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 10px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 
 	.vocab-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 16px;
-		padding: 16px;
+		padding: 14px 16px;
+		box-shadow: var(--shadow-sm);
 	}
 
-	.vocab-card-main {
+	.vocab-top {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
 		margin-bottom: 4px;
 	}
 
 	.vocab-jp-group {
 		display: flex;
-		flex-direction: column;
-		gap: 2px;
+		align-items: baseline;
+		gap: 8px;
+		min-width: 0;
 	}
 
 	.vocab-jp {
-		font-family: var(--font-jp);
 		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.2;
-	}
-
-	.vocab-pronunciation {
-		display: flex;
-		align-items: center;
-		gap: 8px;
+		flex-shrink: 0;
 	}
 
 	.vocab-kana {
-		font-family: var(--font-jp);
-		font-size: 13px;
-		color: var(--fg-secondary);
-		font-weight: 500;
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		white-space: nowrap;
 	}
 
-	.vocab-romaji {
-		font-size: 11px;
-		color: var(--hinomaru-red);
-		font-weight: 700;
-		text-transform: lowercase;
-		opacity: 0.8;
+	.vocab-actions {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex-shrink: 0;
 	}
 
-	.audio-btn {
+	.vocab-action-btn {
 		background: var(--ink-100);
 		border: none;
 		width: 32px;
@@ -464,12 +514,24 @@
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		font-size: 14px;
+		color: var(--fg-secondary);
+		transition: background 150ms, color 150ms;
+	}
+	.vocab-action-btn:hover:not(:disabled) { background: var(--ink-200); }
+	.vocab-action-btn:disabled { opacity: 0.5; cursor: default; }
+	.vocab-action-btn.vocab-saved { background: var(--success-wash); cursor: default; }
+
+	.vocab-romaji {
+		font-size: 11px;
+		color: var(--hinomaru-red);
+		font-weight: 600;
+		margin-bottom: 2px;
 	}
 
 	.vocab-meaning {
 		font-size: 14px;
 		color: var(--fg-secondary);
+		line-height: 1.4;
 	}
 
 	/* --- Quiz --- */
