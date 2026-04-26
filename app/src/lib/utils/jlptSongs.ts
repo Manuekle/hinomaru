@@ -468,15 +468,25 @@ export const jlptSongs: SongLesson[] = [
         title: "残酷な天使のテーゼ",
         artist: "高橋洋子",
         start: "00:00",
-        end: "01:00",
+        end: "01:31",
         focus: { es: "Metáforas religiosas y filosóficas", en: "Religious and philosophical metaphors" },
         difficulty: 5,
-        youtubeId: "o6wtDPVkKqI", // ✅ verificado
+        youtubeId: "nU21rCWkuJw", // ✅ Evangelion OP (TV Size)
         lyrics: [
-            { time: 86.0, text: "残酷な天使のテーゼ", romaji: "zankoku na tenshi no te-ze", translation_es: "La tesis de un ángel cruel", translation_en: "A cruel angel's thesis" }
+            { time: 1.0, text: "残酷な天使のように 少年よ 神話になれ", romaji: "zankoku na tenshi no you ni shounen yo shinwa ni nare", translation_es: "Como un ángel cruel, ¡muchacho, conviértete en una leyenda!", translation_en: "Like a cruel angel, young boy, become a legend!" },
+            { time: 24.0, text: "蒼い風がいま 胸のドアを叩いても 私だけをただ見つめて 微笑んでるあなた", romaji: "aoi kaze ga ima mune no doa wo tataitemo watashi dake wo tada mitsumete hohoenderu anata", translation_es: "Aunque el viento azul golpee ahora la puerta de tu pecho, tú solo me miras a mí y sonríes.", translation_en: "Even if a blue wind knocks on the door to your heart right now, you only look at me and smile." },
+            { time: 39.0, text: "そっとふれるもの もとめることに夢中で 運命さえまだ知らない いたいけな瞳", romaji: "sotto fureru mono motomeru koto ni muchuu de unmei sae mada shiranai itaike na hitomi", translation_es: "Absorto en la búsqueda de aquello que tocas suavemente, tus ojos inocentes aún desconocen el destino.", translation_en: "Absorbed in searching for things you touch softly, your innocent eyes still don't know fate." },
+            { time: 52.0, text: "だけどいつか気付くでしょう その背中には 遥か未来 めざすための羽根があること", romaji: "dakedo itsuka kizuku deshou sono senaka ni wa haruka mirai mezasu tame no hane ga aru koto", translation_es: "Pero algún día te darás cuenta de que en tu espalda tienes alas para alcanzar el futuro lejano.", translation_en: "But someday you'll realize that on your back, you have wings to reach the far future." },
+            { time: 68.5, text: "残酷な天使のテーゼ 窓辺からやがて飛び立つ", romaji: "zankoku na tenshi no teeze madobe kara yagate tobitatsu", translation_es: "La tesis del ángel cruel pronto emprenderá el vuelo desde la ventana.", translation_en: "The cruel angel's thesis will soon take flight from the window." },
+            { time: 76.0, text: "ほとばしる熱いパトスで 思い出を裏切るなら", romaji: "hotobashiru atsui patosu de omoide wo uragiru nara", translation_es: "Si traicionas tus recuerdos con un patetismo ardiente y brotante...", translation_en: "If you betray your memories with a surging hot pathos..." },
+            { time: 83.3, text: "この空を抱いて輝く 少年よ 神話になれ", romaji: "kono sora wo idaite kagayaku shounen yo shinwa ni nare", translation_es: "Abraza este cielo y brilla. ¡Muchacho, conviértete en una leyenda!", translation_en: "Embrace this sky and shine. Young boy, become a legend!" }
         ],
         vocab: [
-            { jp: "残酷", kana: "ざんこく", romaji: "zankoku", en: "cruel", es: "cruel" }
+            { jp: "残酷", kana: "ざんこく", romaji: "zankoku", en: "cruel", es: "cruel" },
+            { jp: "神話", kana: "しんわ", romaji: "shinwa", en: "myth / legend", es: "mitología / leyenda" },
+            { jp: "運命", kana: "うんめい", romaji: "unmei", en: "fate / destiny", es: "destino / sino" },
+            { jp: "遥か", kana: "はるか", romaji: "haruka", en: "far away / distant", es: "lejano / distante" },
+            { jp: "裏切る", kana: "うらぎる", romaji: "uragiru", en: "to betray", es: "traicionar" }
         ]
     },
 ];
