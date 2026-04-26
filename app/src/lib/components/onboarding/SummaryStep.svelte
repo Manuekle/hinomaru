@@ -81,7 +81,12 @@
 	</div>
 
 	<StickyFooter {onBack}>
-		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={onComplete} disabled={loading}>
+		<button
+			class="hm-btn hm-btn-dark hm-btn-lg"
+			style="flex: 1"
+			onclick={onComplete}
+			disabled={loading}
+		>
 			{#if loading}
 				<ButtonLoader size={20} />
 			{:else}
@@ -165,7 +170,7 @@
 
 	.check-icon {
 		color: var(--success);
-		font-weight: 800;
+		font-weight: 400;
 		font-size: 14px;
 	}
 </style>

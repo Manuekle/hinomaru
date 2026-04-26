@@ -33,10 +33,29 @@
 	}
 
 	function getSRSStage(reps: number) {
-		if (reps === 0) return { key: 'new', color: 'var(--ink-400)' };
-		if (reps < 4) return { key: 'apprentice', color: 'var(--color-warning)' };
-		if (reps < 7) return { key: 'learned', color: 'var(--success)' };
-		return { key: 'master', color: '#b59410' };
+		if (reps === 0)
+			return {
+				key: 'new',
+				bg: 'var(--success-wash)',
+				color: 'var(--success)'
+			};
+		if (reps < 4)
+			return {
+				key: 'apprentice',
+				bg: 'var(--warning-wash)',
+				color: 'var(--warning)'
+			};
+		if (reps < 7)
+			return {
+				key: 'learned',
+				bg: 'var(--hinomaru-red-wash)',
+				color: 'var(--hinomaru-red-ink)'
+			};
+		return {
+			key: 'master',
+			bg: '#fcf8e8',
+			color: '#b59410'
+		};
 	}
 
 	function formatReviewDate(dateString: string) {
@@ -46,9 +65,9 @@
 		const diffMs = next.getTime() - now.getTime();
 		const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-		if (diffDays <= 0) return { text: 'Due', urgent: true };
-		if (diffDays === 1) return { text: 'Tomorrow', urgent: false };
-		return { text: `In ${diffDays}d`, urgent: false };
+		if (diffDays <= 0) return { text: t('vocab.due', $locale), urgent: true };
+		if (diffDays === 1) return { text: t('vocab.tomorrow', $locale), urgent: false };
+		return { text: t('vocab.inDays', $locale, { n: diffDays }), urgent: false };
 	}
 
 	let searchQuery = $state('');
@@ -100,9 +119,7 @@
 		<div class="search-input-wrap">
 			<input type="text" placeholder={t('vocab.search', $locale)} bind:value={searchQuery} />
 			{#if data.savedWords.length > 0}
-				<span class="word-count"
-					>{filteredWords.length} {t('home.cards', $locale).split(' ')[1]}</span
-				>
+				<span class="word-count">{t('home.cards', $locale, { n: filteredWords.length })}</span>
 			{/if}
 		</div>
 	</div>
@@ -122,7 +139,10 @@
 							<span class="word-jp">{word.jp}</span>
 							<div class="word-meta-inline">
 								<span class="word-kana">{word.kana}</span>
-								<div class="srs-badge" style="background: {stage.color}">
+								<div
+									class="srs-badge"
+									style="background: {stage.bg}; color: {stage.color}"
+								>
 									{t('vocab.stage.' + stage.key, $locale)}
 								</div>
 							</div>
@@ -282,13 +302,12 @@
 	}
 
 	.srs-badge {
-		font-size: 9px;
-		font-weight: 800;
+		font-size: 10px;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: white;
-		padding: 2px 6px;
-		border-radius: 6px;
+		letter-spacing: 0.02em;
+		padding: 2px 10px;
+		border-radius: 99px;
 	}
 
 	.word-actions {

@@ -18,6 +18,17 @@
 
 	const filtered = $derived(data.decks.filter((d: any) => d.level === activeLevel));
 	const totalLearned = $derived(data.decks.reduce((s: number, d: any) => s + (d.learned ?? 0), 0));
+	const profile = $derived(data.profile);
+	const level = $derived(profile?.level || 1);
+	const currentXP = $derived(profile?.xp || 0);
+	const xpForCurrentLevel = $derived(Math.pow((level - 1) * 10, 2));
+	const xpForNextLevel = $derived(Math.pow(level * 10, 2));
+	const levelProgress = $derived(
+		Math.min(
+			100,
+			Math.max(0, ((currentXP - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100)
+		)
+	);
 </script>
 
 {#if !data.user}
@@ -26,13 +37,63 @@
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 	>
-		<!-- Header -->
+		<!-- Minimalist Header -->
 		<div
-			use:fadeUp={{ delay: 0, y: 12 }}
-			style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"
+			use:fadeUp={{ delay: 0, y: 10 }}
+			style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;padding-top:8px;"
 		>
-			<div class="label-meta">{t('home.streak', $locale, { n: data.streak })}</div>
-			<a href="/settings" class="dashboard-settings-btn" aria-label="Settings">
+			<div style="display:flex;align-items:center;gap:16px;">
+				<div style="font-size:32px;line-height:1;">
+					{profile?.avatar || '🎏'}
+				</div>
+				<div style="display:flex;flex-direction:column;gap:4px;">
+					<div style="display:flex;align-items:baseline;gap:6px;">
+						<span style="font-weight:800;font-size:16px;color:var(--sumi);">Lvl. {level}</span>
+						<span style="font-size:12px;font-weight:600;color:var(--fg-tertiary);"
+							>{currentXP} XP</span
+						>
+					</div>
+					<div
+						style="width:120px;height:3px;background:var(--ink-100);border-radius:2px;overflow:hidden;"
+					>
+						<div
+							style="width:{levelProgress}%;height:100%;background:var(--hinomaru-red);transition:width 0.6s ease;"
+						></div>
+					</div>
+				</div>
+			</div>
+
+			<div
+				style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:2px;"
+			>
+				<div
+					style="font-size:24px;font-weight:400;color:var(--sumi);line-height:1;display:flex;align-items:center;gap:4px;"
+				>
+					{data.streak} <span style="font-size:18px;">🔥</span>
+				</div>
+				<div
+					style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-tertiary);"
+				>
+					{t('home.streak', $locale, { n: '' }).replace(':', '').trim()}
+				</div>
+			</div>
+		</div>
+
+		<div
+			style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;"
+		>
+			<h1
+				use:fadeUp={{ delay: 0.06, y: 16 }}
+				style="font-size:36px;font-weight:800;letter-spacing:-0.03em;margin:0;"
+			>
+				{t('home.title', $locale)}
+			</h1>
+			<a
+				href="/settings"
+				class="dashboard-settings-btn"
+				aria-label="Settings"
+				style="margin-top:-6px;"
+			>
 				<svg
 					width="20"
 					height="20"
@@ -50,13 +111,6 @@
 				</svg>
 			</a>
 		</div>
-
-		<h1
-			use:fadeUp={{ delay: 0.06, y: 16 }}
-			style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
-		>
-			{t('home.title', $locale)}
-		</h1>
 
 		<p
 			use:fadeUp={{ delay: 0.12, y: 12 }}

@@ -315,7 +315,7 @@
 	/* Title */
 	.drawer-title {
 		font-size: 22px;
-		font-weight: 800;
+		font-weight: 400;
 		color: var(--sumi);
 		margin: 0 0 24px;
 		letter-spacing: -0.02em;
@@ -347,7 +347,7 @@
 		background: var(--hinomaru-red);
 		color: #fff;
 		font-size: 13px;
-		font-weight: 800;
+		font-weight: 400;
 		display: flex;
 		align-items: center;
 		justify-content: center;

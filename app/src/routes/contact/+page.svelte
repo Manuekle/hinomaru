@@ -147,7 +147,7 @@
 
 	.page-title {
 		font-size: 40px;
-		font-weight: 800;
+		font-weight: 400;
 		margin: 0 0 12px;
 		letter-spacing: -0.03em;
 		color: var(--sumi);
@@ -193,7 +193,7 @@
 
 	.success-title {
 		font-size: 24px;
-		font-weight: 800;
+		font-weight: 400;
 		margin: 0;
 		color: var(--sumi);
 	}

@@ -67,18 +67,30 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.maybeSingle();
 
 	let wordSaved = false;
-	if (user && todayWord) {
-		const { data: savedWord } = await locals.supabase
-			.from('user_saved_words')
-			.select('id')
-			.eq('user_id', user.id)
-			.eq('jp', todayWord.jp)
-			.maybeSingle();
-		wordSaved = !!savedWord;
+	let profile: any = null;
+
+	if (user) {
+		const { data: prof } = await locals.supabase
+			.from('profiles')
+			.select('xp, level, total_lessons, avatar')
+			.eq('id', user.id)
+			.single();
+		profile = prof;
+
+		if (todayWord) {
+			const { data: savedWord } = await locals.supabase
+				.from('user_saved_words')
+				.select('id')
+				.eq('user_id', user.id)
+				.eq('jp', todayWord.jp)
+				.maybeSingle();
+			wordSaved = !!savedWord;
+		}
 	}
 
 	return {
 		user,
+		profile,
 		decks: (decks ?? []).map((d: any) => ({
 			...d,
 			learned: learnedByDeck[d.id] ?? 0,

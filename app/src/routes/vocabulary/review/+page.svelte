@@ -11,8 +11,11 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
+	import { kanaToRomaji } from '$lib/utils/romaji';
+	import { addXP } from '$lib/utils/gamification';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import confetti from 'canvas-confetti';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -76,8 +79,15 @@
 				await animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.3, ease: 'easeIn' })
 					.finished;
 			}
+			confetti({
+				particleCount: 100,
+				spread: 70,
+				origin: { y: 0.6 },
+				colors: ['#BC002D', '#1A1A1A', '#F9F8F6']
+			});
 			await saveSession();
-			goto('/vocabulary');
+			// Short delay to enjoy confetti
+			setTimeout(() => goto('/vocabulary'), 1500);
 		} else {
 			if (cardEl) {
 				const dir = gotIt ? -1 : 1;
@@ -115,8 +125,8 @@
 			data: { user }
 		} = await supabase.auth.getUser();
 		if (!user) return;
-		// Update user streak when finishing a vocabulary review
 		await updateStreak(supabase, user.id);
+		await addXP(supabase, user.id, 15);
 	}
 </script>
 
@@ -133,14 +143,15 @@
 			style="min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;"
 		>
 			<div style="font-size:48px;margin-bottom:16px;">✨</div>
-			<h2 style="font-size:24px;font-weight:800;margin:0 0 8px;">{t('home.empty', $locale)}</h2>
-			<p style="color:var(--fg-secondary);margin-bottom:24px;">{t('vocab.empty', $locale)}</p>
+			<h2 style="font-size:24px;font-weight:800;margin:0 0 8px;">{t('home.complete', $locale)}</h2>
+			<p style="color:var(--fg-secondary);margin-bottom:24px;">{t('summary.all', $locale)}</p>
 			<a href="/vocabulary" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
 		</div>
 	{:else if word}
 		<div
 			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 24px 140px;gap:32px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
 		>
+			<!-- Card with 3D flip -->
 			<div
 				bind:this={cardEl}
 				class="card-scene"
@@ -156,29 +167,23 @@
 						<div style="position:absolute;top:24px;left:24px;" class="label-meta">
 							{t('nav.vocabulary', $locale)}
 						</div>
-						<div
-							class="jp"
-							style="font-size:80px;line-height:1.2;text-align:center;padding:0 20px;"
-						>
-							{word.jp}
-						</div>
-						<div
-							style="margin-top:12px;font-size:20px;color:var(--fg-secondary);font-family:var(--font-jp);"
-						>
-							{word.kana}
-						</div>
+						<div class="jp" style="font-size:96px;line-height:1;">{word.jp}</div>
 						<button
 							onclick={(e) => {
 								e.stopPropagation();
 								speak(word.jp);
 							}}
-							style="margin-top:24px;width:48px;height:48px;border-radius:50%;border:1px solid var(--ink-200);background:var(--bg-surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--sumi);"
+							style="margin-top:20px;width:44px;height:44px;border-radius:50%;
+                     border:1px solid var(--ink-200);background:var(--bg-surface);cursor:pointer;
+                     display:inline-flex;align-items:center;justify-content:center;font-size:18px;
+                     transition:background 150ms ease, transform 150ms ease;"
+							onmouseenter={(e) =>
+								((e.currentTarget as HTMLElement).style.transform = 'scale(1.1)')}
+							onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
 						>
-							<Icon icon={VolumeHighIcon} size={20} strokeWidth={1.5} />
+							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 						</button>
-						<div
-							style="margin-top:auto;padding-bottom:24px;font-size:12px;color:var(--fg-tertiary);"
-						>
+						<div style="margin-top:16px;font-size:12px;color:var(--fg-tertiary);">
 							{t('session.flip', $locale)}
 						</div>
 					</div>
@@ -186,16 +191,42 @@
 					<!-- Back -->
 					<div class="card-face back">
 						<div
-							style="font-size:32px;font-weight:800;letter-spacing:-0.02em;color:var(--sumi);line-height:1.2;text-align:center;padding:0 24px;"
+							style="font-size:36px;font-weight:700;letter-spacing:-0.02em;color:var(--sumi);line-height:1;"
 						>
 							{$locale === 'es' ? word.es : word.en}
 						</div>
+						
+						<div style="margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:4px;">
+							<div class="jp" style="font-size:24px;color:var(--fg-secondary);">{word.kana}</div>
+							{#if $showRomaji}
+								<div class="romaji" style="font-size:14px;color:var(--hinomaru-red);font-weight:600;">
+									{word.romaji || kanaToRomaji(word.kana)}
+								</div>
+							{/if}
+						</div>
 
-						{#if $showRomaji}
+						{#if word.example}
 							<div
-								style="margin-top:12px;font-size:15px;color:var(--hinomaru-red);font-weight:600;"
+								style="margin-top:20px;padding-top:20px;border-top:1px solid var(--ink-200);width:90%;text-align:center;position:relative;"
 							>
-								{word.romaji || ''}
+								<div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+									<div class="jp" style="font-size:17px;line-height:1.4;">{word.example}</div>
+									<button
+										onclick={(e) => {
+											e.stopPropagation();
+											speak(word.example);
+										}}
+										style="width:28px;height:28px;border-radius:50%;border:1px solid var(--ink-100);
+											background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
+											justify-content:center;font-size:12px;color:var(--fg-tertiary);flex-shrink:0;"
+									>
+										<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+									</button>
+								</div>
+
+								<div style="font-size:13px;color:var(--fg-secondary);margin-top:6px;line-height:1.4;">
+									{$locale === 'es' ? word.example_es : word.example_en}
+								</div>
 							</div>
 						{/if}
 
@@ -214,14 +245,21 @@
 
 			<StickyFooter>
 				{#if flipped}
-					<button class="hm-btn hm-btn-secondary" onclick={retry} style="flex:1;">
+					<button
+						class="hm-btn hm-btn-secondary touch-action-manip"
+						onclick={retry}
+						style="flex:1;"
+					>
 						✕ {t('session.again', $locale)}
 					</button>
 				{/if}
 				<button
-					class="hm-btn hm-btn-primary {flipped ? '' : 'hm-btn-full'}"
+					class="hm-btn hm-btn-primary {flipped ? '' : 'hm-btn-full'} touch-action-manip"
 					onclick={() => (flipped ? next(true) : (flipped = true))}
-					style="flex:1;"
+					style="flex:1; transition:transform 100ms ease, box-shadow 150ms ease;"
+					onmouseenter={(e) =>
+						((e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(188,0,45,0.30)')}
+					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = '')}
 				>
 					{flipped ? `✓ ${t('session.gotIt', $locale)}` : t('session.flip', $locale)}
 				</button>
@@ -276,5 +314,13 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--fg-tertiary);
+	}
+
+	.romaji {
+		font-weight: 500;
+	}
+
+	:global(.touch-action-manip) {
+		touch-action: manipulation;
 	}
 </style>

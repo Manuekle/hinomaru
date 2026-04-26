@@ -7,9 +7,12 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import { svileo } from 'svileo';
+	import { addXP } from '$lib/utils/gamification';
+	import { createClient } from '$lib/supabase';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
+	const supabase = createClient();
 
 	const correct = $derived(Number($page.url.searchParams.get('correct') ?? 0));
 	const total = $derived(Number($page.url.searchParams.get('total') ?? 0));
@@ -23,13 +26,22 @@
 				: t('summary.retry', $locale)
 	);
 
+	const xpEarned = $derived(correct * 5);
+
 	// Animated score counter
 	let displayScore = $state(0);
 	let displayTotal = $state(0);
+	let displayXP = $state(0);
 
-	onMount(() => {
+	onMount(async () => {
 		animateNumber((v) => (displayScore = v), correct, { duration: 0.9, delay: 0.4 });
 		animateNumber((v) => (displayTotal = v), total, { duration: 0.7, delay: 0.3 });
+		animateNumber((v) => (displayXP = v), xpEarned, { duration: 1.2, delay: 0.6 });
+
+		const { data: { user } } = await supabase.auth.getUser();
+		if (user && xpEarned > 0) {
+			await addXP(supabase, user.id, xpEarned);
+		}
 
 		if (pct >= 70) {
 			setTimeout(() => {
@@ -82,6 +94,12 @@
 				<span style="font-weight:600;"
 					>{$locale === 'es' ? data.deck?.title_es : data.deck?.title_en}</span
 				>
+			</div>
+			<div
+				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;"
+			>
+				<span style="color:var(--fg-secondary);">XP {t('home.total', $locale) || 'Total'}</span>
+				<span style="font-weight:700;color:#b59410;">+{displayXP} XP</span>
 			</div>
 			<div
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;"

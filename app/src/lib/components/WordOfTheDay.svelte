@@ -19,6 +19,9 @@
 		en: string;
 		es: string;
 		level?: string;
+		example?: string;
+		example_en?: string;
+		example_es?: string;
 	}
 
 	let { word, initiallySaved = false } = $props<{ word: Word | null; initiallySaved?: boolean }>();
@@ -45,7 +48,10 @@
 				jp: word.jp,
 				kana: word.kana,
 				en: word.en,
-				es: word.es
+				es: word.es,
+				example: word.example,
+				example_en: word.example_en,
+				example_es: word.example_es
 			});
 
 			if (error) {
