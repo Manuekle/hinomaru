@@ -403,16 +403,30 @@ export const jlptSongs: SongLesson[] = [
         title: "廻廻奇譚",
         artist: "Eve",
         start: "00:00",
-        end: "01:00",
+        end: "01:30",
         focus: { es: "Vocabulario abstracto y complejo", en: "Abstract and complex vocabulary" },
         difficulty: 5,
-        youtubeId: "1tk1pqwrOys", // ✅ MV oficial Eve (Jujutsu Kaisen OP)
+        youtubeId: "v8bZVdTgXoY", // ✅ MV oficial Eve (Full Version)
         lyrics: [
-            { time: 10.0, text: "闇を祓って 闇を祓って", romaji: "yami wo haratte yami wo haratte", translation_es: "Exorcizando la oscuridad, expulsando la oscuridad", translation_en: "Exorcising the darkness, driving out the darkness" }
+            { time: 18.0, text: "有象無象 人の成り 虚聖深傷 人外もののけみたいだ", romaji: "uzou muzou hito no nari kyosei shinshou jingai mononoke mitai da", translation_es: "La gente corriente, las heridas profundas de la falsa santidad; parece algo inhumano, un mononoke.", translation_en: "The masses, the deep wounds of false holiness; it's like something inhuman, a mononoke." },
+            { time: 23.0, text: "虚心坦懐 命宿し あとはぱっぱらぱな中身なき人間", romaji: "kyoshin tankai inochi yadoshi ato wa pappara pa na nakami naki ningen", translation_es: "Con la mente abierta, albergando vida; el resto son humanos vacíos y atolondrados.", translation_en: "With an open mind, harboring life; the rest are empty, light-headed humans." },
+            { time: 29.0, text: "寄せる期待 不平等な人生 才能もない 大乗非日常が", romaji: "yoseru kitai fubyoudou na jinsei sainou mo nai daijou hi nichijou ga", translation_es: "Expectativas que se acercan, una vida desigual; lo extraordinario de lo cotidiano sin talento.", translation_en: "Approaching expectations, an unequal life; the extraordinary in the everyday without talent." },
+            { time: 34.0, text: "怨親平等に没個性 辿る記憶 僕に居場所などないから", romaji: "onshin byoudou ni botsu kosei tadoru kioku boku ni ibasho nado nai kara", translation_es: "Tratando a todos por igual sin individualidad; siguiendo recuerdos, porque no tengo un lugar al que pertenecer.", translation_en: "Treating everyone equally without individuality; tracing memories, because I have no place to belong." },
+            { time: 40.0, text: "夢の狭間で泣いてないで どんな顔すればいいか分かってる", romaji: "yume no hazama de naitenaide donna kao sureba ii ka wakatteru", translation_es: "No llores en la brecha entre los sueños; sé qué cara poner.", translation_en: "Don't cry in the gap between dreams; I know what kind of face to make." },
+            { time: 45.0, text: "だけどまだ応えてくれよ", romaji: "dakedomada kotaete kure yo", translation_es: "Pero todavía tienes que responder", translation_en: "But you still have to answer me" },
+            { time: 48.0, text: "闇を祓って 闇を祓って 夜の帳が下りたら合図だ", romaji: "yami wo haratte yami wo haratte yoru no tobari ga oritara aizu da", translation_es: "Exorciza la oscuridad, exorciza la oscuridad; cuando baje el velo de la noche, será la señal.", translation_en: "Exorcise the darkness, exorcise the darkness; when the veil of night falls, it's the signal." },
+            { time: 53.5, text: "相対して回る感情線 戯言などは吐き捨て行けと", romaji: "aitai shite mawaru kanjousen zaregoto nado wa hakisute ike to", translation_es: "Enfrentándome a las líneas emocionales que giran; vete escupiendo las tonterías.", translation_en: "Facing the revolving emotional lines; go while spitting out the nonsense." },
+            { time: 58.5, text: "まだ止めないで まだ止めないで 誰よりも聡くある街に生まれしこの正体を", romaji: "mada tomenaide mada tomenaide dare yori mo satoku aru machi ni umareshi kono shoutai wo", translation_es: "No te detengas todavía, no te detengas todavía; esta identidad nacida en una ciudad más sabia que ninguna.", translation_en: "Don't stop yet, don't stop yet; this identity born in a city wiser than any other." },
+            { time: 66.0, text: "今はただ呪い呪われた僕の未来を創造して", romaji: "ima wa tada noroi norowareta boku no mirai wo souzou shite", translation_es: "Ahora solo crea mi futuro, maldito y lleno de maldiciones.", translation_en: "Now just create my future, cursed and full of curses." },
+            { time: 71.0, text: "走って転んで 消えない痛み抱いては 世界が待ってる この一瞬を", romaji: "hashitte koronde kienai itami daite wa sekai ga matteru kono isshun wo", translation_es: "Corriendo, tropezando, abrazando un dolor que no desaparece; el mundo espera este instante.", translation_en: "Running, stumbling, embracing an unvanishing pain; the world is waiting for this moment." },
         ],
         vocab: [
-            { jp: "闇", kana: "やみ", romaji: "yami", en: "darkness", es: "oscuridad" },
-            { jp: "祓う", kana: "はらう", romaji: "harau", en: "to exorcise / drive away", es: "exorcizar / expulsar" }
+            { jp: "有象無象", kana: "うぞうむぞう", romaji: "uzoumuzou", en: "the masses / riffraff", es: "la gente corriente / chusma" },
+            { jp: "虚心坦懐", kana: "きょしんたんかい", romaji: "kyoshintankai", en: "with an open mind", es: "con la mente abierta" },
+            { jp: "不平等", kana: "ふびょうどう", romaji: "fubyoudou", en: "inequality / unfairness", es: "desigualdad / injusticia" },
+            { jp: "聡い", kana: "さとい", romaji: "satoi", en: "clever / sharp / wise", es: "sabio / agudo / inteligente" },
+            { jp: "呪い", kana: "のろい", romaji: "noroi", en: "curse", es: "maldición" },
+            { jp: "想像", kana: "そうぞう", romaji: "souzou", en: "imagination / creation", es: "imaginación / creación" }
         ]
     },
     {
