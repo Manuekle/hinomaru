@@ -245,34 +245,22 @@
 	</section>
 
 	<!-- Footer -->
-	<footer
-		style="padding:60px 24px; text-align:center; border-top:1px solid var(--ink-100); background:var(--bg-surface);"
-	>
-		<div
-			style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:20px;"
-		>
-			<span style="width:10px; height:10px; background:var(--hinomaru-red); border-radius:50%;"
-			></span>
-			<span style="font-weight:700; font-size:18px;">Hinomaru</span>
+	<footer class="landing-footer">
+		<div class="footer-brand">
+			<span class="brand-dot"></span>
+			<span class="brand-name">Hinomaru</span>
 		</div>
-		<div
-			style="font-size:14px; color:var(--fg-tertiary); display:flex; justify-content:center; gap:24px; margin-bottom:24px;"
-		>
-			<a href="/terms" style="color:inherit; text-decoration:none;">{t('terms.title', $locale)}</a>
-			<a href="/privacy" style="color:inherit; text-decoration:none;"
-				>{t('privacy.title', $locale)}</a
-			>
-			<a href="/contact" style="color:inherit; text-decoration:none;"
-				>{t('contact.title', $locale)}</a
-			>
+		<div class="footer-links">
+			<a href="/terms">{t('terms.title', $locale)}</a>
+			<a href="/privacy">{t('privacy.title', $locale)}</a>
+			<a href="/contact">{t('contact.title', $locale)}</a>
 			<a
 				href="https://ko-fi.com/manujsx"
 				target="_blank"
-				rel="noopener noreferrer"
-				style="color:inherit; text-decoration:none;">Ko-fi</a
+				rel="noopener noreferrer">Ko-fi</a
 			>
 		</div>
-		<div style="font-size:12px; color:var(--fg-tertiary);">
+		<div class="footer-copyright">
 			© 2026 Hinomaru 日の丸. {t('landing.footer.crafted', $locale)}
 		</div>
 	</footer>
@@ -369,6 +357,59 @@
 		color: var(--fg-tertiary);
 	}
 
+	.landing-footer {
+		padding: 60px 24px;
+		text-align: center;
+		border-top: 1px solid var(--ink-100);
+		background: var(--bg-surface);
+	}
+
+	.footer-brand {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 20px;
+	}
+
+	.brand-dot {
+		width: 10px;
+		height: 10px;
+		background: var(--hinomaru-red);
+		border-radius: 50%;
+	}
+
+	.brand-name {
+		font-weight: 700;
+		font-size: 18px;
+		color: var(--sumi);
+	}
+
+	.footer-links {
+		font-size: 14px;
+		color: var(--fg-tertiary);
+		display: flex;
+		justify-content: center;
+		gap: 24px;
+		margin-bottom: 24px;
+		flex-wrap: wrap;
+	}
+
+	.footer-links a {
+		color: inherit;
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+
+	.footer-links a:hover {
+		color: var(--sumi);
+	}
+
+	.footer-copyright {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+	}
+
 	@media (max-width: 900px) {
 		.hero-section {
 			grid-template-columns: 1fr !important;
@@ -423,6 +464,19 @@
 			width: 100% !important;
 			justify-content: center;
 		}
+		.footer-links {
+			gap: 16px;
+		}
+		.experience-card {
+			padding: 32px 20px;
+		}
+		.deck-item-minimal {
+			padding: 16px;
+			gap: 16px;
+		}
+		.hero-section img {
+			border-radius: 24px !important;
+		}
 	}
 
 	@media (max-width: 480px) {
@@ -433,6 +487,13 @@
 		}
 		.stats > div:last-child {
 			grid-column: span 2;
+		}
+		.footer-links {
+			flex-direction: column;
+			gap: 12px;
+		}
+		.landing-footer {
+			padding: 40px 24px;
 		}
 	}
 </style>

@@ -3,6 +3,7 @@
 	import { fadeUp, fadeIn, scaleIn } from '$lib/motion';
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
+	import * as Drawer from '$lib/components/ui/drawer';
 	import {
 		SmartPhone01Icon,
 		ArrowUp01Icon,
@@ -20,12 +21,6 @@
 	let isMobile = $state(false);
 	let desktopTab = $state<'ios' | 'android'>('ios');
 
-	// Swipe to close logic
-	let touchStartY = 0;
-	let touchCurrentY = 0;
-	let isSwiping = $state(false);
-	let swipeOffset = $state(0);
-
 	onMount(() => {
 		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 		isAndroid = /Android/.test(navigator.userAgent);
@@ -38,40 +33,8 @@
 		}
 	});
 
-	function handleTouchStart(e: TouchEvent) {
-		if (!isMobile) return;
-		touchStartY = e.touches[0].clientY;
-		isSwiping = true;
-	}
-
-	function handleTouchMove(e: TouchEvent) {
-		if (!isSwiping) return;
-		touchCurrentY = e.touches[0].clientY;
-		const deltaY = touchCurrentY - touchStartY;
-		if (deltaY > 0) {
-			swipeOffset = deltaY;
-		}
-	}
-
-	function handleTouchEnd() {
-		if (!isSwiping) return;
-		if (swipeOffset > 100) {
-			close();
-		}
-		isSwiping = false;
-		swipeOffset = 0;
-	}
-
 	function close() {
 		open = false;
-	}
-
-	function handleBackdropClick(e: MouseEvent) {
-		if (e.target === e.currentTarget) close();
-	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') close();
 	}
 
 	// i18n strings
@@ -137,230 +100,153 @@
 	]);
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<Drawer.Root bind:open>
+	<Drawer.Content class="p-0 border-none bg-transparent">
+		<div class="drawer-inner">
+			<!-- Close button -->
+			<button class="close-btn" onclick={close} aria-label={s.close}>
+				<Icon icon={Cancel01Icon} size={20} strokeWidth={1.5} />
+			</button>
 
-{#if open}
-	<!-- Backdrop -->
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div use:fadeIn class="backdrop" onclick={handleBackdropClick}></div>
+			<Drawer.Header class="p-0 mb-6">
+				<Drawer.Title class="drawer-title">
+					{#if isMobile}
+						{s.title}
+					{:else}
+						{s.desktopTitle}
+					{/if}
+				</Drawer.Title>
+			</Drawer.Header>
 
-	<!-- Drawer / Modal -->
-	<div
-		use:fadeIn={{ duration: 0.3 }}
-		class="drawer"
-		class:is-swiping={isSwiping}
-		style="--swipe-offset: {swipeOffset}px"
-		role="dialog"
-		aria-modal="true"
-		aria-label={s.title}
-		ontouchstart={handleTouchStart}
-		ontouchmove={handleTouchMove}
-		ontouchend={handleTouchEnd}
-	>
-		<!-- Close button -->
-		<button class="close-btn" onclick={close} aria-label={s.close}>
-			<Icon icon={Cancel01Icon} size={20} strokeWidth={1.5} />
-		</button>
-
-		<!-- Handle bar (mobile only) -->
-		<div class="handle-bar"></div>
-
-		<!-- Title -->
-		<h2 class="drawer-title">
-			{#if isMobile}
-				{s.title}
-			{:else}
-				{s.desktopTitle}
-			{/if}
-		</h2>
-
-		<!-- iOS content -->
-		{#if isIOS}
-			<div class="steps-list">
-				{#each iosSteps as step, i (i)}
-					<div class="step-item">
-						<div class="step-number">{i + 1}</div>
-						<div class="step-icon-wrap">
-							<Icon icon={step.icon} size={22} strokeWidth={1.5} color="var(--hinomaru-red)" />
-						</div>
-						<div class="step-text">
-							<div class="step-label">{step.label}</div>
-							<div class="step-desc">{step.desc}</div>
-						</div>
+			<div class="drawer-body">
+				<!-- iOS content -->
+				{#if isIOS}
+					<div class="steps-list">
+						{#each iosSteps as step, i (i)}
+							<div class="step-item">
+								<div class="step-number">{i + 1}</div>
+								<div class="step-icon-wrap">
+									<Icon icon={step.icon} size={22} strokeWidth={1.5} color="var(--hinomaru-red)" />
+								</div>
+								<div class="step-text">
+									<div class="step-label">{step.label}</div>
+									<div class="step-desc">{step.desc}</div>
+								</div>
+							</div>
+						{/each}
 					</div>
-				{/each}
-			</div>
 
-			<!-- Android content -->
-		{:else if isAndroid}
-			<div class="steps-list">
-				{#each androidSteps as step, i (i)}
-					<div class="step-item">
-						<div class="step-number">{i + 1}</div>
-						<div class="step-icon-wrap">
-							<Icon icon={step.icon} size={22} strokeWidth={1.5} color="var(--hinomaru-red)" />
-						</div>
-						<div class="step-text">
-							<div class="step-label">{step.label}</div>
-							<div class="step-desc">{step.desc}</div>
-						</div>
+					<!-- Android content -->
+				{:else if isAndroid}
+					<div class="steps-list">
+						{#each androidSteps as step, i (i)}
+							<div class="step-item">
+								<div class="step-number">{i + 1}</div>
+								<div class="step-icon-wrap">
+									<Icon icon={step.icon} size={22} strokeWidth={1.5} color="var(--hinomaru-red)" />
+								</div>
+								<div class="step-text">
+									<div class="step-label">{step.label}</div>
+									<div class="step-desc">{step.desc}</div>
+								</div>
+							</div>
+						{/each}
 					</div>
-				{/each}
-			</div>
 
-			<!-- Desktop content -->
-		{:else}
-			<p class="desktop-desc">{s.desktopDesc}</p>
+					<!-- Desktop content -->
+				{:else}
+					<p class="desktop-desc">{s.desktopDesc}</p>
 
-			<!-- QR placeholder -->
-			<div class="qr-block" use:scaleIn={{ delay: 0.1 }}>
-				<Icon icon={QrCode01Icon} size={80} strokeWidth={1} color="var(--sumi)" />
-				<span class="qr-url">hinomaru.app</span>
-			</div>
+					<!-- QR placeholder -->
+					<div class="qr-block" use:scaleIn={{ delay: 0.1 }}>
+						<Icon icon={QrCode01Icon} size={80} strokeWidth={1} color="var(--sumi)" />
+						<span class="qr-url">hinomaru.app</span>
+					</div>
 
-			<!-- Tabs -->
-			<div class="tabs">
-				<button
-					class="tab-btn"
-					class:tab-btn-active={desktopTab === 'ios'}
-					onclick={() => (desktopTab = 'ios')}
-				>
-					<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
-					{s.tabIOS}
-				</button>
-				<button
-					class="tab-btn"
-					class:tab-btn-active={desktopTab === 'android'}
-					onclick={() => (desktopTab = 'android')}
-				>
-					<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
-					{s.tabAndroid}
-				</button>
-			</div>
+					<!-- Tabs -->
+					<div class="tabs">
+						<button
+							class="tab-btn"
+							class:tab-btn-active={desktopTab === 'ios'}
+							onclick={() => (desktopTab = 'ios')}
+						>
+							<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
+							{s.tabIOS}
+						</button>
+						<button
+							class="tab-btn"
+							class:tab-btn-active={desktopTab === 'android'}
+							onclick={() => (desktopTab = 'android')}
+						>
+							<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
+							{s.tabAndroid}
+						</button>
+					</div>
 
-			<!-- Tab content -->
-			{#if desktopTab === 'ios'}
-				<div class="steps-list steps-list-compact">
-					{#each iosSteps as step, i (i)}
-						<div class="step-item">
-							<div class="step-number">{i + 1}</div>
-							<div class="step-icon-wrap">
-								<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
-							</div>
-							<div class="step-text">
-								<div class="step-label">{step.label}</div>
-								<div class="step-desc">{step.desc}</div>
-							</div>
+					<!-- Tab content -->
+					{#if desktopTab === 'ios'}
+						<div class="steps-list steps-list-compact">
+							{#each iosSteps as step, i (i)}
+								<div class="step-item">
+									<div class="step-number">{i + 1}</div>
+									<div class="step-icon-wrap">
+										<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
+									</div>
+									<div class="step-text">
+										<div class="step-label">{step.label}</div>
+										<div class="step-desc">{step.desc}</div>
+									</div>
+								</div>
+							{/each}
 						</div>
-					{/each}
-				</div>
-			{:else}
-				<div class="steps-list steps-list-compact">
-					{#each androidSteps as step, i (i)}
-						<div class="step-item">
-							<div class="step-number">{i + 1}</div>
-							<div class="step-icon-wrap">
-								<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
-							</div>
-							<div class="step-text">
-								<div class="step-label">{step.label}</div>
-								<div class="step-desc">{step.desc}</div>
-							</div>
+					{:else}
+						<div class="steps-list steps-list-compact">
+							{#each androidSteps as step, i (i)}
+								<div class="step-item">
+									<div class="step-number">{i + 1}</div>
+									<div class="step-icon-wrap">
+										<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
+									</div>
+									<div class="step-text">
+										<div class="step-label">{step.label}</div>
+										<div class="step-desc">{step.desc}</div>
+									</div>
+								</div>
+							{/each}
 						</div>
-					{/each}
-				</div>
-			{/if}
+					{/if}
 
-			<p class="pwa-note">{s.desktopPWANote}</p>
-		{/if}
-	</div>
-{/if}
+					<p class="pwa-note">{s.desktopPWANote}</p>
+				{/if}
+			</div>
+		</div>
+	</Drawer.Content>
+</Drawer.Root>
 
 <style>
-	/* Backdrop */
-	.backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
-		z-index: 199;
-	}
-
-	/* Drawer base (mobile-first: bottom sheet) */
-	.drawer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		z-index: 200;
+	.drawer-inner {
 		background: var(--bg-surface);
 		border-radius: 24px 24px 0 0;
-		padding: 32px 24px env(safe-area-inset-bottom, 20px);
+		padding: 32px 24px calc(24px + env(safe-area-inset-bottom, 20px));
 		box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
-		max-height: 90dvh;
-		overflow-y: auto;
-		transform: translateY(var(--swipe-offset, 0px));
-		transition: transform 0.4s var(--ease-brand);
-		will-change: transform;
-	}
-	@keyframes drawer-slide-up {
-		from { transform: translateY(100%); }
-		to { transform: translateY(0px); }
-	}
-	:not(.is-android) .drawer {
-		animation: drawer-slide-up 0.4s var(--ease-brand);
-	}
-	.drawer.is-swiping {
-		transition: none !important;
-	}
-
-	/* Force modal for Android and Desktop */
-	:global(.is-android) .drawer {
-		bottom: auto;
-		left: 50%;
-		top: 50%;
-		right: auto;
-		transform: translate(-50%, calc(-50% + var(--swipe-offset, 0px))) !important;
-		border-radius: 24px;
-		width: min(480px, 90vw);
-		max-height: 85dvh;
-		padding: 32px 32px 36px;
-		animation: drawer-pop-in 0.3s var(--ease-brand);
-	}
-	@keyframes drawer-pop-in {
-		from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; }
-		to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-	}
-
-	:global(.is-android) .handle-bar {
-		display: none;
+		position: relative;
 	}
 
 	@media (min-width: 768px) {
-		.drawer {
-			bottom: auto;
-			left: 50%;
-			top: 50%;
-			right: auto;
-			transform: translate(-50%, calc(-50% + var(--swipe-offset, 0px))) !important;
+		.drawer-inner {
 			border-radius: 24px;
 			width: min(480px, 90vw);
-			max-height: 85dvh;
+			margin: 0 auto 40px;
 			padding: 32px 32px 36px;
-			animation: drawer-pop-in 0.3s var(--ease-brand);
-		}
-		.handle-bar {
-			display: none;
 		}
 	}
 
-	/* Handle bar */
-	.handle-bar {
-		width: 40px;
-		height: 4px;
-		background: var(--ink-200);
-		border-radius: 2px;
-		margin: 0 auto 24px;
+	/* Force modal for Android */
+	:global(.is-android) .drawer-inner {
+		border-radius: 24px;
+		width: min(480px, 90vw);
+		margin: 0 auto 40px;
+		padding: 32px 32px 36px;
 	}
 
 	/* Close button */
@@ -382,6 +268,7 @@
 			background 150ms ease,
 			color 150ms ease;
 		padding: 0;
+		z-index: 10;
 	}
 	.close-btn:hover {
 		background: var(--ink-100);
@@ -393,9 +280,10 @@
 		font-size: 22px;
 		font-weight: 400;
 		color: var(--sumi);
-		margin: 0 0 24px;
+		margin: 0;
 		letter-spacing: -0.02em;
 		padding-right: 40px;
+		text-align: left;
 	}
 
 	/* Steps list */
@@ -451,6 +339,7 @@
 	.step-text {
 		flex: 1;
 		padding-top: 2px;
+		text-align: left;
 	}
 
 	.step-label {
@@ -473,6 +362,7 @@
 		color: var(--fg-secondary);
 		margin: 0 0 20px;
 		line-height: 1.5;
+		text-align: left;
 	}
 
 	.qr-block {
@@ -543,5 +433,6 @@
 		opacity: 0.7;
 		border-top: 1px solid var(--ink-100);
 		padding-top: 14px;
+		text-align: left;
 	}
 </style>
