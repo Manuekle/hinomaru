@@ -12,6 +12,8 @@
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon, Award01Icon, BookOpen01Icon } from '@hugeicons/core-free-icons';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
+	import { updateStreak } from '$lib/utils/updateStreak';
+	import { addXP } from '$lib/utils/gamification';
 	import { svileo } from '$lib/stores/toast';
 	import type { PageData } from './$types';
 
@@ -116,14 +118,20 @@
 	async function saveRead() {
 		if (!story || !supabase) return;
 		try {
-			await supabase.from('user_story_reads').upsert(
-				{
-					user_id: data.userId,
-					story_id: story.id,
-					quiz_score: score
-				},
+			const { data: { user } } = await supabase.auth.getUser();
+			if (!user) return;
+			supabase.from('user_story_reads').upsert(
+				{ user_id: user.id, story_id: story.id, quiz_score: score },
 				{ onConflict: 'user_id,story_id' }
 			);
+			supabase.from('sessions').insert({
+				user_id: user.id,
+				mode: 'story',
+				correct: score,
+				total: quiz.length
+			});
+			updateStreak(supabase, user.id);
+			addXP(supabase, user.id, score * 5 + 10);
 		} catch {
 			// silent fail
 		}

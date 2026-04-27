@@ -8,6 +8,7 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { updateStreak } from '$lib/utils/updateStreak';
+	import { addXP } from '$lib/utils/gamification';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon, Award01Icon, BubbleChatIcon } from '@hugeicons/core-free-icons';
@@ -73,7 +74,16 @@
 		}
 		try {
 			const { data: { user } } = await supabase.auth.getUser();
-			if (user) await updateStreak(supabase, user.id);
+			if (user) {
+				supabase.from('sessions').insert({
+					user_id: user.id,
+					mode: 'conversation',
+					correct: score,
+					total: totalChoices
+				});
+				updateStreak(supabase, user.id);
+				addXP(supabase, user.id, score * 5 + 10);
+			}
 		} catch { /* non-critical */ }
 		svileo.success({ title: $locale === 'es' ? '¡Conversación completada!' : 'Conversation complete!' });
 	}

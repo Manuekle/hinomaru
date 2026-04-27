@@ -5,6 +5,7 @@
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { updateStreak } from '$lib/utils/updateStreak';
+	import { addXP } from '$lib/utils/gamification';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -215,6 +216,8 @@
 			});
 
 			await updateStreak(supabase, user.id);
+			const xpEarned = score * 5;
+			if (xpEarned > 0) await addXP(supabase, user.id, xpEarned);
 		} catch {
 			// silent
 		}

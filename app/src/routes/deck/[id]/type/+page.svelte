@@ -57,29 +57,26 @@
 	}
 
 	async function next() {
-		// Save progress for this specific card before moving to next
-		await updateCardProgress(card, isCorrect, struggled);
+		updateCardProgress(card, isCorrect, struggled);
 
 		if (i >= cards.length - 1) {
-			const {
-				data: { user }
-			} = await supabase.auth.getUser();
-			if (user) {
-				await supabase.from('sessions').insert({
-					user_id: user.id,
-					deck_id: data.deck.id,
-					mode: 'type',
-					correct,
-					total: cards.length
-				});
-				await updateStreak(supabase, user.id);
-			}
 			const params = new URLSearchParams({
 				correct: String(correct),
 				total: String(cards.length),
 				mode: 'type'
 			});
 			goto(`/deck/${data.deck.id}/summary?${params}`);
+			supabase.auth.getUser().then(({ data: { user } }) => {
+				if (!user) return;
+				supabase.from('sessions').insert({
+					user_id: user.id,
+					deck_id: data.deck.id,
+					mode: 'type',
+					correct,
+					total: cards.length
+				});
+				updateStreak(supabase, user.id);
+			});
 		} else {
 			submitted = false;
 			answer = '';

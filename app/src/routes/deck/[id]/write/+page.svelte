@@ -339,21 +339,20 @@
 			playWrong();
 		}
 
-		await updateCardProgress(card, gotIt, struggled);
+		updateCardProgress(card, gotIt, struggled);
 
 		if (gotIt) {
 			if (i >= quizCards.length - 1) {
-				if (cardEl) {
-					await animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.3, ease: 'easeIn' })
-						.finished;
-				}
-				await saveSession(correctCount, data.cards.length);
 				const params = new URLSearchParams({
 					correct: String(correctCount),
 					total: String(data.cards.length),
 					mode: 'write'
 				});
+				if (cardEl) {
+					animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
+				}
 				goto(`/deck/${data.deck.id}/summary?${params}`);
+				saveSession(correctCount, data.cards.length);
 			} else {
 				if (cardEl) {
 					await animate(cardEl, { opacity: [1, 0], x: [0, -40] }, { duration: 0.2, ease: 'easeIn' })

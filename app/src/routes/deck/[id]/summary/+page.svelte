@@ -114,19 +114,7 @@
 		</div>
 
 		<StickyFooter>
-			<a
-				href="/"
-				class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
-				style="transition:box-shadow 180ms ease, transform 150ms ease;"
-				onmouseenter={(e) => {
-					(e.currentTarget as HTMLElement).style.boxShadow = '0 8px 28px rgba(188,0,45,0.30)';
-					(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-				}}
-				onmouseleave={(e) => {
-					(e.currentTarget as HTMLElement).style.boxShadow = '';
-					(e.currentTarget as HTMLElement).style.transform = '';
-				}}
-			>
+			<a href="/" class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg summary-back-btn">
 				{t('summary.back', $locale)}
 			</a>
 		</StickyFooter>
@@ -138,6 +126,11 @@
 </div>
 
 <style>
+	.summary-back-btn:hover {
+		box-shadow: 0 8px 28px rgba(188, 0, 45, 0.3);
+		transform: translateY(-2px);
+	}
+
 	@keyframes pulse-bg {
 		0%,
 		100% {

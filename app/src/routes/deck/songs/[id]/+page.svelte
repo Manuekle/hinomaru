@@ -17,7 +17,12 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { svileo } from '$lib/stores/toast';
 	import { playFinish } from '$lib/utils/sounds';
+	import { createClient } from '$lib/supabase';
+	import { updateStreak } from '$lib/utils/updateStreak';
+	import { addXP } from '$lib/utils/gamification';
 	import Confetti from '$lib/components/Confetti.svelte';
+
+	const supabase = createClient();
 	import DotLoader from '$lib/components/DotLoader.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
@@ -198,6 +203,17 @@
 			} catch {
 				// ignore
 			}
+			supabase.auth.getUser().then(({ data: { user } }) => {
+				if (!user) return;
+				supabase.from('sessions').insert({
+					user_id: user.id,
+					mode: 'song',
+					correct: 1,
+					total: 1
+				});
+				updateStreak(supabase, user.id);
+				addXP(supabase, user.id, 20);
+			});
 		}
 	}
 

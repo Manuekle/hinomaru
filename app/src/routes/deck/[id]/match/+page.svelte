@@ -8,7 +8,6 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { onMount, onDestroy } from 'svelte';
 	import SessionNav from '$lib/components/SessionNav.svelte';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { Award01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
@@ -16,6 +15,7 @@
 	import { svileo } from '$lib/stores/toast';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
+	import { addXP } from '$lib/utils/gamification';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -139,10 +139,9 @@
 		finished = true;
 		playFinish();
 
-		const {
-			data: { user }
-		} = await supabase.auth.getUser();
-		if (user) {
+		// Fire DB ops in background — don't block UI
+		supabase.auth.getUser().then(async ({ data: { user } }) => {
+			if (!user) return;
 			await supabase.from('sessions').insert({
 				user_id: user.id,
 				deck_id: data.deck.id,
@@ -150,25 +149,23 @@
 				correct: allCards.length,
 				total: allCards.length
 			});
-
-			// Save SRS progress for every card (match = correct, no struggle)
-			for (const card of allCards) {
-				const currentProgress = card.progress && card.progress.length > 0 ? card.progress[0] : undefined;
-				const quality = mapPerformanceToQuality(true, false);
-				const nextState = calculateNextReview(quality, currentProgress);
-				await supabase.from('progress').upsert({
-					user_id: user.id,
-					card_id: card.id,
-					learned: true,
-					...nextState,
-					last_seen: new Date().toISOString()
-				});
-			}
-
+			await Promise.all(
+				allCards.map((card) => {
+					const currentProgress = card.progress?.[0];
+					const quality = mapPerformanceToQuality(true, false);
+					const nextState = calculateNextReview(quality, currentProgress);
+					return supabase.from('progress').upsert({
+						user_id: user.id,
+						card_id: card.id,
+						learned: true,
+						...nextState,
+						last_seen: new Date().toISOString()
+					});
+				})
+			);
 			await updateStreak(supabase, user.id);
-		}
-
-		svileo.success({ title: t('session.wellDone', $locale) || '¡Muy bien!' });
+			await addXP(supabase, user.id, allCards.length * 5);
+		});
 	}
 
 	function goBack() {
@@ -259,23 +256,20 @@
 		<div class="finish-overlay">
 			<div class="finish-card">
 				<div class="finish-icon">
-					<Icon icon={Award01Icon} size={48} color="var(--sumi)" strokeWidth={1.5} />
+					<Icon icon={Award01Icon} size={48} color="var(--washi)" strokeWidth={1.5} />
 				</div>
 				<h2>{t('session.wellDone', $locale) || '¡Muy bien!'}</h2>
 				<div class="finish-time">{formatTime(finalTime)}</div>
-				<p style="color:var(--fg-secondary);font-size:15px;margin-bottom:32px;">
+				<p style="color:var(--fg-secondary);font-size:15px;margin:0 0 32px;">
 					{allCards.length}
 					{t('home.cards', $locale) || 'cartas'} completadas
 				</p>
-				<StickyFooter>
+				<div class="finish-actions">
 					<button
-						class="hm-btn hm-btn-primary hm-btn-full"
+						class="hm-btn hm-btn-secondary"
 						style="flex:1;"
 						onclick={() => {
-							if (timerInterval) {
-								clearInterval(timerInterval);
-								timerInterval = null;
-							}
+							if (timerInterval) clearInterval(timerInterval);
 							finished = false;
 							currentIndex = 0;
 							elapsed = 0;
@@ -284,12 +278,12 @@
 							timerInterval = setInterval(() => elapsed++, 1000);
 						}}
 					>
-						↺ {t('session.again', $locale) || 'Jugar de nuevo'}
+						↺ {t('session.again', $locale) || 'Otra vez'}
 					</button>
-					<button class="hm-btn hm-btn-dark hm-btn-full" style="flex:1;" onclick={goBack}>
+					<button class="hm-btn hm-btn-dark" style="flex:1;" onclick={goBack}>
 						{t('session.finish', $locale) || 'Terminar'}
 					</button>
-				</StickyFooter>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -503,9 +497,14 @@
 	}
 
 	.finish-icon {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		background: var(--hinomaru-red);
 		display: flex;
+		align-items: center;
 		justify-content: center;
-		margin-bottom: 16px;
+		margin: 0 auto 20px;
 	}
 
 	.finish-card h2 {
@@ -523,6 +522,12 @@
 		font-variant-numeric: tabular-nums;
 		letter-spacing: -0.02em;
 		margin-bottom: 8px;
+	}
+
+	.finish-actions {
+		display: flex;
+		gap: 10px;
+		width: 100%;
 	}
 
 	/* ── Animations ── */

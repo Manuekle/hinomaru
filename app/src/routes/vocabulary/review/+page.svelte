@@ -13,6 +13,7 @@
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { addXP } from '$lib/utils/gamification';
+	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import confetti from 'canvas-confetti';
@@ -71,13 +72,13 @@
 
 	async function next(gotIt: boolean) {
 		flipped = false;
-
-		await updateWordProgress(word, gotIt, struggled);
+		if (gotIt) playCorrect();
+		updateWordProgress(word, gotIt, struggled);
 
 		if (i >= words.length - 1) {
+			playFinish();
 			if (cardEl) {
-				await animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.3, ease: 'easeIn' })
-					.finished;
+				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
 			}
 			confetti({
 				particleCount: 60,
@@ -101,8 +102,7 @@
 				colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
 				scalar: 0.9
 			}), 80);
-			await saveSession();
-			// Short delay to enjoy confetti
+			saveSession();
 			setTimeout(() => goto('/vocabulary'), 1500);
 		} else {
 			if (cardEl) {
@@ -130,6 +130,7 @@
 
 	async function retry() {
 		struggled = true;
+		playWrong();
 		flipped = false;
 		if (cardEl) {
 			animate(cardEl, { scale: [1, 0.98, 1] }, { duration: 0.3 });

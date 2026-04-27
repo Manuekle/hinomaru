@@ -68,21 +68,19 @@
 		}
 		flipped = false;
 
-		await updateCardProgress(card, gotIt, struggled);
+		updateCardProgress(card, gotIt, struggled);
 
 		if (i >= cards.length - 1) {
-			// Fade out before leaving
-			if (cardEl) {
-				await animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.3, ease: 'easeIn' })
-					.finished;
-			}
-			await saveSession(correct, cards.length);
 			const params = new URLSearchParams({
 				correct: String(correct),
 				total: String(cards.length),
 				mode: 'flashcards'
 			});
+			if (cardEl) {
+				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
+			}
 			goto(`/deck/${data.deck.id}/summary?${params}`);
+			saveSession(correct, cards.length);
 		} else {
 			// Slide out current, slide in next
 			if (cardEl) {
