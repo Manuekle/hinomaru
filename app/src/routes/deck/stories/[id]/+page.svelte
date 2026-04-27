@@ -6,7 +6,8 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
-	import { fade } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -272,7 +273,7 @@
 	</title>
 </svelte:head>
 
-<div class="story-viewer-layout" class:reading-mode={isReadingMode} data-theme={isReadingMode ? readingTheme : undefined} style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}">
+<div class="story-viewer-layout" class:reading-mode={isReadingMode} data-theme={readingTheme} style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}">
 	<!-- Standardized Container matching Dashboard -->
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
@@ -321,7 +322,7 @@
 					</p>
 
 					{#if $showRomaji && story.body_romaji}
-						<p class="body-text-romaji" use:fadeUp={{ y: 5 }}>{story.body_romaji}</p>
+						<p class="body-text-romaji" use:fadeUp={{ y: 5 }}>{story.body_romaji.replace(/\\n/g, '\n')}</p>
 					{/if}
 
 					<div class="translation-section">
@@ -425,8 +426,7 @@
 				<div 
 					class="reading-mode-overlay" 
 					data-theme={readingTheme}
-					in:fade={{ duration: 250 }}
-					out:fade={{ duration: 200 }}
+					in:fly={{ y: 1000, duration: 500, easing: quintOut, opacity: 1 }}
 					style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
 				>
 					<div class="reading-mode-content">
@@ -444,7 +444,7 @@
 						</div>
 
 						{#if $showRomaji && story.body_romaji}
-							<p class="body-text-romaji" in:fade={{ duration: 200 }}>{story.body_romaji}</p>
+							<p class="body-text-romaji" in:fade={{ duration: 200 }}>{story.body_romaji.replace(/\\n/g, '\n')}</p>
 						{/if}
 
 						{#if showTranslation}
@@ -678,7 +678,7 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
-		background: var(--paper);
+		background: var(--bg-page, var(--paper));
 	}
 
 	.back-link-beautiful {
@@ -1355,7 +1355,8 @@
 
 	/* --- Reading Mode Overrides --- */
 	.story-viewer-layout {
-		transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		/* Remove background transition to avoid flashes */
+		transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 		min-height: 100vh;
 	}
 
@@ -1371,6 +1372,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		outline: none;
+		border: none;
 	}
 
 	.reading-mode-content {
@@ -1435,7 +1438,7 @@
 	}
 
 	.reading-mode .story-body-card {
-		border: none;
+		border-color: transparent;
 		box-shadow: none;
 		padding: 0;
 		background: transparent;
@@ -1477,11 +1480,18 @@
 	.reading-mode-overlay .body-text-romaji {
 		font-size: calc(var(--story-fs) * 0.65);
 		opacity: 0.7;
-		margin-top: -30px;
+		margin-top: 10px;
 		margin-bottom: 40px;
-		text-align: justify;
+		text-align: left;
 		font-style: italic;
 		color: var(--hinomaru-red);
+		white-space: pre-wrap;
+	}
+
+	@media (min-width: 600px) {
+		.reading-mode-overlay .body-text-romaji {
+			text-align: justify;
+		}
 	}
 
 	.reading-mode-overlay .body-text-translated {
