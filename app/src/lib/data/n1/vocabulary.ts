@@ -9,6 +9,10 @@ export const vocabulary: CardData[] = [
 		example: '概念を理解する。',
 		example_en: 'Understand the concept.',
 		example_es: 'Entender el concepto.',
+		category: 'Academic',
+		category_es: 'Académico',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 1
 	},
 	{
@@ -19,6 +23,10 @@ export const vocabulary: CardData[] = [
 		example: '哲学を学ぶ。',
 		example_en: 'Study philosophy.',
 		example_es: 'Estudiar filosofía.',
+		category: 'Academic',
+		category_es: 'Académico',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 2
 	},
 	{
@@ -29,6 +37,10 @@ export const vocabulary: CardData[] = [
 		example: '抽象的な考え。',
 		example_en: 'Abstract idea.',
 		example_es: 'Idea abstracta.',
+		category: 'Academic',
+		category_es: 'Académico',
+		pos: 'adj',
+		pos_es: 'adjetivo',
 		sort_order: 3
 	},
 	{
@@ -39,6 +51,10 @@ export const vocabulary: CardData[] = [
 		example: '矛盾が生じる。',
 		example_en: 'A contradiction arises.',
 		example_es: 'Surge una contradicción.',
+		category: 'Academic',
+		category_es: 'Académico',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 4
 	},
 	{
@@ -49,6 +65,10 @@ export const vocabulary: CardData[] = [
 		example: '平和の象徴。',
 		example_en: 'Symbol of peace.',
 		example_es: 'Símbolo de paz.',
+		category: 'Academic',
+		category_es: 'Académico',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 5
-	}
+	},
 ];

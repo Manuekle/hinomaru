@@ -12,6 +12,10 @@ export const vocabulary: CardData[] = [
 		example: 'おはようございます、田中さん。',
 		example_en: 'Good morning, Mr. Tanaka.',
 		example_es: 'Buenos días, Sr. Tanaka.',
+		category: 'Greetings',
+		category_es: 'Saludos',
+		pos: 'phrase',
+		pos_es: 'frase',
 		sort_order: 1
 	},
 	{
@@ -114,6 +118,10 @@ export const vocabulary: CardData[] = [
 		example: 'わたしは学生です。',
 		example_en: 'I am a student.',
 		example_es: 'Yo soy estudiante.',
+		category: 'Pronouns',
+		category_es: 'Pronombres',
+		pos: 'pronoun',
+		pos_es: 'pronombre',
 		sort_order: 11
 	},
 	{
@@ -166,6 +174,10 @@ export const vocabulary: CardData[] = [
 		example: 'これは何ですか。',
 		example_en: 'What is this?',
 		example_es: '¿Qué es esto?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 16
 	},
 	{
@@ -176,6 +188,10 @@ export const vocabulary: CardData[] = [
 		example: 'だれですか。',
 		example_en: 'Who is it?',
 		example_es: '¿Quién es?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'pronoun',
+		pos_es: 'pronombre',
 		sort_order: 17
 	},
 	{
@@ -186,6 +202,10 @@ export const vocabulary: CardData[] = [
 		example: 'トイレはどこですか。',
 		example_en: 'Where is the bathroom?',
 		example_es: '¿Dónde está el baño?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'pronoun',
+		pos_es: 'pronombre',
 		sort_order: 18
 	},
 	{
@@ -195,7 +215,11 @@ export const vocabulary: CardData[] = [
 		es: 'cuándo',
 		example: 'いつ来ますか。',
 		example_en: 'When are you coming?',
-		example_es: '¿Cuándo vienes?',
+		example_es: '¿Cuál es la fecha?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 19
 	},
 	{
@@ -206,6 +230,10 @@ export const vocabulary: CardData[] = [
 		example: '日本語はどうですか。',
 		example_en: 'How is Japanese?',
 		example_es: '¿Cómo te parece el japonés?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 20
 	},
 	{
@@ -216,6 +244,10 @@ export const vocabulary: CardData[] = [
 		example: 'なぜ日本語を勉強しますか。',
 		example_en: 'Why do you study Japanese?',
 		example_es: '¿Por qué estudias japonés?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 21
 	},
 	{
@@ -226,6 +258,10 @@ export const vocabulary: CardData[] = [
 		example: 'これはいくらですか。',
 		example_en: 'How much is this?',
 		example_es: '¿Cuánto cuesta esto?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 22
 	},
 	{
@@ -236,6 +272,10 @@ export const vocabulary: CardData[] = [
 		example: 'りんごはいくつありますか。',
 		example_en: 'How many apples are there?',
 		example_es: '¿Cuántas manzanas hay?',
+		category: 'Question Words',
+		category_es: 'Preguntas',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 23
 	},
 
@@ -248,6 +288,10 @@ export const vocabulary: CardData[] = [
 		example: 'いちばんです。',
 		example_en: "It's number one.",
 		example_es: 'Es el número uno.',
+		category: 'Numbers',
+		category_es: 'Números',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 24
 	},
 	{
@@ -258,6 +302,10 @@ export const vocabulary: CardData[] = [
 		example: 'ふたりです。',
 		example_en: 'There are two people.',
 		example_es: 'Somos dos personas.',
+		category: 'Numbers',
+		category_es: 'Números',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 25
 	},
 	{
@@ -268,6 +316,10 @@ export const vocabulary: CardData[] = [
 		example: 'さんびゃく円です。',
 		example_en: 'It is 300 yen.',
 		example_es: 'Son 300 yenes.',
+		category: 'Numbers',
+		category_es: 'Números',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 26
 	},
 	{
@@ -278,6 +330,10 @@ export const vocabulary: CardData[] = [
 		example: 'よんじゅう円。',
 		example_en: '40 yen.',
 		example_es: '40 yenes.',
+		category: 'Numbers',
+		category_es: 'Números',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 27
 	},
 	{
@@ -288,6 +344,10 @@ export const vocabulary: CardData[] = [
 		example: 'ごふんまってください。',
 		example_en: 'Please wait 5 minutes.',
 		example_es: 'Por favor espera 5 minutos.',
+		category: 'Numbers',
+		category_es: 'Números',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 28
 	},
 	{
@@ -350,6 +410,10 @@ export const vocabulary: CardData[] = [
 		example: 'いまなんじですか。',
 		example_en: 'What time is it now?',
 		example_es: '¿Qué hora es ahora?',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 34
 	},
 	{
@@ -360,6 +424,10 @@ export const vocabulary: CardData[] = [
 		example: 'きょうは月曜日です。',
 		example_en: 'Today is Monday.',
 		example_es: 'Hoy es lunes.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 35
 	},
 	{
@@ -370,6 +438,10 @@ export const vocabulary: CardData[] = [
 		example: 'あしたは休みです。',
 		example_en: 'Tomorrow is a day off.',
 		example_es: 'Mañana es día libre.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 36
 	},
 	{
@@ -380,6 +452,10 @@ export const vocabulary: CardData[] = [
 		example: 'きのうは楽しかったです。',
 		example_en: 'Yesterday was fun.',
 		example_es: 'Ayer fue divertido.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 37
 	},
 	{
@@ -390,6 +466,10 @@ export const vocabulary: CardData[] = [
 		example: 'まいにち日本語を勉強します。',
 		example_en: 'I study Japanese every day.',
 		example_es: 'Estudio japonés todos los días.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'adverb',
+		pos_es: 'adverbio',
 		sort_order: 38
 	},
 	{
@@ -400,6 +480,10 @@ export const vocabulary: CardData[] = [
 		example: 'あさごはんを食べます。',
 		example_en: 'I eat breakfast.',
 		example_es: 'Desayuno.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 39
 	},
 	{
@@ -410,6 +494,10 @@ export const vocabulary: CardData[] = [
 		example: 'ひるごはんはカレーです。',
 		example_en: 'Lunch is curry.',
 		example_es: 'El almuerzo es curry.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 40
 	},
 	{
@@ -420,6 +508,10 @@ export const vocabulary: CardData[] = [
 		example: 'よるはすしを食べます。',
 		example_en: 'I eat sushi at night.',
 		example_es: 'Como sushi por la noche.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 41
 	},
 	{
@@ -430,6 +522,10 @@ export const vocabulary: CardData[] = [
 		example: 'ことしは二千二十五年です。',
 		example_en: 'This year is 2025.',
 		example_es: 'Este año es 2025.',
+		category: 'Time',
+		category_es: 'Tiempo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 42
 	},
 
@@ -442,6 +538,10 @@ export const vocabulary: CardData[] = [
 		example: 'おとうさんはどこですか。',
 		example_en: 'Where is your father?',
 		example_es: '¿Dónde está tu padre?',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 43
 	},
 	{
@@ -452,6 +552,10 @@ export const vocabulary: CardData[] = [
 		example: 'おかあさんは先生です。',
 		example_en: 'Your mother is a teacher.',
 		example_es: 'Tu madre es profesora.',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 44
 	},
 	{
@@ -462,6 +566,10 @@ export const vocabulary: CardData[] = [
 		example: 'おにいさんがいますか。',
 		example_en: 'Do you have an older brother?',
 		example_es: '¿Tienes un hermano mayor?',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 45
 	},
 	{
@@ -472,6 +580,10 @@ export const vocabulary: CardData[] = [
 		example: 'おねえさんはかわいいです。',
 		example_en: 'Your older sister is cute.',
 		example_es: 'Tu hermana mayor es bonita.',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 46
 	},
 	{
@@ -482,6 +594,10 @@ export const vocabulary: CardData[] = [
 		example: 'おとうとは中学生です。',
 		example_en: 'My younger brother is in middle school.',
 		example_es: 'Mi hermano menor está en la secundaria.',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 47
 	},
 	{
@@ -492,6 +608,10 @@ export const vocabulary: CardData[] = [
 		example: 'いもうとはかわいいです。',
 		example_en: 'My younger sister is cute.',
 		example_es: 'Mi hermana menor es linda.',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 48
 	},
 	{
@@ -502,6 +622,10 @@ export const vocabulary: CardData[] = [
 		example: 'こどもが好きです。',
 		example_en: 'I like children.',
 		example_es: 'Me gustan los niños.',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 49
 	},
 	{
@@ -512,6 +636,10 @@ export const vocabulary: CardData[] = [
 		example: 'かぞくは四人です。',
 		example_en: 'My family has four members.',
 		example_es: 'Mi familia tiene cuatro miembros.',
+		category: 'Family',
+		category_es: 'Familia',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 50
 	},
 	{
@@ -522,6 +650,10 @@ export const vocabulary: CardData[] = [
 		example: 'ともだちとえいがを見ます。',
 		example_en: 'I watch movies with friends.',
 		example_es: 'Veo películas con amigos.',
+		category: 'People',
+		category_es: 'Gente',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 51
 	},
 
@@ -534,6 +666,10 @@ export const vocabulary: CardData[] = [
 		example: 'ごはんを食べます。',
 		example_en: 'I eat rice.',
 		example_es: 'Como arroz.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 52
 	},
 	{
@@ -544,6 +680,10 @@ export const vocabulary: CardData[] = [
 		example: 'あさはパンを食べます。',
 		example_en: 'I eat bread in the morning.',
 		example_es: 'Como pan por la mañana.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 53
 	},
 	{
@@ -554,6 +694,10 @@ export const vocabulary: CardData[] = [
 		example: 'さかなが好きです。',
 		example_en: 'I like fish.',
 		example_es: 'Me gusta el pescado.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 54
 	},
 	{
@@ -564,6 +708,10 @@ export const vocabulary: CardData[] = [
 		example: 'にくを食べます。',
 		example_en: 'I eat meat.',
 		example_es: 'Como carne.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 55
 	},
 	{
@@ -574,6 +722,10 @@ export const vocabulary: CardData[] = [
 		example: 'たまごが二つあります。',
 		example_en: 'There are two eggs.',
 		example_es: 'Hay dos huevos.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 56
 	},
 	{
@@ -584,6 +736,10 @@ export const vocabulary: CardData[] = [
 		example: 'やさいが好きじゃないです。',
 		example_en: "I don't like vegetables.",
 		example_es: 'No me gustan las verduras.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 57
 	},
 	{
@@ -594,6 +750,10 @@ export const vocabulary: CardData[] = [
 		example: 'くだものは体にいいです。',
 		example_en: 'Fruit is good for your body.',
 		example_es: 'La fruta es buena para el cuerpo.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 58
 	},
 	{
@@ -604,6 +764,10 @@ export const vocabulary: CardData[] = [
 		example: 'みずを飲みます。',
 		example_en: 'I drink water.',
 		example_es: 'Bebo agua.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 59
 	},
 	{
@@ -614,6 +778,10 @@ export const vocabulary: CardData[] = [
 		example: 'おちゃをどうぞ。',
 		example_en: 'Please have some tea.',
 		example_es: 'Por favor, tome un poco de té.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 60
 	},
 	{
@@ -624,6 +792,10 @@ export const vocabulary: CardData[] = [
 		example: 'まいあさコーヒーを飲みます。',
 		example_en: 'I drink coffee every morning.',
 		example_es: 'Bebo café todas las mañanas.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 61
 	},
 	{
@@ -631,30 +803,98 @@ export const vocabulary: CardData[] = [
 		romaji: 'gyuunyuu',
 		en: 'milk',
 		es: 'leche',
-		example: 'ぎゅうにゅうが好きです。',
-		example_en: 'I like milk.',
-		example_es: 'Me gusta la leche.',
+		example: 'ぎゅうにゅうをのみます。',
+		example_en: 'I drink milk.',
+		example_es: 'Bebo leche.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 62
 	},
 	{
-		jp: 'すし',
-		romaji: 'sushi',
-		en: 'sushi',
-		es: 'sushi',
-		example: 'すしを食べたいです。',
-		example_en: 'I want to eat sushi.',
-		example_es: 'Quiero comer sushi.',
+		jp: 'りんご',
+		romaji: 'ringo',
+		en: 'apple',
+		es: 'manzana',
+		example: 'りんごを食べます。',
+		example_en: 'I eat an apple.',
+		example_es: 'Como una manzana.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 63
+	},
+	{
+		jp: 'バナナ',
+		romaji: 'banana',
+		en: 'banana',
+		es: 'plátano',
+		example: 'バナナはおいしいです。',
+		example_en: 'Bananas are delicious.',
+		example_es: 'Los plátanos son deliciosos.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 64
+	},
+	{
+		jp: 'おにぎり',
+		romaji: 'onigiri',
+		en: 'rice ball',
+		es: 'bola de arroz',
+		example: 'おにぎりを買いました。',
+		example_en: 'I bought a rice ball.',
+		example_es: 'Compré una bola de arroz.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 65
+	},
+	{
+		jp: 'みそしる',
+		romaji: 'misoshiru',
+		en: 'miso soup',
+		es: 'sopa de miso',
+		example: 'みそしるはあたたかいです。',
+		example_en: 'The miso soup is warm.',
+		example_es: 'La sopa de miso está caliente.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 66
+	},
+	{
+		jp: 'カレー',
+		romaji: 'karee',
+		en: 'curry',
+		es: 'curry',
+		example: '日本のカレーは辛くないです。',
+		example_en: "Japanese curry isn't spicy.",
+		example_es: 'El curry japonés no es picante.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 66
 	},
 	{
 		jp: 'ラーメン',
 		romaji: 'raamen',
 		en: 'ramen',
 		es: 'ramen',
-		example: 'ラーメンがおいしいです。',
-		example_en: 'The ramen is delicious.',
-		example_es: 'El ramen está delicioso.',
-		sort_order: 64
+		example: 'ラーメンを食べに行きましょう。',
+		example_en: "Let's go eat ramen.",
+		example_es: 'Vamos a comer ramen.',
+		category: 'Food',
+		category_es: 'Comida',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 67
 	},
 
 	// ── Colores / Colors ─────────────────────────────────────────────────────
@@ -666,7 +906,11 @@ export const vocabulary: CardData[] = [
 		example: 'しろいシャツを着ます。',
 		example_en: 'I wear a white shirt.',
 		example_es: 'Me pongo una camisa blanca.',
-		sort_order: 65
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun / adj',
+		pos_es: 'sustantivo / adj',
+		sort_order: 72
 	},
 	{
 		jp: 'くろ',
@@ -676,7 +920,11 @@ export const vocabulary: CardData[] = [
 		example: 'くろい犬です。',
 		example_en: 'It is a black dog.',
 		example_es: 'Es un perro negro.',
-		sort_order: 66
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun / adj',
+		pos_es: 'sustantivo / adj',
+		sort_order: 73
 	},
 	{
 		jp: 'あか',
@@ -686,7 +934,11 @@ export const vocabulary: CardData[] = [
 		example: 'あかいはなです。',
 		example_en: 'It is a red flower.',
 		example_es: 'Es una flor roja.',
-		sort_order: 67
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun / adj',
+		pos_es: 'sustantivo / adj',
+		sort_order: 74
 	},
 	{
 		jp: 'あお',
@@ -696,7 +948,11 @@ export const vocabulary: CardData[] = [
 		example: 'そらはあおいです。',
 		example_en: 'The sky is blue.',
 		example_es: 'El cielo es azul.',
-		sort_order: 68
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun / adj',
+		pos_es: 'sustantivo / adj',
+		sort_order: 75
 	},
 	{
 		jp: 'きいろ',
@@ -706,7 +962,11 @@ export const vocabulary: CardData[] = [
 		example: 'きいろいバナナです。',
 		example_en: 'It is a yellow banana.',
 		example_es: 'Es un plátano amarillo.',
-		sort_order: 69
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun / adj',
+		pos_es: 'sustantivo / adj',
+		sort_order: 76
 	},
 	{
 		jp: 'みどり',
@@ -716,7 +976,97 @@ export const vocabulary: CardData[] = [
 		example: 'みどりの木です。',
 		example_en: 'It is a green tree.',
 		example_es: 'Es un árbol verde.',
-		sort_order: 70
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun / adj',
+		pos_es: 'sustantivo / adj',
+		sort_order: 77
+	},
+
+	// ── Animales / Animals ───────────────────────────────────────────────────
+	{
+		jp: 'いぬ',
+		romaji: 'inu',
+		en: 'dog',
+		es: 'perro',
+		example: 'いぬがいます。',
+		example_en: 'There is a dog.',
+		example_es: 'Hay un perro.',
+		category: 'Animals',
+		category_es: 'Animales',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 81
+	},
+	{
+		jp: 'ねこ',
+		romaji: 'neko',
+		en: 'cat',
+		es: 'gato',
+		example: 'ねこがすきです。',
+		example_en: 'I like cats.',
+		example_es: 'Me gustan los gatos.',
+		category: 'Animals',
+		category_es: 'Animales',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 82
+	},
+	{
+		jp: 'とり',
+		romaji: 'tori',
+		en: 'bird',
+		es: 'pájaro',
+		example: 'とりがとんでいます。',
+		example_en: 'A bird is flying.',
+		example_es: 'Un pájaro está volando.',
+		category: 'Animals',
+		category_es: 'Animales',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 83
+	},
+	{
+		jp: 'さかな',
+		romaji: 'sakana',
+		en: 'fish',
+		es: 'pez',
+		example: 'きんぎょはさかなです。',
+		example_en: 'A goldfish is a fish.',
+		example_es: 'Un pez dorado es un pez.',
+		category: 'Animals',
+		category_es: 'Animales',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 84
+	},
+	{
+		jp: 'うま',
+		romaji: 'uma',
+		en: 'horse',
+		es: 'caballo',
+		example: 'うまははしるのがはやいです。',
+		example_en: 'Horses run fast.',
+		example_es: 'Los caballos corren rápido.',
+		category: 'Animals',
+		category_es: 'Animales',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 85
+	},
+	{
+		jp: 'うし',
+		romaji: 'ushi',
+		en: 'cow',
+		es: 'vaca',
+		example: 'うしがいます。',
+		example_en: 'There is a cow.',
+		example_es: 'Hay una vaca.',
+		category: 'Animals',
+		category_es: 'Animales',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 86
 	},
 
 	// ── Lugares / Places ─────────────────────────────────────────────────────
@@ -728,6 +1078,10 @@ export const vocabulary: CardData[] = [
 		example: 'がっこうへ行きます。',
 		example_en: 'I go to school.',
 		example_es: 'Voy a la escuela.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 71
 	},
 	{
@@ -738,6 +1092,10 @@ export const vocabulary: CardData[] = [
 		example: 'うちに帰ります。',
 		example_en: 'I return home.',
 		example_es: 'Vuelvo a casa.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 72
 	},
 	{
@@ -748,6 +1106,10 @@ export const vocabulary: CardData[] = [
 		example: 'えきはどこですか。',
 		example_en: 'Where is the station?',
 		example_es: '¿Dónde está la estación?',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 73
 	},
 	{
@@ -758,6 +1120,10 @@ export const vocabulary: CardData[] = [
 		example: 'みせでかいます。',
 		example_en: 'I buy it at the store.',
 		example_es: 'Lo compro en la tienda.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 74
 	},
 	{
@@ -768,6 +1134,10 @@ export const vocabulary: CardData[] = [
 		example: 'びょういんへ行きます。',
 		example_en: 'I go to the hospital.',
 		example_es: 'Voy al hospital.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 75
 	},
 	{
@@ -778,6 +1148,10 @@ export const vocabulary: CardData[] = [
 		example: 'こうえんで遊びます。',
 		example_en: 'I play in the park.',
 		example_es: 'Juego en el parque.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 76
 	},
 	{
@@ -788,6 +1162,10 @@ export const vocabulary: CardData[] = [
 		example: 'としょかんで本を読みます。',
 		example_en: 'I read books in the library.',
 		example_es: 'Leo libros en la biblioteca.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 77
 	},
 	{
@@ -798,6 +1176,10 @@ export const vocabulary: CardData[] = [
 		example: 'レストランでたべます。',
 		example_en: 'I eat at a restaurant.',
 		example_es: 'Como en un restaurante.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 78
 	},
 	{
@@ -808,6 +1190,10 @@ export const vocabulary: CardData[] = [
 		example: 'スーパーでやさいをかいます。',
 		example_en: 'I buy vegetables at the supermarket.',
 		example_es: 'Compro verduras en el supermercado.',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 79
 	},
 	{
@@ -818,6 +1204,10 @@ export const vocabulary: CardData[] = [
 		example: 'ぎんこうはどこですか。',
 		example_en: 'Where is the bank?',
 		example_es: '¿Dónde está el banco?',
+		category: 'Places',
+		category_es: 'Lugares',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 80
 	},
 
@@ -830,6 +1220,10 @@ export const vocabulary: CardData[] = [
 		example: 'でんしゃで行きます。',
 		example_en: 'I go by train.',
 		example_es: 'Voy en tren.',
+		category: 'Transport',
+		category_es: 'Transporte',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 81
 	},
 	{
@@ -837,9 +1231,13 @@ export const vocabulary: CardData[] = [
 		romaji: 'basu',
 		en: 'bus',
 		es: 'autobús',
-		example: 'バスにのります。',
+		example: 'バスにのります. ',
 		example_en: 'I take the bus.',
 		example_es: 'Tomo el autobús.',
+		category: 'Transport',
+		category_es: 'Transporte',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 82
 	},
 	{
@@ -850,6 +1248,10 @@ export const vocabulary: CardData[] = [
 		example: 'くるまで来ます。',
 		example_en: 'I come by car.',
 		example_es: 'Vengo en coche.',
+		category: 'Transport',
+		category_es: 'Transporte',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 83
 	},
 	{
@@ -860,6 +1262,10 @@ export const vocabulary: CardData[] = [
 		example: 'じてんしゃで学校へ行きます。',
 		example_en: 'I go to school by bicycle.',
 		example_es: 'Voy a la escuela en bicicleta.',
+		category: 'Transport',
+		category_es: 'Transporte',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 84
 	},
 	{
@@ -870,6 +1276,10 @@ export const vocabulary: CardData[] = [
 		example: 'タクシーをよびます。',
 		example_en: 'I call a taxi.',
 		example_es: 'Llamo un taxi.',
+		category: 'Transport',
+		category_es: 'Transporte',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 85
 	},
 	{
@@ -880,6 +1290,10 @@ export const vocabulary: CardData[] = [
 		example: 'ひこうきでにほんへいきます。',
 		example_en: 'I go to Japan by airplane.',
 		example_es: 'Voy a Japón en avión.',
+		category: 'Transport',
+		category_es: 'Transporte',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 86
 	},
 
@@ -892,6 +1306,10 @@ export const vocabulary: CardData[] = [
 		example: 'すしを食べます。',
 		example_en: 'I eat sushi.',
 		example_es: 'Como sushi.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 87
 	},
 	{
@@ -902,6 +1320,10 @@ export const vocabulary: CardData[] = [
 		example: 'みずを飲みます。',
 		example_en: 'I drink water.',
 		example_es: 'Bebo agua.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 88
 	},
 	{
@@ -912,6 +1334,10 @@ export const vocabulary: CardData[] = [
 		example: 'えいがを見ます。',
 		example_en: 'I watch a movie.',
 		example_es: 'Veo una película.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 89
 	},
 	{
@@ -922,6 +1348,10 @@ export const vocabulary: CardData[] = [
 		example: 'おんがくをききます。',
 		example_en: 'I listen to music.',
 		example_es: 'Escucho música.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 90
 	},
 	{
@@ -932,6 +1362,10 @@ export const vocabulary: CardData[] = [
 		example: '日本語を話します。',
 		example_en: 'I speak Japanese.',
 		example_es: 'Hablo japonés.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 91
 	},
 	{
@@ -942,6 +1376,10 @@ export const vocabulary: CardData[] = [
 		example: 'ほんをよみます。',
 		example_en: 'I read a book.',
 		example_es: 'Leo un libro.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 92
 	},
 	{
@@ -952,6 +1390,10 @@ export const vocabulary: CardData[] = [
 		example: 'てがみをかきます。',
 		example_en: 'I write a letter.',
 		example_es: 'Escribo una carta.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 93
 	},
 	{
@@ -962,6 +1404,10 @@ export const vocabulary: CardData[] = [
 		example: 'ほんをかいます。',
 		example_en: 'I buy a book.',
 		example_es: 'Compro un libro.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 94
 	},
 	{
@@ -972,6 +1418,10 @@ export const vocabulary: CardData[] = [
 		example: 'がっこうへいきます。',
 		example_en: 'I go to school.',
 		example_es: 'Voy a la escuela.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 95
 	},
 	{
@@ -982,6 +1432,10 @@ export const vocabulary: CardData[] = [
 		example: 'いえにきます。',
 		example_en: 'I come home.',
 		example_es: 'Vengo a casa.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 96
 	},
 	{
@@ -992,6 +1446,10 @@ export const vocabulary: CardData[] = [
 		example: 'ろくじにかえります。',
 		example_en: 'I return home at six.',
 		example_es: 'Regreso a casa a las seis.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 97
 	},
 	{
@@ -1002,6 +1460,10 @@ export const vocabulary: CardData[] = [
 		example: 'じゅういちじにねます。',
 		example_en: 'I go to bed at eleven.',
 		example_es: 'Me acuesto a las once.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 98
 	},
 	{
@@ -1012,6 +1474,10 @@ export const vocabulary: CardData[] = [
 		example: 'しちじにおきます。',
 		example_en: 'I wake up at seven.',
 		example_es: 'Me levanto a las siete.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 99
 	},
 	{
@@ -1022,6 +1488,10 @@ export const vocabulary: CardData[] = [
 		example: 'まいにちあるきます。',
 		example_en: 'I walk every day.',
 		example_es: 'Camino todos los días.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 100
 	},
 	{
@@ -1032,6 +1502,10 @@ export const vocabulary: CardData[] = [
 		example: 'こうえんではしります。',
 		example_en: 'I run in the park.',
 		example_es: 'Corro en el parque.',
+		category: 'Verbs',
+		category_es: 'Verbos',
+		pos: 'verb',
+		pos_es: 'verbo',
 		sort_order: 101
 	},
 	{
@@ -1521,5 +1995,375 @@ export const vocabulary: CardData[] = [
 		example_en: 'Winter is cold.',
 		example_es: 'El invierno es frío.',
 		sort_order: 149
-	}
+	},
+	// ── Naturaleza / Nature ──────────────────────────────────────────────────
+	{
+		jp: 'やま',
+		romaji: 'yama',
+		en: 'mountain',
+		es: 'montaña',
+		example: 'ふじさんはたかいやまです。',
+		example_en: 'Mt. Fuji is a tall mountain.',
+		example_es: 'El monte Fuji es una montaña alta.',
+		category: 'Nature',
+		category_es: 'Naturaleza',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 87
+	},
+	{
+		jp: 'かわ',
+		romaji: 'kawa',
+		en: 'river',
+		es: 'río',
+		example: 'かわでおよぎます。',
+		example_en: 'I swim in the river.',
+		example_es: 'Nado en el río.',
+		category: 'Nature',
+		category_es: 'Naturaleza',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 88
+	},
+	{
+		jp: 'うみ',
+		romaji: 'umi',
+		en: 'sea / ocean',
+		es: 'mar / océano',
+		example: 'うみはあおいです。',
+		example_en: 'The sea is blue.',
+		example_es: 'El mar es azul.',
+		category: 'Nature',
+		category_es: 'Naturaleza',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 89
+	},
+	{
+		jp: 'そら',
+		romaji: 'sora',
+		en: 'sky',
+		es: 'cielo',
+		example: 'そらをとびたいです。',
+		example_en: 'I want to fly in the sky.',
+		example_es: 'Quiero volar en el cielo.',
+		category: 'Nature',
+		category_es: 'Naturaleza',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 90
+	},
+	{
+		jp: 'あめ',
+		romaji: 'ame',
+		en: 'rain',
+		es: 'lluvia',
+		example: 'あめがふっています。',
+		example_en: "It's raining.",
+		example_es: 'Está lloviendo.',
+		category: 'Nature',
+		category_es: 'Naturaleza',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 91
+	},
+
+	// ── Cuerpo / Body ────────────────────────────────────────────────────────
+	{
+		jp: 'め',
+		romaji: 'me',
+		en: 'eye',
+		es: 'ojo',
+		example: 'めがいたいです。',
+		example_en: 'My eyes hurt.',
+		example_es: 'Me duelen los ojos.',
+		category: 'Body',
+		category_es: 'Cuerpo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 92
+	},
+	{
+		jp: 'みみ',
+		romaji: 'mimi',
+		en: 'ear',
+		es: 'oreja',
+		example: 'みみがとおいです。',
+		example_en: "I'm hard of hearing.",
+		example_es: 'Tengo problemas de audición.',
+		category: 'Body',
+		category_es: 'Cuerpo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 93
+	},
+	{
+		jp: 'くち',
+		romaji: 'kuchi',
+		en: 'mouth',
+		es: 'boca',
+		example: 'くちをあけてください。',
+		example_en: 'Please open your mouth.',
+		example_es: 'Por favor, abra la boca.',
+		category: 'Body',
+		category_es: 'Cuerpo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 94
+	},
+	{
+		jp: 'て',
+		romaji: 'te',
+		en: 'hand',
+		es: 'mano',
+		example: 'てをあらいます。',
+		example_en: 'I wash my hands.',
+		example_es: 'Me lavo las manos.',
+		category: 'Body',
+		category_es: 'Cuerpo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 95
+	},
+	{
+		jp: 'あし',
+		romaji: 'ashi',
+		en: 'leg / foot',
+		es: 'pierna / pie',
+		example: 'あしがながいです。',
+		example_en: 'Legs are long.',
+		example_es: 'Las piernas son largas.',
+		category: 'Body',
+		category_es: 'Cuerpo',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 96
+	},
+	// ── Direcciones / Directions ─────────────────────────────────────────────
+	{
+		jp: 'うえ',
+		romaji: 'ue',
+		en: 'up / above / on top',
+		es: 'arriba / sobre',
+		example: 'つくえのうえに本があります。',
+		example_en: 'There is a book on the desk.',
+		example_es: 'Hay un libro sobre el escritorio.',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 97
+	},
+	{
+		jp: 'した',
+		romaji: 'shita',
+		en: 'down / below / under',
+		es: 'abajo / debajo',
+		example: 'いすのしたにねこがいます。',
+		example_en: 'There is a cat under the chair.',
+		example_es: 'Hay un gato debajo de la silla.',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 98
+	},
+	{
+		jp: 'まえ',
+		romaji: 'mae',
+		en: 'front / before',
+		es: 'delante / antes',
+		example: 'ぎんこうのまえにバスていがあります。',
+		example_en: 'There is a bus stop in front of the bank.',
+		example_es: 'Hay una parada de autobús delante del banco.',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 99
+	},
+	{
+		jp: 'うしろ',
+		romaji: 'ushiro',
+		en: 'behind / back',
+		es: 'detrás / atrás',
+		example: 'わたしのうしろにだれかいますか。',
+		example_en: 'Is there someone behind me?',
+		example_es: '¿Hay alguien detrás de mí?',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 100
+	},
+	{
+		jp: 'なか',
+		romaji: 'naka',
+		en: 'inside / middle',
+		es: 'dentro / medio',
+		example: 'はこのなかになにがありますか。',
+		example_en: 'What is inside the box?',
+		example_es: '¿Qué hay dentro de la caja?',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 101
+	},
+	{
+		jp: 'みぎ',
+		romaji: 'migi',
+		en: 'right (side)',
+		es: 'derecha',
+		example: 'みぎをみてください。',
+		example_en: 'Please look to the right.',
+		example_es: 'Por favor, mire a la derecha.',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 102
+	},
+	{
+		jp: 'ひだり',
+		romaji: 'hidari',
+		en: 'left (side)',
+		es: 'izquierda',
+		example: 'ひだりにまがってください。',
+		example_en: 'Please turn left.',
+		example_es: 'Por favor, gire a la izquierda.',
+		category: 'Directions',
+		category_es: 'Direcciones',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 103
+	},
+	// ── Tiempo / Weather ─────────────────────────────────────────────────────
+	{
+		jp: 'てんき',
+		romaji: 'tenki',
+		en: 'weather',
+		es: 'clima',
+		example: 'きょうはいいてんきですね。',
+		example_en: 'The weather is nice today, isn\'t it?',
+		example_es: 'Hoy hace buen tiempo, ¿verdad?',
+		category: 'Weather',
+		category_es: 'Clima',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 104
+	},
+	{
+		jp: 'あめ',
+		romaji: 'ame',
+		en: 'rain',
+		es: 'lluvia',
+		example: 'あめがふっています。',
+		example_en: 'It is raining.',
+		example_es: 'Está lloviendo.',
+		category: 'Weather',
+		category_es: 'Clima',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 105
+	},
+	{
+		jp: 'はれ',
+		romaji: 'hare',
+		en: 'sunny weather',
+		es: 'despejado',
+		example: 'あしたははれでしょう。',
+		example_en: 'It will probably be sunny tomorrow.',
+		example_es: 'Probablemente estará despejado mañana.',
+		category: 'Weather',
+		category_es: 'Clima',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 106
+	},
+	{
+		jp: 'ゆき',
+		romaji: 'yuki',
+		en: 'snow',
+		es: 'nieve',
+		example: 'ゆきがふりはじめました。',
+		example_en: 'It started to snow.',
+		example_es: 'Empezó a nevar.',
+		category: 'Weather',
+		category_es: 'Clima',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 107
+	},
+	// ── Colores / Colors ─────────────────────────────────────────────────────
+	{
+		jp: 'あか',
+		romaji: 'aka',
+		en: 'red',
+		es: 'rojo',
+		example: 'あかいはながさいています。',
+		example_en: 'Red flowers are blooming.',
+		example_es: 'Están floreciendo flores rojas.',
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 108
+	},
+	{
+		jp: 'あお',
+		romaji: 'ao',
+		en: 'blue',
+		es: 'azul',
+		example: 'あおい空がきれいです。',
+		example_en: 'The blue sky is beautiful.',
+		example_es: 'El cielo azul es hermoso.',
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 109
+	},
+	{
+		jp: 'しろ',
+		romaji: 'shiro',
+		en: 'white',
+		es: 'blanco',
+		example: 'しろいいぬがいます。',
+		example_en: 'There is a white dog.',
+		example_es: 'Hay un perro blanco.',
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 110
+	},
+	{
+		jp: 'くろ',
+		romaji: 'kuro',
+		en: 'black',
+		es: 'negro',
+		example: 'くろいかばんをかいました。',
+		example_en: 'I bought a black bag.',
+		example_es: 'Compré un bolso negro.',
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 111
+	},
+	{
+		jp: 'きいろ',
+		romaji: 'kiiro',
+		en: 'yellow',
+		es: 'amarillo',
+		example: 'きいろいシャツをきています。',
+		example_en: 'I am wearing a yellow shirt.',
+		example_es: 'Llevo una camisa amarilla.',
+		category: 'Colors',
+		category_es: 'Colores',
+		pos: 'noun',
+		pos_es: 'sustantivo',
+		sort_order: 112
+	},
 ];

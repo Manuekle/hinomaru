@@ -5,11 +5,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = await locals.safeGetSession();
 	if (!user) throw error(401, 'Unauthorized');
 
-	const { data: words } = await supabase
+	const { data: words } = await locals.supabase
 		.from('user_saved_words')
 		.select('*')
 		.eq('user_id', user.id)
-		.lte('next_review', new Date().toISOString())
+		.or(`next_review.lte.${new Date().toISOString()},next_review.is.null`)
 		.order('next_review', { ascending: true })
 		.limit(50);
 

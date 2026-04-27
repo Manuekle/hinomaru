@@ -14,6 +14,7 @@
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { getWordMetadata } from '$lib/utils/vocab_registry';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -27,6 +28,7 @@
 	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const card = $derived(cards[i]);
+	const meta = $derived(card ? getWordMetadata(card.jp) : null);
 	const pct = $derived(((i + 1) / cards.length) * 100);
 
 	// Animate card in on mount
@@ -157,9 +159,14 @@
 				tabindex="0"
 				onkeydown={(e) => e.key === ' ' && (flipped = !flipped)}
 			>
-				<div class="card-body" class:flipped>
+				<div 
+					class="card-body" 
+					class:flipped
+					style="--cat-color: var(--cat-{meta?.category?.toLowerCase() || 'general'})"
+				>
 					<!-- Front -->
 					<div class="card-face">
+						<div class="cat-indicator" style="background: var(--cat-color, var(--hinomaru-red));"></div>
 						<div style="position:absolute;top:24px;left:24px;" class="label-meta">
 							{$locale === 'es' ? (data.deck.kind_es ?? data.deck.kind) : data.deck.kind}
 						</div>
@@ -278,5 +285,17 @@
 		font-size: 12px;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
+	}
+
+	.cat-indicator {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 6px;
+	}
+
+	.card-face {
+		overflow: hidden;
 	}
 </style>

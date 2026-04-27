@@ -6,6 +6,12 @@ export interface CardData {
 	example: string;
 	example_en: string;
 	example_es: string;
+	category?: string;
+	category_es?: string;
+	pos?: string;
+	pos_es?: string;
+	definitions_en?: string[];
+	definitions_es?: string[];
 	extra?: Record<string, string>;
 	sort_order?: number;
 }

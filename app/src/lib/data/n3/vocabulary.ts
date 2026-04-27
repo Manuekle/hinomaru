@@ -9,6 +9,10 @@ export const vocabulary: CardData[] = [
 		example: '目的は何ですか。',
 		example_en: 'What is the purpose?',
 		example_es: '¿Cuál es el propósito?',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 1
 	},
 	{
@@ -19,6 +23,10 @@ export const vocabulary: CardData[] = [
 		example: '良い結果が出た。',
 		example_en: 'A good result came out.',
 		example_es: 'Salió un buen resultado.',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 2
 	},
 	{
@@ -29,6 +37,10 @@ export const vocabulary: CardData[] = [
 		example: '理解が深まる。',
 		example_en: 'Understanding deepens.',
 		example_es: 'La comprensión se profundiza.',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 3
 	},
 	{
@@ -39,6 +51,10 @@ export const vocabulary: CardData[] = [
 		example: 'それは可能です。',
 		example_en: 'That is possible.',
 		example_es: 'Eso es posible.',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'adj',
+		pos_es: 'adjetivo',
 		sort_order: 4
 	},
 	{
@@ -49,6 +65,10 @@ export const vocabulary: CardData[] = [
 		example: '情報を集める。',
 		example_en: 'Collect information.',
 		example_es: 'Recopilar información.',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 5
-	}
+	},
 ];

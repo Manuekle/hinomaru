@@ -16,6 +16,7 @@
 	import Confetti from '$lib/components/Confetti.svelte';
 	import { svileo } from '$lib/stores/toast';
 	import { conversations, type DialogueChoice } from '$lib/data/conversations';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 
 	const supabase = createClient();
 
@@ -179,7 +180,9 @@
 								</button>
 							</div>
 
-							<p class="body-text-jp">{currentTurn.jp}</p>
+							<p class="body-text-jp">
+								<InteractiveText text={currentTurn.jp} />
+							</p>
 
 							{#if $showRomaji}
 								<p class="body-text-romaji">{currentTurn.romaji}</p>
@@ -211,7 +214,9 @@
 								</button>
 							</div>
 
-							<p class="body-text-jp">{currentTurn.prompt_jp}</p>
+							<p class="body-text-jp">
+								<InteractiveText text={currentTurn.prompt_jp} />
+							</p>
 
 							{#if $showRomaji}
 								<p class="body-text-romaji">{currentTurn.prompt_romaji}</p>

@@ -9,6 +9,10 @@ export const vocabulary: CardData[] = [
 		example: '基準を満たす。',
 		example_en: 'Meet the standard.',
 		example_es: 'Cumplir con el estándar.',
+		category: 'Business',
+		category_es: 'Negocios',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 1
 	},
 	{
@@ -19,6 +23,10 @@ export const vocabulary: CardData[] = [
 		example: '影響を与える。',
 		example_en: 'Have an influence.',
 		example_es: 'Tener influencia.',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 2
 	},
 	{
@@ -29,6 +37,10 @@ export const vocabulary: CardData[] = [
 		example: 'その傾向がある。',
 		example_en: 'There is a tendency.',
 		example_es: 'Existe esa tendencia.',
+		category: 'Abstract',
+		category_es: 'Abstracto',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 3
 	},
 	{
@@ -39,6 +51,10 @@ export const vocabulary: CardData[] = [
 		example: 'データを分析する。',
 		example_en: 'Analyze the data.',
 		example_es: 'Analizar los datos.',
+		category: 'Business',
+		category_es: 'Negocios',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 4
 	},
 	{
@@ -49,6 +65,10 @@ export const vocabulary: CardData[] = [
 		example: '評価が高い。',
 		example_en: 'The evaluation is high.',
 		example_es: 'La evaluación es alta.',
+		category: 'Business',
+		category_es: 'Negocios',
+		pos: 'noun',
+		pos_es: 'sustantivo',
 		sort_order: 5
-	}
+	},
 ];

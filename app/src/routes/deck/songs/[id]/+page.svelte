@@ -22,6 +22,8 @@
 	import { addXP } from '$lib/utils/gamification';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
+	import { getWordMetadata } from '$lib/utils/vocab_registry';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
 	let songId = $derived(Number($page.params.id));
@@ -471,7 +473,9 @@
 								}
 							}}
 						>
-							<div class="lyric-jp jp">{line.text}</div>
+							<div class="lyric-jp jp">
+								<InteractiveText text={line.text} />
+							</div>
 							{#if $showRomaji && line.romaji}
 								<div class="lyric-romaji">{line.romaji}</div>
 							{/if}
@@ -496,7 +500,7 @@
 			<div class="section" use:fadeUp={{ delay: 0.25, y: 10 }}>
 				<div class="section-title">{t('songs.vocab', $locale)}</div>
 				<div class="vocab-list">
-					{#each song.vocab as word (word.jp)}
+					{#each song.vocab.map(w => ({ ...w, ...getWordMetadata(w.jp) })) as word (word.jp)}
 						<div class="vocab-card">
 							<div class="vocab-top">
 								<div class="vocab-jp-group">
@@ -532,6 +536,19 @@
 								<div class="vocab-romaji">{word.romaji}</div>
 							{/if}
 							<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
+							
+							<div class="vocab-tags">
+								{#if word.category}
+									<span class="vocab-cat-tag">
+										{$locale === 'es' ? word.category_es || word.category : word.category}
+									</span>
+								{/if}
+								{#if word.pos}
+									<span class="vocab-pos-tag">
+										{$locale === 'es' ? word.pos_es || word.pos : word.pos}
+									</span>
+								{/if}
+							</div>
 						</div>
 					{/each}
 				</div>
@@ -1017,5 +1034,31 @@
 		font-size: 14px;
 		color: var(--fg-secondary);
 		line-height: 1.4;
+	}
+
+	.vocab-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 8px;
+	}
+
+	.vocab-cat-tag {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		background: var(--ink-100);
+		color: var(--fg-tertiary);
+		padding: 2px 8px;
+		border-radius: 4px;
+	}
+
+	.vocab-pos-tag {
+		font-size: 10px;
+		font-weight: 600;
+		font-style: italic;
+		color: var(--fg-tertiary);
+		padding: 2px 0;
 	}
 </style>

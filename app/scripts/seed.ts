@@ -71,6 +71,12 @@ async function run() {
 				example: c.example,
 				example_en: c.example_en,
 				example_es: c.example_es,
+				category: c.category ?? null,
+				category_es: c.category_es ?? null,
+				pos: c.pos ?? null,
+				pos_es: c.pos_es ?? null,
+				definitions_en: c.definitions_en ?? null,
+				definitions_es: c.definitions_es ?? null,
 				extra: c.extra ?? null,
 				sort_order: c.sort_order ?? 0
 			}));

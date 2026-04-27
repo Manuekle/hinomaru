@@ -14,8 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.from('stories')
 		.select('*')
 		.lte('publish_date', today)
-		.order('publish_date', { ascending: false })
-		.limit(20);
+		.order('publish_date', { ascending: false });
 
 	if (error) throw new Error(error.message);
 

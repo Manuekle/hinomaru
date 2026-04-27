@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
+	import { theme } from '$lib/stores/theme';
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { speakJapanese } from '$lib/utils/tts';
@@ -10,12 +11,23 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon, Award01Icon, BookOpen01Icon } from '@hugeicons/core-free-icons';
+	import { 
+		VolumeHighIcon, 
+		Award01Icon, 
+		BookOpen01Icon, 
+		ArrowLeft02Icon,
+		Sun01Icon,
+		Moon01Icon,
+		TextFontIcon,
+		TranslateIcon
+	} from '@hugeicons/core-free-icons';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
 	import { svileo } from '$lib/stores/toast';
 	import type { PageData } from './$types';
+	import { getWordMetadata } from '$lib/utils/vocab_registry';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -24,23 +36,6 @@
 	// ── Vocab saving ───────────────────────────────────────────────────────────
 	let savedVocab = $state(new Set<string>());
 	let savingVocab = $state(new Set<string>());
-
-	$effect(() => {
-		const v = story?.vocab;
-		if (!v?.length || !supabase) return;
-		const jpList = v.map((w: any) => w.jp);
-		supabase.auth.getUser().then(({ data: { user } }: any) => {
-			if (!user) return;
-			supabase
-				.from('user_saved_words')
-				.select('jp')
-				.eq('user_id', user.id)
-				.in('jp', jpList)
-				.then(({ data: rows }: any) => {
-					if (rows?.length) savedVocab = new Set(rows.map((r: any) => r.jp));
-				});
-		});
-	});
 
 	async function saveVocabWord(word: { jp: string; kana: string; en: string; es: string }) {
 		if (savedVocab.has(word.jp) || savingVocab.has(word.jp) || !supabase) return;
@@ -73,10 +68,51 @@
 
 	const story = $derived(data.story);
 	const vocab: any[] = $derived(story?.vocab ?? []);
+	
+	// Enrich vocab with categories from registry
+	const enrichedVocab = $derived(
+		vocab.map(w => {
+			const meta = getWordMetadata(w.jp);
+			return {
+				...w,
+				category: w.category || meta?.category,
+				category_es: w.category_es || meta?.category_es,
+				pos: w.pos || meta?.pos,
+				pos_es: w.pos_es || meta?.pos_es
+			};
+		})
+	);
 	const quiz: any[] = $derived(story?.quiz ?? []);
 
 	let showTranslation = $state(false);
 	let phase = $state<'read' | 'quiz' | 'result'>('read');
+	let isReadingMode = $state(false);
+	let readingTheme = $state<'light' | 'sepia' | 'dark'>('light');
+	let fontSize = $state<'sm' | 'md' | 'lg'>('md');
+	
+	$effect(() => {
+		if (story?.vocab?.length && supabase) {
+			const jpList = story.vocab.map((w: any) => w.jp);
+			supabase.auth.getUser().then(({ data: { user } }: any) => {
+				if (user) {
+					supabase.from('user_saved_words')
+						.select('jp')
+						.eq('user_id', user.id)
+						.in('jp', jpList)
+						.then(({ data: rows }: any) => {
+							if (rows?.length) savedVocab = new Set(rows.map((r: any) => r.jp));
+						});
+				}
+			});
+		}
+
+		return () => {
+			if (typeof window !== 'undefined' && window.speechSynthesis) {
+				window.speechSynthesis.cancel();
+			}
+		};
+	});
+
 	let currentQ = $state(0);
 	let answers = $state<number[]>([]);
 	let selected = $state<number | null>(null);
@@ -86,6 +122,15 @@
 	const scorePct = $derived(quiz.length > 0 ? Math.round((score / quiz.length) * 100) : 0);
 
 	const bodyJp = $derived(story?.body_jp ?? '');
+
+	// Stop audio on unmount or navigation
+	$effect(() => {
+		return () => {
+			if (typeof window !== 'undefined' && window.speechSynthesis) {
+				window.speechSynthesis.cancel();
+			}
+		};
+	});
 
 	function selectAnswer(idx: number) {
 		if (checked) return;
@@ -149,6 +194,35 @@
 	function restartRead() {
 		phase = 'read';
 		showTranslation = false;
+		isReadingMode = false;
+	}
+
+	function toggleReadingMode() {
+		if (typeof window !== 'undefined' && window.speechSynthesis) {
+			window.speechSynthesis.cancel();
+		}
+		
+		isReadingMode = !isReadingMode;
+		if (isReadingMode) {
+			// Initialize theme based on system/global theme
+			const isDark = $theme === 'dark' || ($theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+			readingTheme = isDark ? 'dark' : 'light';
+			
+			// Auto-scroll to top when entering
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	}
+
+	function cycleTheme() {
+		if (readingTheme === 'light') readingTheme = 'sepia';
+		else if (readingTheme === 'sepia') readingTheme = 'dark';
+		else readingTheme = 'light';
+	}
+
+	function cycleFontSize() {
+		if (fontSize === 'sm') fontSize = 'md';
+		else if (fontSize === 'md') fontSize = 'lg';
+		else fontSize = 'sm';
 	}
 
 	const currentQuestion = $derived(quiz[currentQ]);
@@ -178,12 +252,12 @@
 	</title>
 </svelte:head>
 
-<div class="story-viewer-layout">
+<div class="story-viewer-layout" class:reading-mode={isReadingMode} data-theme={isReadingMode ? readingTheme : undefined} style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}">
 	<!-- Standardized Container matching Dashboard -->
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 	>
-		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;">
+		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:12px;">
 			<a href="/deck/stories" class="back-link-beautiful">
 				← {t('deck.back', $locale)}
 			</a>
@@ -195,7 +269,7 @@
 				<p>{t('stories.noStory', $locale)}</p>
 			</div>
 		{:else if phase === 'read'}
-			<div class="story-content" use:fadeUp={{ delay: 0.1, y: 12 }}>
+			<div class="story-content">
 				<div class="story-meta-tags">
 					<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{story.level}</span>
 					<span class="date-badge">
@@ -210,26 +284,32 @@
 					<h1 class="story-display-title">
 						{$locale === 'es' ? story.title_es : story.title_en}
 					</h1>
-					<button
-						class="story-audio-btn"
-						onclick={() => speakJapanese(bodyJp)}
-						title="Escuchar historia"
-					>
-						<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-					</button>
+					{#if !isReadingMode}
+						<button
+							class="story-audio-btn"
+							onclick={() => speakJapanese(bodyJp)}
+							title="Escuchar historia"
+						>
+							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+						</button>
+					{/if}
 				</div>
 
-				<div class="story-body-card">
-					<p class="body-text-jp">{bodyJp}</p>
+				<div class="story-body-card" class:glass-reading={isReadingMode} class:is-preview={!isReadingMode}>
+					<p class="body-text-jp">
+						<InteractiveText text={isReadingMode ? bodyJp : ([...bodyJp].slice(0, 150).join('') + (bodyJp.length > 150 ? '...' : ''))} />
+					</p>
 
 					{#if $showRomaji && story.body_romaji}
 						<p class="body-text-romaji" use:fadeUp={{ y: 5 }}>{story.body_romaji}</p>
 					{/if}
 
 					<div class="translation-section">
-						<button class="toggle-btn" onclick={() => (showTranslation = !showTranslation)}>
-							{showTranslation ? 'Ocultar traducción' : 'Ver traducción'}
-						</button>
+						{#if !isReadingMode}
+							<button class="toggle-btn" onclick={() => (showTranslation = !showTranslation)}>
+								{showTranslation ? 'Ocultar traducción' : 'Ver traducción'}
+							</button>
+						{/if}
 						{#if showTranslation}
 							<p class="body-text-translated" use:fadeUp={{ y: 5 }}>
 								{$locale === 'es' ? story.body_es : story.body_en}
@@ -238,11 +318,19 @@
 					</div>
 				</div>
 
-				{#if vocab.length > 0}
+				{#if !isReadingMode}
+					<div class="enter-reading-row" use:fadeUp={{ delay: 0.2 }}>
+						<button class="reading-mode-simple-trigger" onclick={toggleReadingMode}>
+							{t('stories.read', $locale)}
+						</button>
+					</div>
+				{/if}
+
+				{#if enrichedVocab.length > 0 && !isReadingMode}
 					<section class="vocab-section">
 						<h3 class="section-title">{t('stories.vocab', $locale)}</h3>
 						<div class="vocab-list">
-							{#each vocab as word (word.jp)}
+							{#each enrichedVocab as word (word.jp)}
 								<div class="vocab-card">
 									<div class="vocab-top">
 										<div class="vocab-jp-group">
@@ -284,6 +372,19 @@
 										<div class="vocab-romaji">{kanaToRomaji(word.kana)}</div>
 									{/if}
 									<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
+									
+									<div class="vocab-tags">
+										{#if word.category}
+											<span class="vocab-cat-tag">
+												{$locale === 'es' ? word.category_es || word.category : word.category}
+											</span>
+										{/if}
+										{#if word.pos}
+											<span class="vocab-pos-tag">
+												{$locale === 'es' ? word.pos_es || word.pos : word.pos}
+											</span>
+										{/if}
+									</div>
 								</div>
 							{/each}
 						</div>
@@ -291,11 +392,98 @@
 				{/if}
 			</div>
 
-			<StickyFooter>
-				<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={startQuiz}>
-					{t('stories.quiz.title', $locale)} →
-				</button>
-			</StickyFooter>
+			</div>
+
+			{#if !isReadingMode}
+				<StickyFooter>
+					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={startQuiz}>
+						{t('stories.quiz.title', $locale)} →
+					</button>
+				</StickyFooter>
+			{/if}
+
+			{#if isReadingMode}
+				<div 
+					class="reading-mode-overlay" 
+					data-theme={readingTheme}
+					transition:fade={{ duration: 300 }}
+					style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
+				>
+					<div class="reading-mode-content">
+						<div class="story-title-row">
+							<h1 class="story-display-title">
+								{$locale === 'es' ? story.title_es : story.title_en}
+							</h1>
+						</div>
+
+						<div class="story-body-card">
+							<InteractiveText 
+								text={bodyJp} 
+								{vocab}
+							/>
+						</div>
+
+						{#if showTranslation}
+							<p class="body-text-translated" transition:fade>
+								{$locale === 'es' ? story.body_es : story.body_en}
+							</p>
+						{/if}
+					</div>
+
+					<!-- Floating Reading Toolbar -->
+					<div class="reading-toolbar-container">
+						<div class="reading-toolbar-pill">
+							<button class="tool-btn exit" onclick={toggleReadingMode} title="Salir">
+								<Icon icon={ArrowLeft02Icon} size={18} color="currentColor" strokeWidth={2} />
+							</button>
+							
+							<div class="tool-divider"></div>
+							
+							<div class="tool-group-pill">
+								<button 
+									class="tool-tab" 
+									class:active={!showTranslation} 
+									onclick={() => showTranslation = false}
+								>
+									{$locale === 'es' ? 'Lectura' : 'Read'}
+								</button>
+								<button 
+									class="tool-tab" 
+									class:active={showTranslation} 
+									onclick={() => showTranslation = true}
+								>
+									{$locale === 'es' ? 'Trad.' : 'Trans'}
+								</button>
+							</div>
+
+							<div class="tool-divider"></div>
+
+							<button class="tool-btn" onclick={() => speakJapanese(bodyJp)} title="Escuchar">
+								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={2} />
+							</button>
+							<button class="tool-btn" onclick={() => showRomaji.toggle()} title="Romaji" class:active-tool={$showRomaji}>
+								<Icon icon={TranslateIcon} size={18} color="currentColor" strokeWidth={2} />
+							</button>
+
+							<div class="tool-divider"></div>
+
+							<button class="tool-btn" onclick={cycleTheme} title="Tema">
+								{#if readingTheme === 'light'}
+									<Icon icon={Sun01Icon} size={18} color="currentColor" strokeWidth={2} />
+								{:else if readingTheme === 'sepia'}
+									<Icon icon={TextFontIcon} size={18} color="currentColor" strokeWidth={2} />
+								{:else}
+									<Icon icon={Moon01Icon} size={18} color="currentColor" strokeWidth={2} />
+								{/if}
+							</button>
+
+							<button class="tool-btn" onclick={cycleFontSize} title="Tamaño">
+								<Icon icon={TextFontIcon} size={18} color="currentColor" strokeWidth={2} />
+							</button>
+						</div>
+					</div>
+				</div>
+			{/if}
 		{:else if phase === 'quiz'}
 			<div class="quiz-container" use:fadeUp={{ delay: 0, y: 12 }}>
 				<!-- Progress indicator -->
@@ -488,7 +676,7 @@
 	.story-meta-tags {
 		display: flex;
 		gap: 8px;
-		margin-bottom: 16px;
+		margin-bottom: 12px;
 	}
 
 	.date-badge {
@@ -507,11 +695,16 @@
 
 	.story-display-title {
 		font-size: 32px;
-		font-weight: 600;
+		font-weight: 700;
 		letter-spacing: -0.03em;
 		color: var(--fg-primary);
-		line-height: 1.1;
+		line-height: 1.2;
 		flex: 1;
+		transition: all 0.3s ease;
+	}
+
+	.story-viewer-layout:not(.reading-mode) .story-display-title {
+		font-size: 24px;
 	}
 
 	.story-audio-btn {
@@ -527,6 +720,12 @@
 		cursor: pointer;
 		transition: all 0.2s;
 		flex-shrink: 0;
+	}
+
+	.story-viewer-layout:not(.reading-mode) .story-audio-btn {
+		width: 40px;
+		height: 40px;
+		font-size: 16px;
 	}
 
 	@media (hover: hover) {
@@ -546,7 +745,40 @@
 		border-radius: 28px;
 		padding: 24px;
 		box-shadow: var(--shadow-sm);
-		margin-bottom: 40px;
+		margin-bottom: 24px;
+		transition: all 0.3s ease;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.story-body-card.is-preview {
+		padding: 20px 24px;
+		background: var(--ink-50);
+		border-color: var(--ink-100);
+		box-shadow: none;
+	}
+
+	.story-body-card.is-preview::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 80px;
+		background: linear-gradient(transparent, var(--ink-50));
+		pointer-events: none;
+	}
+
+	.is-preview .body-text-jp {
+		font-size: 17px;
+		line-height: 1.6;
+		margin-bottom: 0;
+		color: var(--fg-secondary);
+	}
+
+	.is-preview .body-text-romaji,
+	.is-preview .translation-section {
+		display: none;
 	}
 
 	.body-text-jp {
@@ -698,6 +930,32 @@
 		font-size: 14px;
 		color: var(--fg-secondary);
 		line-height: 1.4;
+	}
+
+	.vocab-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 8px;
+	}
+
+	.vocab-cat-tag {
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		background: var(--ink-100);
+		color: var(--fg-tertiary);
+		padding: 2px 8px;
+		border-radius: 4px;
+	}
+
+	.vocab-pos-tag {
+		font-size: 10px;
+		font-weight: 600;
+		font-style: italic;
+		color: var(--fg-tertiary);
+		padding: 2px 0;
 	}
 
 	/* --- Quiz --- */
@@ -1067,6 +1325,284 @@
 		}
 		.body-text-jp {
 			font-size: 18px;
+		}
+	}
+
+	/* --- Reading Mode Overrides --- */
+	.story-viewer-layout {
+		transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		min-height: 100vh;
+	}
+
+	.reading-mode-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 2000;
+		background: var(--bg-page);
+		overflow-y: auto;
+		padding: 60px 24px 140px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.reading-mode-content {
+		width: 100%;
+		max-width: 720px;
+		margin: 0 auto;
+	}
+
+	.reading-mode-overlay[data-theme='dark'] {
+		--bg-page: #121212;
+		--bg-surface: transparent;
+		--bg-toolbar: rgba(30, 30, 30, 0.85);
+		--fg-primary: #e0e0e0;
+		--fg-secondary: #888;
+		--fg-toolbar: #fff;
+		--ink-100: rgba(255, 255, 255, 0.1);
+		--ink-200: rgba(255, 255, 255, 0.2);
+		--paper: #121212;
+	}
+
+	.reading-mode-overlay[data-theme='light'] {
+		--bg-page: var(--paper);
+		--bg-surface: transparent;
+		--bg-toolbar: rgba(255, 255, 255, 0.85);
+		--fg-toolbar: #000;
+		--ink-200: transparent;
+	}
+
+	.reading-mode-overlay[data-theme='sepia'] {
+		--bg-page: #f4ecd8;
+		--bg-surface: transparent;
+		--bg-toolbar: rgba(244, 236, 216, 0.85);
+		--fg-primary: #5b4636;
+		--fg-secondary: #7a6352;
+		--fg-toolbar: #5b4636;
+		--ink-100: rgba(91, 70, 54, 0.1);
+		--ink-200: rgba(91, 70, 54, 0.2);
+		--paper: #f4ecd8;
+	}
+
+	.reading-mode .story-display-title,
+	.reading-mode .body-text-jp,
+	.reading-mode .body-text-translated,
+	.reading-mode .story-content {
+		transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.reading-mode .story-display-title {
+		font-family: var(--font-heading);
+		font-size: 52px;
+		font-weight: 700;
+		text-align: center;
+		margin-top: 60px;
+		margin-bottom: 80px;
+		letter-spacing: -0.02em;
+	}
+
+	.reading-mode .story-body-card {
+		border: none;
+		box-shadow: none;
+		padding: 0;
+		background: transparent;
+		max-width: 680px;
+		margin: 0 auto;
+	}
+
+	.reading-mode-overlay .body-text-jp {
+		font-size: var(--story-fs);
+		text-align: justify;
+		line-height: 2.2;
+		margin-bottom: 40px;
+		letter-spacing: 0.02em;
+	}
+
+	.reading-mode .body-text-romaji {
+		font-size: calc(var(--story-fs) * 0.65);
+		opacity: 0.7;
+		margin-top: -30px;
+		margin-bottom: 40px;
+		text-align: justify;
+		font-style: italic;
+	}
+
+	.reading-mode .body-text-translated {
+		font-size: calc(var(--story-fs) - 4px);
+		line-height: 1.8;
+		opacity: 0.7;
+		border-left: 2px solid var(--hinomaru-red);
+		padding-left: 24px;
+		margin-top: 40px;
+		font-style: italic;
+	}
+
+	.reading-mode-overlay :global(.word-link) {
+		color: inherit;
+		border-bottom: 1.5px dotted var(--hinomaru-red);
+		background: transparent;
+		text-decoration: none;
+	}
+
+	.reading-mode-overlay[data-theme='dark'] :global(.word-link) {
+		border-bottom-color: rgba(255, 255, 255, 0.3);
+	}
+
+	.reading-mode-overlay[data-theme='sepia'] :global(.word-link) {
+		border-bottom-color: rgba(91, 70, 54, 0.4);
+	}
+
+	.reading-mode-overlay .back-link-beautiful,
+	.reading-mode-overlay .story-meta-tags {
+		opacity: 0 !important;
+		pointer-events: none;
+	}
+
+	.glass-reading {
+		transition: all 0.4s ease;
+	}
+
+	/* --- Enter Reading Row --- */
+	.enter-reading-row {
+		display: flex;
+		justify-content: center;
+		margin-top: -10px;
+		margin-bottom: 40px;
+	}
+
+	.reading-mode-simple-trigger {
+		background: none;
+		border: none;
+		color: var(--sumi);
+		font-size: 13px;
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		cursor: pointer;
+		padding: 4px 0;
+		transition: opacity 0.2s;
+	}
+
+	.reading-mode-simple-trigger:hover {
+		opacity: 0.6;
+	}
+
+	/* --- Floating Reading Toolbar --- */
+	.reading-toolbar-container {
+		position: fixed;
+		bottom: 32px;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		z-index: 2500;
+		padding: 0 20px;
+	}
+
+	.reading-toolbar-pill {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px;
+		background: var(--bg-toolbar, rgba(26, 26, 26, 0.95));
+		backdrop-filter: blur(24px);
+		-webkit-backdrop-filter: blur(24px);
+		border-radius: var(--radius-full);
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+		color: var(--fg-toolbar, white);
+		border: 1px solid var(--ink-100);
+		transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.tool-btn {
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		border: none;
+		background: transparent;
+		color: currentColor;
+		opacity: 0.7;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.tool-btn:hover {
+		background: var(--ink-100);
+		opacity: 1;
+	}
+
+	.tool-btn.active-tool {
+		color: var(--hinomaru-red);
+		opacity: 1;
+		background: var(--ink-100);
+	}
+
+	.tool-btn.exit {
+		background: var(--fg-primary);
+		color: var(--bg-page);
+	}
+
+	.tool-btn.exit:hover {
+		transform: scale(1.05);
+	}
+
+	.tool-divider {
+		width: 1px;
+		height: 24px;
+		background: rgba(255, 255, 255, 0.15);
+		margin: 0 4px;
+	}
+
+	.tool-group-pill {
+		display: flex;
+		background: var(--ink-100);
+		padding: 4px;
+		border-radius: var(--radius-full);
+		gap: 2px;
+	}
+
+	.tool-tab {
+		padding: 6px 16px;
+		border-radius: var(--radius-full);
+		border: none;
+		background: transparent;
+		color: var(--fg-toolbar, white);
+		opacity: 0.5;
+		font-size: 13px;
+		font-weight: 700;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.tool-tab.active {
+		background: rgba(255, 255, 255, 0.15);
+		color: var(--fg-toolbar, white);
+		opacity: 1;
+	}
+
+	.reading-mode[data-theme='light'] .tool-tab.active {
+		background: rgba(0, 0, 0, 0.08);
+	}
+
+	@media (max-width: 600px) {
+		.reading-toolbar-pill {
+			gap: 4px;
+			padding: 6px;
+		}
+		.tool-btn {
+			width: 40px;
+			height: 40px;
+		}
+		.tool-tab {
+			padding: 6px 12px;
+			font-size: 12px;
+		}
+		.reading-mode .story-display-title {
+			font-size: 32px;
+			margin-bottom: 40px;
 		}
 	}
 </style>

@@ -19,21 +19,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (sessionUserCache) return sessionUserCache;
 
 		const {
-			data: { session }
-		} = await event.locals.supabase.auth.getSession();
-		if (!session) {
+			data: { user },
+			error
+		} = await event.locals.supabase.auth.getUser();
+
+		if (error || !user) {
 			sessionUserCache = { session: null, user: null };
 			return sessionUserCache;
 		}
 
 		const {
-			data: { user },
-			error
-		} = await event.locals.supabase.auth.getUser();
-		if (error) {
-			sessionUserCache = { session: null, user: null };
-			return sessionUserCache;
-		}
+			data: { session }
+		} = await event.locals.supabase.auth.getSession();
 
 		sessionUserCache = { session, user };
 		return sessionUserCache;
