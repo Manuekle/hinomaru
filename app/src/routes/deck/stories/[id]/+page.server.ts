@@ -10,23 +10,22 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	const { id } = params;
 
-	const { data: story, error: storyError } = await locals.supabase
-		.from('stories')
-		.select('*')
-		.eq('id', id)
-		.single();
+	const [storyRes, readRes] = await Promise.all([
+		locals.supabase.from('stories').select('*').eq('id', id).single(),
+		locals.supabase
+			.from('user_story_reads')
+			.select('id, quiz_score')
+			.eq('user_id', user.id)
+			.eq('story_id', id)
+			.maybeSingle()
+	]);
 
-	if (storyError || !story) {
+	const story = storyRes.data;
+	const readRow = readRes.data;
+
+	if (storyRes.error || !story) {
 		throw error(404, 'Story not found');
 	}
-
-	// Check if user already read/quizzed this story
-	const { data: readRow } = await locals.supabase
-		.from('user_story_reads')
-		.select('id, quiz_score')
-		.eq('user_id', user.id)
-		.eq('story_id', story.id)
-		.maybeSingle();
 
 	return {
 		story,

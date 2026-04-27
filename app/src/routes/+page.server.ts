@@ -2,25 +2,47 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = await locals.safeGetSession();
+	const today = new Date().toISOString().split('T')[0];
 
-	const { data: decks } = await locals.supabase
-		.from('decks')
-		.select('*')
-		.order('level', { ascending: true });
+	// Start all queries in parallel
+	const [decksRes, progressRes, streakRes, storyRes, wordRes] = await Promise.all([
+		locals.supabase.from('decks').select('*').order('level', { ascending: true }),
+		user
+			? locals.supabase
+					.from('progress')
+					.select('card_id, learned, next_review, cards(deck_id)')
+					.eq('user_id', user.id)
+					.eq('learned', true)
+			: Promise.resolve({ data: [] }),
+		user
+			? locals.supabase.from('profiles').select('current_streak, xp, level, avatar, total_lessons, srs_enabled').eq('id', user.id).maybeSingle()
+			: Promise.resolve({ data: null }),
+		user
+			? locals.supabase
+					.from('stories')
+					.select('id, level, title_en, title_es, body_jp, publish_date')
+					.lte('publish_date', today)
+					.order('id')
+			: Promise.resolve({ data: [] }),
+		locals.supabase.from('daily_words').select('*').eq('publish_date', today).maybeSingle()
+	]);
 
-	const progress = user
-		? await locals.supabase
-				.from('progress')
-				.select('card_id, learned, next_review, cards(deck_id)')
-				.eq('user_id', user.id)
-				.eq('learned', true)
-		: { data: [] };
+	const decks = decksRes.data ?? [];
+	const progressData = progressRes.data ?? [];
+	const profile = streakRes.data;
+	const stories = storyRes.data ?? [];
+	const todayWord = wordRes.data;
 
+	// Deterministic daily rotation matching /deck/stories/today
+	const daysSinceEpoch = Math.floor(Date.now() / 86_400_000);
+	const todayStory = stories.length > 0 ? stories[daysSinceEpoch % stories.length] : null;
+
+	// Process progress data
 	const learnedByDeck: Record<string, number> = {};
 	const dueByDeck: Record<string, number> = {};
 	const now = new Date().toISOString();
 
-	for (const row of progress.data ?? []) {
+	for (const row of progressData) {
 		const deckId = (row.cards as any)?.deck_id;
 		if (deckId) {
 			learnedByDeck[deckId] = (learnedByDeck[deckId] ?? 0) + 1;
@@ -30,82 +52,52 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	// Read streak directly from profiles (get_user_streak RPC does not exist)
-	let streakDays = 0;
-	if (user) {
-		const { data: streakRow } = await locals.supabase
-			.from('profiles')
-			.select('current_streak')
-			.eq('id', user.id)
-			.maybeSingle();
-		streakDays = streakRow?.current_streak ?? 0;
-	}
-
-	// Historia del día — la más reciente con publish_date <= hoy
-	const today = new Date().toISOString().split('T')[0];
-	let todayStory: any = null;
+	// Dependent queries (these need results from the first batch)
 	let storyRead = false;
-
-	if (user) {
-		const { data: story } = await locals.supabase
-			.from('stories')
-			.select('id, level, title_en, title_es, body_jp, publish_date')
-			.lte('publish_date', today)
-			.order('publish_date', { ascending: false })
-			.limit(1)
-			.single();
-
-		if (story) {
-			todayStory = story;
-			const { data: readRow } = await locals.supabase
-				.from('user_story_reads')
-				.select('id')
-				.eq('user_id', user.id)
-				.eq('story_id', story.id)
-				.maybeSingle();
-			storyRead = !!readRow;
-		}
-	}
-
-	// Word of the day
-	const { data: todayWord } = await locals.supabase
-		.from('daily_words')
-		.select('*')
-		.eq('publish_date', today)
-		.maybeSingle();
-
 	let wordSaved = false;
-	let profile: any = null;
 
 	if (user) {
-		const { data: prof } = await locals.supabase
-			.from('profiles')
-			.select('xp, level, total_lessons, avatar, current_streak, srs_enabled')
-			.eq('id', user.id)
-			.single();
-		profile = prof;
-		streakDays = prof?.current_streak ?? streakDays;
+		const queries = [];
+		if (todayStory) {
+			queries.push(
+				locals.supabase
+					.from('user_story_reads')
+					.select('id')
+					.eq('user_id', user.id)
+					.eq('story_id', todayStory.id)
+					.maybeSingle()
+			);
+		} else {
+			queries.push(Promise.resolve({ data: null }));
+		}
 
 		if (todayWord) {
-			const { data: savedWord } = await locals.supabase
-				.from('user_saved_words')
-				.select('id')
-				.eq('user_id', user.id)
-				.eq('jp', todayWord.jp)
-				.maybeSingle();
-			wordSaved = !!savedWord;
+			queries.push(
+				locals.supabase
+					.from('user_saved_words')
+					.select('id')
+					.eq('user_id', user.id)
+					.eq('jp', todayWord.jp)
+					.maybeSingle()
+			);
+		} else {
+			queries.push(Promise.resolve({ data: null }));
 		}
+
+		const [readRes, savedRes] = await Promise.all(queries);
+		storyRead = !!readRes.data;
+		wordSaved = !!savedRes.data;
 	}
 
 	return {
 		user,
 		profile,
-		decks: (decks ?? []).map((d: any) => ({
+		decks: decks.map((d: any) => ({
 			...d,
 			learned: learnedByDeck[d.id] ?? 0,
 			due: dueByDeck[d.id] ?? 0
 		})),
-		streak: streakDays ?? 0,
+		streak: profile?.current_streak ?? 0,
 		todayStory,
 		storyRead,
 		todayWord,

@@ -12,7 +12,17 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	if (!session && !isPublic) throw redirect(303, '/login');
 	if (session && url.pathname === '/login') throw redirect(303, '/');
 
+	let profile = null;
+	if (user) {
+		const { data: p } = await locals.supabase
+			.from('profiles')
+			.select('*')
+			.eq('id', user.id)
+			.single();
+		profile = p;
+	}
+
 	const initialLocale = (cookies.get('hm-locale') as 'es' | 'en') ?? 'es';
 
-	return { session, user, initialLocale, cookies: cookies.getAll() };
+	return { session, user, profile, initialLocale, cookies: cookies.getAll() };
 };

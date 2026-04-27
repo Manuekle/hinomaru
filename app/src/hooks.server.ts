@@ -14,17 +14,29 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	});
 
+	let sessionUserCache: { session: any; user: any } | null = null;
 	event.locals.safeGetSession = async () => {
+		if (sessionUserCache) return sessionUserCache;
+
 		const {
 			data: { session }
 		} = await event.locals.supabase.auth.getSession();
-		if (!session) return { session: null, user: null };
+		if (!session) {
+			sessionUserCache = { session: null, user: null };
+			return sessionUserCache;
+		}
+
 		const {
 			data: { user },
 			error
 		} = await event.locals.supabase.auth.getUser();
-		if (error) return { session: null, user: null };
-		return { session, user };
+		if (error) {
+			sessionUserCache = { session: null, user: null };
+			return sessionUserCache;
+		}
+
+		sessionUserCache = { session, user };
+		return sessionUserCache;
 	};
 
 	return resolve(event, {

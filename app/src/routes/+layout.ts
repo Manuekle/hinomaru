@@ -17,8 +17,8 @@ export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 	} = await supabase.auth.getUser();
 	const session = data.session ?? null;
 
-	let profile = null;
-	if (user) {
+	let profile = data.profile;
+	if (user && !profile) {
 		try {
 			const { data: p, error: pErr } = await supabase
 				.from('profiles')
