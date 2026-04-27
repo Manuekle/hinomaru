@@ -12,6 +12,7 @@
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
+	import { kanaToRomaji } from '$lib/utils/romaji';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
@@ -134,6 +135,7 @@
 		progress={pct}
 		current={i + 1}
 		total={cards.length}
+		showRomajiToggle={true}
 		onClose={() => goto(`/deck/${data.deck.id}`)}
 	/>
 
@@ -166,7 +168,6 @@
 				>
 					<!-- Front -->
 					<div class="card-face">
-						<div class="cat-indicator" style="background: var(--cat-color, var(--hinomaru-red));"></div>
 						<div style="position:absolute;top:24px;left:24px;" class="label-meta">
 							{$locale === 'es' ? (data.deck.kind_es ?? data.deck.kind) : data.deck.kind}
 						</div>
@@ -191,8 +192,8 @@
 						>
 							{$locale === 'es' ? card.es : card.en}
 						</div>
-						{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-							<div class="romaji" style="margin-top:8px;">{card.romaji}</div>
+						{#if $showRomaji}
+							<div class="romaji" style="margin-top:8px; font-size:16px; font-weight:600; color:var(--hinomaru-red);">{card.romaji}</div>
 						{/if}
 						<div
 							style="margin-top:20px;padding-top:20px;border-top:1px solid var(--ink-200);width:90%;text-align:center;position:relative;"
@@ -210,11 +211,11 @@
 								</button>
 							</div>
 
-							{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+							{#if $showRomaji}
 								<div
 									style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;font-weight:600;letter-spacing:0.02em;"
 								>
-									{card.example_romaji || card.extra?.example_romaji || ''}
+									{card.example_romaji || card.extra?.example_romaji || (card.example ? kanaToRomaji(card.example_kana || card.example) : '')}
 								</div>
 							{/if}
 
@@ -285,14 +286,6 @@
 		font-size: 12px;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
-	}
-
-	.cat-indicator {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 6px;
 	}
 
 	.card-face {

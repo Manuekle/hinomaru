@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getWordMetadata, getAllRegistryWords } from '$lib/utils/vocab_registry';
+	import { getAllRegistryWords } from '$lib/utils/vocab_registry';
 	import WordPopup from './WordPopup.svelte';
 
 	let { text } = $props<{ text: string }>();
@@ -22,7 +22,7 @@
 		let current = txt;
 		
 		while (current.length > 0) {
-			let found = false;
+
 			// Try to find the longest matching word at the start
 			let longestMatch = '';
 			for (const w of words) {
@@ -34,7 +34,7 @@
 			if (longestMatch) {
 				parts.push({ text: longestMatch, isWord: true });
 				current = current.slice(longestMatch.length);
-				found = true;
+
 			} else {
 				// No word found at start, take one character and continue
 				let char = current[0];
@@ -64,7 +64,7 @@
 </script>
 
 <div class="interactive-text">
-	{#each parts as part}
+	{#each parts as part, i (i)}
 		{#if part.isWord}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->

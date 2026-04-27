@@ -12,15 +12,10 @@
 	import { fly, fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { preferredVoice, dailyGoal, srsEnabled as srsStore } from '$lib/stores/settings';
-	import { locale } from '$lib/stores/locale';
-	import { t } from '$lib/i18n';
-	import Icon from '$lib/Icon.svelte';
-	import { ArrowLeft02Icon } from '@hugeicons/core-free-icons';
 
 	let { onFinish } = $props<{ onFinish: (selections: any) => void }>();
 
 	let step = $state(1);
-	const totalSteps = 10;
 	let selections = $state({
 		motivation: '',
 		experience: '',
@@ -37,7 +32,7 @@
 		if (step > 1) step -= 1;
 	}
 
-	let progress = $derived((step / 10) * 100);
+
 
 	function handleMotivation(val: string) {
 		selections.motivation = val;

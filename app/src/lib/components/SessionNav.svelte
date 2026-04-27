@@ -1,4 +1,8 @@
 <script lang="ts">
+	import Icon from '$lib/Icon.svelte';
+	import { TranslateIcon } from '@hugeicons/core-free-icons';
+	import { showRomaji } from '$lib/stores/settings';
+
 	let {
 		progress = 0,
 		current = 0,
@@ -6,7 +10,8 @@
 		title = '',
 		onClose,
 		showTimer = false,
-		elapsed = 0
+		elapsed = 0,
+		showRomajiToggle = false
 	} = $props<{
 		progress: number;
 		current: number;
@@ -15,6 +20,7 @@
 		onClose: () => void;
 		showTimer?: boolean;
 		elapsed?: number;
+		showRomajiToggle?: boolean;
 	}>();
 
 	const formatTime = (s: number) => {
@@ -51,10 +57,21 @@
 		</div>
 
 		<!-- Right: Timer or empty -->
-		<div class="nav-slot right">
+		<div class="nav-slot right" style="gap: 8px;">
 			{#if showTimer}
 				<div class="timer">{formatTime(elapsed)}</div>
-			{:else}
+			{/if}
+			{#if showRomajiToggle}
+				<button 
+					class="romaji-nav-btn" 
+					class:active={$showRomaji}
+					onclick={() => showRomaji.toggle()}
+					title="Romaji"
+				>
+					<Icon icon={TranslateIcon} size={20} strokeWidth={2} />
+				</button>
+			{/if}
+			{#if !showTimer && !showRomajiToggle}
 				<div class="empty-slot"></div>
 			{/if}
 		</div>
@@ -160,5 +177,31 @@
 
 	.empty-slot {
 		width: 44px;
+	}
+
+	.romaji-nav-btn {
+		background: none;
+		border: none;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		width: 44px;
+		height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		transition: all 150ms ease;
+		padding: 0;
+	}
+
+	@media (hover: hover) {
+		.romaji-nav-btn:hover {
+			background: var(--ink-100);
+			color: var(--sumi);
+		}
+	}
+
+	.romaji-nav-btn.active {
+		color: var(--hinomaru-red);
 	}
 </style>

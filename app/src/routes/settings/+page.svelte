@@ -16,7 +16,10 @@
 		MonitorDotIcon,
 		Sun01Icon,
 		Moon01Icon,
-		VolumeHighIcon
+		VolumeHighIcon,
+		AlphabetJapaneseIcon,
+		AiBrain01Icon,
+		Notification01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -189,9 +192,11 @@
 		</div>
 	</section>
 
-	{#snippet settingsItem(icon: string, title: string, subtext: string, active: boolean, onclick: () => void)}
+	{#snippet settingsItem(icon: any, title: string, subtext: string, active: boolean, onclick: () => void)}
 		<button class="list-item" {onclick} role="switch" aria-checked={active}>
-			<div class="item-icon-box" aria-hidden="true">{icon}</div>
+			<div class="item-icon-box" aria-hidden="true">
+				<Icon {icon} size={20} color="currentColor" strokeWidth={1.8} />
+			</div>
 			<div class="item-text-stack">
 				<span class="item-text">{title}</span>
 				{#if subtext}<span class="item-subtext">{subtext}</span>{/if}
@@ -284,18 +289,18 @@
 		<section class="settings-group">
 			<h2 class="group-label">{t('settings.preferences', $locale)}</h2>
 			<div class="settings-list">
-				{@render settingsItem('🇯🇵', t('settings.showRomaji', $locale), '', $showRomaji, () =>
+				{@render settingsItem(AlphabetJapaneseIcon, t('settings.showRomaji', $locale), '', $showRomaji, () =>
 					showRomaji.toggle()
 				)}
 				{@render settingsItem(
-					'🧠',
+					AiBrain01Icon,
 					t('settings.srs', $locale),
 					t('settings.srs.desc', $locale),
 					$srsEnabled,
 					toggleSRS
 				)}
 				{@render settingsItem(
-					'🔔',
+					Notification01Icon,
 					t('settings.notifications', $locale),
 					t('settings.notifications.desc', $locale),
 					$notificationsEnabled,
@@ -314,7 +319,15 @@
 					role="radio"
 					aria-checked={$locale === 'es'}
 				>
-					<span class="lang-flag" aria-hidden="true">🇪🇸</span>
+					<img
+						class="lang-flag"
+						src="https://flagcdn.com/32x24/es.png"
+						srcset="https://flagcdn.com/64x48/es.png 2x, https://flagcdn.com/96x72/es.png 3x"
+						width="32"
+						height="24"
+						alt="España"
+						aria-hidden="true"
+					/>
 					<div class="lang-info">
 						<span class="lang-name">{t('settings.spanish', $locale)}</span>
 						<span class="lang-native">Español</span>
@@ -328,7 +341,15 @@
 					role="radio"
 					aria-checked={$locale === 'en'}
 				>
-					<span class="lang-flag" aria-hidden="true">🇺🇸</span>
+					<img
+						class="lang-flag"
+						src="https://flagcdn.com/32x24/us.png"
+						srcset="https://flagcdn.com/64x48/us.png 2x, https://flagcdn.com/96x72/us.png 3x"
+						width="32"
+						height="24"
+						alt="United States"
+						aria-hidden="true"
+					/>
 					<div class="lang-info">
 						<span class="lang-name">{t('settings.english', $locale)}</span>
 						<span class="lang-native">English</span>
@@ -621,7 +642,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 20px;
+		color: var(--fg-secondary);
+		flex-shrink: 0;
 	}
 
 	.item-text {
@@ -632,30 +654,39 @@
 
 	/* Custom Switch */
 	.hm-switch {
-		width: 44px;
-		height: 24px;
+		width: 48px;
+		height: 28px;
 		background: var(--ink-200);
-		border-radius: 12px;
+		border-radius: 14px;
 		position: relative;
-		transition: background 0.2s;
+		flex-shrink: 0;
+		transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 	.hm-switch.active {
 		background: var(--hinomaru-red);
 	}
 
 	.switch-handle {
-		width: 18px;
-		height: 18px;
-		background: var(--paper);
-		border-radius: 50%;
+		width: 22px;
+		height: 22px;
+		background: white;
+		border-radius: 11px;
 		position: absolute;
 		top: 3px;
 		left: 3px;
-		transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-		box-shadow: var(--shadow-sm);
+		transition:
+			transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+			width 0.15s ease;
+		box-shadow: 0 1px 4px rgba(0,0,0,0.25), 0 0 0 0.5px rgba(0,0,0,0.06);
+	}
+	.list-item:active .switch-handle {
+		width: 26px;
 	}
 	.hm-switch.active .switch-handle {
 		transform: translateX(20px);
+	}
+	.hm-switch.active .list-item:active .switch-handle {
+		transform: translateX(16px);
 	}
 
 	/* Language Grid */
@@ -704,7 +735,12 @@
 	}
 
 	.lang-flag {
-		font-size: 24px;
+		width: 32px;
+		height: 24px;
+		border-radius: 4px;
+		object-fit: cover;
+		flex-shrink: 0;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 	}
 
 	.lang-info {

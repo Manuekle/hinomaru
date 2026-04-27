@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
-	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
+	import { fadeUp, fadeIn } from '$lib/motion';
 	import { fly } from 'svelte/transition';
-	import { cubicOut, cubicIn } from 'svelte/easing';
+	import { cubicOut } from 'svelte/easing';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
@@ -13,7 +14,6 @@
 		VolumeHighIcon,
 		Search01Icon,
 		ZapIcon,
-		ArrowLeft02Icon,
 		TranslateIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
@@ -92,7 +92,7 @@
 	);
 
 	const availableCategories = $derived.by(() => {
-		const cats = new Set<string>();
+		const cats = new SvelteSet<string>();
 		enrichedWords.forEach((w) => cats.add(w.category || 'General'));
 		const sorted = Array.from(cats).sort();
 		return ['All', ...sorted];
@@ -195,7 +195,7 @@
 		<!-- Categories (Horizontal Scroll) -->
 		{#if !searchQuery && availableCategories.length > 2}
 			<div class="categories-scroll hide-scrollbar" use:fadeIn={{ delay: 0.15 }}>
-				{#each availableCategories as cat}
+				{#each availableCategories as cat (cat)}
 					<button
 						class="cat-tab touch-action-manip"
 						class:active={activeCategory === cat}

@@ -39,7 +39,7 @@
 		 * env(safe-area-inset-bottom) = ~34px on iOS (home bar), = 0 on Android/desktop.
 		 * max() ensures at least 20px bottom padding on Android/desktop.
 		 */
-		padding: 12px 24px max(20px, env(safe-area-inset-bottom));
+		padding: 8px 24px max(16px, calc(env(safe-area-inset-bottom, 0px) - 14px));
 		display: flex;
 		justify-content: center;
 		pointer-events: auto;
@@ -60,7 +60,7 @@
 	/* Desktop: more generous padding, centered feel */
 	@media (min-width: 768px) {
 		.sticky-footer {
-			padding: 16px 32px 28px;
+			padding: 12px 32px 24px;
 		}
 	}
 

@@ -6,6 +6,8 @@
 	import { cubicOut, cubicIn } from 'svelte/easing';
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
+	import Icon from '$lib/Icon.svelte';
+	import { Settings02Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -35,46 +37,40 @@
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 	>
-		<!-- Minimalist Header -->
-		<div
-			use:fadeUp={{ delay: 0, y: 10 }}
-			style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;padding-top:8px;"
-		>
-			<div style="display:flex;align-items:center;gap:16px;">
-				<div style="font-size:32px;line-height:1;">
-					{profile?.avatar || '🎏'}
-				</div>
-				<div style="display:flex;flex-direction:column;gap:4px;">
-					<div style="display:flex;align-items:baseline;gap:6px;">
-						<span style="font-weight:800;font-size:16px;color:var(--sumi);">Lvl. {level}</span>
-						<span style="font-size:12px;font-weight:600;color:var(--fg-tertiary);"
-							>{currentXP} XP</span
-						>
+		<!-- Header -->
+		<div use:fadeUp={{ delay: 0, y: 10 }} class="dash-header">
+			<!-- Left: avatar + level + xp bar -->
+			<div class="dash-header-left">
+				<div class="dash-avatar">{profile?.avatar || '🎏'}</div>
+				<div class="dash-level-wrap">
+					<div class="dash-level-row">
+						<span class="dash-level-label">Lvl. {level}</span>
+						<span class="dash-xp-label">{currentXP} XP</span>
 					</div>
-					<div
-						style="width:120px;height:3px;background:var(--ink-100);border-radius:2px;overflow:hidden;"
-					>
-						<div
-							style="width:{levelProgress}%;height:100%;background:var(--hinomaru-red);transition:width 0.6s ease;"
-						></div>
+					<div class="dash-xp-track">
+						<div class="dash-xp-fill" style="width:{levelProgress}%;"></div>
 					</div>
 				</div>
 			</div>
 
-			<div style="text-align:right;display:flex;align-items:center;gap:12px;">
-				<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
-					<div style="font-size:24px;font-weight:800;color:var(--sumi);line-height:1;display:flex;align-items:center;gap:4px;">
-						{data.streak} <span style="font-size:18px;">🔥</span>
-					</div>
-					<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-tertiary);">
-						{t('home.streak', $locale, { n: '' }).replace(':', '').trim()}
-					</div>
-				</div>
-				<a href="/settings" class="dashboard-settings-btn" aria-label="Settings" style="margin-right:-10px;">
-					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-						<circle cx="12" cy="12" r="3"></circle>
+			<!-- Right: streak chip + settings -->
+			<div class="dash-header-right">
+				<div class="dash-streak-chip" class:streak-active={data.streak > 0}>
+					<svg class="streak-flame" viewBox="-33 0 255 255" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+						<defs>
+							<linearGradient id="streak-flame-grad" gradientUnits="userSpaceOnUse" x1="94.141" y1="255" x2="94.141" y2="0.188">
+								<stop offset="0" stop-color="#ff4c0d"/>
+								<stop offset="1" stop-color="#fc9502"/>
+							</linearGradient>
+						</defs>
+						<path d="M187.899,164.809 C185.803,214.868 144.574,254.812 94.000,254.812 C42.085,254.812 -0.000,211.312 -0.000,160.812 C-0.000,154.062 -0.121,140.572 10.000,117.812 C16.057,104.191 19.856,95.634 22.000,87.812 C23.178,83.513 25.469,76.683 32.000,87.812 C35.851,94.374 36.000,103.812 36.000,103.812 C36.000,103.812 50.328,92.817 60.000,71.812 C74.179,41.019 62.866,22.612 59.000,9.812 C57.662,5.384 56.822,-2.574 66.000,0.812 C75.352,4.263 100.076,21.570 113.000,39.812 C131.445,65.847 138.000,90.812 138.000,90.812 C138.000,90.812 143.906,83.482 146.000,75.812 C148.365,67.151 148.400,58.573 155.999,67.813 C163.226,76.600 173.959,93.113 180.000,108.812 C190.969,137.321 187.899,164.809 187.899,164.809 Z" fill="url(#streak-flame-grad)" fill-rule="evenodd"/>
+						<path d="M94.000,254.812 C58.101,254.812 29.000,225.711 29.000,189.812 C29.000,168.151 37.729,155.000 55.896,137.166 C67.528,125.747 78.415,111.722 83.042,102.172 C83.953,100.292 86.026,90.495 94.019,101.966 C98.212,107.982 104.785,118.681 109.000,127.812 C116.266,143.555 118.000,158.812 118.000,158.812 C118.000,158.812 125.121,154.616 130.000,143.812 C131.573,140.330 134.753,127.148 143.643,140.328 C150.166,150.000 159.127,167.390 159.000,189.812 C159.000,225.711 129.898,254.812 94.000,254.812 Z" fill="#fc9502" fill-rule="evenodd"/>
+						<path d="M95.000,183.812 C104.250,183.812 104.250,200.941 116.000,223.812 C123.824,239.041 112.121,254.812 95.000,254.812 C77.879,254.812 69.000,240.933 69.000,223.812 C69.000,206.692 85.750,183.812 95.000,183.812 Z" fill="#fce202" fill-rule="evenodd"/>
 					</svg>
+					<span class="dash-streak-num">{data.streak}</span>
+				</div>
+				<a href="/settings" class="dashboard-settings-btn" aria-label="Settings">
+					<Icon icon={Settings02Icon} size={20} color="currentColor" strokeWidth={1.8} />
 				</a>
 			</div>
 		</div>
@@ -447,16 +443,123 @@
 		white-space: nowrap;
 	}
 
-	.dashboard-settings-btn {
-		width: 44px;
-		height: 44px;
+	/* ── Header ── */
+	.dash-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 32px;
+		padding-top: 8px;
+	}
+
+	.dash-header-left {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.dash-avatar {
+		font-size: 28px;
+		line-height: 1;
+		width: 40px;
+		height: 40px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--fg-secondary);
-		border-radius: 50%;
+		background: var(--ink-50);
+		border-radius: 12px;
+		border: 1px solid var(--ink-100);
+		flex-shrink: 0;
+	}
+
+	.dash-level-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+	}
+
+	.dash-level-row {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+	}
+
+	.dash-level-label {
+		font-weight: 800;
+		font-size: 14px;
+		color: var(--sumi);
+		letter-spacing: -0.01em;
+	}
+
+	.dash-xp-label {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+	}
+
+	.dash-xp-track {
+		width: 100px;
+		height: 3px;
+		background: var(--ink-100);
+		border-radius: 2px;
+		overflow: hidden;
+	}
+
+	.dash-xp-fill {
+		height: 100%;
+		background: var(--hinomaru-red);
+		border-radius: 2px;
+		transition: width 0.6s ease;
+	}
+
+	.dash-header-right {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.dash-streak-chip {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		padding: 5px 10px;
+		border-radius: 99px;
+		background: var(--ink-50);
+		border: 1px solid var(--ink-100);
+		color: var(--fg-tertiary);
 		transition: all 0.2s;
-		margin-right: -10px;
+	}
+
+	.dash-streak-chip.streak-active {
+		background: rgba(255, 107, 0, 0.08);
+		border-color: rgba(255, 107, 0, 0.2);
+		color: #e05c00;
+	}
+
+	.streak-flame {
+		width: 14px;
+		height: 14px;
+		flex-shrink: 0;
+	}
+
+	.dash-streak-num {
+		font-size: 13px;
+		font-weight: 800;
+		letter-spacing: -0.01em;
+		line-height: 1;
+	}
+
+	.dashboard-settings-btn {
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-tertiary);
+		border-radius: 10px;
+		transition: all 0.15s;
+		background: var(--ink-50);
+		border: 1px solid var(--ink-100);
 	}
 
 	@media (hover: hover) {
@@ -467,6 +570,6 @@
 	}
 
 	.dashboard-settings-btn:active {
-		transform: scale(0.9);
+		transform: scale(0.92);
 	}
 </style>
