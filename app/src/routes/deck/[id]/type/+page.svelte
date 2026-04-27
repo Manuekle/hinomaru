@@ -7,6 +7,7 @@
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
@@ -47,7 +48,12 @@
 	function submit() {
 		if (submitted || !answer.trim()) return;
 		submitted = true;
-		if (isCorrect) correct++;
+		if (isCorrect) {
+			correct++;
+			playCorrect();
+		} else {
+			playWrong();
+		}
 	}
 
 	async function next() {

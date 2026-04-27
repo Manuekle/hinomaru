@@ -7,6 +7,7 @@
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
@@ -57,7 +58,12 @@
 	function pick(opt: string) {
 		if (picked) return;
 		picked = opt;
-		if (opt === card.en) correct++;
+		if (opt === card.en) {
+			correct++;
+			playCorrect();
+		} else {
+			playWrong();
+		}
 	}
 
 	async function next() {

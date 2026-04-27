@@ -343,7 +343,7 @@
 							<div class="feedback-text">
 								{isCorrect 
 									? ($locale === 'es' ? '¡Excelente! Respuesta correcta.' : 'Excellent! Correct answer.') 
-									: ($locale === 'es' ? 'Vaya, esa no era. ¡Sigue intentando!' : 'Oops, that wasn''t it. Keep trying!')}
+									: ($locale === 'es' ? 'Vaya, esa no era. ¡Sigue intentando!' : "Oops, that wasn't it. Keep trying!")}
 							</div>
 						</div>
 					{/if}

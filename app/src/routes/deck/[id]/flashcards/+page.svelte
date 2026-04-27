@@ -9,6 +9,7 @@
 	import { createClient } from '$lib/supabase';
 	import { animate } from 'motion';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
@@ -61,7 +62,10 @@
 	}
 
 	async function next(gotIt: boolean) {
-		if (gotIt) correct++;
+		if (gotIt) {
+			correct++;
+			playCorrect();
+		}
 		flipped = false;
 
 		await updateCardProgress(card, gotIt, struggled);
@@ -106,6 +110,7 @@
 
 	async function retry() {
 		struggled = true;
+		playWrong();
 		flipped = false;
 		if (cardEl) {
 			animate(cardEl, { scale: [1, 0.98, 1] }, { duration: 0.3 });

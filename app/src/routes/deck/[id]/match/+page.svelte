@@ -12,6 +12,7 @@
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { Award01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { svileo } from '$lib/stores/toast';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
@@ -107,6 +108,7 @@
 			matchedIds.add(item.id);
 			selectedKey = null;
 			wrongKeys.clear();
+			playCorrect();
 
 			// Check if the round is complete
 			const roundSize = Math.min(SET_SIZE, sessionCards.length - currentIndex);
@@ -122,6 +124,7 @@
 			wrongKeys.add(selectedKey);
 			wrongKeys.add(key);
 			selectedKey = null;
+			playWrong();
 
 			setTimeout(() => {
 				wrongKeys.clear();
@@ -134,6 +137,7 @@
 		if (timerInterval) clearInterval(timerInterval);
 		finalTime = elapsed;
 		finished = true;
+		playFinish();
 
 		const {
 			data: { user }
@@ -301,7 +305,7 @@
 		flex-direction: column;
 		min-height: 100dvh;
 		background: var(--paper);
-		padding-bottom: env(safe-area-inset-bottom);
+		padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 	}
 
 	/* ── Grid ── */

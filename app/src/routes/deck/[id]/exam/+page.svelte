@@ -9,6 +9,7 @@
 	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { Certificate01Icon, CheckmarkCircle01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
+	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -176,6 +177,9 @@
 		const isRight = answer.toLowerCase() === q.correctAnswer.toLowerCase();
 		correctness = [...correctness, isRight];
 
+		if (isRight) playCorrect();
+		else playWrong();
+
 		// Auto-advance
 		const delay = isRight ? 2000 : 3000;
 		advanceTimeout = setTimeout(() => {
@@ -201,6 +205,7 @@
 	async function endExam() {
 		stopTimer();
 		phase = 'result';
+		playFinish();
 		await saveSession();
 	}
 

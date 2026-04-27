@@ -6,6 +6,7 @@
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { animate } from 'motion';
 	import { calculateNextReview, mapPerformanceToQuality, type SRSState } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
@@ -272,6 +273,7 @@
 					current.box.style.borderColor = 'var(--success)';
 					currentQuizIndex++;
 					updateCharProgress();
+					playCorrect();
 					if (sequential && currentQuizIndex < writers.length) {
 						// Brief pause before showing next char
 						setTimeout(() => startQuizSequence(), 300);
@@ -331,8 +333,10 @@
 	async function next(gotIt: boolean) {
 		if (gotIt) {
 			correctCount++;
+			playCorrect();
 		} else {
 			quizCards = [...quizCards, quizCards[i]];
+			playWrong();
 		}
 
 		await updateCardProgress(card, gotIt, struggled);

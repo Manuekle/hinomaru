@@ -136,39 +136,88 @@ export const jlptSongs: SongLesson[] = [
 				translation_en: 'From inside the pot, poof! The phony old man appears.'
 			},
 			{
-				time: 30.0,
+				time: 27.0,
 				text: 'いつだって 忘れない エジソンは 偉い人',
 				romaji: 'itsu datte wasurenai Ejison wa erai hito',
 				translation_es: 'Siempre recordaremos que Edison fue un gran hombre.',
 				translation_en: "We'll never forget that Edison was a great man."
 			},
 			{
-				time: 35.0,
+				time: 34.8,
 				text: 'そんなの常識 タッタタラリラ',
 				romaji: 'sonna no joushiki tatta tararira',
 				translation_es: 'Eso es de sentido común. ¡Tatta-tararira!',
 				translation_en: "That's just common sense. Tatta-tararira!"
 			},
 			{
-				time: 40.0,
-				text: 'ピーヒャラ ピーヒャラ パッパパラパ',
-				romaji: 'piihyara piihyara pappaparapa',
-				translation_es: '¡Pii-hyara pii-hyara! ¡Pappa-parapa!',
-				translation_en: 'Pii-hyara pii-hyara! Pappa-parapa!'
+				time: 41.0,
+				text: 'ぴいはら、ぴいはら、ぱっぱぱらぱ',
+				romaji: 'piihara, piihara, pappaparapa',
+				translation_es: '¡Pii-hara, pii-hara! ¡Pappa-parapa!',
+				translation_en: 'Pii-hara, pii-hara! Pappa-parapa!'
 			},
 			{
-				time: 50.0,
-				text: 'おどるポンポコリン ピーヒャラ ピー',
-				romaji: 'odoru ponpokorin piihyara pii',
-				translation_es: 'Bailando el Ponpokorin, pii-hyara pii.',
-				translation_en: 'Dancing the Ponpokorin, pii-hyara pii.'
+				time: 45.0,
+				text: 'ぴいはら、ぴいはら、ぱっぱぱらぱ',
+				romaji: 'piihara, piihara, pappaparapa',
+				translation_es: '¡Pii-hara, pii-hara! ¡Pappa-parapa!',
+				translation_en: 'Pii-hara, pii-hara! Pappa-parapa!'
+			},
+			{
+				time: 48.0,
+				text: 'ぴいはら、ぴいはら、おへそがちらり',
+				romaji: 'piihara, piihara, oheso ga chirari',
+				translation_es: '¡Pii-hara, pii-hara! ¡Se asoma el ombligo!',
+				translation_en: 'Pii-hara, pii-hara! The belly button peekaboo!'
+			},
+			{
+				time: 54.0,
+				text: 'たったらりら',
+				romaji: 'tattararira',
+				translation_es: '¡Tatta-rarira!',
+				translation_en: 'Tatta-rarira!'
 			},
 			{
 				time: 55.0,
-				text: 'おなかがへったよ',
-				romaji: 'onaka ga hetta yo',
-				translation_es: 'Tengo hambre.',
-				translation_en: "I'm hungry."
+				text: 'ぴいはら、ぴいはら、ぱっぱぱらぱ',
+				romaji: 'piihara, piihara, pappaparapa',
+				translation_es: '¡Pii-hara, pii-hara! ¡Pappa-parapa!',
+				translation_en: 'Pii-hara, pii-hara! Pappa-parapa!'
+			},
+			{
+				time: 58.8,
+				text: 'ぴいはら、ぴいはら、おどるぽんぽこりん',
+				romaji: 'piihara, piihara, odoru ponpokorin',
+				translation_es: '¡Pii-hara, pii-hara! ¡Bailando el Ponpokorin!',
+				translation_en: 'Pii-hara, pii-hara! Dancing the Ponpokorin!'
+			},
+			{
+				time: 62.0,
+				text: 'ぴいはらぴ、おなかがへったよ',
+				romaji: 'piihara pi, onaka ga hetta yo',
+				translation_es: '¡Pii-hara-pi! Tengo hambre.',
+				translation_en: "Pii-hara-pi! I'm hungry."
+			},
+			{
+				time: 69.0,
+				text: 'ぴいはら、ぴいはら、ぱっぱぱらぱ',
+				romaji: 'piihara, piihara, pappaparapa',
+				translation_es: '¡Pii-hara, pii-hara! ¡Pappa-parapa!',
+				translation_en: 'Pii-hara, pii-hara! Pappa-parapa!'
+			},
+			{
+				time: 72.0,
+				text: 'ぴいはら、ぴいはら、おどるぽんぽこりん',
+				romaji: 'piihara, piihara, odoru ponpokorin',
+				translation_es: '¡Pii-hara, pii-hara! ¡Bailando el Ponpokorin!',
+				translation_en: 'Pii-hara, pii-hara! Dancing the Ponpokorin!'
+			},
+			{
+				time: 75.8,
+				text: 'ぴいはらぴ、おなかがへったよ',
+				romaji: 'piihara pi, onaka ga hetta yo',
+				translation_es: '¡Pii-hara-pi! Tengo hambre.',
+				translation_en: "Pii-hara-pi! I'm hungry."
 			}
 		],
 		vocab: [

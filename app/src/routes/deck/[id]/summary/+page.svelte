@@ -9,6 +9,7 @@
 	import { svileo } from '$lib/stores/toast';
 	import { addXP } from '$lib/utils/gamification';
 	import { createClient } from '$lib/supabase';
+	import { playFinish } from '$lib/utils/sounds';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -37,6 +38,7 @@
 		animateNumber((v) => (displayScore = v), correct, { duration: 0.9, delay: 0.4 });
 		animateNumber((v) => (displayTotal = v), total, { duration: 0.7, delay: 0.3 });
 		animateNumber((v) => (displayXP = v), xpEarned, { duration: 1.2, delay: 0.6 });
+		playFinish();
 
 		const { data: { user } } = await supabase.auth.getUser();
 		if (user && xpEarned > 0) {

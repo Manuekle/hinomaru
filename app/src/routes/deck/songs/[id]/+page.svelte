@@ -16,6 +16,7 @@
 	} from '@hugeicons/core-free-icons';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { svileo } from '$lib/stores/toast';
+	import { playFinish } from '$lib/utils/sounds';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 
@@ -185,6 +186,7 @@
 		if (!completed) {
 			completed = true;
 			fireConfetti = true;
+			playFinish();
 			svileo.success({ title: t('songs.doneBravo', $locale) });
 			try {
 				const raw = localStorage.getItem('hinomaru_songs_completed');
