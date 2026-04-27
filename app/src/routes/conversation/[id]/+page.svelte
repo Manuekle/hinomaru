@@ -4,7 +4,6 @@
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
-	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { updateStreak } from '$lib/utils/updateStreak';
@@ -104,232 +103,228 @@
 	</title>
 </svelte:head>
 
-<div
-	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
->
-	{#if !scenario}
+{#if !scenario}
+	<div class="story-viewer-layout">
 		<div style="text-align:center;padding:80px 0;color:var(--fg-tertiary);">
 			Escenario no encontrado.
 		</div>
-	{:else}
-		<!-- Back link -->
-		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;">
-			<a href="/conversation" class="back-link-beautiful">
-				← {$locale === 'es' ? 'Conversatorio' : 'Conversations'}
-			</a>
-		</div>
-
-		{#if phase !== 'result'}
-			<!-- Header row -->
-			<div use:fadeUp={{ delay: 0.05, y: 10 }} class="scenario-header">
-				<div class="scenario-meta">
-					<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{scenario.level}</span>
-					<span class="scenario-progress-label label-meta">
-						{score}/{totalChoices} {$locale === 'es' ? 'correctas' : 'correct'}
-					</span>
-				</div>
-
-				<div class="scenario-title-row">
-					<h1 class="scenario-display-title">
-						{scenario.icon}
-						{$locale === 'es' ? scenario.title_es : scenario.title_en}
-					</h1>
-				</div>
-
-				<p class="scenario-context">{scenario.context_es}</p>
-
-				<!-- Progress bar -->
-				<div class="progress-track">
-					<div class="progress-fill" style="width:{progressPct}%"></div>
-				</div>
+	</div>
+{:else}
+	<div class="story-viewer-layout">
+		<div
+			style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
+		>
+			<!-- Back link -->
+			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;">
+				<a href="/conversation" class="back-link-beautiful">
+					← {$locale === 'es' ? 'Conversatorio' : 'Conversations'}
+				</a>
 			</div>
 
-			<!-- NPC card -->
-			{#if (phase === 'npc' || phase === 'choice' || phase === 'feedback') && currentTurn}
-				{@const npcTurn = currentTurn.type === 'npc'
-					? currentTurn
-					: currentTurn.type === 'choice' && phase === 'feedback' && currentTurn.next_npc
-					? null
-					: null}
-
-				{#if currentTurn.type === 'npc'}
-					<div use:fadeUp={{ delay: 0.1, y: 12 }} class="story-body-card">
-						<div class="npc-card-header">
-							<span class="npc-badge">🤖 NPC</span>
-							<button
-								class="story-audio-btn"
-								onclick={() => speakJapanese(currentTurn.jp)}
-								aria-label="Escuchar"
-							>
-								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-							</button>
-						</div>
-
-						<p class="body-text-jp">{currentTurn.jp}</p>
-
-						{#if $showRomaji}
-							<p class="body-text-romaji">{currentTurn.romaji}</p>
-						{/if}
-
-						<div class="translation-section">
-							<button class="toggle-btn" onclick={() => (showTranslation = !showTranslation)}>
-								{showTranslation
-									? ($locale === 'es' ? 'Ocultar traducción' : 'Hide translation')
-									: ($locale === 'es' ? 'Ver traducción' : 'Show translation')}
-							</button>
-							{#if showTranslation}
-								<p class="body-text-translated" use:fadeUp={{ y: 5 }}>{currentTurn.translation}</p>
-							{/if}
-						</div>
+			{#if phase !== 'result'}
+				<!-- Header row -->
+				<div use:fadeUp={{ delay: 0.05, y: 10 }} class="scenario-header">
+					<div class="scenario-meta">
+						<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{scenario.level}</span>
+						<span class="scenario-progress-label label-meta">
+							{score}/{totalChoices} {$locale === 'es' ? 'correctas' : 'correct'}
+						</span>
 					</div>
 
-				{:else if currentTurn.type === 'choice'}
-					<!-- Choice prompt card -->
-					<div use:fadeUp={{ delay: 0.1, y: 12 }} class="story-body-card">
-						<div class="npc-card-header">
-							<span class="npc-badge">🤖 NPC</span>
-							<button
-								class="story-audio-btn"
-								onclick={() => speakJapanese(currentTurn.prompt_jp)}
-								aria-label="Escuchar"
-							>
-								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-							</button>
-						</div>
-
-						<p class="body-text-jp">{currentTurn.prompt_jp}</p>
-
-						{#if $showRomaji}
-							<p class="body-text-romaji">{currentTurn.prompt_romaji}</p>
-						{/if}
-
-						<div class="translation-section">
-							<p class="body-text-translated" style="margin:0;">{currentTurn.prompt_translation}</p>
-						</div>
+					<div class="scenario-title-row">
+						<h1 class="scenario-display-title">
+							{scenario.icon}
+							{$locale === 'es' ? scenario.title_es : scenario.title_en}
+						</h1>
 					</div>
 
-					<!-- Options (same as story quiz) -->
-					<div use:fadeUp={{ delay: 0.18, y: 10 }} class="question-box" style="margin-top:20px;">
-						<p class="question-text">
-							{$locale === 'es' ? 'Elige la respuesta más natural:' : 'Choose the most natural response:'}
-						</p>
+					<p class="scenario-context">{scenario.context_es}</p>
 
-						<div class="options-grid">
-							{#each currentTurn.choices as choice, idx (idx)}
-								{@const isPicked = selectedIdx === idx}
-								{@const isRevealed = phase === 'feedback'}
+					<!-- Progress bar -->
+					<div class="progress-track">
+						<div class="progress-fill" style="width:{progressPct}%"></div>
+					</div>
+				</div>
+
+				<!-- NPC card -->
+				{#if (phase === 'npc' || phase === 'choice' || phase === 'feedback') && currentTurn}
+					{#if currentTurn.type === 'npc'}
+						<div use:fadeUp={{ delay: 0.1, y: 12 }} class="story-body-card">
+							<div class="npc-card-header">
+								<span class="npc-badge">🤖 NPC</span>
 								<button
-									class="option-item"
-									class:is-selected={phase === 'choice' && isPicked}
-									class:is-correct={isRevealed && choice.correct}
-									class:is-wrong={isRevealed && isPicked && !choice.correct}
-									class:is-dimmed={isRevealed && !isPicked && !choice.correct}
-									onclick={() => pickChoice(choice, idx)}
-									disabled={phase === 'feedback'}
-									touch-action="manipulation"
+									class="story-audio-btn"
+									onclick={() => speakJapanese(currentTurn.jp)}
+									aria-label="Escuchar"
 								>
-									<div class="option-marker">{String.fromCharCode(65 + idx)}</div>
-									<div class="option-content">
-										<div class="option-label jp">{choice.jp}</div>
-										{#if $showRomaji}
-											<div class="option-romaji">{choice.romaji}</div>
-										{/if}
-									</div>
+									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 								</button>
-							{/each}
-						</div>
-					</div>
-
-					<!-- Feedback (shown after picking) -->
-					{#if phase === 'feedback' && selectedChoice}
-						<div
-							use:fadeUp={{ delay: 0, y: 8 }}
-							class="quiz-feedback"
-							class:correct={selectedChoice.correct}
-							class:wrong={!selectedChoice.correct}
-						>
-							<div class="feedback-row">
-								<strong>{selectedChoice.correct
-									? ($locale === 'es' ? '✓ ¡Correcto!' : '✓ Correct!')
-									: ($locale === 'es' ? '✗ No del todo...' : '✗ Not quite...')}</strong>
-								<span class="feedback-text">{selectedChoice.feedback_es}</span>
 							</div>
 
-							{#if currentTurn.type === 'choice' && currentTurn.next_npc}
-								<div class="feedback-npc-response">
-									<span class="label-meta" style="display:block;margin-bottom:6px;">
-										{$locale === 'es' ? 'El NPC responde:' : 'NPC responds:'}
-									</span>
-									<p class="body-text-jp" style="font-size:18px;margin:0 0 4px;">{currentTurn.next_npc.jp}</p>
-									{#if $showRomaji}
-										<p style="font-size:12px;color:var(--hinomaru-red);font-weight:600;margin:0 0 4px;">{currentTurn.next_npc.romaji}</p>
-									{/if}
-									<p style="font-size:13px;color:var(--fg-secondary);margin:0;">{currentTurn.next_npc.translation}</p>
-								</div>
+							<p class="body-text-jp">{currentTurn.jp}</p>
+
+							{#if $showRomaji}
+								<p class="body-text-romaji">{currentTurn.romaji}</p>
 							{/if}
+
+							<div class="translation-section">
+								<button class="toggle-btn" onclick={() => (showTranslation = !showTranslation)}>
+									{showTranslation
+										? ($locale === 'es' ? 'Ocultar traducción' : 'Hide translation')
+										: ($locale === 'es' ? 'Ver traducción' : 'Show translation')}
+								</button>
+								{#if showTranslation}
+									<p class="body-text-translated" use:fadeUp={{ y: 5 }}>{currentTurn.translation}</p>
+								{/if}
+							</div>
 						</div>
+
+					{:else if currentTurn.type === 'choice'}
+						<!-- Choice prompt card -->
+						<div use:fadeUp={{ delay: 0.1, y: 12 }} class="story-body-card">
+							<div class="npc-card-header">
+								<span class="npc-badge">🤖 NPC</span>
+								<button
+									class="story-audio-btn"
+									onclick={() => speakJapanese(currentTurn.prompt_jp)}
+									aria-label="Escuchar"
+								>
+									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+								</button>
+							</div>
+
+							<p class="body-text-jp">{currentTurn.prompt_jp}</p>
+
+							{#if $showRomaji}
+								<p class="body-text-romaji">{currentTurn.prompt_romaji}</p>
+							{/if}
+
+							<div class="translation-section">
+								<p class="body-text-translated" style="margin:0;">{currentTurn.prompt_translation}</p>
+							</div>
+						</div>
+
+						<!-- Options (same as story quiz) -->
+						<div use:fadeUp={{ delay: 0.18, y: 10 }} class="question-box" style="margin-top:20px;">
+							<p class="question-text">
+								{$locale === 'es' ? 'Elige la respuesta más natural:' : 'Choose the most natural response:'}
+							</p>
+
+							<div class="options-grid">
+								{#each currentTurn.choices as choice, idx (idx)}
+									{@const isPicked = selectedIdx === idx}
+									{@const isRevealed = phase === 'feedback'}
+									<button
+										class="option-item"
+										class:is-selected={phase === 'choice' && isPicked}
+										class:is-correct={isRevealed && choice.correct}
+										class:is-wrong={isRevealed && isPicked && !choice.correct}
+										class:is-dimmed={isRevealed && !isPicked && !choice.correct}
+										onclick={() => pickChoice(choice, idx)}
+										disabled={phase === 'feedback'}
+										touch-action="manipulation"
+									>
+										<div class="option-marker">{String.fromCharCode(65 + idx)}</div>
+										<div class="option-content">
+											<div class="option-label jp">{choice.jp}</div>
+											{#if $showRomaji}
+												<div class="option-romaji">{choice.romaji}</div>
+											{/if}
+										</div>
+									</button>
+								{/each}
+							</div>
+						</div>
+
+						<!-- Feedback (shown after picking) -->
+						{#if phase === 'feedback' && selectedChoice}
+							<div
+								use:fadeUp={{ delay: 0, y: 8 }}
+								class="quiz-feedback"
+								class:correct={selectedChoice.correct}
+								class:wrong={!selectedChoice.correct}
+							>
+								<div class="feedback-row">
+									<strong>{selectedChoice.correct
+										? ($locale === 'es' ? '✓ ¡Correcto!' : '✓ Correct!')
+										: ($locale === 'es' ? '✗ No del todo...' : '✗ Not quite...')}</strong>
+									<span class="feedback-text">{selectedChoice.feedback_es}</span>
+								</div>
+
+								{#if currentTurn.type === 'choice' && currentTurn.next_npc}
+									<div class="feedback-npc-response">
+										<span class="label-meta" style="display:block;margin-bottom:6px;">
+											{$locale === 'es' ? 'El NPC responde:' : 'NPC responds:'}
+										</span>
+										<p class="body-text-jp" style="font-size:18px;margin:0 0 4px;">{currentTurn.next_npc.jp}</p>
+										{#if $showRomaji}
+											<p style="font-size:12px;color:var(--hinomaru-red);font-weight:600;margin:0 0 4px;">{currentTurn.next_npc.romaji}</p>
+										{/if}
+										<p style="font-size:13px;color:var(--fg-secondary);margin:0;">{currentTurn.next_npc.translation}</p>
+									</div>
+								{/if}
+							</div>
+						{/if}
 					{/if}
 				{/if}
-			{/if}
 
-		{:else}
-			<!-- Result screen — mirrors stories result -->
-			<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
-				<div class="result-badge">
-					<Icon
-						icon={scorePct === 100 ? Award01Icon : BubbleChatIcon}
-						size={48}
-						color="var(--washi)"
-						strokeWidth={1.5}
-					/>
-				</div>
-				<h2 class="result-headline">
-					{scorePct === 100
-						? ($locale === 'es' ? '¡Perfecto!' : 'Perfect!')
-						: scorePct >= 70
-						? ($locale === 'es' ? '¡Muy bien!' : 'Great job!')
-						: ($locale === 'es' ? '¡Sigue practicando!' : 'Keep practicing!')}
-				</h2>
-				<p class="result-summary">
-					{$locale === 'es'
-						? `Acertaste ${score} de ${totalChoices} situaciones. (${scorePct}%)`
-						: `You got ${score} of ${totalChoices} correct. (${scorePct}%)`}
-				</p>
-
+			{:else}
+				<!-- Result screen — mirrors stories result -->
+				<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
+					<div class="result-badge">
+						<Icon
+							icon={scorePct === 100 ? Award01Icon : BubbleChatIcon}
+							size={48}
+							color="var(--washi)"
+							strokeWidth={1.5}
+						/>
+					</div>
+					<h2 class="result-headline">
+						{scorePct === 100
+							? ($locale === 'es' ? '¡Perfecto!' : 'Perfect!')
+							: scorePct >= 70
+							? ($locale === 'es' ? '¡Muy bien!' : 'Great job!')
+							: ($locale === 'es' ? '¡Sigue practicando!' : 'Keep practicing!')}
+					</h2>
+					<p class="result-summary">
+						{$locale === 'es'
+							? `Acertaste ${score} de ${totalChoices} situaciones. (${scorePct}%)`
+							: `You got ${score} of ${totalChoices} correct. (${scorePct}%)`}
+					</p>
 				</div>
 			{/if}
+		</div>
 
-			<StickyFooter>
-				{#if phase === 'result'}
-					<button
-						class="hm-btn hm-btn-ghost hm-btn-lg"
-						style="flex:1;"
-						onclick={() => goto('/conversation')}
-					>
-						{$locale === 'es' ? 'Otros escenarios' : 'Other scenarios'}
-					</button>
-					<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={restart}>
-						{$locale === 'es' ? 'Repetir' : 'Repeat'}
-					</button>
-				{:else}
-					<button
-						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
-						onclick={advance}
-						disabled={phase === 'choice'}
-					>
-						{#if phase === 'choice'}
-							{$locale === 'es' ? 'Elige una respuesta' : 'Choose a response'}
-						{:else}
-							{turnIndex >= scenario.turns.length - 1
-								? ($locale === 'es' ? 'Terminar' : 'Finish')
-								: ($locale === 'es' ? 'Continuar' : 'Continue')} →
-						{/if}
-					</button>
-				{/if}
-			</StickyFooter>
-		{/if}
-	{/if}
-</div>
+		<StickyFooter>
+			{#if phase === 'result'}
+				<button
+					class="hm-btn hm-btn-ghost hm-btn-lg"
+					style="flex:1;"
+					onclick={() => goto('/conversation')}
+				>
+					{$locale === 'es' ? 'Otros escenarios' : 'Other scenarios'}
+				</button>
+				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={restart}>
+					{$locale === 'es' ? 'Repetir' : 'Repeat'}
+				</button>
+			{:else}
+				<button
+					class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
+					onclick={advance}
+					disabled={phase === 'choice'}
+				>
+					{#if phase === 'choice'}
+						{$locale === 'es' ? 'Elige una respuesta' : 'Choose a response'}
+					{:else}
+						{turnIndex >= (scenario?.turns.length ?? 0) - 1
+							? ($locale === 'es' ? 'Terminar' : 'Finish')
+							: ($locale === 'es' ? 'Continuar' : 'Continue')} →
+					{/if}
+				</button>
+			{/if}
+		</StickyFooter>
+	</div>
+{/if}
 
 {#if fireConfetti}
 	<Confetti fireOnMount={true} />
@@ -640,5 +635,12 @@
 	@media (max-width: 480px) {
 		.scenario-display-title { font-size: 26px; }
 		.body-text-jp { font-size: 19px; }
+	}
+
+	.story-viewer-layout {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		background: var(--bg-page);
 	}
 </style>
