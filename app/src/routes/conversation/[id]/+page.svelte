@@ -6,6 +6,7 @@
 	import { showRomaji } from '$lib/stores/settings';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
@@ -54,12 +55,18 @@
 		selectedChoice = choice;
 		selectedIdx = idx;
 		totalChoices++;
-		if (choice.correct) score++;
+		if (choice.correct) {
+			score++;
+			playCorrect();
+		} else {
+			playWrong();
+		}
 		phase = 'feedback';
 	}
 
 	async function finishConversation() {
 		phase = 'result';
+		playFinish();
 		if (scorePct >= 70) {
 			fireConfetti = true;
 			setTimeout(() => (fireConfetti = false), 4000);
