@@ -138,7 +138,15 @@
 		}}
 	/>
 	{@render children()}
-	{#if data.session && $page.url.pathname === '/'}
+	{#if data.session && (
+		$page.url.pathname === '/' || 
+		$page.url.pathname === '/alphabet' || 
+		$page.url.pathname === '/vocabulary' || 
+		$page.url.pathname === '/deck/stories' || 
+		$page.url.pathname === '/deck/songs' || 
+		$page.url.pathname === '/conversation' ||
+		$page.url.pathname === '/settings'
+	)}
 		<DockBar />
 	{/if}
 	<InstallPrompt />

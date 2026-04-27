@@ -35,8 +35,8 @@
 		z-index: 100;
 		/* Slightly smoother gradient, starting further down */
 		background: linear-gradient(to top, var(--bg-page) 0%, var(--bg-page) 60%, transparent 100%);
-		/* Reduced gap from 24px to 12px for iOS home indicator integration */
-		padding: 20px 24px calc(12px + env(safe-area-inset-bottom, 0px));
+		/* Relying solely on env() for iOS home indicator integration to keep it as low as possible */
+		padding: 20px 24px env(safe-area-inset-bottom, 12px);
 		display: flex;
 		justify-content: center;
 		pointer-events: none; /* Allow clicks through the gradient area */

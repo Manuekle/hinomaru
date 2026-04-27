@@ -305,7 +305,7 @@
 		flex-direction: column;
 		min-height: 100dvh;
 		background: var(--paper);
-		padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+		padding-bottom: env(safe-area-inset-bottom, 12px);
 	}
 
 	/* ── Grid ── */

@@ -57,8 +57,8 @@
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		/* env() for iOS home indicator; 8px gap for a more "docked" feel */
-		padding: 0 16px calc(8px + env(safe-area-inset-bottom, 0px));
+		/* env() for iOS home indicator; removed extra 8px gap to keep it closer to bottom */
+		padding: 0 16px env(safe-area-inset-bottom, 12px);
 		pointer-events: none;
 		/* GPU layer — prevents iOS scroll jitter on position:fixed */
 		transform: translateZ(0);
@@ -79,8 +79,8 @@
 		/* Subtle border for glass effect */
 		border: 0.5px solid rgba(0, 0, 0, 0.05);
 		box-shadow:
-			0 10px 30px rgba(0, 0, 0, 0.08),
-			0 1px 8px rgba(0, 0, 0, 0.04);
+			0 12px 32px rgba(0, 0, 0, 0.12),
+			0 2px 8px rgba(0, 0, 0, 0.06);
 		pointer-events: auto;
 		max-width: 420px;
 		width: 100%;

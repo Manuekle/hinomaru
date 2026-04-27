@@ -295,7 +295,7 @@
 		z-index: 200;
 		background: var(--bg-surface);
 		border-radius: 24px 24px 0 0;
-		padding: 32px 24px calc(32px + env(safe-area-inset-bottom));
+		padding: 32px 24px env(safe-area-inset-bottom, 20px);
 		box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
 		max-height: 90dvh;
 		overflow-y: auto;

@@ -349,7 +349,7 @@
 	/* ── Footer ───────────────────────────────────── */
 	.footer {
 		flex-shrink: 0;
-		padding: 16px 0 calc(16px + env(safe-area-inset-bottom));
+		padding: 16px 0 env(safe-area-inset-bottom, 12px);
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
