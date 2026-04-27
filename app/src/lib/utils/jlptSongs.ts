@@ -48,56 +48,54 @@ export const jlptSongs: SongLesson[] = [
 		lyrics: [
 			{
 				time: 3.0,
-				text: 'そうだ おそれないで みんなのために 愛と勇気だけが ともだちさ',
+				text: 'そうだ おそれないで みんなのために あいとゆうきだけが ともだちさ',
 				romaji: 'sou da osorenaide minna no tame ni ai to yuuki dake ga tomodachi sa',
 				translation_es:
 					'¡Así es! No tengas miedo, hazlo por todos. El amor y el valor son tus únicos amigos.',
 				translation_en:
-					'Yes, that’s right! Don’t be afraid Stand up for everyone Only love and your courage will be your friend'
+					'Yes, that’s right! Don’t be afraid. Stand up for everyone. Only love and courage are your friends.'
 			},
 			{
 				time: 23.0,
 				text: 'なにが君の しあわせ なにをして よろこぶ',
 				romaji: 'nani ga kimi no shiawase nani wo shite yorokobu',
 				translation_es: '¿Qué es lo que te hace feliz? ¿Qué es lo que te da alegría?',
-				translation_en: 'Do you know what your happiness is? Do you know what brings you joy?'
+				translation_en: 'What is your happiness? What makes you joyful?'
 			},
 			{
 				time: 28.0,
 				text: 'わからないまま おわる そんなのは いやだ！',
 				romaji: 'wakaranai mama owaru sonna no wa iya da!',
 				translation_es: 'No quiero terminar sin haberlo descubierto.',
-				translation_en: 'If you don’t know ‘til the end You can’t stand it, no, no!'
+				translation_en: 'I don’t want it to end without ever knowing!'
 			},
 			{
 				time: 33.0,
-				text: '忘れないで 夢を こぼさないで 涙 だから 君は とぶんだ どこまでも',
-				romaji: 'wasurenaide yume wo kobosanaide namida dakara kimi wa tobunda doko made mo',
-				translation_es:
-					'No olvides tus sueños ni derrames tus lágrimas; por eso volarás a donde quieras.',
-				translation_en:
-					'Don’t forget you have a dream Don’t you shed anymore tears That is why you fly away to'
+				text: 'わすれないで ゆめを こぼさないで なみだ だから 君は とぶんだ',
+				romaji: 'wasurenaide yume wo kobosanaide namida dakara kimi wa tobunda',
+				translation_es: 'No olvides tus sueños ni derrames tus lágrimas; por eso volarás',
+				translation_en: "Don't forget your dreams, don't shed your tears; that is why you'll fly"
 			},
 			{
 				time: 40.0,
 				text: 'どこまでも そうだ おそれないで みんなのために',
 				romaji: 'doko made mo sou da osorenaide minna no tame ni',
-				translation_es: 'A donde quieras. ¡Así es! No tengas miedo, hazlo por todos.',
-				translation_en: 'Anywhere you want Yes, that’s right! Don’t be afraid Stand up for everyone'
+				translation_es: 'A donde sea. ¡Así es! No tengas miedo, hazlo por todos.',
+				translation_en: "Anywhere you want. Yes, that's right! Don't be afraid, for everyone's sake"
 			},
 			{
 				time: 48.0,
-				text: '愛と勇気だけが ともだちさ ああ アンパンマン',
+				text: 'あいとゆうきだけが ともだちさ ああ アンパンマン',
 				romaji: 'ai to yuuki dake ga tomodachi sa aa Anpanman',
 				translation_es: 'El amor y el valor son tus únicos amigos. ¡Ah, ah! Anpanman.',
-				translation_en: 'Only love and your courage will be your friend Ah, ah! Anpanman'
+				translation_en: 'Only love and courage are your friends. Ah, ah! Anpanman'
 			},
 			{
 				time: 55.0,
-				text: '優しい君は 行け！みんなの夢 まもるため',
+				text: 'やさしい君は 行け！みんなのゆめ まもるため',
 				romaji: 'yasashii kimi wa ike! minna no yume mamoru tame',
 				translation_es: 'Tú que eres tan amable, ¡ve! Ve a proteger los sueños de todos.',
-				translation_en: 'You have such a loving heart Go! Go! You go on to save all our dreams'
+				translation_en: 'You, who are so kind, go! Go protect everyone’s dreams'
 			}
 		],
 		vocab: [
@@ -130,21 +128,21 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 21.0,
-				text: 'おなべの中から ボワっと インチキおじさん 登場',
+				text: 'おなべのなかから ボワっと インチキおじさん とうじょう',
 				romaji: 'onabe no naka kara bowatto inchiki ojisan toujou',
 				translation_es: 'Desde adentro de la olla, ¡puf! aparece el hombre tramposo.',
 				translation_en: 'From inside the pot, poof! The phony old man appears.'
 			},
 			{
 				time: 27.0,
-				text: 'いつだって 忘れない エジソンは 偉い人',
+				text: 'いつだって わすれない エジソンは えらいひと',
 				romaji: 'itsu datte wasurenai Ejison wa erai hito',
 				translation_es: 'Siempre recordaremos que Edison fue un gran hombre.',
 				translation_en: "We'll never forget that Edison was a great man."
 			},
 			{
 				time: 34.8,
-				text: 'そんなの常識 タッタタラリラ',
+				text: 'そんなのじょうしき タッタタラリラ',
 				romaji: 'sonna no joushiki tatta tararira',
 				translation_es: 'Eso es de sentido común. ¡Tatta-tararira!',
 				translation_en: "That's just common sense. Tatta-tararira!"
@@ -258,7 +256,7 @@ export const jlptSongs: SongLesson[] = [
 		lyrics: [
 			{
 				time: 30.0,
-				text: 'ありったけの夢をかき集め 捜し物を捜しに行くのさ ONE PIECE!',
+				text: 'ありったけのゆめをかきあつめ さがしものをさがしにいくのさ ONE PIECE!',
 				romaji: 'arittake no yume wo kakiatsume sagashimono wo sagashi ni yuku no sa ONE PIECE!',
 				translation_es:
 					'Reuniendo todos mis sueños, voy en busca de lo que estoy buscando. ¡One Piece!',
@@ -267,7 +265,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 48.0,
-				text: '羅針盤なんて 渋滞のもと 熱にうかされ 舵をとるのさ',
+				text: 'らしんばんなんて じゅうたいのもと ねつにうかされ かじをとるのさ',
 				romaji: 'rashinban nante juutai no moto netsu ni ukasare kaji wo toru no sa',
 				translation_es:
 					'Una brújula solo causaría retrasos, así que tomo el timón guiado por mi pasión.',
@@ -276,7 +274,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 59.0,
-				text: 'ホコリかぶってた 宝の地図も 確かめたのなら 伝説じゃない！',
+				text: 'ホコリかぶってた たからのちずも たしかめたのなら でんせつじゃない！',
 				romaji: 'hokori kabutteta takara no chizu mo tashikameta no nara densetsu ja nai!',
 				translation_es:
 					'Si confirmamos ese mapa del tesoro lleno de polvo, dejará de ser una leyenda.',
@@ -284,7 +282,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 72.0,
-				text: '個人的な嵐は 誰かの バイオリズム乗っかって 思い過ごせばいい！',
+				text: 'こじんてきなあらしは だれかの バイオリズムのっかって おもいすごせばいい！',
 				romaji: 'kojinteki na arashi wa dareka no baiorizumu nokkatte omoisugoseba ii!',
 				translation_es:
 					'Si una tormenta personal llega, solo súbete al biorritmo de alguien más y déjala pasar.',
@@ -293,7 +291,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 86.0,
-				text: 'ありったけの夢をかき集め 捜し物を捜しに行くのさ',
+				text: 'ありったけのゆめをかきあつめ さがしものをさがしにいくのさ',
 				romaji: 'arittake no yume wo kakiatsume sagashimono wo sagashi ni yuku no sa',
 				translation_es: 'Reuniendo todos mis sueños, voy en busca de lo que estoy buscando.',
 				translation_en: "Gathering all my dreams, I'm going in search of what I'm looking for."
@@ -335,7 +333,7 @@ export const jlptSongs: SongLesson[] = [
 		lyrics: [
 			{
 				time: 1.0,
-				text: '羽ばたいたら 戻れないと言って 目指したのは 蒼い 蒼い あの空',
+				text: 'はばたいたら もどれないといって めざしたのは あおい あおい あの空',
 				romaji: 'habataitara modorenai to itte mezashita no wa aoi aoi ano sora',
 				translation_es:
 					'Dijiste que al volar no volverías. Lo que buscabas era aquel cielo azul, tan azul.',
@@ -344,7 +342,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 26.0,
-				text: '悲しみはまだ覚えられず 切なさは今つかみはじめた',
+				text: 'かなしみはまだ覚えられず せつなさは今つかみはじめた',
 				romaji: 'kanashimi wa mada oboerarezu setsunasa wa ima tsukami hajimeta',
 				translation_es:
 					'Aún no puedo recordar la tristeza, pero he empezado a comprender la nostalgia.',
@@ -360,7 +358,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 39.0,
-				text: '未知なる世界の夢から目覚めて この羽を広げ飛び立つ',
+				text: '未知なる世界のゆめからめざめて この羽を広げ飛び立つ',
 				romaji: 'michi naru sekai no yume kara mezamete kono hane wo hiroge tobitatsu',
 				translation_es:
 					'Despertando del sueño de un mundo desconocido, extiendo mis alas y emprendo el vuelo.',
@@ -369,7 +367,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 51.0,
-				text: '羽ばたいたら 戻れないと言って 目指したのは 白い 白い あの雲',
+				text: 'はばたいたら もどれないといって めざしたのは しろい しろい あの雲',
 				romaji: 'habataitara modorenai to itte mezashita no wa shiroi shiroi ano kumo',
 				translation_es:
 					'Dijiste que al volar no volverías. Lo que buscabas era aquella nube blanca, tan blanca.',
@@ -378,7 +376,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 64.0,
-				text: '突き抜けたら 見つかると知って 振り切るほど 蒼い 蒼い あの空',
+				text: '突き抜けたら 見つかると知って 振り切るほど あおい あおい あの空',
 				romaji: 'tsukinuketara mitsukaru to shitte furikiru hodo aoi aoi ano sora',
 				translation_es:
 					'Sabiendo que lo encontraré si lo atravieso, aquel cielo azul, tan azul, que parece sacudirse de encima.',
@@ -387,7 +385,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 77.0,
-				text: '蒼い 蒼い あの空 蒼い 蒼い あの空',
+				text: 'あおい あおい あの空 あおい あおい あの空',
 				romaji: 'aoi aoi ano sora aoi aoi ano sora',
 				translation_es: 'Aquel cielo azul, tan azul. Aquel cielo azul, tan azul.',
 				translation_en: 'That blue, blue sky. That blue, blue sky.'
@@ -425,14 +423,14 @@ export const jlptSongs: SongLesson[] = [
 		lyrics: [
 			{
 				time: 21.5,
-				text: '雨上がりの虹も 凛と咲いた花も',
+				text: 'あめあがりのにじも りんとさいた花も',
 				romaji: 'ameagari no niji mo rin to saita hana mo',
 				translation_es: 'Tanto el arcoíris tras la lluvia como la flor que floreció valiente.',
 				translation_en: 'Both the rainbow after the rain and the flower that bloomed bravely.'
 			},
 			{
 				time: 28.0,
-				text: '色付きあふれだす 茜色の空 仰ぐ君に あの日恋に落ちた',
+				text: '色付きあふれだす あかねいろの空 あおぐ君に あの日こいにおちた',
 				romaji: 'irozuki afuredasu akaneiro no sora aogu kimi ni ano hi koi ni ochita',
 				translation_es:
 					'Aquel día me enamoré de ti, mientras mirabas el cielo carmesí que se llenaba de colores.',
@@ -448,7 +446,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 51.0,
-				text: '消えないよ 心に刻むから',
+				text: '消えないよ 心にきざむから',
 				romaji: 'kienai yo kokoro ni kizamu kara',
 				translation_es: 'No desaparecerá, porque lo grabaré en mi corazón.',
 				translation_en: "It won't disappear, because I'll carve it into my heart."
@@ -462,28 +460,28 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 66.0,
-				text: '暗闇も光るなら 星空になる',
+				text: 'くらやみも光るなら 星空になる',
 				romaji: 'kurayami mo hikaru nara hoshizora ni naru',
 				translation_es: 'Si la oscuridad también brilla, se convertirá en un cielo estrellado.',
 				translation_en: "If even the darkness shines, it'll become a starry sky."
 			},
 			{
 				time: 72.0,
-				text: '悲しみを笑顔に もう隠さないで',
+				text: 'かなしみを笑顔に もうかくさないで',
 				romaji: 'kanashimi wo egao ni mou kakusanaide',
 				translation_es: 'Convirtiendo la tristeza en sonrisas, ya no la escondas más.',
 				translation_en: "Turning sadness into smiles, don't hide it anymore."
 			},
 			{
 				time: 78.0,
-				text: '煌めく どんな星も 君を照らすから',
+				text: 'きらめく どんな星も 君をてらすから',
 				romaji: 'kirameku donna hoshi mo kimi wo terasu kara',
 				translation_es: 'Porque cualquier estrella que brille te iluminará.',
 				translation_en: 'Because any star that sparkles will shine on you.'
 			},
 			{
 				time: 86.0,
-				text: '眠りも忘れて 迎えた朝日が',
+				text: 'ねむりもわすれて むかえたあさひが',
 				romaji: 'nemuri mo wasurete mukaeta asahi ga',
 				translation_es: 'Olvidando el sueño, el sol de la mañana que recibí.',
 				translation_en: 'Forgetting sleep, the morning sun I greeted.'
@@ -521,7 +519,7 @@ export const jlptSongs: SongLesson[] = [
 		lyrics: [
 			{
 				time: 18.5,
-				text: 'ゴキゲンな蝶になって きらめく風に乗って',
+				text: 'ごきげんなちょうになって きらめく風に乗って',
 				romaji: 'gokigen na chou ni natte kirameku kaze ni notte',
 				translation_es:
 					'Convirtiéndome en una mariposa alegre, montando el viento resplandeciente.',
@@ -536,7 +534,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 30.5,
-				text: '余計なことなんて 忘れたほうがましさ',
+				text: 'よけいなことなんて わすれたほうがましさ',
 				romaji: 'yokei na koto nante wasureta hou ga mashi sa',
 				translation_es: 'Es mejor olvidar las cosas innecesarias.',
 				translation_en: "It's better to forget about unnecessary things."
@@ -564,28 +562,28 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 56.5,
-				text: '無限大な夢のあとの 何もない世の中じゃ',
+				text: 'むげんだいなゆめのあとの なにもない世の中じゃ',
 				romaji: 'mugendai na yume no ato no nani mo nai yo no naka ja',
 				translation_es: 'En este mundo vacío tras un sueño infinito.',
 				translation_en: 'In this empty world after an infinite dream.'
 			},
 			{
 				time: 63.0,
-				text: 'そうさ 愛しい思いも負けそうになるけど',
+				text: 'そうさ いとしい思いも負けそうになるけど',
 				romaji: 'sou sa itoshii omoi mo makesou ni naru kedo',
 				translation_es: 'Sí, parece que hasta mis sentimientos más queridos van a perder, pero...',
 				translation_en: "Yeah, even my beloved feelings seem like they're going to lose, but..."
 			},
 			{
 				time: 68.0,
-				text: 'Stay しがちなイメージだらけの 頼りない翼でも',
+				text: 'Stay しがちなイメージだらけの たよりないつばさでも',
 				romaji: 'Stay shigachi na imeeji darake no tayorinai tsubasa demo',
 				translation_es: 'Incluso con estas alas poco fiables, llenas de imágenes de estancamiento.',
 				translation_en: 'Even with these unreliable wings, full of images of staying still.'
 			},
 			{
 				time: 75.0,
-				text: 'きっと飛べるさ On my love',
+				text: 'きっととべるさ On my love',
 				romaji: 'kitto toberu sa On my love',
 				translation_es: 'Seguro que podré volar, con mi amor.',
 				translation_en: "I'm sure I can fly, on my love."
@@ -654,7 +652,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 36.0,
-				text: '屍踏み越えて 進む意志を 嗤う豚よ',
+				text: 'しかばね踏み越えて 進む意志を わらう豚よ',
 				romaji: 'shikabane fumikoete susumu ishi wo warau buta yo',
 				translation_es: 'Cerdos que se ríen de la voluntad de avanzar sobre los cadáveres.',
 				translation_en: 'Oh pigs who mock the will to advance over corpses.'
@@ -675,7 +673,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 47.0,
-				text: '囚われた屈辱は 反撃の嚆矢だ',
+				text: '囚われた屈辱は 反撃のこうしだ',
 				romaji: 'torawareta kutsujoku wa hangeki no koushi da',
 				translation_es: 'La humillación de estar atrapado es la flecha del contraataque.',
 				translation_en:
@@ -683,21 +681,21 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 52.0,
-				text: '城壁のその彼方 獲物を屠る イェーガー！',
+				text: '城壁のその彼方 獲物をほふる イェーガー！',
 				romaji: 'jouheki no sono kanata emono wo hofuru Ieegaa!',
 				translation_es: 'Más allá de las murallas, masacra a la presa... ¡Jäger!',
 				translation_en: 'Beyond those castle walls, slaughter the prey... Jäger!'
 			},
 			{
 				time: 57.0,
-				text: '迸る衝動に その身を灼きながら',
+				text: 'ほとばしる衝動に その身をきながら',
 				romaji: 'hotobashiru shoudou ni sono mi wo yakinagara',
 				translation_es: 'Mientras ardes en ese impulso que brota.',
 				translation_en: 'While burning in that surging impulse.'
 			},
 			{
 				time: 63.0,
-				text: '黄昏に緋を穿つ 紅蓮の弓矢',
+				text: '黄昏にひをうがつ 紅蓮の弓矢',
 				romaji: 'tasogare ni hi wo ugatsu guren no yumiya',
 				translation_es: 'Perforando el carmesí en el crepúsculo, la flecha de loto carmesí.',
 				translation_en: 'Piercing the scarlet into the twilight, the crimson bow and arrow.'
@@ -846,7 +844,7 @@ export const jlptSongs: SongLesson[] = [
 		lyrics: [
 			{
 				time: 0.0,
-				text: 'この想いを消してしまうには まだ人生長いでしょ',
+				text: 'このおもいを消してしまうには まだ人生長いでしょ',
 				romaji: 'kono omoi wo keshite shimau ni wa mada jinsei nagai desho',
 				translation_es: 'Todavía queda mucha vida por delante como para borrar estos sentimientos.',
 				translation_en: 'You still have too long a life left to erase these feelings completely.'
@@ -860,7 +858,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 22.0,
-				text: '夢のつづき 追いかけていたはずなのに',
+				text: 'ゆめのつづき 追いかけていたはずなのに',
 				romaji: 'yume no tsuzuki oikakete ita hazu na noni',
 				translation_es:
 					'A pesar de que se suponía que estaba persiguiendo la continuación de mi sueño.',
@@ -868,7 +866,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 29.0,
-				text: '曲がりくねった 細い道 人につまずく',
+				text: 'まがりくねった 細い道 人につまずく',
 				romaji: 'magarikunetta hosoi michi hito ni tsumazuku',
 				translation_es: 'Tropiezo con la gente en este camino estrecho y sinuoso.',
 				translation_en: 'I stumble over people on this narrow, winding road.'
@@ -889,7 +887,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 42.0,
-				text: 'わかってくれますように 犠牲になったような',
+				text: 'わかってくれますように ぎせいになったような',
 				romaji: 'wakatte kuremasu you ni gisei ni natta you na',
 				translation_es: 'Espero que lo entiendas, como si me hubiera convertido en un sacrificio.',
 				translation_en: 'I hope you understand, as if I had become a sacrifice.'
@@ -903,7 +901,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 48.0,
-				text: '罪の最後は涙じゃないよ ずっと苦しく背負ってくんだ',
+				text: 'つみの最後はなみだじゃないよ ずっと苦しくせおってくんだ',
 				romaji: 'tsumi no saigo wa namida ja nai yo zutto kurushiku seotte kun da',
 				translation_es:
 					'El final del pecado no son las lágrimas; es cargarlo con dolor para siempre.',
@@ -911,14 +909,14 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 52.0,
-				text: '出口見えない感情迷路に 誰を待ってるの',
+				text: '出口見えない感情めいろに 誰を待ってるの',
 				romaji: 'deguchi mienai kanjou meiro ni dare wo matteru no',
 				translation_es: '¿A quién esperas en este laberinto emocional sin salida?',
 				translation_en: 'Who are you waiting for in this emotional maze with no exit?'
 			},
 			{
 				time: 56.0,
-				text: '白いノートに綴ったように もっと素直に吐き出したいよ',
+				text: '白いノートに綴ったように もっとすなおに吐き出したいよ',
 				romaji: 'shiroi nooto ni tsuzutta you ni motto sunao ni hakidashitai yo',
 				translation_es:
 					'Quiero expresarme con más honestidad, como si estuviera escribiendo en un cuaderno en blanco.',
@@ -933,7 +931,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 62.0,
-				text: '叶えるために 生きてるんだって 叫びたくなるよ 聞こえていますか',
+				text: '叶えるために 生きてるんだって さけびたくなるよ 聞こえていますか',
 				romaji: 'kanaeru tame ni ikiteru nda tte sakebitaku naru yo kikoete imasu ka',
 				translation_es: 'Me dan ganas de gritar que vivo para cumplir mis deseos, ¿puedes oírme?',
 				translation_en:
@@ -941,7 +939,7 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 69.0,
-				text: '無難になんて やってられないから 帰る場所も無いの',
+				text: 'ぶなんになんて やってられないから 帰る場所も無いの',
 				romaji: 'bunan ni nante yatterarenai kara kaeru basho mo nai no',
 				translation_es:
 					'No puedo simplemente ir a lo seguro, porque no tengo un lugar al que volver.',
@@ -949,14 +947,14 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{
 				time: 75.8,
-				text: "優しさにはいつも感謝している だから強くなりたい (I'm on the way)",
+				text: "やさしさにはいつもかんしゃしている だから強くなりたい (I'm on the way)",
 				romaji: "yasashisa ni wa itsumo kansha shite iru dakara tsuyoku naritai (I'm on the way)",
 				translation_es: 'Siempre estoy agradecida por tu amabilidad, por eso quiero ser fuerte.',
 				translation_en: "I'm always grateful for your kindness, that's why I want to be strong."
 			},
 			{
 				time: 82.7,
-				text: '懐かしくなる こんな痛みも歓迎じゃん',
+				text: '懐かしくなる こんな痛みもかんげいじゃん',
 				romaji: 'natsukashiku naru konna itami mo kangei jan',
 				translation_es: 'Incluso este dolor que se siente nostálgico es bienvenido.',
 				translation_en: 'Even pain like this that becomes nostalgic is welcome.'
