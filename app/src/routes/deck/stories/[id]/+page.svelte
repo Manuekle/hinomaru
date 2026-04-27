@@ -554,7 +554,8 @@
 		font-size: 20px;
 		line-height: 1.8;
 		color: var(--fg-primary);
-		margin-bottom: 8px;
+		margin-bottom: 24px;
+		white-space: pre-wrap;
 	}
 
 	.body-text-romaji {
@@ -562,8 +563,9 @@
 		color: var(--hinomaru-red);
 		font-weight: 500;
 		line-height: 1.6;
-		margin-bottom: 20px;
+		margin-bottom: 24px;
 		opacity: 0.9;
+		white-space: pre-wrap;
 	}
 
 	.translation-section {
@@ -587,6 +589,7 @@
 		line-height: 1.6;
 		color: var(--fg-secondary);
 		margin: 0;
+		white-space: pre-wrap;
 	}
 
 	/* --- Vocab --- */
