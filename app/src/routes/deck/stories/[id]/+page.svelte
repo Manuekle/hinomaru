@@ -137,6 +137,21 @@
 
 	const currentQuestion = $derived(quiz[currentQ]);
 	const isCorrect = $derived(checked && selected === currentQuestion?.a);
+
+	// Better language handling for questions and options
+	const qJp = $derived(currentQuestion?.q_jp || currentQuestion?.q);
+	const qRomaji = $derived(currentQuestion?.q_romaji);
+	const qTrans = $derived($locale === 'es' 
+		? (currentQuestion?.q_es || currentQuestion?.q_en || currentQuestion?.q)
+		: (currentQuestion?.q_en || currentQuestion?.q_es || currentQuestion?.q)
+	);
+
+	const optionsJp = $derived(currentQuestion?.o_jp || currentQuestion?.o || []);
+	const optionsRomaji = $derived(currentQuestion?.o_romaji || []);
+	const optionsTrans = $derived($locale === 'es'
+		? (currentQuestion?.o_es || currentQuestion?.o_en || currentQuestion?.o || [])
+		: (currentQuestion?.o_en || currentQuestion?.o_es || currentQuestion?.o || [])
+	);
 </script>
 
 <svelte:head>
@@ -279,18 +294,24 @@
 				</div>
 
 				{#if currentQuestion}
-					{@const questionText = $locale === 'es'
-						? (currentQuestion.q_es ?? currentQuestion.q)
-						: (currentQuestion.q_en ?? currentQuestion.q)}
-					{@const questionOptions = $locale === 'es'
-						? (currentQuestion.o_es ?? currentQuestion.o)
-						: (currentQuestion.o_en ?? currentQuestion.o)}
-
-					<div class="question-box" style="margin-top:16px;">
-						<h2 class="question-text">{questionText}</h2>
+					<div class="question-box" style="margin-top:16px;" use:fadeUp={{ y: 8 }}>
+						<div class="question-header">
+							<span class="question-badge">{$locale === 'es' ? 'PREGUNTA' : 'QUESTION'}</span>
+							{#if $showRomaji && qRomaji}
+								<span class="question-romaji-hint">{qRomaji}</span>
+							{/if}
+						</div>
+						
+						<h2 class="question-text jp">{qJp}</h2>
+						
+						{#if qTrans && qTrans !== qJp}
+							<p class="question-translation">{qTrans}</p>
+						{/if}
 
 						<div class="options-grid">
-							{#each questionOptions as option, i (i)}
+							{#each optionsJp as optionJp, i (i)}
+								{@const optRomaji = optionsRomaji[i]}
+								{@const optTrans = optionsTrans[i]}
 								<button
 									class="option-item"
 									class:is-selected={selected === i}
@@ -300,15 +321,30 @@
 									disabled={checked}
 								>
 									<div class="option-marker">{String.fromCharCode(65 + i)}</div>
-									<div class="option-label">{option}</div>
+									<div class="option-content">
+										<div class="option-label jp">{optionJp}</div>
+										{#if $showRomaji && optRomaji}
+											<div class="option-romaji">{optRomaji}</div>
+										{/if}
+										{#if optTrans && optTrans !== optionJp}
+											<div class="option-translation">{optTrans}</div>
+										{/if}
+									</div>
 								</button>
 							{/each}
 						</div>
 					</div>
 
 					{#if checked}
-						<div class="quiz-feedback" class:correct={isCorrect} class:wrong={!isCorrect}>
-							{isCorrect ? '✓ ¡Correcto!' : '✗ Incorrecto'}
+						<div class="quiz-feedback-box" class:correct={isCorrect} class:wrong={!isCorrect} use:fadeUp={{ y: 5 }}>
+							<div class="feedback-icon">
+								{isCorrect ? '✓' : '✗'}
+							</div>
+							<div class="feedback-text">
+								{isCorrect 
+									? ($locale === 'es' ? '¡Excelente! Respuesta correcta.' : 'Excellent! Correct answer.') 
+									: ($locale === 'es' ? 'Vaya, esa no era. ¡Sigue intentando!' : 'Oops, that wasn''t it. Keep trying!')}
+							</div>
 						</div>
 					{/if}
 				{/if}
@@ -363,15 +399,23 @@
 						</p>
 						{#each quiz as q, i}
 							{@const wasCorrect = answers[i] === q.a}
-							{@const qText = $locale === 'es' ? (q.q_es ?? q.q) : (q.q_en ?? q.q)}
-							{@const opts = $locale === 'es' ? (q.o_es ?? q.o) : (q.o_en ?? q.o)}
-							<div class="breakdown-row" class:correct={wasCorrect} class:wrong={!wasCorrect}>
+							{@const qJpLocal = q.q_jp || q.q}
+							{@const qRomajiLocal = q.q_romaji}
+							{@const optsJpLocal = q.o_jp || q.o}
+							
+							<div class="breakdown-row" class:correct={wasCorrect} class:wrong={!wasCorrect} use:fadeUp={{ delay: i * 0.05, y: 5 }}>
 								<span class="breakdown-dot">{wasCorrect ? '✓' : '✗'}</span>
 								<div class="breakdown-content">
-									<span class="breakdown-q">{qText}</span>
+									<div class="breakdown-q-group">
+										<span class="breakdown-q jp">{qJpLocal}</span>
+										{#if $showRomaji && qRomajiLocal}
+											<span class="breakdown-romaji">{qRomajiLocal}</span>
+										{/if}
+									</div>
 									{#if !wasCorrect}
 										<span class="breakdown-correct-ans">
-											{$locale === 'es' ? 'Correcta:' : 'Correct:'} {opts?.[q.a] ?? '—'}
+											{$locale === 'es' ? 'Correcta:' : 'Correct:'} 
+											<span class="jp">{optsJpLocal?.[q.a] ?? '—'}</span>
 										</span>
 									{/if}
 								</div>
@@ -635,17 +679,48 @@
 	.question-box {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 28px;
-		padding: 28px;
-		box-shadow: var(--shadow-sm);
+		border-radius: 32px;
+		padding: 32px;
+		box-shadow: var(--shadow-md);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.question-header {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		margin-bottom: 16px;
+	}
+
+	.question-badge {
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		color: var(--hinomaru-red);
+		opacity: 0.8;
+	}
+
+	.question-romaji-hint {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		font-weight: 500;
 	}
 
 	.question-text {
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 700;
-		line-height: 1.4;
-		margin-bottom: 24px;
+		line-height: 1.3;
+		margin-bottom: 8px;
 		color: var(--fg-primary);
+	}
+
+	.question-translation {
+		font-size: 15px;
+		color: var(--fg-secondary);
+		margin-bottom: 24px;
+		font-style: italic;
+		opacity: 0.8;
 	}
 
 	.options-grid {
@@ -658,14 +733,25 @@
 		display: flex;
 		align-items: center;
 		gap: 16px;
-		padding: 16px;
-		border: 1.5px solid var(--ink-200);
-		border-radius: 16px;
+		padding: 16px 20px;
+		border: 2px solid var(--ink-200);
+		border-radius: 20px;
 		background: var(--bg-surface);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 		text-align: left;
 		font-family: inherit;
+		position: relative;
+	}
+
+	.option-item:hover:not(:disabled) {
+		border-color: var(--ink-300);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.option-item:active:not(:disabled) {
+		transform: translateY(0);
 	}
 
 	.option-item:disabled {
@@ -686,17 +772,23 @@
 	}
 
 	.option-marker {
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
+		width: 32px;
+		height: 32px;
+		border-radius: 10px;
 		background: var(--ink-100);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 12px;
-		font-weight: 600;
+		font-size: 14px;
+		font-weight: 700;
 		color: var(--fg-secondary);
 		flex-shrink: 0;
+		transition: all 0.2s;
+	}
+
+	.is-selected .option-marker {
+		background: var(--sumi);
+		color: white;
 	}
 
 	.is-correct .option-marker {
@@ -708,26 +800,81 @@
 		color: white;
 	}
 
+	.option-content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+	}
+
 	.option-label {
-		font-size: 16px;
+		font-size: 18px;
 		font-weight: 600;
 		color: var(--fg-primary);
 	}
 
-	.quiz-feedback {
-		text-align: center;
-		margin-top: 24px;
-		font-weight: 700;
-		padding: 12px;
-		border-radius: 12px;
-	}
-	.quiz-feedback.correct {
-		color: var(--success);
-		background: var(--success-wash);
-	}
-	.quiz-feedback.wrong {
+	.option-romaji {
+		font-size: 12px;
 		color: var(--hinomaru-red);
+		font-weight: 500;
+		opacity: 0.8;
+	}
+
+	.option-translation {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		opacity: 0.7;
+	}
+
+	.quiz-feedback-box {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-top: 24px;
+		padding: 20px;
+		border-radius: 20px;
+		animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	}
+
+	.quiz-feedback-box.correct {
+		background: var(--success-wash);
+		border: 1px solid var(--success-200);
+	}
+	.quiz-feedback-box.wrong {
 		background: var(--hinomaru-red-wash);
+		border: 1px solid var(--hinomaru-red-200);
+	}
+
+	.feedback-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 20px;
+		font-weight: 800;
+		flex-shrink: 0;
+	}
+
+	.correct .feedback-icon {
+		background: var(--success);
+		color: white;
+	}
+	.wrong .feedback-icon {
+		background: var(--hinomaru-red);
+		color: white;
+	}
+
+	.feedback-text {
+		font-size: 15px;
+		font-weight: 600;
+		color: var(--fg-primary);
+	}
+
+	@keyframes bounceIn {
+		0% { transform: scale(0.9); opacity: 0; }
+		100% { transform: scale(1); opacity: 1; }
 	}
 
 	/* --- Quiz progress --- */
@@ -850,15 +997,31 @@
 		gap: 2px;
 		flex: 1;
 	}
+	.breakdown-q-group {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+	}
 	.breakdown-q {
 		font-size: 14px;
 		color: var(--fg-primary);
-		font-weight: 500;
+		font-weight: 600;
 		line-height: 1.4;
+	}
+	.breakdown-romaji {
+		font-size: 11px;
+		color: var(--hinomaru-red);
+		font-weight: 500;
+		opacity: 0.8;
 	}
 	.breakdown-correct-ans {
 		font-size: 12px;
 		color: var(--fg-tertiary);
+		margin-top: 2px;
+	}
+	.breakdown-correct-ans .jp {
+		color: var(--sumi);
+		font-weight: 600;
 	}
 
 	.empty-state {

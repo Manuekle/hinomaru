@@ -57,8 +57,8 @@
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		/* env() for iOS home indicator; 16px gap from indicator */
-		padding: 10px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+		/* env() for iOS home indicator; reduced gap from 16px to 10px */
+		padding: 0 20px calc(10px + env(safe-area-inset-bottom, 0px));
 		pointer-events: none;
 		/* GPU layer — prevents iOS scroll jitter on position:fixed */
 		transform: translateZ(0);
