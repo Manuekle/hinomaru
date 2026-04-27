@@ -6,8 +6,6 @@
 	import { cubicOut, cubicIn } from 'svelte/easing';
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
-	import Icon from '$lib/Icon.svelte';
-	import { BookOpenIcon, BookOpen01Icon, BubbleChatIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -129,30 +127,6 @@
 			</a>
 		{/if}
 
-		<!-- Quick Actions / Tools -->
-		<div class="quick-tools" use:fadeUp={{ delay: 0.22, y: 12 }}>
-			<a href="/alphabet" class="tool-btn">
-				<span class="tool-icon">⛩️</span>
-				<span>{t('nav.alphabet', $locale)}</span>
-			</a>
-			<a href="/vocabulary" class="tool-btn">
-				<span class="tool-icon">📚</span>
-				<span>{t('nav.vocabulary', $locale)}</span>
-			</a>
-			<a href="/deck/stories" class="tool-btn">
-				<span class="tool-icon">📜</span>
-				<span>{t('stories.title', $locale)}</span>
-			</a>
-			<a href="/deck/songs" class="tool-btn">
-				<span class="tool-icon">🎧</span>
-				<span>{t('nav.songs', $locale)}</span>
-			</a>
-			<a href="/conversation" class="tool-btn">
-				<span class="tool-icon"><Icon icon={BubbleChatIcon} size={22} color="currentColor" strokeWidth={1.5} /></span>
-				<span>{$locale === 'es' ? 'Conversatorio' : 'Talk'}</span>
-			</a>
-		</div>
-
 		<!-- Word of the Day -->
 		<WordOfTheDay word={data.todayWord} initiallySaved={data.wordSaved} />
 
@@ -201,25 +175,7 @@
 						{@const complete = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
 						<a
 							href="/deck/{deck.id}"
-							class="touch-action-manip"
-							style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:20px;
-                   cursor:pointer;text-decoration:none;color:inherit;display:block;
-                   box-shadow:var(--shadow-sm);
-                   transition:box-shadow 200ms ease, transform 200ms ease;"
-							onmouseenter={(e) => {
-								(e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-md)';
-								(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-							}}
-							onmouseleave={(e) => {
-								(e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-sm)';
-								(e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-							}}
-							ontouchstart={(e) => {
-								(e.currentTarget as HTMLElement).style.transform = 'scale(0.98)';
-							}}
-							ontouchend={(e) => {
-								(e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-							}}
+							class="deck-card"
 						>
 							<div
 								style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"
@@ -337,6 +293,29 @@
 
 	.support-image-btn:active {
 		transform: scale(0.95);
+	}
+
+	.deck-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 24px;
+		padding: 20px;
+		cursor: pointer;
+		text-decoration: none;
+		color: inherit;
+		display: block;
+		box-shadow: var(--shadow-sm);
+		transition: box-shadow 200ms ease, transform 200ms ease;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.deck-card:hover {
+		box-shadow: var(--shadow-md);
+		transform: translateY(-2px);
+	}
+	.deck-card:active {
+		transform: scale(0.98);
+		box-shadow: var(--shadow-sm);
 	}
 
 	/* ── Historia del día ── */
@@ -460,75 +439,6 @@
 		padding: 2px 10px;
 		border-radius: 99px;
 		white-space: nowrap;
-	}
-
-	.quick-tools {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 8px;
-		margin: 24px 0;
-	}
-
-	@media (min-width: 540px) {
-		.quick-tools {
-			grid-template-columns: repeat(4, 1fr);
-			gap: 10px;
-		}
-	}
-
-	.tool-btn {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 16px;
-		height: 48px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0 8px;
-		gap: 6px;
-		text-decoration: none;
-		color: var(--sumi);
-		font-weight: 700;
-		font-size: 12px;
-		box-shadow: var(--shadow-sm);
-		transition: all 0.2s;
-		overflow: hidden;
-		white-space: nowrap;
-	}
-
-	@media (min-width: 380px) {
-		.tool-btn {
-			padding: 0 12px;
-			gap: 8px;
-			font-size: 13px;
-		}
-	}
-
-	@media (min-width: 540px) {
-		.tool-btn {
-			height: 52px;
-		}
-	}
-
-	.tool-btn:hover {
-		border-color: var(--ink-300);
-		box-shadow: var(--shadow-md);
-		transform: translateY(-1px);
-	}
-
-	.tool-icon {
-		width: 28px;
-		height: 28px;
-		flex-shrink: 0;
-		background: var(--ink-100);
-		border-radius: 8px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 17px;
-		font-family: var(--font-jp);
-		color: var(--sumi);
-		line-height: 1;
 	}
 
 	.dashboard-settings-btn {

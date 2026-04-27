@@ -10,17 +10,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const today = new Date().toISOString().split('T')[0];
 
-	const { data: story, error } = await locals.supabase
+	const { data: stories, error } = await locals.supabase
 		.from('stories')
 		.select('id')
 		.lte('publish_date', today)
-		.order('publish_date', { ascending: false })
-		.limit(1)
-		.single();
+		.order('id');
 
-	if (error || !story) {
-		return { story: null };
+	if (error || !stories || stories.length === 0) {
+		throw redirect(303, '/deck/stories');
 	}
+
+	// Deterministic daily rotation: days since epoch mod total
+	const daysSinceEpoch = Math.floor(Date.now() / 86_400_000);
+	const story = stories[daysSinceEpoch % stories.length];
 
 	throw redirect(303, `/deck/stories/${story.id}`);
 };

@@ -147,10 +147,10 @@
 
 	<!-- Drawer / Modal -->
 	<div
-		use:fadeUp={{ y: 24, duration: 0.4 }}
+		use:fadeIn={{ duration: 0.3 }}
 		class="drawer"
 		class:is-swiping={isSwiping}
-		style="transform: {isMobile && !isAndroid ? `translateY(${swipeOffset}px)` : ''}"
+		style="--swipe-offset: {swipeOffset}px"
 		role="dialog"
 		aria-modal="true"
 		aria-label={s.title}
@@ -177,7 +177,7 @@
 
 		<!-- iOS content -->
 		{#if isIOS}
-			<div class="steps-list" use:fadeUp={{ delay: 0.05 }}>
+			<div class="steps-list">
 				{#each iosSteps as step, i (i)}
 					<div class="step-item">
 						<div class="step-number">{i + 1}</div>
@@ -194,7 +194,7 @@
 
 			<!-- Android content -->
 		{:else if isAndroid}
-			<div class="steps-list" use:fadeUp={{ delay: 0.05 }}>
+			<div class="steps-list">
 				{#each androidSteps as step, i (i)}
 					<div class="step-item">
 						<div class="step-number">{i + 1}</div>
@@ -299,6 +299,16 @@
 		box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
 		max-height: 90dvh;
 		overflow-y: auto;
+		transform: translateY(var(--swipe-offset, 0px));
+		transition: transform 0.4s var(--ease-brand);
+		will-change: transform;
+	}
+	@keyframes drawer-slide-up {
+		from { transform: translateY(100%); }
+		to { transform: translateY(0px); }
+	}
+	:not(.is-android) .drawer {
+		animation: drawer-slide-up 0.4s var(--ease-brand);
 	}
 	.drawer.is-swiping {
 		transition: none !important;
@@ -310,11 +320,16 @@
 		left: 50%;
 		top: 50%;
 		right: auto;
-		transform: translate(-50%, -50%) !important;
+		transform: translate(-50%, calc(-50% + var(--swipe-offset, 0px))) !important;
 		border-radius: 24px;
 		width: min(480px, 90vw);
 		max-height: 85dvh;
 		padding: 32px 32px 36px;
+		animation: drawer-pop-in 0.3s var(--ease-brand);
+	}
+	@keyframes drawer-pop-in {
+		from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; }
+		to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 	}
 
 	:global(.is-android) .handle-bar {
@@ -327,11 +342,12 @@
 			left: 50%;
 			top: 50%;
 			right: auto;
-			transform: translate(-50%, -50%) !important;
+			transform: translate(-50%, calc(-50% + var(--swipe-offset, 0px))) !important;
 			border-radius: 24px;
 			width: min(480px, 90vw);
 			max-height: 85dvh;
 			padding: 32px 32px 36px;
+			animation: drawer-pop-in 0.3s var(--ease-brand);
 		}
 		.handle-bar {
 			display: none;

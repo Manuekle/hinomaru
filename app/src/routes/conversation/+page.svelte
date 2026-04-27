@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
-	import { fadeUp, staggerChildren } from '$lib/motion';
+	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
 	import { conversations } from '$lib/data/conversations';
 
-	const levelColors: Record<string, string> = {
-		N5: '#2e7d5b',
-		N4: '#6d8c3b',
-		N3: '#a8741a'
-	};
+	const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
+	let activeLevel = $state('N5');
+
+	const filtered = $derived(conversations.filter((c) => c.level === activeLevel));
 
 	function countChoices(scenario: (typeof conversations)[0]) {
 		return scenario.turns.filter((t) => t.type === 'choice').length;
@@ -19,60 +18,79 @@
 	<title>Conversatorio — Hinomaru</title>
 </svelte:head>
 
-<div class="page">
+<div
+	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+>
 	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
-		<a href="/" class="back-link">
-			← {t('deck.back', $locale)}
-		</a>
+		<a href="/" class="back-link-beautiful">← {t('deck.back', $locale)}</a>
 	</div>
 
-	<h1 use:fadeUp={{ delay: 0.06, y: 16 }} class="page-title">
-		{$locale === 'es' ? 'Conversatorio' : 'Conversation Practice'}
+	<h1
+		use:fadeUp={{ delay: 0.06, y: 16 }}
+		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
+	>
+		{$locale === 'es' ? 'Conversatorio' : 'Conversations'}
 	</h1>
-	<p use:fadeUp={{ delay: 0.1 }} class="page-desc">
+
+	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">
 		{$locale === 'es'
-			? 'Practica conversaciones reales con situaciones cotidianas en Japón.'
-			: 'Practice real conversations with everyday situations in Japan.'}
+			? 'Practica situaciones reales del día a día en Japón.'
+			: 'Practice real everyday situations in Japan.'}
 	</p>
 
+	<!-- Level filter chips -->
 	<div
-		use:staggerChildren={{ delay: 0.15, stagger: 0.07, y: 14 }}
-		class="scenario-grid"
+		use:fadeIn={{ delay: 0.18 }}
+		class="hide-scrollbar"
+		style="display:flex;gap:8px;margin-top:32px;margin-bottom:20px;overflow-x:auto;"
 	>
-		{#each conversations as scenario (scenario.id)}
-			{@const choices = countChoices(scenario)}
-			<a href="/conversation/{scenario.id}" class="scenario-card">
-				<div class="card-icon">{scenario.icon}</div>
-				<div class="card-body">
-					<div class="card-title">
-						{$locale === 'es' ? scenario.title_es : scenario.title_en}
-					</div>
-					<div class="card-meta">
-						<span class="level-tag" style="background: {levelColors[scenario.level]}20; color: {levelColors[scenario.level]};">
-							{scenario.level}
-						</span>
-						<span class="turns-label">
-							{choices} {$locale === 'es' ? 'decisiones' : 'decisions'}
-						</span>
-					</div>
-					<p class="card-context">
-						{$locale === 'es' ? scenario.context_es : scenario.context_es}
-					</p>
-				</div>
-				<span class="card-arrow">→</span>
-			</a>
+		{#each levels as level (level)}
+			<button
+				onclick={() => (activeLevel = level)}
+				class="filter-chip"
+				class:active={activeLevel === level}
+			>
+				{level}
+			</button>
 		{/each}
+	</div>
+
+	<!-- List -->
+	<div class="list" use:staggerChildren={{ delay: 0.25, stagger: 0.07, y: 10 }}>
+		{#if filtered.length === 0}
+			<div class="empty-state">
+				<div class="empty-icon">📭</div>
+				<p>{$locale === 'es' ? 'Sin escenarios en este nivel.' : 'No scenarios at this level.'}</p>
+			</div>
+		{:else}
+			{#each filtered as scenario, i (scenario.id)}
+				<a href="/conversation/{scenario.id}" class="row">
+					<div class="row-num">{i + 1 < 10 ? '0' + (i + 1) : i + 1}</div>
+					<div class="row-body">
+						<div class="row-top">
+							<span class="row-icon">{scenario.icon}</span>
+							<span class="row-title">
+								{$locale === 'es' ? scenario.title_es : scenario.title_en}
+							</span>
+						</div>
+						<div class="row-sub">{scenario.context_es}</div>
+						<div class="row-meta-inline">
+							{countChoices(scenario)}
+							{$locale === 'es' ? 'situaciones' : 'situations'}
+						</div>
+					</div>
+					<div class="row-meta">
+						<span class="row-level">{scenario.level}</span>
+						<span class="row-arrow">→</span>
+					</div>
+				</a>
+			{/each}
+		{/if}
 	</div>
 </div>
 
 <style>
-	.page {
-		max-width: 680px;
-		margin: 0 auto;
-		padding: calc(24px + env(safe-area-inset-top)) 24px calc(80px + env(safe-area-inset-bottom));
-	}
-
-	.back-link {
+	.back-link-beautiful {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
@@ -81,104 +99,149 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link:hover { color: var(--sumi); }
-
-	.page-title {
-		font-size: 40px;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		margin: 0 0 12px;
+	.back-link-beautiful:hover {
+		color: var(--sumi);
 	}
 
-	.page-desc {
-		font-size: 17px;
-		color: var(--fg-secondary);
-		line-height: 1.6;
-		margin: 0 0 40px;
+	.filter-chip {
+		height: 42px;
+		padding: 0 16px;
+		border-radius: 999px;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
+		color: var(--sumi);
+		font-weight: 600;
+		font-size: 13px;
+		cursor: pointer;
+		font-family: var(--font-ui);
+		white-space: nowrap;
+		flex-shrink: 0;
+		transition: all 180ms ease;
+		touch-action: manipulation;
+	}
+	.filter-chip.active {
+		background: var(--sumi);
+		color: var(--bg-surface);
+		border-color: var(--sumi);
 	}
 
-	.scenario-grid {
+	.list {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
 	}
 
-	.scenario-card {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 20px;
+	.row {
 		display: flex;
 		align-items: flex-start;
 		gap: 16px;
+		padding: 16px 0;
+		border-bottom: 1px solid var(--ink-100);
 		text-decoration: none;
 		color: inherit;
-		transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+		transition: background 150ms;
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
-
-	.scenario-card:hover {
-		box-shadow: var(--shadow-md);
-		border-color: var(--ink-300);
-		transform: translateY(-2px);
+	.row:first-child {
+		border-top: 1px solid var(--ink-100);
+	}
+	.row:hover .row-title {
+		color: var(--hinomaru-red);
+	}
+	.row:hover .row-arrow {
+		color: var(--hinomaru-red);
+		transform: translateX(3px);
 	}
 
-	.scenario-card:active {
-		transform: scale(0.99);
-		box-shadow: var(--shadow-sm);
+	.row-num {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		font-variant-numeric: tabular-nums;
+		padding-top: 3px;
+		min-width: 24px;
+		letter-spacing: 0.02em;
 	}
 
-	.card-icon {
-		font-size: 32px;
-		line-height: 1;
-		flex-shrink: 0;
-		margin-top: 2px;
-	}
-
-	.card-body {
+	.row-body {
 		flex: 1;
 		min-width: 0;
 	}
 
-	.card-title {
-		font-size: 17px;
-		font-weight: 700;
-		color: var(--fg-primary);
-		margin-bottom: 8px;
-	}
-
-	.card-meta {
+	.row-top {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		margin-bottom: 8px;
+		margin-bottom: 3px;
 	}
 
-	.level-tag {
-		font-size: 11px;
+	.row-icon {
+		font-size: 17px;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+
+	.row-title {
+		font-size: 17px;
 		font-weight: 700;
-		padding: 2px 8px;
-		border-radius: 999px;
+		color: var(--fg-primary);
+		line-height: 1.2;
+		transition: color 150ms;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	.turns-label {
+	.row-sub {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		margin-bottom: 3px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.row-meta-inline {
 		font-size: 12px;
 		color: var(--fg-tertiary);
 		font-weight: 500;
 	}
 
-	.card-context {
-		font-size: 13px;
-		color: var(--fg-secondary);
-		line-height: 1.5;
-		margin: 0;
+	.row-meta {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+		padding-top: 3px;
+		flex-shrink: 0;
 	}
 
-	.card-arrow {
+	.row-level {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		letter-spacing: 0.04em;
+		background: var(--hinomaru-red-wash);
+		padding: 2px 7px;
+		border-radius: 6px;
+	}
+
+	.row-arrow {
+		font-size: 14px;
 		color: var(--fg-tertiary);
-		font-size: 16px;
-		flex-shrink: 0;
-		margin-top: 4px;
+		transition:
+			color 150ms,
+			transform 150ms;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 60px 24px;
+		color: var(--fg-tertiary);
+	}
+	.empty-icon {
+		font-size: 48px;
+		margin-bottom: 12px;
+		display: block;
 	}
 </style>

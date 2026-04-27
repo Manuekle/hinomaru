@@ -667,83 +667,83 @@ export const jlptSongs: SongLesson[] = [
 		title: 'FLY HIGH!!',
 		artist: 'BURNOUT SYNDROMES',
 		start: '00:00',
-		end: '01:27',
+		end: '01:33',
 		focus: { es: 'Superación y esfuerzo', en: 'Overcoming and effort' },
 		difficulty: 3,
-		youtubeId: 'txgg-fbVjf4', // ✅ MV oficial Epic Records Japan
+		youtubeId: 'SV0B0KEgSqQ', // ✅ MV oficial Epic Records Japan
 		lyrics: [
 			{
-				time: 1.0,
+				time: 0.0,
 				text: '飛べ FLY HIGH!! 汗と血と涙で',
 				romaji: 'tobe FLY HIGH!! ase to chi to namida de',
 				translation_es: '¡Vuela, vuela alto! Con sudor, sangre y lágrimas.',
 				translation_en: 'Fly, FLY HIGH!! With sweat, blood, and tears.'
 			},
 			{
-				time: 7.0,
+				time: 6.0,
 				text: '光る翼で今全部全部置き去って',
 				romaji: 'hikaru tsubasa de ima zenbu zenbu okizatte',
 				translation_es: 'Con alas brillantes, deja todo atrás ahora mismo.',
 				translation_en: 'With shining wings, leave everything behind right now.'
 			},
 			{
-				time: 11.5,
+				time: 10.0,
 				text: '飛べ FLY 高く FLY 最果ての未来へ',
 				romaji: 'tobe FLY takaku FLY saihate no mirai e',
 				translation_es: 'Vuela, vuela alto, hacia el futuro más lejano.',
 				translation_en: 'Fly, fly high, toward the furthest future.'
 			},
 			{
-				time: 23.0,
+				time: 21.5,
 				text: '傷だらけの若鳥が 空を睨んでる',
 				romaji: 'kizudarake no wakadori ga sora wo niranderu',
 				translation_es: 'Un ave joven cubierta de heridas mira fijamente al cielo.',
 				translation_en: 'A young bird covered in wounds is glaring at the sky.'
 			},
 			{
-				time: 33.0,
+				time: 32.0,
 				text: '低空飛行する奴らが 嗤おうと 海の果てが見たい',
 				romaji: 'teikuu hikou suru yatsura ga waraou to umi no hate ga mitai',
 				translation_es: 'Aunque se rían los que vuelan bajo, quiero ver el fin del mar.',
 				translation_en: 'Even if those flying low mock me, I want to see the edge of the sea.'
 			},
 			{
-				time: 42.0,
+				time: 41.5,
 				text: '心を無にして 向かい風に乗り 助走を付けて',
 				romaji: 'kokoro wo mu ni shite mukaikaze ni nori josou wo tsukete',
 				translation_es: 'Vaciando mi corazón, montando el viento en contra y tomando impulso.',
 				translation_en: 'Emptying my heart, riding the headwind and gaining speed.'
 			},
 			{
-				time: 52.0,
+				time: 51.5,
 				text: '(Hop step jump で)',
 				romaji: '(Hop step jump de)',
 				translation_es: '(Con un salto, paso y brinco)',
 				translation_en: '(With a hop, step, and jump)'
 			},
 			{
-				time: 56.0,
+				time: 55.0,
 				text: '飛べ FLY HIGH!! 汗と血と涙で',
 				romaji: 'tobe FLY HIGH!! ase to chi to namida de',
 				translation_es: '¡Vuela, vuela alto! Con sudor, sangre y lágrimas.',
 				translation_en: 'Fly, FLY HIGH!! With sweat, blood, and tears.'
 			},
 			{
-				time: 62.0,
+				time: 61.0,
 				text: '光る翼が君をどこへだって連れて行く',
 				romaji: 'hikaru tsubasa ga kimi wo doko e datte tsurete iku',
 				translation_es: 'Tus alas brillantes te llevarán a donde sea.',
 				translation_en: 'Those shining wings will take you anywhere.'
 			},
 			{
-				time: 66.0,
+				time: 65.0,
 				text: '青い衝動と本能と爪牙を むき出しにして',
 				romaji: 'aoi shoudou to honnou to souga wo mukidashi ni shite',
 				translation_es: 'Exponiendo tu impulso azul, tu instinto y tus garras.',
 				translation_en: 'Baring your blue impulse, instinct, and fangs.'
 			},
 			{
-				time: 72.0,
+				time: 71.0,
 				text: '艱難な旅路も 夢叶うまで 何度だって',
 				romaji: 'kannan na tabiji mo yume kanau made nando datte',
 				translation_es:
@@ -752,7 +752,7 @@ export const jlptSongs: SongLesson[] = [
 					'Even on this arduous journey, do it as many times as it takes until your dream comes true.'
 			},
 			{
-				time: 76.5,
+				time: 75.0,
 				text: '飛べ FLY 高く FLY 最果ての未来へ',
 				romaji: 'tobe FLY takaku FLY saihate no mirai e',
 				translation_es: 'Vuela, vuela alto, hacia el futuro más lejano.',

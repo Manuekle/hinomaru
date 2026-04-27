@@ -8,7 +8,8 @@
 		Target01Icon,
 		KeyboardIcon,
 		PencilEdit01Icon,
-		PuzzleIcon
+		PuzzleIcon,
+		Certificate01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -33,7 +34,8 @@
 			descKey: 'mode.write.desc',
 			icon: PencilEdit01Icon
 		},
-		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: PuzzleIcon }
+		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: PuzzleIcon },
+		{ id: 'exam', titleKey: 'mode.exam.title', descKey: 'mode.exam.desc', icon: Certificate01Icon }
 	];
 </script>
 

@@ -80,6 +80,7 @@
 	let checked = $state(false);
 
 	const score = $derived(answers.filter((ans, i) => ans === quiz[i]?.a).length);
+	const scorePct = $derived(quiz.length > 0 ? Math.round((score / quiz.length) * 100) : 0);
 
 	const bodyJp = $derived(story?.body_jp ?? '');
 
@@ -127,6 +128,11 @@
 		answers = [];
 		selected = null;
 		checked = false;
+	}
+
+	function restartRead() {
+		phase = 'read';
+		showTranslation = false;
 	}
 
 	const currentQuestion = $derived(quiz[currentQ]);
@@ -261,16 +267,30 @@
 			</StickyFooter>
 		{:else if phase === 'quiz'}
 			<div class="quiz-container" use:fadeUp={{ delay: 0, y: 12 }}>
+				<!-- Progress indicator -->
+				<div class="quiz-progress-row">
+					<span class="quiz-progress-label">
+						{$locale === 'es' ? 'Pregunta' : 'Question'} {currentQ + 1} {$locale === 'es' ? 'de' : 'of'} {quiz.length}
+					</span>
+					<span class="quiz-score-live">{answers.filter((a, i) => a === quiz[i]?.a).length} ✓</span>
+				</div>
+				<div class="quiz-progress-bar">
+					<div class="quiz-progress-fill" style="width:{((currentQ) / quiz.length) * 100}%;"></div>
+				</div>
+
 				{#if currentQuestion}
-					<div class="question-box">
-						<h2 class="question-text">
-							{$locale === 'es'
-								? currentQuestion.q_es || currentQuestion.q
-								: currentQuestion.q_en || currentQuestion.q}
-						</h2>
+					{@const questionText = $locale === 'es'
+						? (currentQuestion.q_es ?? currentQuestion.q)
+						: (currentQuestion.q_en ?? currentQuestion.q)}
+					{@const questionOptions = $locale === 'es'
+						? (currentQuestion.o_es ?? currentQuestion.o)
+						: (currentQuestion.o_en ?? currentQuestion.o)}
+
+					<div class="question-box" style="margin-top:16px;">
+						<h2 class="question-text">{questionText}</h2>
 
 						<div class="options-grid">
-							{#each $locale === 'es' ? currentQuestion.o_es || currentQuestion.o : currentQuestion.o_en || currentQuestion.o as option, i (i)}
+							{#each questionOptions as option, i (i)}
 								<button
 									class="option-item"
 									class:is-selected={selected === i}
@@ -313,25 +333,67 @@
 			</StickyFooter>
 		{:else if phase === 'result'}
 			<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
-				<div class="result-badge">
+				<div class="result-badge" class:result-pass={scorePct >= 70} class:result-fail={scorePct < 70}>
 					<Icon
 						icon={score === quiz.length ? Award01Icon : BookOpen01Icon}
 						size={48}
-						color="var(--sumi)"
+						color="var(--washi)"
 						strokeWidth={1.5}
 					/>
 				</div>
 				<h2 class="result-headline">
-					{score === quiz.length ? '¡Perfecto!' : 'Lectura completada'}
+					{score === quiz.length
+						? ($locale === 'es' ? '¡Perfecto!' : 'Perfect!')
+						: ($locale === 'es' ? 'Lectura completada' : 'Reading complete')}
 				</h2>
-				<p class="result-summary">Has acertado {score} de {quiz.length} preguntas.</p>
+
+				<!-- Score percentage with color -->
+				<div class="result-score-row">
+					<span class="result-pct" class:pass={scorePct >= 70} class:fail={scorePct < 70}>
+						{scorePct}%
+					</span>
+					<span class="result-fraction">{score} / {quiz.length}</span>
+				</div>
+
+				<!-- Question breakdown -->
+				{#if quiz.length > 0}
+					<div class="result-breakdown">
+						<p class="breakdown-heading">
+							{$locale === 'es' ? 'Detalle por pregunta' : 'Question breakdown'}
+						</p>
+						{#each quiz as q, i}
+							{@const wasCorrect = answers[i] === q.a}
+							{@const qText = $locale === 'es' ? (q.q_es ?? q.q) : (q.q_en ?? q.q)}
+							{@const opts = $locale === 'es' ? (q.o_es ?? q.o) : (q.o_en ?? q.o)}
+							<div class="breakdown-row" class:correct={wasCorrect} class:wrong={!wasCorrect}>
+								<span class="breakdown-dot">{wasCorrect ? '✓' : '✗'}</span>
+								<div class="breakdown-content">
+									<span class="breakdown-q">{qText}</span>
+									{#if !wasCorrect}
+										<span class="breakdown-correct-ans">
+											{$locale === 'es' ? 'Correcta:' : 'Correct:'} {opts?.[q.a] ?? '—'}
+										</span>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
 
 				<StickyFooter>
 					<button
-						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
+						class="hm-btn hm-btn-ghost hm-btn-lg"
+						style="flex:1;"
+						onclick={restartRead}
+					>
+						{$locale === 'es' ? 'Leer de nuevo' : 'Read again'}
+					</button>
+					<button
+						class="hm-btn hm-btn-dark hm-btn-lg"
+						style="flex:1;"
 						onclick={() => goto('/deck/stories')}
 					>
-						{t('stories.back', $locale)}
+						{$locale === 'es' ? 'Otras historias' : 'More stories'}
 					</button>
 				</StickyFooter>
 			</div>
@@ -668,6 +730,37 @@
 		background: var(--hinomaru-red-wash);
 	}
 
+	/* --- Quiz progress --- */
+	.quiz-progress-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 8px;
+	}
+	.quiz-progress-label {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+	}
+	.quiz-score-live {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--success);
+	}
+	.quiz-progress-bar {
+		height: 4px;
+		background: var(--ink-100);
+		border-radius: 2px;
+		overflow: hidden;
+		margin-bottom: 4px;
+	}
+	.quiz-progress-fill {
+		height: 100%;
+		background: var(--sumi);
+		border-radius: 2px;
+		transition: width 0.3s ease;
+	}
+
 	/* --- Result --- */
 	.result-container {
 		text-align: center;
@@ -683,18 +776,89 @@
 		align-items: center;
 		justify-content: center;
 		margin: 0 auto 24px;
-		color: var(--washi);
 	}
+	.result-badge.result-pass { background: var(--success); }
+	.result-badge.result-fail { background: var(--hinomaru-red); }
 
 	.result-headline {
 		font-size: 28px;
 		font-weight: 600;
-		margin-bottom: 8px;
+		margin-bottom: 16px;
 	}
 
-	.result-summary {
-		font-size: 16px;
+	.result-score-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: center;
+		gap: 10px;
+		margin-bottom: 24px;
+	}
+	.result-pct {
+		font-size: 52px;
+		font-weight: 800;
+		letter-spacing: -0.04em;
+		color: var(--sumi);
+	}
+	.result-pct.pass { color: var(--success); }
+	.result-pct.fail { color: var(--hinomaru-red); }
+	.result-fraction {
+		font-size: 18px;
 		color: var(--fg-secondary);
+		font-weight: 600;
+	}
+
+	/* --- Breakdown --- */
+	.result-breakdown {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 18px 20px;
+		margin-bottom: 24px;
+		box-shadow: var(--shadow-sm);
+		text-align: left;
+	}
+	.breakdown-heading {
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--fg-tertiary);
+		margin: 0 0 12px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid var(--ink-100);
+	}
+	.breakdown-row {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+		padding: 8px 0;
+		border-bottom: 1px solid var(--ink-50);
+	}
+	.breakdown-row:last-child { border-bottom: none; }
+	.breakdown-dot {
+		font-size: 14px;
+		font-weight: 700;
+		width: 18px;
+		flex-shrink: 0;
+		margin-top: 1px;
+	}
+	.breakdown-row.correct .breakdown-dot { color: var(--success); }
+	.breakdown-row.wrong .breakdown-dot { color: var(--hinomaru-red); }
+	.breakdown-content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+	}
+	.breakdown-q {
+		font-size: 14px;
+		color: var(--fg-primary);
+		font-weight: 500;
+		line-height: 1.4;
+	}
+	.breakdown-correct-ans {
+		font-size: 12px;
+		color: var(--fg-tertiary);
 	}
 
 	.empty-state {

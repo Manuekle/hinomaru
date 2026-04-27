@@ -116,7 +116,8 @@
 		border: 1px solid var(--ink-200);
 		border-radius: 24px;
 		padding: 20px;
-		margin-bottom: 24px;
+		margin-top: 16px;
+		margin-bottom: 0;
 		box-shadow: var(--shadow-sm);
 		position: relative;
 		overflow: hidden;

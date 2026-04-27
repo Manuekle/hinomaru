@@ -10,6 +10,7 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
+	import DockBar from '$lib/components/DockBar.svelte';
 	import { isBrowser } from '$lib/supabase';
 	import { inject } from '@vercel/analytics';
 	import { dev } from '$app/environment';
@@ -137,6 +138,9 @@
 		closeButton
 	/>
 	{@render children()}
+	{#if data.session}
+		<DockBar />
+	{/if}
 	<InstallPrompt />
 	<PWASplash visible={booting} />
 </div>
