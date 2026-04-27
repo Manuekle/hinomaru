@@ -200,17 +200,20 @@
 			} catch {
 				// ignore
 			}
-			supabase.auth.getUser().then(({ data: { user } }) => {
-				if (!user) return;
-				supabase.from('sessions').insert({
-					user_id: user.id,
-					mode: 'song',
-					correct: 1,
-					total: 1
+			const client = supabase;
+			if (client) {
+				client.auth.getUser().then(({ data: { user } }) => {
+					if (!user) return;
+					client.from('sessions').insert({
+						user_id: user.id,
+						mode: 'song',
+						correct: 1,
+						total: 1
+					});
+					updateStreak(client, user.id);
+					addXP(client, user.id, 20);
 				});
-				updateStreak(supabase, user.id);
-				addXP(supabase, user.id, 20);
-			});
+			}
 		}
 	}
 

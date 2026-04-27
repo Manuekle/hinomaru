@@ -45,10 +45,7 @@
 	<a
 		use:fadeIn={{ delay: 0 }}
 		href="/"
-		style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-secondary);text-decoration:none;margin-bottom:32px;
-           transition:color 150ms ease;"
-		onmouseenter={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--sumi)')}
-		onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.color = 'var(--fg-secondary)')}
+		class="back-link"
 	>
 		← {t('deck.back', $locale)}
 	</a>
@@ -115,6 +112,22 @@
 </div>
 
 <style>
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
+		color: var(--fg-secondary);
+		text-decoration: none;
+		margin-bottom: 32px;
+		transition: color 150ms ease;
+		touch-action: manipulation;
+	}
+
+	.back-link:hover {
+		color: var(--sumi);
+	}
+
 	.mode-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);

@@ -169,13 +169,7 @@
 								e.stopPropagation();
 								speak(card.jp);
 							}}
-							style="margin-top:20px;width:44px;height:44px;border-radius:50%;
-                     border:1px solid var(--ink-200);background:var(--bg-surface);cursor:pointer;
-                     display:inline-flex;align-items:center;justify-content:center;font-size:18px;
-                     transition:background 150ms ease, transform 150ms ease;"
-							onmouseenter={(e) =>
-								((e.currentTarget as HTMLElement).style.transform = 'scale(1.1)')}
-							onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
+							class="audio-btn"
 						>
 							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 						</button>
@@ -203,9 +197,7 @@
 										e.stopPropagation();
 										speak(card.example);
 									}}
-									style="width:28px;height:28px;border-radius:50%;border:1px solid var(--ink-100);
-										   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
-										   justify-content:center;font-size:12px;color:var(--fg-tertiary);flex-shrink:0;"
+									class="audio-btn audio-btn-sm"
 								>
 									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 								</button>
@@ -238,12 +230,9 @@
 					</button>
 				{/if}
 				<button
-					class="hm-btn hm-btn-primary {flipped ? '' : 'hm-btn-full'} touch-action-manip"
+					class="hm-btn hm-btn-primary {flipped ? '' : 'hm-btn-full'} touch-action-manip flash-primary-btn"
 					onclick={() => (flipped ? next(true) : (flipped = true))}
-					style="flex:1; transition:transform 100ms ease, box-shadow 150ms ease;"
-					onmouseenter={(e) =>
-						((e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(188,0,45,0.30)')}
-					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = '')}
+					style="flex:1;"
 				>
 					{flipped ? `✓ ${t('session.gotIt', $locale)}` : t('session.flip', $locale)}
 				</button>
@@ -251,3 +240,41 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.flash-primary-btn:hover {
+		box-shadow: 0 4px 20px rgba(188, 0, 45, 0.3);
+	}
+
+	.audio-btn {
+		margin-top: 20px;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 18px;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+		transition: background 150ms ease;
+	}
+
+	.audio-btn:hover,
+	.audio-btn:active {
+		background: var(--ink-100);
+	}
+
+	.audio-btn-sm {
+		margin-top: 0;
+		width: 28px;
+		height: 28px;
+		border: 1px solid var(--ink-100);
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		flex-shrink: 0;
+	}
+</style>
