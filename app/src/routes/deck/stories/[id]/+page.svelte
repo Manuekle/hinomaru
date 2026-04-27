@@ -10,7 +10,8 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { Award01Icon, BookOpen01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Award01Icon, BookOpen01Icon } from '@hugeicons/core-free-icons';
+	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { svileo } from '$lib/stores/toast';
 	import type { PageData } from './$types';
 
@@ -93,6 +94,11 @@
 		if (selected === null) return;
 		checked = true;
 		answers = [...answers, selected];
+		if (selected === currentQuestion?.a) {
+			playCorrect();
+		} else {
+			playWrong();
+		}
 	}
 
 	function nextQuestion() {
@@ -100,6 +106,7 @@
 		selected = null;
 		if (currentQ + 1 >= quiz.length) {
 			phase = 'result';
+			playFinish();
 			saveRead();
 		} else {
 			currentQ += 1;
@@ -397,7 +404,7 @@
 						<p class="breakdown-heading">
 							{$locale === 'es' ? 'Detalle por pregunta' : 'Question breakdown'}
 						</p>
-						{#each quiz as q, i}
+						{#each quiz as q, i (i)}
 							{@const wasCorrect = answers[i] === q.a}
 							{@const qJpLocal = q.q_jp || q.q}
 							{@const qRomajiLocal = q.q_romaji}

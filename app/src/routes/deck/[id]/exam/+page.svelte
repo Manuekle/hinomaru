@@ -34,7 +34,6 @@
 	let phase = $state<'intro' | 'exam' | 'result'>('intro');
 	let questions = $state<ExamQuestion[]>([]);
 	let currentIdx = $state(0);
-	let userAnswers = $state<string[]>([]);
 	let correctness = $state<boolean[]>([]);
 
 	// current question interaction
@@ -148,7 +147,6 @@
 		questions = generateQuestions(cards);
 		if (questions.length === 0) return;
 		currentIdx = 0;
-		userAnswers = [];
 		correctness = [];
 		selected = null;
 		typedAnswer = '';
@@ -163,18 +161,11 @@
 		const q = currentQuestion;
 		if (!q) return;
 
-		let answer = '';
-		if (q.type === 'multiple-choice' || q.type === 'sentence-context') {
-			if (selected === null) return;
-			answer = q.options![selected];
-		} else {
-			if (!typedAnswer.trim()) return;
-			answer = typedAnswer.trim();
-		}
+		const isRight = (q.type === 'multiple-choice' || q.type === 'sentence-context')
+			? (selected !== null && q.options![selected].toLowerCase() === q.correctAnswer.toLowerCase())
+			: (typedAnswer.trim().toLowerCase() === q.correctAnswer.toLowerCase());
 
 		checked = true;
-		userAnswers = [...userAnswers, answer];
-		const isRight = answer.toLowerCase() === q.correctAnswer.toLowerCase();
 		correctness = [...correctness, isRight];
 
 		if (isRight) playCorrect();
@@ -264,8 +255,8 @@
 	<title>{$locale === 'es' ? 'Examen' : 'Exam'} — {deck?.title_en ?? ''} — Hinomaru</title>
 </svelte:head>
 
-<div class="exam-layout">
-	<div class="exam-container">
+<div class="session-layout">
+	<div class="session-container">
 
 		{#if phase === 'intro'}
 			<!-- ── Intro Screen ── -->
@@ -304,9 +295,9 @@
 			</div>
 
 			<StickyFooter>
-				<a href="/deck/{deck?.id}" class="hm-btn hm-btn-ghost hm-btn-lg" style="flex:1;">
+				<button class="hm-btn hm-btn-ghost hm-btn-lg" style="flex:1;" onclick={() => goto(`/deck/${deck?.id}`)}>
 					← {t('deck.back', $locale)}
-				</a>
+				</button>
 				<button
 					class="hm-btn hm-btn-dark hm-btn-lg"
 					style="flex:2;"
@@ -363,7 +354,7 @@
 					<div class="options-list">
 						{#each currentQuestion.options! as opt, idx (idx)}
 							<button
-								class="option-btn"
+								class="option-item"
 								class:is-selected={selected === idx}
 								class:is-correct={checked && opt === currentQuestion.correctAnswer}
 								class:is-wrong={checked && selected === idx && opt !== currentQuestion.correctAnswer}
@@ -468,7 +459,7 @@
 					<h3 class="breakdown-title">
 						{$locale === 'es' ? 'Por tipo de pregunta' : 'By question type'}
 					</h3>
-					{#each (['multiple-choice', 'type-answer', 'sentence-context'] as QuestionType[]) as qtype}
+					{#each (['multiple-choice', 'type-answer', 'sentence-context'] as QuestionType[]) as qtype (qtype)}
 						{@const typeQs = questions.map((q, i) => ({ q, correct: correctness[i] })).filter(({ q }) => q.type === qtype)}
 						{#if typeQs.length > 0}
 							{@const typeScore = typeQs.filter((x) => x.correct).length}
@@ -484,7 +475,7 @@
 
 				<!-- Question-by-question list -->
 				<div class="question-list">
-					{#each questions as q, idx}
+					{#each questions as q, idx (idx)}
 						<div class="q-row" class:q-correct={correctness[idx]} class:q-wrong={!correctness[idx]}>
 							<span class="q-dot">
 								{correctness[idx] ? '✓' : '✗'}
@@ -518,16 +509,18 @@
 </div>
 
 <style>
-	.exam-layout {
+	.session-layout {
+		display: flex;
+		flex-direction: column;
 		min-height: 100vh;
 		background: var(--paper);
 	}
 
-	.exam-container {
+	.session-container {
+		width: 100%;
 		max-width: 720px;
 		margin: 0 auto;
 		padding: calc(16px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
-		width: 100%;
 	}
 
 	/* ── Timer Bar ── */
@@ -689,7 +682,7 @@
 		flex-direction: column;
 		gap: 10px;
 	}
-	.option-btn {
+	.option-item {
 		display: flex;
 		align-items: center;
 		gap: 14px;
@@ -702,20 +695,20 @@
 		font-family: inherit;
 		transition: all 0.18s;
 	}
-	.option-btn:hover:not(:disabled) {
+	.option-item:hover:not(:disabled) {
 		border-color: var(--ink-300);
 		box-shadow: var(--shadow-sm);
 	}
-	.option-btn:disabled { cursor: default; }
-	.option-btn.is-selected {
+	.option-item:disabled { cursor: default; }
+	.option-item.is-selected {
 		border-color: var(--sumi);
 		background: var(--ink-50);
 	}
-	.option-btn.is-correct {
+	.option-item.is-correct {
 		border-color: var(--success);
 		background: var(--success-wash);
 	}
-	.option-btn.is-wrong {
+	.option-item.is-wrong {
 		border-color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 	}

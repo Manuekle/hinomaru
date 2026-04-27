@@ -4,10 +4,11 @@
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
-	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
+	import { fadeUp } from '$lib/motion';
+	import { t } from '$lib/i18n';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
@@ -25,7 +26,7 @@
 
 	const card = $derived(cards[i]);
 	const pct = $derived(((i + 1) / cards.length) * 100);
-	const isCorrect = $derived(picked === (card?.en ?? ''));
+	const isCorrect = $derived(picked === ($locale === 'es' ? card?.es : card?.en));
 
 	const options = $derived.by(() => {
 		if (!card) return [];
@@ -58,7 +59,8 @@
 	function pick(opt: string) {
 		if (picked) return;
 		picked = opt;
-		if (opt === card.en) {
+		const correctMeaning = $locale === 'es' ? card.es : card.en;
+		if (opt === correctMeaning) {
 			correct++;
 			playCorrect();
 		} else {
@@ -120,7 +122,7 @@
 	}
 </script>
 
-<div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
+<div class="session-layout">
 	<SessionNav
 		progress={pct}
 		current={i + 1}
@@ -128,155 +130,324 @@
 		onClose={() => goto(`/deck/${data.deck.id}`)}
 	/>
 
-	{#if cards.length === 0}
-		<div
-			style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;"
-		>
-			<div style="font-size:48px;margin-bottom:16px;">📭</div>
-			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
-			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
-		</div>
-	{:else if card}
-		<div
-			style="flex:1;padding:32px 24px 140px;max-width:520px;margin:0 auto;width:100%;box-sizing:border-box;"
-		>
-			<div
-				style="background:var(--bg-surface);border-radius:24px;padding:48px;text-align:center;box-shadow:var(--shadow-sm);position:relative;"
-			>
-				<button
-					onclick={playAudio}
-					aria-label="Play pronunciation"
-					style="position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:var(--shadow-sm);transition:transform 100ms ease;"
-					onmousedown={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(0.92)')}
-					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
-					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
-				>
-					<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+	<div class="session-container">
+		{#if cards.length === 0}
+			<div class="empty-state">
+				<div class="empty-icon">📭</div>
+				<p>{t('home.empty', $locale)}</p>
+				<button class="hm-btn hm-btn-dark" onclick={() => goto(`/deck/${data.deck.id}`)}>
+					{t('deck.back', $locale)}
 				</button>
-				<div class="label-meta" style="margin-bottom:16px;">{t('session.whatMean', $locale)}</div>
-				<div class="jp" style="font-size:64px;line-height:1;">{card.jp}</div>
-				{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-					<div class="romaji" style="margin-top:12px;">{card.romaji}</div>
-				{/if}
 			</div>
-
-			<div style="margin-top:24px;display:flex;flex-direction:column;gap:10px;">
-				{#each options as opt (opt)}
-					{@const isThisCorrect = opt === card.en}
-					{@const isThisPicked = opt === picked}
+		{:else if card}
+			<div class="card-viewer">
+				<div class="card-main">
 					<button
-						onclick={() => pick(opt)}
-						style="padding:18px 20px;background:{picked
-							? isThisCorrect
-								? 'var(--success-wash)'
-								: isThisPicked
-									? 'var(--hinomaru-red-wash)'
-									: 'var(--bg-surface)'
-							: 'var(--bg-surface)'};
-              border:1.5px solid {picked
-							? isThisCorrect
-								? 'var(--success)'
-								: isThisPicked
-									? 'var(--hinomaru-red-ink)'
-									: 'var(--ink-200)'
-							: 'var(--ink-200)'};
-              border-radius:16px;font-weight:{picked && (isThisCorrect || isThisPicked)
-							? 600
-							: 500};font-size:16px;
-              color:{picked
-							? isThisCorrect
-								? 'var(--success)'
-								: isThisPicked
-									? 'var(--hinomaru-red-ink)'
-									: 'var(--sumi)'
-							: 'var(--sumi)'};
-              cursor:{picked ? 'default' : 'pointer'};text-align:center;font-family:var(--font-ui);
-              opacity:{picked && !isThisCorrect && !isThisPicked ? 0.5 : 1};
-              transition:all 120ms var(--ease-brand);"
+						onclick={playAudio}
+						aria-label="Play pronunciation"
+						class="audio-btn-circle"
 					>
-						{opt}
+						<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 					</button>
-				{/each}
-			</div>
+					<div class="label-meta">{t('session.whatMean', $locale)}</div>
+					<div class="jp card-jp">{card.jp}</div>
+					{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+						<div class="romaji card-romaji">{card.romaji}</div>
+					{/if}
+				</div>
 
-			{#if picked}
-				<div
-					style="margin-top:20px;padding:20px;border-radius:20px;background:{isCorrect
-						? 'var(--success-wash)'
-						: 'var(--hinomaru-red-wash)'};display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow-sm);"
-				>
-					<div style="display:flex;flex-direction:column;gap:2px;">
-						<div
-							style="font-weight:700;font-size:18px;color:{isCorrect
-								? 'var(--success)'
-								: 'var(--hinomaru-red-ink)'};"
+				<div class="options-grid">
+					{#each options as opt (opt)}
+						{@const isThisCorrect = opt === ($locale === 'es' ? card.es : card.en)}
+						{@const isThisPicked = opt === picked}
+						<button
+							onclick={() => pick(opt)}
+							class="option-item"
+							class:is-correct={picked && isThisCorrect}
+							class:is-wrong={picked && isThisPicked && !isThisCorrect}
+							class:is-dimmed={picked && !isThisCorrect && !isThisPicked}
+							disabled={!!picked}
 						>
-							{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-						</div>
-						{#if !isCorrect}
-							<div style="font-size:14px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;">
-								{t('session.answerIs', $locale, { a: card.en })}
+							{opt}
+						</button>
+					{/each}
+				</div>
+
+				{#if picked}
+					<div
+						class="feedback-box"
+						class:correct={isCorrect}
+						class:wrong={!isCorrect}
+						use:fadeUp={{ y: 10 }}
+					>
+						<div class="feedback-header">
+							<div class="feedback-status">
+								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
 							</div>
-						{/if}
-					</div>
+							{#if !isCorrect}
+								<div class="correct-answer">
+									{t('session.answerIs', $locale, { a: $locale === 'es' ? card.es : card.en })}
+								</div>
+							{/if}
+						</div>
 
-					{#if card.example}
-						<div
-							style="padding-top:16px;border-top:1.5px solid {isCorrect
-								? 'rgba(0,128,0,0.1)'
-								: 'rgba(188,0,45,0.1)'};"
-						>
-							<div style="display:flex;align-items:flex-start;gap:8px;">
-								<div style="flex:1;">
-									<div class="jp" style="font-size:16px;line-height:1.4;color:var(--sumi);">
-										{card.example}
-									</div>
+						{#if card.example}
+							<div class="example-section">
+								<div class="example-content">
+									<div class="example-text jp">{card.example}</div>
 									{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-										<div
-											style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.7;margin-top:2px;font-weight:600;"
-										>
+										<div class="example-romaji">
 											{card.example_romaji || card.extra?.example_romaji || ''}
 										</div>
 									{/if}
-									<div style="font-size:13px;color:var(--fg-secondary);margin-top:4px;">
+									<div class="example-translation">
 										{$locale === 'es' ? card.example_es : card.example_en}
 									</div>
 								</div>
 								<button
 									onclick={() => speakJapanese(card.example)}
-									style="width:32px;height:32px;border-radius:50%;border:1px solid var(--ink-100);
-										   background:var(--bg-surface);cursor:pointer;display:flex;align-items:center;
-										   justify-content:center;font-size:14px;color:var(--fg-tertiary);flex-shrink:0;margin-top:2px;"
+									class="audio-btn-small"
 								>
-									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+									<Icon icon={VolumeHighIcon} size={16} color="currentColor" strokeWidth={1.5} />
 								</button>
 							</div>
-						</div>
-					{/if}
-				</div>
+						{/if}
+					</div>
 
-				<StickyFooter>
-					{#if !isCorrect}
+					<StickyFooter>
+						{#if !isCorrect}
+							<button
+								class="hm-btn hm-btn-ghost hm-btn-lg"
+								onclick={() => {
+									picked = null;
+									struggled = true;
+								}}
+								style="flex:1;"
+							>
+								{t('session.again', $locale)}
+							</button>
+						{/if}
 						<button
-							class="hm-btn hm-btn-secondary touch-action-manip"
-							onclick={() => {
-								picked = null;
-								struggled = true;
-							}}
+							class="hm-btn hm-btn-dark hm-btn-lg touch-action-manip"
+							onclick={next}
 							style="flex:1;"
 						>
-							✕ {t('session.again', $locale)}
+							{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
 						</button>
-					{/if}
-					<button
-						class="hm-btn {isCorrect ? 'hm-btn-primary' : 'hm-btn-dark'} touch-action-manip"
-						onclick={next}
-						style="flex:1;"
-					>
-						{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
-					</button>
-				</StickyFooter>
-			{/if}
-		</div>
-	{/if}
+					</StickyFooter>
+				{/if}
+			</div>
+		{/if}
+	</div>
 </div>
+
+<style>
+	.session-layout {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		background: var(--paper);
+	}
+
+	.session-container {
+		flex: 1;
+		width: 100%;
+		max-width: 520px;
+		margin: 0 auto;
+		padding: 32px 24px 140px;
+		box-sizing: border-box;
+	}
+
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 40px;
+		text-align: center;
+		height: 100%;
+	}
+
+	.empty-icon {
+		font-size: 48px;
+		margin-bottom: 16px;
+	}
+
+	.card-viewer {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.card-main {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 24px;
+		padding: 48px 24px;
+		text-align: center;
+		box-shadow: var(--shadow-sm);
+		position: relative;
+	}
+
+	.card-jp {
+		font-size: 64px;
+		line-height: 1.1;
+		margin: 8px 0;
+	}
+
+	.card-romaji {
+		margin-top: 12px;
+		color: var(--hinomaru-red);
+		font-weight: 500;
+	}
+
+	.audio-btn-circle {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: var(--sumi);
+		box-shadow: var(--shadow-sm);
+		transition: transform 100ms ease;
+	}
+
+	.audio-btn-circle:active {
+		transform: scale(0.92);
+	}
+
+	.options-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.option-item {
+		padding: 18px 20px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		border-radius: 16px;
+		font-size: 16px;
+		font-weight: 500;
+		color: var(--sumi);
+		cursor: pointer;
+		text-align: center;
+		transition: all 120ms var(--ease-brand);
+		font-family: var(--font-ui);
+	}
+
+	.option-item:hover:not(:disabled) {
+		border-color: var(--ink-300);
+		background: var(--ink-50);
+	}
+
+	.option-item.is-correct {
+		background: var(--success-wash);
+		border-color: var(--success);
+		color: var(--success);
+		font-weight: 700;
+	}
+
+	.option-item.is-wrong {
+		background: var(--hinomaru-red-wash);
+		border-color: var(--hinomaru-red);
+		color: var(--hinomaru-red-ink);
+		font-weight: 700;
+	}
+
+	.option-item.is-dimmed {
+		opacity: 0.5;
+		cursor: default;
+	}
+
+	.feedback-box {
+		padding: 20px;
+		border-radius: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.feedback-box.correct {
+		background: var(--success-wash);
+	}
+
+	.feedback-box.wrong {
+		background: var(--hinomaru-red-wash);
+	}
+
+	.feedback-header {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.feedback-status {
+		font-weight: 700;
+		font-size: 18px;
+	}
+
+	.correct.feedback-status { color: var(--success); }
+	.wrong .feedback-status { color: var(--hinomaru-red-ink); }
+
+	.correct-answer {
+		font-size: 14px;
+		color: var(--hinomaru-red-ink);
+		opacity: 0.8;
+		margin-top: 2px;
+	}
+
+	.example-section {
+		padding-top: 16px;
+		border-top: 1.5px solid rgba(0, 0, 0, 0.05);
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+	}
+
+	.example-content {
+		flex: 1;
+	}
+
+	.example-text {
+		font-size: 16px;
+		line-height: 1.5;
+		color: var(--sumi);
+	}
+
+	.example-romaji {
+		font-size: 11px;
+		color: var(--hinomaru-red-ink);
+		opacity: 0.7;
+		margin-top: 2px;
+		font-weight: 600;
+	}
+
+	.example-translation {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		margin-top: 4px;
+	}
+
+	.audio-btn-small {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1px solid var(--ink-100);
+		background: var(--bg-surface);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-tertiary);
+		flex-shrink: 0;
+	}
+</style>
