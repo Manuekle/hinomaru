@@ -7,7 +7,7 @@
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { BookOpenIcon, BookOpen01Icon } from '@hugeicons/core-free-icons';
+	import { BookOpenIcon, BookOpen01Icon, BubbleChatIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -146,6 +146,10 @@
 			<a href="/deck/songs" class="tool-btn">
 				<span class="tool-icon">🎧</span>
 				<span>{t('nav.songs', $locale)}</span>
+			</a>
+			<a href="/conversation" class="tool-btn">
+				<span class="tool-icon"><Icon icon={BubbleChatIcon} size={22} color="currentColor" strokeWidth={1.5} /></span>
+				<span>{$locale === 'es' ? 'Conversatorio' : 'Talk'}</span>
 			</a>
 		</div>
 

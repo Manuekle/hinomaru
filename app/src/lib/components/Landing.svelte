@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
@@ -18,6 +19,11 @@
 	let { decks = [] } = $props();
 
 	let showDownload = $state(false);
+	let isIOS = $state(false);
+
+	onMount(() => {
+		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+	});
 
 	// Select a few N5 decks for preview
 	const previewDecks = $derived(decks.filter((d: any) => d.level === 'N5').slice(0, 3));
@@ -82,14 +88,16 @@
 				>
 					{t('landing.cta', $locale)}
 				</a>
-				<button
-					onclick={() => (showDownload = true)}
-					class="hm-btn hm-btn-ghost hm-btn-lg mobile-only-btn"
-					style="padding:0 32px; height:64px; font-size:18px; display:inline-flex; align-items:center; gap:10px; border:1.5px solid var(--ink-200);"
-				>
-					<Icon icon={Download02Icon} size={20} strokeWidth={1.5} />
-					Descargar app
-				</button>
+				{#if isIOS}
+					<button
+						onclick={() => (showDownload = true)}
+						class="hm-btn hm-btn-ghost hm-btn-lg download-btn"
+						style="padding:0 32px; height:64px; font-size:18px; display:inline-flex; align-items:center; gap:10px; border:1.5px solid var(--ink-200);"
+					>
+						<Icon icon={Download02Icon} size={20} strokeWidth={1.5} />
+						Descargar app
+					</button>
+				{/if}
 			</div>
 
 			<!-- Stats row -->
@@ -273,6 +281,9 @@
 <AppDownloadDrawer bind:open={showDownload} />
 
 <style>
+	.download-btn {
+		display: inline-flex;
+	}
 	.experience-grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);

@@ -127,6 +127,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'pwa.install.desc': 'Study offline and with a better experience.',
 		'pwa.install.ios': 'Tap the Share icon and "Add to Home Screen"',
 		'pwa.install.btn': 'Install',
+		'pwa.download.btn': 'Download',
+		'pwa.download.title': 'Download Hinomaru',
 		'landing.hero.label': 'MASTER JAPANESE SIMPLY',
 		'landing.hero.title': 'Learn Japanese, one card at a time.',
 		'landing.hero.desc':
@@ -480,6 +482,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'pwa.install.desc': 'Estudia sin conexión y con una mejor experiencia.',
 		'pwa.install.ios': 'Pulsa el icono Compartir y "Añadir a la pantalla de inicio"',
 		'pwa.install.btn': 'Instalar',
+		'pwa.download.btn': 'Descargar',
+		'pwa.download.title': 'Descargar Hinomaru',
 		'landing.hero.label': 'DOMINA EL JAPONÉS FÁCILMENTE',
 		'landing.hero.title': 'Aprende japonés, tarjeta por tarjeta.',
 		'landing.hero.desc':

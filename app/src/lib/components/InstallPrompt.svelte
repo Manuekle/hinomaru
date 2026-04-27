@@ -72,7 +72,7 @@
 			</div>
 			<div>
 				<div style="font-weight:700; font-size:15px; line-height:1.2;">
-					{t('pwa.install.title', $locale)}
+					{t('pwa.download.title', $locale)}
 				</div>
 				<div style="font-size:13px; color:var(--fg-secondary); line-height:1.3; margin-top:1px;">
 					{isIOS ? t('pwa.install.ios', $locale) : t('pwa.install.desc', $locale)}
@@ -90,7 +90,7 @@
 					onmousedown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
 					onmouseup={(e) => (e.currentTarget.style.transform = 'scale(1)')}
 				>
-					{t('pwa.install.btn', $locale)}
+					{t('pwa.download.btn', $locale)}
 				</button>
 			{/if}
 			<button

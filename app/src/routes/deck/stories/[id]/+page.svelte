@@ -162,7 +162,7 @@
 				<div class="story-meta-tags">
 					<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{story.level}</span>
 					<span class="date-badge">
-						{new Date(story.publish_date).toLocaleDateString($locale === 'es' ? 'es-MX' : 'en-US', {
+						{new Date(story.publish_date + 'T12:00:00').toLocaleDateString($locale === 'es' ? 'es-MX' : 'en-US', {
 							month: 'long',
 							day: 'numeric'
 						})}

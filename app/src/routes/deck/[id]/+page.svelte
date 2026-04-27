@@ -97,26 +97,9 @@
 		{#each modes as mode (mode.id)}
 			<a
 				href={mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`}
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:18px;
-               cursor:pointer;display:flex;align-items:center;gap:16px;
-               text-decoration:none;color:inherit;
-               transition:box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;"
-				onmouseenter={(e) => {
-					const el = e.currentTarget as HTMLElement;
-					el.style.boxShadow = 'var(--shadow-md)';
-					el.style.transform = 'translateX(4px)';
-					el.style.borderColor = 'var(--ink-300)';
-				}}
-				onmouseleave={(e) => {
-					const el = e.currentTarget as HTMLElement;
-					el.style.boxShadow = '';
-					el.style.transform = '';
-					el.style.borderColor = 'var(--ink-200)';
-				}}
+				class="mode-card"
 			>
-				<div
-					style="width:40px;height:40px;background:var(--ink-100);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--sumi);"
-				>
+				<div class="mode-icon-box">
 					<Icon icon={mode.icon} size={20} strokeWidth={1.5} color="currentColor" />
 				</div>
 				<div style="flex:1;">
@@ -128,3 +111,42 @@
 		{/each}
 	</div>
 </div>
+
+<style>
+	.mode-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 16px;
+		padding: 18px;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		text-decoration: none;
+		color: inherit;
+		transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.mode-card:hover {
+		box-shadow: var(--shadow-md);
+		transform: translateX(4px);
+		border-color: var(--ink-300);
+	}
+
+	.mode-card:active {
+		transform: translateX(2px) scale(0.99);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.mode-icon-box {
+		width: 40px;
+		height: 40px;
+		background: var(--ink-100);
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--sumi);
+	}
+</style>

@@ -8,6 +8,7 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import type { PageData } from './$types';
@@ -67,7 +68,7 @@
 			const {
 				data: { user }
 			} = await supabase.auth.getUser();
-			if (user)
+			if (user) {
 				await supabase.from('sessions').insert({
 					user_id: user.id,
 					deck_id: data.deck.id,
@@ -75,6 +76,8 @@
 					correct,
 					total: cards.length
 				});
+				await updateStreak(supabase, user.id);
+			}
 			const params = new URLSearchParams({
 				correct: String(correct),
 				total: String(cards.length),

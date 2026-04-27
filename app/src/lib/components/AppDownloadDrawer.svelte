@@ -20,11 +20,47 @@
 	let isMobile = $state(false);
 	let desktopTab = $state<'ios' | 'android'>('ios');
 
+	// Swipe to close logic
+	let touchStartY = 0;
+	let touchCurrentY = 0;
+	let isSwiping = $state(false);
+	let swipeOffset = $state(0);
+
 	onMount(() => {
 		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 		isAndroid = /Android/.test(navigator.userAgent);
 		isMobile = isIOS || isAndroid;
+
+		if (isAndroid) {
+			document.documentElement.classList.add('is-android');
+		} else {
+			document.documentElement.classList.remove('is-android');
+		}
 	});
+
+	function handleTouchStart(e: TouchEvent) {
+		if (!isMobile) return;
+		touchStartY = e.touches[0].clientY;
+		isSwiping = true;
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (!isSwiping) return;
+		touchCurrentY = e.touches[0].clientY;
+		const deltaY = touchCurrentY - touchStartY;
+		if (deltaY > 0) {
+			swipeOffset = deltaY;
+		}
+	}
+
+	function handleTouchEnd() {
+		if (!isSwiping) return;
+		if (swipeOffset > 100) {
+			close();
+		}
+		isSwiping = false;
+		swipeOffset = 0;
+	}
 
 	function close() {
 		open = false;
@@ -113,9 +149,14 @@
 	<div
 		use:fadeUp={{ y: 24, duration: 0.4 }}
 		class="drawer"
+		class:is-swiping={isSwiping}
+		style="transform: {isMobile && !isAndroid ? `translateY(${swipeOffset}px)` : ''}"
 		role="dialog"
 		aria-modal="true"
 		aria-label={s.title}
+		ontouchstart={handleTouchStart}
+		ontouchmove={handleTouchMove}
+		ontouchend={handleTouchEnd}
 	>
 		<!-- Close button -->
 		<button class="close-btn" onclick={close} aria-label={s.close}>
@@ -259,15 +300,34 @@
 		max-height: 90dvh;
 		overflow-y: auto;
 	}
+	.drawer.is-swiping {
+		transition: none !important;
+	}
 
-	/* Desktop: centered modal */
+	/* Force modal for Android and Desktop */
+	:global(.is-android) .drawer {
+		bottom: auto;
+		left: 50%;
+		top: 50%;
+		right: auto;
+		transform: translate(-50%, -50%) !important;
+		border-radius: 24px;
+		width: min(480px, 90vw);
+		max-height: 85dvh;
+		padding: 32px 32px 36px;
+	}
+
+	:global(.is-android) .handle-bar {
+		display: none;
+	}
+
 	@media (min-width: 768px) {
 		.drawer {
 			bottom: auto;
 			left: 50%;
 			top: 50%;
 			right: auto;
-			transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%) !important;
 			border-radius: 24px;
 			width: min(480px, 90vw);
 			max-height: 85dvh;

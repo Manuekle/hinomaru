@@ -13,6 +13,8 @@
 	import Icon from '$lib/Icon.svelte';
 	import { Award01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import { svileo } from 'svileo';
+	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -144,6 +146,22 @@
 				correct: allCards.length,
 				total: allCards.length
 			});
+
+			// Save SRS progress for every card (match = correct, no struggle)
+			for (const card of allCards) {
+				const currentProgress = card.progress && card.progress.length > 0 ? card.progress[0] : undefined;
+				const quality = mapPerformanceToQuality(true, false);
+				const nextState = calculateNextReview(quality, currentProgress);
+				await supabase.from('progress').upsert({
+					user_id: user.id,
+					card_id: card.id,
+					learned: true,
+					...nextState,
+					last_seen: new Date().toISOString()
+				});
+			}
+
+			await updateStreak(supabase, user.id);
 		}
 
 		svileo.success({ title: t('session.wellDone', $locale) || '¡Muy bien!' });

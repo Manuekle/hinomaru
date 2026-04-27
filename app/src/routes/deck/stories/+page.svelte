@@ -70,7 +70,7 @@
 						</div>
 						<div class="row-sub jp">{[...story.body_jp].slice(0, 28).join('')}…</div>
 						<div class="row-date">
-							{new Date(story.publish_date).toLocaleDateString(
+							{new Date(story.publish_date + 'T12:00:00').toLocaleDateString(
 								$locale === 'es' ? 'es-MX' : 'en-US',
 								{ month: 'short', day: 'numeric' }
 							)}
