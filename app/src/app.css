@@ -514,3 +514,30 @@ body {
 		@apply font-sans;
 	}
 }
+
+/* ── Svileo (Sileo) overrides ───────────────────────────────────────────── */
+:root {
+  /* Match app palette */
+  --svileo-state-success: oklch(0.65 0.18 142);
+  --svileo-state-error: oklch(0.48 0.22 25);      /* closer to --hinomaru-red */
+  --svileo-state-warning: oklch(0.75 0.18 75);
+  --svileo-state-info: oklch(0.56 0 0);           /* sumi-toned */
+
+  /* Snappier animation */
+  --svileo-duration: 420ms;
+  --svileo-width: 360px;
+  --svileo-height: 44px;
+}
+
+/* Real slide-in from top — was only -6px, override to 64px */
+[data-svileo-viewport][data-position^='top'] [data-svileo-toast]:not([data-ready='true']) {
+  transform: translateY(-64px) scale(0.94) !important;
+  opacity: 0 !important;
+}
+
+/* Exit slides back up */
+[data-svileo-viewport][data-position^='top']
+  [data-svileo-toast][data-ready='true'][data-exiting='true'] {
+  transform: translateY(-64px) scale(0.94) !important;
+  opacity: 0 !important;
+}
