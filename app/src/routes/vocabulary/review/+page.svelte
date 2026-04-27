@@ -85,7 +85,7 @@
 	async function next(gotIt: boolean) {
 		if (gotIt) playCorrect();
 		updateWordProgress(word, gotIt, struggled);
-		
+
 		flipped = false;
 
 		if (i >= words.length - 1) {
@@ -105,17 +105,21 @@
 				colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
 				scalar: 0.9
 			});
-			setTimeout(() => confetti({
-				particleCount: 60,
-				angle: 120,
-				spread: 65,
-				startVelocity: 55,
-				decay: 0.88,
-				gravity: 1.1,
-				origin: { x: 1, y: 1 },
-				colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
-				scalar: 0.9
-			}), 80);
+			setTimeout(
+				() =>
+					confetti({
+						particleCount: 60,
+						angle: 120,
+						spread: 65,
+						startVelocity: 55,
+						decay: 0.88,
+						gravity: 1.1,
+						origin: { x: 1, y: 1 },
+						colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
+						scalar: 0.9
+					}),
+				80
+			);
 			saveSession();
 			setTimeout(() => goto('/vocabulary'), 1500);
 		} else {
@@ -192,11 +196,12 @@
 		>
 			<!-- Header based on image -->
 			<div style="text-align:center; margin-bottom: 8px;">
-				<h1 style="font-size: 20px; font-weight: 800; color: var(--sumi); margin: 0 0 4px;">
+				<h1 style="font-size: 20px; font-weight: 400; color: var(--sumi); margin: 0 0 4px;">
 					{($locale === 'es' ? word.category_es : word.category) || t('nav.vocabulary', $locale)}
 				</h1>
 				<div style="font-size: 14px; color: var(--fg-tertiary); font-weight: 600;">
-					{String(i + 1).padStart(2, '0')}/{String(words.length).padStart(2, '0')} {t('home.cards', $locale).toLowerCase()}
+					{String(i + 1).padStart(2, '0')}/{String(words.length).padStart(2, '0')}
+					{t('home.cards', $locale).toLowerCase()}
 				</div>
 			</div>
 
@@ -210,25 +215,38 @@
 				tabindex="0"
 				onkeydown={(e) => e.key === ' ' && (flipped = !flipped)}
 			>
-				<div 
-					class="card-body" 
-					class:flipped 
+				<div
+					class="card-body"
+					class:flipped
 					style="--cat-color: var(--cat-{meta?.category?.toLowerCase() || 'general'})"
 				>
 					<!-- Front -->
 					<div class="card-face">
-						<div class="cat-indicator" style="background: var(--cat-color, var(--hinomaru-red));"></div>
+						<div
+							class="cat-indicator"
+							style="background: var(--cat-color, var(--hinomaru-red));"
+						></div>
 						<div class="jp" style="font-size:72px;line-height:1.1;font-weight:700;">{word.jp}</div>
-						<div style="margin-top:32px;font-size:12px;color:var(--fg-tertiary);letter-spacing:0.05em;text-transform:uppercase;font-weight:700;">
+						<div
+							style="margin-top:32px;font-size:12px;color:var(--fg-tertiary);letter-spacing:0.05em;text-transform:uppercase;font-weight:700;"
+						>
 							{t('session.flip', $locale)}
 						</div>
 					</div>
 
 					<!-- Back -->
-					<div class="card-face back" style="align-items: flex-start; text-align: left; padding: 40px 32px; justify-content: flex-start;">
+					<div
+						class="card-face back"
+						style="align-items: flex-start; text-align: left; padding: 40px 32px; justify-content: flex-start;"
+					>
 						<div style="width:100%;">
 							<div style="display:flex; align-items: baseline; gap: 12px; margin-bottom: 4px;">
-								<div class="jp" style="font-size:40px;font-weight:700;color:var(--sumi);line-height:1;">{word.jp}</div>
+								<div
+									class="jp"
+									style="font-size:40px;font-weight:700;color:var(--sumi);line-height:1;"
+								>
+									{word.jp}
+								</div>
 								<button
 									onclick={(e) => {
 										e.stopPropagation();
@@ -239,10 +257,12 @@
 									<Icon icon={VolumeHighIcon} size={20} color="currentColor" strokeWidth={1.5} />
 								</button>
 							</div>
-							
+
 							<div style="display:flex; align-items: center; gap: 8px; margin-bottom: 24px;">
 								{#if word.pos}
-									<div style="font-style: italic; color: var(--fg-tertiary); font-size: 16px; font-family: var(--font-ui);">
+									<div
+										style="font-style: italic; color: var(--fg-tertiary); font-size: 16px; font-family: var(--font-ui);"
+									>
 										{word.pos_es || word.pos}
 									</div>
 								{/if}
@@ -253,11 +273,16 @@
 
 							<div style="margin-bottom: 32px;">
 								{#if word.definitions_en || word.definitions_es}
-									{@const defs = $locale === 'es' ? word.definitions_es || [word.es] : word.definitions_en || [word.en]}
+									{@const defs =
+										$locale === 'es'
+											? word.definitions_es || [word.es]
+											: word.definitions_en || [word.en]}
 									<div style="display:flex; flex-direction: column; gap: 12px;">
 										{#each defs as def, idx}
 											<div style="display:flex; gap:12px; line-height: 1.5; font-size: 16px;">
-												<span style="color: var(--fg-tertiary); font-weight: 700; flex-shrink: 0;">{idx + 1}.</span>
+												<span style="color: var(--fg-tertiary); font-weight: 700; flex-shrink: 0;"
+													>{idx + 1}.</span
+												>
 												<span style="color: var(--sumi);">{def}</span>
 											</div>
 										{/each}
@@ -272,7 +297,10 @@
 							{#if word.example}
 								<div style="border-top: 1px solid var(--ink-100); padding-top: 24px;">
 									<div style="display:flex; gap: 8px; align-items: flex-start; margin-bottom: 8px;">
-										<div class="jp" style="font-size:16px; line-height:1.6; color: var(--fg-secondary); flex: 1;">
+										<div
+											class="jp"
+											style="font-size:16px; line-height:1.6; color: var(--fg-secondary); flex: 1;"
+										>
 											{word.example}
 										</div>
 										<button
@@ -282,7 +310,12 @@
 											}}
 											class="audio-icon-btn small"
 										>
-											<Icon icon={VolumeHighIcon} size={16} color="currentColor" strokeWidth={1.5} />
+											<Icon
+												icon={VolumeHighIcon}
+												size={16}
+												color="currentColor"
+												strokeWidth={1.5}
+											/>
 										</button>
 									</div>
 									<div style="font-size:14px; color: var(--fg-tertiary); line-height:1.5;">
@@ -306,7 +339,9 @@
 			</div>
 
 			{#if !finishing}
-				<div style="position: fixed; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; z-index: 100;">
+				<div
+					style="position: fixed; bottom: 40px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; z-index: 100;"
+				>
 					<!-- Image-style buttons -->
 					<button
 						class="action-round-btn again"
@@ -323,15 +358,13 @@
 						{#if flipped}
 							✓
 						{:else}
-							<div style="font-size: 16px; font-weight: 800;">{t('session.flip', $locale).toUpperCase()}</div>
+							<div style="font-size: 16px; font-weight: 400;">
+								{t('session.flip', $locale).toUpperCase()}
+							</div>
 						{/if}
 					</button>
 
-					<button
-						class="action-round-btn next"
-						onclick={() => next(false)}
-						title="Skip"
-					>
+					<button class="action-round-btn next" onclick={() => next(false)} title="Skip">
 						→
 					</button>
 				</div>

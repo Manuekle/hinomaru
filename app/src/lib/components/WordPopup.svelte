@@ -6,7 +6,13 @@
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 
-	let { word, visible = false, x = 0, y = 0, onclose } = $props<{
+	let {
+		word,
+		visible = false,
+		x = 0,
+		y = 0,
+		onclose
+	} = $props<{
 		word: string;
 		visible: boolean;
 		x: number;
@@ -51,10 +57,10 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div class="popup-overlay" onclick={onclose}></div>
-	
-	<div 
+
+	<div
 		bind:this={popupEl}
-		class="word-popup" 
+		class="word-popup"
 		class:is-down={direction === 'down'}
 		style="left: {clampedX}px; top: {clampedY}px;"
 		transition:scale={{ duration: 200, start: 0.9, opacity: 0 }}
@@ -66,7 +72,13 @@
 					<span class="kana-text">{meta.kana}</span>
 				{/if}
 			</div>
-			<button class="audio-btn" onclick={(e) => { e.stopPropagation(); speakJapanese(word); }}>
+			<button
+				class="audio-btn"
+				onclick={(e) => {
+					e.stopPropagation();
+					speakJapanese(word);
+				}}
+			>
 				<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
 			</button>
 		</div>
@@ -116,12 +128,14 @@
 		border: 1px solid var(--ink-200);
 		border-radius: 16px;
 		padding: 12px 14px;
-		box-shadow: 
+		box-shadow:
 			0 10px 25px -5px rgba(0, 0, 0, 0.1),
 			0 8px 10px -6px rgba(0, 0, 0, 0.1);
 		transform: translate(-50%, -100%);
 		pointer-events: auto;
-		transition: top 0.2s, left 0.2s;
+		transition:
+			top 0.2s,
+			left 0.2s;
 	}
 
 	.word-popup.is-down {
@@ -173,8 +187,12 @@
 		transition: all 0.2s;
 	}
 
-	.audio-btn:hover { background: var(--ink-200); }
-	.audio-btn:active { transform: scale(0.9); }
+	.audio-btn:hover {
+		background: var(--ink-200);
+	}
+	.audio-btn:active {
+		transform: scale(0.9);
+	}
 
 	.tags {
 		display: flex;
@@ -185,7 +203,7 @@
 
 	.tag {
 		font-size: 9px;
-		font-weight: 800;
+		font-weight: 400;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		padding: 2px 6px;

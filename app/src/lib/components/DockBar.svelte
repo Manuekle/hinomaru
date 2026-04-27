@@ -3,8 +3,8 @@
 	import Icon from '$lib/Icon.svelte';
 	import {
 		Home01Icon,
-		LanguageCircleIcon,
-		BookOpen01Icon,
+		ArrangeByLettersAZIcon,
+		LibraryIcon,
 		News01Icon,
 		HeadphonesIcon,
 		BubbleChatIcon
@@ -12,8 +12,8 @@
 
 	const items = [
 		{ href: '/', label: 'Inicio', icon: Home01Icon, exact: true },
-		{ href: '/alphabet', label: 'Alfabeto', icon: LanguageCircleIcon, exact: false },
-		{ href: '/vocabulary', label: 'Vocab', icon: BookOpen01Icon, exact: false },
+		{ href: '/alphabet', label: 'Alfabeto', icon: ArrangeByLettersAZIcon, exact: false },
+		{ href: '/vocabulary', label: 'Vocab', icon: LibraryIcon, exact: false },
 		{ href: '/deck/stories', label: 'Historias', icon: News01Icon, exact: false },
 		{ href: '/deck/songs', label: 'Canciones', icon: HeadphonesIcon, exact: false },
 		{ href: '/conversation', label: 'Hablar', icon: BubbleChatIcon, exact: false }

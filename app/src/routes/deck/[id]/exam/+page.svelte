@@ -9,7 +9,11 @@
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import { Certificate01Icon, CheckmarkCircle01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
+	import {
+		Certificate01Icon,
+		CheckmarkCircle01Icon,
+		Cancel01Icon
+	} from '@hugeicons/core-free-icons';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import type { PageData } from './$types';
 
@@ -38,8 +42,8 @@
 	let correctness = $state<boolean[]>([]);
 
 	// current question interaction
-	let selected = $state<number | null>(null);   // for MC
-	let typedAnswer = $state('');                 // for type-answer
+	let selected = $state<number | null>(null); // for MC
+	let typedAnswer = $state(''); // for type-answer
 	let checked = $state(false);
 
 	// Timer
@@ -60,9 +64,7 @@
 
 	const minutesLeft = $derived(Math.floor(timeLeft / 60));
 	const secondsLeft = $derived(timeLeft % 60);
-	const timerLabel = $derived(
-		`${minutesLeft}:${String(secondsLeft).padStart(2, '0')}`
-	);
+	const timerLabel = $derived(`${minutesLeft}:${String(secondsLeft).padStart(2, '0')}`);
 
 	// ── Question generation ──────────────────────────────────────────────────────
 	function buildOptions(card: any, allCards: any[]): string[] {
@@ -102,9 +104,16 @@
 
 		// Weighted distribution: 4 MC, 4 type, 2 sentence-context
 		const types: QuestionType[] = [
-			'multiple-choice', 'multiple-choice', 'multiple-choice', 'multiple-choice',
-			'type-answer', 'type-answer', 'type-answer', 'type-answer',
-			'sentence-context', 'sentence-context'
+			'multiple-choice',
+			'multiple-choice',
+			'multiple-choice',
+			'multiple-choice',
+			'type-answer',
+			'type-answer',
+			'type-answer',
+			'type-answer',
+			'sentence-context',
+			'sentence-context'
 		];
 		// Shuffle type assignments
 		for (let k = types.length - 1; k > 0; k--) {
@@ -162,9 +171,10 @@
 		const q = currentQuestion;
 		if (!q) return;
 
-		const isRight = (q.type === 'multiple-choice' || q.type === 'sentence-context')
-			? (selected !== null && q.options![selected].toLowerCase() === q.correctAnswer.toLowerCase())
-			: (typedAnswer.trim().toLowerCase() === q.correctAnswer.toLowerCase());
+		const isRight =
+			q.type === 'multiple-choice' || q.type === 'sentence-context'
+				? selected !== null && q.options![selected].toLowerCase() === q.correctAnswer.toLowerCase()
+				: typedAnswer.trim().toLowerCase() === q.correctAnswer.toLowerCase();
 
 		checked = true;
 		correctness = [...correctness, isRight];
@@ -203,7 +213,9 @@
 
 	async function saveSession() {
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (!user) return;
 
 			await supabase.from('sessions').insert({
@@ -263,15 +275,17 @@
 	});
 
 	const isCurrentCorrect = $derived(
-		checked && currentQuestion &&
-		(currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'sentence-context'
-			? selected !== null && currentQuestion.options![selected] === currentQuestion.correctAnswer
-			: typedAnswer.trim().toLowerCase() === currentQuestion.correctAnswer.toLowerCase())
+		checked &&
+			currentQuestion &&
+			(currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'sentence-context'
+				? selected !== null && currentQuestion.options![selected] === currentQuestion.correctAnswer
+				: typedAnswer.trim().toLowerCase() === currentQuestion.correctAnswer.toLowerCase())
 	);
 
 	function typeLabel(type: QuestionType): string {
 		if (type === 'multiple-choice') return $locale === 'es' ? 'Opción múltiple' : 'Multiple choice';
-		if (type === 'type-answer') return $locale === 'es' ? 'Escribe la respuesta' : 'Type the answer';
+		if (type === 'type-answer')
+			return $locale === 'es' ? 'Escribe la respuesta' : 'Type the answer';
 		return $locale === 'es' ? 'Contexto' : 'Context';
 	}
 </script>
@@ -284,7 +298,6 @@
 
 <div class="session-layout">
 	<div class="session-container">
-
 		{#if phase === 'intro'}
 			<!-- ── Intro Screen ── -->
 			<div use:fadeUp={{ delay: 0, y: 16 }} class="intro-screen">
@@ -300,11 +313,15 @@
 				<div class="rules-box">
 					<div class="rule-item">
 						<span class="rule-num">10</span>
-						<span class="rule-text">{$locale === 'es' ? 'preguntas mixtas' : 'mixed questions'}</span>
+						<span class="rule-text"
+							>{$locale === 'es' ? 'preguntas mixtas' : 'mixed questions'}</span
+						>
 					</div>
 					<div class="rule-item">
 						<span class="rule-num">5:00</span>
-						<span class="rule-text">{$locale === 'es' ? 'minutos para completar' : 'minutes to finish'}</span>
+						<span class="rule-text"
+							>{$locale === 'es' ? 'minutos para completar' : 'minutes to finish'}</span
+						>
 					</div>
 					<div class="rule-item">
 						<span class="rule-num">1×</span>
@@ -322,7 +339,11 @@
 			</div>
 
 			<StickyFooter>
-				<button class="hm-btn hm-btn-ghost hm-btn-lg" style="flex:1;" onclick={() => goto(`/deck/${deck?.id}`)}>
+				<button
+					class="hm-btn hm-btn-ghost hm-btn-lg"
+					style="flex:1;"
+					onclick={() => goto(`/deck/${deck?.id}`)}
+				>
 					← {t('deck.back', $locale)}
 				</button>
 				<button
@@ -334,21 +355,17 @@
 					{$locale === 'es' ? 'Comenzar examen' : 'Start exam'}
 				</button>
 			</StickyFooter>
-
 		{:else if phase === 'exam' && currentQuestion}
 			<!-- ── Timer Bar ── -->
 			<div class="timer-bar-wrap">
-				<div
-					class="timer-bar-fill"
-					class:critical={timerCritical}
-					style="width: {timerPct}%"
-				></div>
+				<div class="timer-bar-fill" class:critical={timerCritical} style="width: {timerPct}%"></div>
 			</div>
 
 			<!-- ── Exam Header ── -->
 			<div class="exam-header" use:fadeUp={{ delay: 0, y: 8 }}>
 				<span class="q-progress">
-					{$locale === 'es' ? 'Pregunta' : 'Question'} {currentIdx + 1} / {questions.length}
+					{$locale === 'es' ? 'Pregunta' : 'Question'}
+					{currentIdx + 1} / {questions.length}
 				</span>
 				<span class="timer-label" class:critical={timerCritical}>{timerLabel}</span>
 			</div>
@@ -384,9 +401,13 @@
 								class="option-item"
 								class:is-selected={selected === idx}
 								class:is-correct={checked && opt === currentQuestion.correctAnswer}
-								class:is-wrong={checked && selected === idx && opt !== currentQuestion.correctAnswer}
+								class:is-wrong={checked &&
+									selected === idx &&
+									opt !== currentQuestion.correctAnswer}
 								disabled={checked}
-								onclick={() => { if (!checked) selected = idx; }}
+								onclick={() => {
+									if (!checked) selected = idx;
+								}}
 							>
 								<span class="opt-marker">{String.fromCharCode(65 + idx)}</span>
 								<span class="opt-text">{opt}</span>
@@ -394,7 +415,7 @@
 						{/each}
 					</div>
 
-				<!-- Type Answer -->
+					<!-- Type Answer -->
 				{:else if currentQuestion.type === 'type-answer'}
 					<div class="type-input-wrap">
 						<input
@@ -402,7 +423,9 @@
 							class:correct={checked && isCurrentCorrect}
 							class:wrong={checked && !isCurrentCorrect}
 							type="text"
-							placeholder={$locale === 'es' ? 'Escribe la traducción...' : 'Type the translation...'}
+							placeholder={$locale === 'es'
+								? 'Escribe la traducción...'
+								: 'Type the translation...'}
 							bind:value={typedAnswer}
 							disabled={checked}
 							autocomplete="off"
@@ -410,7 +433,8 @@
 						/>
 						{#if checked && !isCurrentCorrect}
 							<p class="correct-reveal">
-								{$locale === 'es' ? 'Respuesta correcta:' : 'Correct answer:'} <strong>{currentQuestion.correctAnswer}</strong>
+								{$locale === 'es' ? 'Respuesta correcta:' : 'Correct answer:'}
+								<strong>{currentQuestion.correctAnswer}</strong>
 							</p>
 						{/if}
 					</div>
@@ -418,7 +442,11 @@
 
 				<!-- Feedback Banner -->
 				{#if checked}
-					<div class="feedback-banner" class:correct={isCurrentCorrect} class:wrong={!isCurrentCorrect}>
+					<div
+						class="feedback-banner"
+						class:correct={isCurrentCorrect}
+						class:wrong={!isCurrentCorrect}
+					>
 						{#if isCurrentCorrect}
 							<Icon icon={CheckmarkCircle01Icon} size={18} color="currentColor" strokeWidth={2} />
 							{$locale === 'es' ? '¡Correcto!' : 'Correct!'}
@@ -435,26 +463,24 @@
 					<button
 						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
 						onclick={checkCurrentAnswer}
-						disabled={
-							currentQuestion.type === 'type-answer'
-								? !typedAnswer.trim()
-								: selected === null
-						}
+						disabled={currentQuestion.type === 'type-answer'
+							? !typedAnswer.trim()
+							: selected === null}
 					>
 						{t('session.check', $locale)}
 					</button>
 				{:else}
-					<button
-						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
-						onclick={advanceQuestion}
-					>
+					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
 						{currentIdx + 1 < questions.length
-							? ($locale === 'es' ? 'Siguiente →' : 'Next →')
-							: ($locale === 'es' ? 'Ver resultados' : 'See results')}
+							? $locale === 'es'
+								? 'Siguiente →'
+								: 'Next →'
+							: $locale === 'es'
+								? 'Ver resultados'
+								: 'See results'}
 					</button>
 				{/if}
 			</StickyFooter>
-
 		{:else if phase === 'result'}
 			<!-- ── Result Screen ── -->
 			<div use:fadeUp={{ delay: 0, y: 20 }} class="result-screen">
@@ -464,8 +490,12 @@
 
 				<h2 class="result-headline">
 					{pct >= 70
-						? ($locale === 'es' ? '¡Buen trabajo!' : 'Great job!')
-						: ($locale === 'es' ? 'Sigue practicando' : 'Keep practicing')}
+						? $locale === 'es'
+							? '¡Buen trabajo!'
+							: 'Great job!'
+						: $locale === 'es'
+							? 'Sigue practicando'
+							: 'Keep practicing'}
 				</h2>
 
 				<div class="score-row">
@@ -486,8 +516,10 @@
 					<h3 class="breakdown-title">
 						{$locale === 'es' ? 'Por tipo de pregunta' : 'By question type'}
 					</h3>
-					{#each (['multiple-choice', 'type-answer', 'sentence-context'] as QuestionType[]) as qtype (qtype)}
-						{@const typeQs = questions.map((q, i) => ({ q, correct: correctness[i] })).filter(({ q }) => q.type === qtype)}
+					{#each ['multiple-choice', 'type-answer', 'sentence-context'] as QuestionType[] as qtype (qtype)}
+						{@const typeQs = questions
+							.map((q, i) => ({ q, correct: correctness[i] }))
+							.filter(({ q }) => q.type === qtype)}
 						{#if typeQs.length > 0}
 							{@const typeScore = typeQs.filter((x) => x.correct).length}
 							<div class="breakdown-row">
@@ -522,16 +554,11 @@
 				>
 					← {t('deck.back', $locale)}
 				</button>
-				<button
-					class="hm-btn hm-btn-dark hm-btn-lg"
-					style="flex:1;"
-					onclick={startExam}
-				>
+				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={startExam}>
 					{$locale === 'es' ? 'Repetir' : 'Retry'}
 				</button>
 			</StickyFooter>
 		{/if}
-
 	</div>
 </div>
 
@@ -563,7 +590,9 @@
 	.timer-bar-fill {
 		height: 100%;
 		background: var(--sumi);
-		transition: width 1s linear, background 0.5s;
+		transition:
+			width 1s linear,
+			background 0.5s;
 	}
 	.timer-bar-fill.critical {
 		background: var(--hinomaru-red);
@@ -728,7 +757,9 @@
 			box-shadow: var(--shadow-sm);
 		}
 	}
-	.option-item:disabled { cursor: default; }
+	.option-item:disabled {
+		cursor: default;
+	}
 	.option-item.is-selected {
 		border-color: var(--sumi);
 		background: var(--ink-50);
@@ -754,8 +785,14 @@
 		color: var(--fg-secondary);
 		flex-shrink: 0;
 	}
-	.is-correct .opt-marker { background: var(--success); color: white; }
-	.is-wrong .opt-marker { background: var(--hinomaru-red); color: white; }
+	.is-correct .opt-marker {
+		background: var(--success);
+		color: white;
+	}
+	.is-wrong .opt-marker {
+		background: var(--hinomaru-red);
+		color: white;
+	}
 	.opt-text {
 		font-size: 16px;
 		font-weight: 600;
@@ -777,7 +814,9 @@
 		padding: 0 18px;
 		font-size: 18px;
 		font-family: inherit;
-		transition: border-color 0.2s, box-shadow 0.2s;
+		transition:
+			border-color 0.2s,
+			box-shadow 0.2s;
 		box-sizing: border-box;
 	}
 	.type-input:focus {
@@ -833,8 +872,12 @@
 		margin: 0 auto 24px;
 		background: var(--sumi);
 	}
-	.result-icon.pass { background: var(--success); }
-	.result-icon.fail { background: var(--hinomaru-red); }
+	.result-icon.pass {
+		background: var(--success);
+	}
+	.result-icon.fail {
+		background: var(--hinomaru-red);
+	}
 
 	.result-headline {
 		font-size: 28px;
@@ -851,12 +894,16 @@
 	}
 	.score-pct {
 		font-size: 52px;
-		font-weight: 800;
+		font-weight: 400;
 		letter-spacing: -0.04em;
 		color: var(--sumi);
 	}
-	.score-pct.pass { color: var(--success); }
-	.score-pct.fail { color: var(--hinomaru-red); }
+	.score-pct.pass {
+		color: var(--success);
+	}
+	.score-pct.fail {
+		color: var(--hinomaru-red);
+	}
 	.score-fraction {
 		font-size: 18px;
 		color: var(--fg-secondary);
@@ -920,16 +967,26 @@
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-100);
 	}
-	.q-row.q-correct { border-color: var(--success); background: var(--success-wash); }
-	.q-row.q-wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
+	.q-row.q-correct {
+		border-color: var(--success);
+		background: var(--success-wash);
+	}
+	.q-row.q-wrong {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+	}
 	.q-dot {
 		font-size: 14px;
 		font-weight: 700;
 		width: 20px;
 		flex-shrink: 0;
 	}
-	.q-correct .q-dot { color: var(--success); }
-	.q-wrong .q-dot { color: var(--hinomaru-red); }
+	.q-correct .q-dot {
+		color: var(--success);
+	}
+	.q-wrong .q-dot {
+		color: var(--hinomaru-red);
+	}
 	.q-jp {
 		font-size: 18px;
 		font-weight: 700;
@@ -942,11 +999,19 @@
 		flex: 1;
 	}
 
-	.jp { font-family: var(--font-jp); }
+	.jp {
+		font-family: var(--font-jp);
+	}
 
 	@media (max-width: 480px) {
-		.rules-box { gap: 16px; }
-		.question-jp { font-size: 36px; }
-		.score-pct { font-size: 40px; }
+		.rules-box {
+			gap: 16px;
+		}
+		.question-jp {
+			font-size: 36px;
+		}
+		.score-pct {
+			font-size: 40px;
+		}
 	}
 </style>

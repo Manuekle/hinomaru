@@ -2,18 +2,19 @@
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
+	import { fly } from 'svelte/transition';
+	import { cubicOut, cubicIn } from 'svelte/easing';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		Cancel01Icon, 
-		VolumeHighIcon, 
-		Search01Icon, 
-		ZapIcon, 
-		Bookmark02Icon, 
+	import {
+		Cancel01Icon,
+		VolumeHighIcon,
+		Search01Icon,
+		ZapIcon,
 		ArrowLeft02Icon,
-		CheckmarkCircle02Icon
+		TranslateIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
@@ -45,10 +46,21 @@
 	}
 
 	function getSRSStage(reps: number) {
-		if (reps === 0) return { key: 'new', color: 'var(--success)', label: 'Nuevo' };
-		if (reps < 4) return { key: 'apprentice', color: 'var(--warning)', label: 'Aprendiz' };
-		if (reps < 7) return { key: 'learned', color: 'var(--hinomaru-red)', label: 'Aprendido' };
-		return { key: 'master', color: '#b59410', label: 'Maestro' };
+		if (reps === 0)
+			return { key: 'new', color: 'var(--success)', label: $locale === 'es' ? 'Nuevo' : 'New' };
+		if (reps < 4)
+			return {
+				key: 'apprentice',
+				color: 'var(--warning)',
+				label: $locale === 'es' ? 'Aprendiz' : 'Apprentice'
+			};
+		if (reps < 7)
+			return {
+				key: 'learned',
+				color: 'var(--hinomaru-red)',
+				label: $locale === 'es' ? 'Aprendido' : 'Learned'
+			};
+		return { key: 'master', color: '#b59410', label: $locale === 'es' ? 'Maestro' : 'Master' };
 	}
 
 	function formatReviewDate(dateString: string) {
@@ -64,9 +76,10 @@
 	}
 
 	let searchQuery = $state('');
+	let activeCategory = $state('All');
 
 	const enrichedWords = $derived(
-		(data.savedWords as SavedWord[]).map(w => {
+		(data.savedWords as SavedWord[]).map((w) => {
 			const meta = getWordMetadata(w.jp);
 			return {
 				...w,
@@ -78,47 +91,54 @@
 		})
 	);
 
+	const availableCategories = $derived.by(() => {
+		const cats = new Set<string>();
+		enrichedWords.forEach((w) => cats.add(w.category || 'General'));
+		const sorted = Array.from(cats).sort();
+		return ['All', ...sorted];
+	});
+
+	// Reset category if searching
+	$effect(() => {
+		if (searchQuery.length > 0 && activeCategory !== 'All') {
+			activeCategory = 'All';
+		}
+	});
+
 	const filteredWords = $derived(
 		enrichedWords.filter((w) => {
 			const q = searchQuery.toLowerCase();
-			return (
+			const matchesSearch =
+				q === '' ||
 				w.jp.includes(searchQuery) ||
 				w.kana.includes(searchQuery) ||
 				w.en.toLowerCase().includes(q) ||
 				w.es.toLowerCase().includes(q) ||
-				(w.romaji || kanaToRomaji(w.kana)).toLowerCase().includes(q) ||
-				(w.category || '').toLowerCase().includes(q) ||
-				(w.category_es || '').toLowerCase().includes(q)
-			);
+				(w.romaji || kanaToRomaji(w.kana)).toLowerCase().includes(q);
+
+			const matchesCategory = activeCategory === 'All' || w.category === activeCategory;
+
+			return matchesSearch && matchesCategory;
 		})
 	);
 
-	const wordsByCategory = $derived.by(() => {
-		const groups: Record<string, { label: string; words: SavedWord[] }> = {};
-		filteredWords.forEach((word) => {
-			const cat = word.category || 'General';
-			const label = $locale === 'es' ? word.category_es || cat : cat;
-			if (!groups[cat]) groups[cat] = { label, words: [] };
-			groups[cat].words.push(word);
-		});
-		return Object.entries(groups).sort(([a], [b]) => {
-			if (a === 'General') return 1;
-			if (b === 'General') return -1;
-			return a.localeCompare(b);
-		});
-	});
-
 	function getCategoryColor(cat: string) {
 		const c = cat.toLowerCase();
-		if (c.includes('food') || c.includes('comida')) return '#e67e22';
-		if (c.includes('animal')) return '#27ae60';
-		if (c.includes('natur')) return '#16a085';
-		if (c.includes('famil')) return '#8e44ad';
-		if (c.includes('verb')) return '#2980b9';
-		if (c.includes('adj')) return '#f39c12';
-		if (c.includes('plac') || c.includes('lugar')) return '#c0392b';
-		if (c.includes('color')) return '#e91e63';
-		return 'var(--fg-tertiary)';
+		if (c.includes('food') || c.includes('comida')) return 'var(--cat-food, #ff6b6b)';
+		if (c.includes('animal')) return 'var(--cat-animals, #4ecdc4)';
+		if (c.includes('natur')) return 'var(--cat-nature, #45b7d1)';
+		if (c.includes('famil')) return 'var(--cat-family, #96ceb4)';
+		if (c.includes('verb')) return 'var(--cat-verbs, #ffeead)';
+		if (c.includes('adj')) return 'var(--cat-adjectives, #d4a5a5)';
+		if (c.includes('plac') || c.includes('lugar')) return 'var(--cat-places, #9de1fe)';
+		if (c.includes('color')) return 'var(--cat-colors, #fa8072)';
+		return 'var(--cat-general, var(--ink-400))';
+	}
+
+	function getCategoryLabel(cat: string) {
+		if (cat === 'All') return t('vocab.all', $locale);
+		const sample = enrichedWords.find((w) => w.category === cat);
+		return $locale === 'es' ? sample?.category_es || cat : cat;
 	}
 </script>
 
@@ -126,117 +146,165 @@
 	<title>{t('nav.vocabulary', $locale) || 'Mi Vocabulario'} — Hinomaru</title>
 </svelte:head>
 
-<div class="vocab-page">
+<div class="vocab-layout">
 	<div class="container">
-		<!-- Minimalist Top Nav -->
+		<!-- Top Nav -->
 		<div use:fadeUp={{ delay: 0, y: 10 }} class="top-nav">
-			<a href="/" class="back-link">
-				<Icon icon={ArrowLeft02Icon} size={18} />
-				<span>{t('deck.back', $locale)}</span>
+			<a href="/" class="back-link-beautiful">
+				← {t('deck.back', $locale)}
 			</a>
-			{#if data.dueCount > 0}
-				<a href="/vocabulary/review" class="review-pill">
-					<Icon icon={ZapIcon} size={14} variant="solid" />
-					<span>{t('nav.review', $locale)} ({data.dueCount})</span>
-				</a>
-			{/if}
+			<div class="top-actions">
+				<button
+					class="romaji-toggle"
+					class:active={$showRomaji}
+					onclick={() => showRomaji.toggle()}
+					title="Romaji"
+				>
+					<Icon icon={TranslateIcon} size={16} strokeWidth={2} />
+				</button>
+				{#if data.dueCount > 0}
+					<a href="/vocabulary/review" class="review-pill">
+						<Icon icon={ZapIcon} size={14} variant="solid" />
+						<span>{t('nav.review', $locale)} ({data.dueCount})</span>
+					</a>
+				{/if}
+			</div>
 		</div>
 
-		<header class="header">
-			<h1 use:fadeUp={{ delay: 0.05, y: 15 }}>{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}</h1>
-			<p use:fadeUp={{ delay: 0.1, y: 10 }}>
+		<!-- Header -->
+		<div class="header" use:fadeUp={{ delay: 0.05, y: 15 }}>
+			<h1 class="page-title">
+				{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}
+			</h1>
+			<p class="page-subtitle">
 				{t('home.cards', $locale, { n: data.savedWords.length })} guardadas para estudiar.
 			</p>
+		</div>
 
-			<div class="search-bar" use:fadeUp={{ delay: 0.15, y: 8 }}>
-				<Icon icon={Search01Icon} size={20} class="search-icon" />
-				<input 
-					type="text" 
-					placeholder={t('vocab.search', $locale)} 
-					bind:value={searchQuery} 
-				/>
+		<!-- Search Bar -->
+		<div class="search-container" use:fadeUp={{ delay: 0.1, y: 12 }}>
+			<Icon icon={Search01Icon} size={20} class="search-icon" strokeWidth={2} />
+			<input
+				type="text"
+				class="hm-input search-input"
+				placeholder={t('vocab.search', $locale)}
+				bind:value={searchQuery}
+			/>
+		</div>
+
+		<!-- Categories (Horizontal Scroll) -->
+		{#if !searchQuery && availableCategories.length > 2}
+			<div class="categories-scroll hide-scrollbar" use:fadeIn={{ delay: 0.15 }}>
+				{#each availableCategories as cat}
+					<button
+						class="cat-tab touch-action-manip"
+						class:active={activeCategory === cat}
+						onclick={() => (activeCategory = cat)}
+					>
+						{getCategoryLabel(cat)}
+					</button>
+				{/each}
 			</div>
-		</header>
+		{/if}
 
+		<!-- Grid -->
 		<main class="content">
 			{#if filteredWords.length === 0}
-				<div class="empty" use:fadeIn>
+				<div class="empty-state" use:fadeIn>
 					<div class="empty-icon">📭</div>
-					<h3>{searchQuery ? 'Sin resultados' : t('vocab.empty', $locale)}</h3>
-					<p>{searchQuery ? 'Prueba con otra búsqueda.' : 'Tus palabras guardadas aparecerán aquí.'}</p>
+					<h3 class="empty-title">
+						{searchQuery ? t('vocab.noResults.title', $locale) : t('vocab.empty', $locale)}
+					</h3>
+					<p class="empty-desc">
+						{searchQuery ? t('vocab.noResults.desc', $locale) : t('vocab.emptyDesc', $locale)}
+					</p>
 				</div>
 			{:else}
-				{#each wordsByCategory as [catKey, group] (catKey)}
-					<section class="cat-section" use:fadeUp={{ delay: 0.1 }}>
-						<div class="cat-header">
-							<div class="cat-indicator" style="background: {getCategoryColor(catKey)}"></div>
-							<h2 class="cat-title">{group.label}</h2>
-							<span class="cat-count">{group.words.length}</span>
-						</div>
-
-						<div class="cards-grid" use:staggerChildren={{ delay: 0.2, stagger: 0.05, y: 10 }}>
-							{#each group.words as word (word.id)}
-								{@const stage = getSRSStage(word.repetitions)}
-								{@const review = formatReviewDate(word.next_review)}
-								<div class="word-card">
-									<div class="card-top">
-										<div class="word-info">
-											<div class="jp-group">
-												<span class="jp-text jp">{word.jp}</span>
-												<span class="kana-text jp">{word.kana}</span>
-											</div>
-											{#if $showRomaji}
-												<span class="romaji-text">{word.romaji || kanaToRomaji(word.kana)}</span>
-											{/if}
-										</div>
-										<div class="card-actions">
-											<button class="icon-btn audio" onclick={() => speakJapanese(word.jp)}>
-												<Icon icon={VolumeHighIcon} size={18} />
-											</button>
-											<button class="icon-btn del" onclick={() => removeWord(word.id)}>
-												<Icon icon={Cancel01Icon} size={16} />
-											</button>
-										</div>
+				<div class="cards-grid">
+					{#each filteredWords as word (word.id)}
+						{@const stage = getSRSStage(word.repetitions)}
+						{@const review = formatReviewDate(word.next_review)}
+						<div class="word-card" in:fly={{ y: 20, duration: 300, easing: cubicOut }}>
+							<div class="card-top">
+								<div class="word-info">
+									<div class="jp-group">
+										<span class="jp-text jp">{word.jp}</span>
+										<span class="kana-text jp">{word.kana}</span>
 									</div>
-
-									<div class="card-body">
-										<p class="meaning">{$locale === 'es' ? word.es : word.en}</p>
-										{#if word.pos}
-											<span class="pos-tag">{word.pos_es || word.pos}</span>
-										{/if}
-									</div>
-
-									<div class="card-footer">
-										<div class="srs-status">
-											<div class="status-dot" style="background: {stage.color}"></div>
-											<span class="status-label">{stage.label}</span>
-										</div>
-										{#if review}
-											<span class="review-info" class:urgent={review.urgent}>
-												{review.text}
-											</span>
-										{/if}
-									</div>
+									{#if $showRomaji}
+										<span class="romaji-text">{word.romaji || kanaToRomaji(word.kana)}</span>
+									{/if}
 								</div>
-							{/each}
+
+								<div class="card-actions">
+									<button
+										class="action-btn"
+										onclick={() => speakJapanese(word.jp)}
+										title={t('vocab.listen', $locale)}
+									>
+										<Icon icon={VolumeHighIcon} size={16} />
+									</button>
+									<button
+										class="action-btn del-btn"
+										onclick={() => removeWord(word.id)}
+										title={t('vocab.delete', $locale)}
+									>
+										<Icon icon={Cancel01Icon} size={16} />
+									</button>
+								</div>
+							</div>
+
+							<div class="card-body">
+								<p class="meaning">{$locale === 'es' ? word.es : word.en}</p>
+								<div class="tags-row">
+									{#if word.pos}
+										<span class="tag pos-tag"
+											>{$locale === 'es' ? word.pos_es || word.pos : word.pos}</span
+										>
+									{/if}
+									{#if word.category}
+										<span
+											class="tag cat-tag"
+											style="--cat-color: {getCategoryColor(word.category)}"
+										>
+											{$locale === 'es' ? word.category_es || word.category : word.category}
+										</span>
+									{/if}
+								</div>
+							</div>
+
+							<div class="card-footer">
+								<div class="srs-status">
+									<div class="status-dot" style="background: {stage.color}"></div>
+									<span class="status-label">{stage.label}</span>
+								</div>
+								{#if review}
+									<span class="review-info" class:urgent={review.urgent}>
+										{#if review.urgent}
+											<Icon icon={ZapIcon} size={12} variant="solid" />
+										{/if}
+										{review.text}
+									</span>
+								{/if}
+							</div>
 						</div>
-					</section>
-				{/each}
+					{/each}
+				</div>
 			{/if}
 		</main>
 	</div>
 </div>
 
 <style>
-	.vocab-page {
-		min-height: 100dvh;
-		background: var(--paper);
+	.vocab-layout {
+		min-height: 100vh;
+		background: var(--bg-page, var(--paper));
 	}
 
 	.container {
-		max-width: 800px;
+		max-width: 720px;
 		margin: 0 auto;
-		padding: calc(24px + env(safe-area-inset-top)) 24px 140px;
+		padding: calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
 	}
 
 	.top-nav {
@@ -246,155 +314,207 @@
 		margin-bottom: 32px;
 	}
 
-	.back-link {
+	.top-actions {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 12px;
+	}
+
+	.romaji-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
+		color: var(--fg-secondary);
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	@media (hover: hover) {
+		.romaji-toggle:hover {
+			background: var(--ink-50);
+			color: var(--sumi);
+		}
+	}
+
+	.romaji-toggle:active {
+		transform: scale(0.9);
+	}
+
+	.romaji-toggle.active {
+		background: var(--hinomaru-red);
+		color: white;
+		border-color: var(--hinomaru-red);
+	}
+
+	.back-link-beautiful {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
 		color: var(--fg-secondary);
 		text-decoration: none;
-		font-size: 14px;
-		font-weight: 600;
-		transition: color 0.2s;
+		transition: color 150ms ease;
 	}
-	.back-link:hover { color: var(--sumi); }
+
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
+	}
 
 	.review-pill {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		padding: 8px 16px;
+		gap: 6px;
+		padding: 6px 14px;
 		background: var(--hinomaru-red);
 		color: white;
-		border-radius: 999px;
-		font-size: 13px;
+		border-radius: 99px;
+		font-size: 12px;
 		font-weight: 700;
 		text-decoration: none;
-		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
-		transition: all 0.2s;
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.25);
+		transition:
+			transform 200ms ease,
+			box-shadow 200ms ease;
 	}
-	.review-pill:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(188, 0, 45, 0.3);
+	@media (hover: hover) {
+		.review-pill:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(188, 0, 45, 0.35);
+		}
+	}
+	.review-pill:active {
+		transform: scale(0.96);
 	}
 
 	.header {
-		margin-bottom: 48px;
-	}
-
-	.header h1 {
-		font-size: 42px;
-		font-weight: 800;
-		letter-spacing: -0.04em;
-		margin: 0 0 8px;
-		color: var(--sumi);
-	}
-
-	.header p {
-		font-size: 16px;
-		color: var(--fg-secondary);
-		margin: 0 0 32px;
-	}
-
-	.search-bar {
-		position: relative;
-		display: flex;
-		align-items: center;
-	}
-
-	:global(.search-icon) {
-		position: absolute;
-		left: 18px;
-		color: var(--fg-tertiary);
-		pointer-events: none;
-	}
-
-	.search-bar input {
-		width: 100%;
-		height: 56px;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 0 20px 0 54px;
-		font-size: 17px;
-		color: var(--sumi);
-		box-shadow: var(--shadow-sm);
-		transition: all 0.3s;
-	}
-
-	.search-bar input:focus {
-		border-color: var(--hinomaru-red);
-		box-shadow: 0 0 0 4px var(--hinomaru-red-wash), var(--shadow-md);
-		transform: translateY(-1px);
-	}
-
-	/* Content */
-	.cat-section {
-		margin-bottom: 56px;
-	}
-
-	.cat-header {
-		display: flex;
-		align-items: center;
-		gap: 12px;
 		margin-bottom: 24px;
-		padding-left: 4px;
 	}
 
-	.cat-indicator {
-		width: 4px;
-		height: 20px;
-		border-radius: 2px;
-	}
-
-	.cat-title {
-		font-size: 16px;
+	.page-title {
+		font-size: 36px;
 		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.03em;
+		margin: 0 0 4px;
+		color: var(--sumi);
+		line-height: 1.1;
+	}
+
+	.page-subtitle {
+		font-size: 16px;
 		color: var(--fg-secondary);
 		margin: 0;
 	}
 
-	.cat-count {
-		font-size: 12px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		background: var(--ink-100);
-		padding: 2px 8px;
-		border-radius: 6px;
+	.search-container {
+		position: relative;
+		margin-bottom: 32px;
 	}
 
+	:global(.search-icon) {
+		position: absolute;
+		left: 16px;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--fg-tertiary);
+		pointer-events: none;
+	}
+
+	.search-input {
+		padding-left: 48px;
+		border-radius: 24px;
+		height: 52px;
+		font-size: 16px;
+		box-shadow: var(--shadow-sm);
+		background: var(--bg-surface);
+	}
+
+	.search-input:focus {
+		box-shadow:
+			0 4px 16px rgba(0, 0, 0, 0.06),
+			0 0 0 3px var(--hinomaru-red-wash);
+	}
+
+	/* Categories Tabs */
+	.categories-scroll {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 24px;
+		overflow-x: auto;
+		padding-bottom: 8px; /* space for scrollbar/shadows */
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.cat-tab {
+		height: 38px;
+		padding: 0 16px;
+		border-radius: 99px;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
+		color: var(--sumi);
+		font-weight: 600;
+		font-size: 13px;
+		cursor: pointer;
+		font-family: var(--font-ui);
+		white-space: nowrap;
+		flex-shrink: 0;
+		transition:
+			background 180ms ease,
+			color 180ms ease,
+			border-color 180ms ease;
+	}
+
+	.cat-tab.active {
+		border-color: var(--sumi);
+		background: var(--sumi);
+		color: var(--bg-surface);
+	}
+
+	/* Cards Grid */
 	.cards-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-		gap: 16px;
+		grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+		gap: 12px;
 	}
 
-	/* Word Card */
 	.word-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 24px;
-		padding: 20px;
+		border-radius: 20px;
+		padding: 16px;
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
 		box-shadow: var(--shadow-sm);
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		transition:
+			box-shadow 200ms ease,
+			transform 200ms ease;
 		position: relative;
-		overflow: hidden;
 	}
 
-	.word-card:hover {
-		transform: translateY(-4px) scale(1.01);
-		box-shadow: var(--shadow-lg), 0 12px 24px rgba(0,0,0,0.04);
-		border-color: var(--ink-300);
+	@media (hover: hover) {
+		.word-card:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-md);
+		}
 	}
 
 	.card-top {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
+		margin-bottom: 12px;
+	}
+
+	.word-info {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
 	}
 
 	.jp-group {
@@ -404,85 +524,101 @@
 	}
 
 	.jp-text {
-		font-size: 32px;
+		font-size: 24px;
 		font-weight: 700;
 		color: var(--sumi);
-		line-height: 1;
+		line-height: 1.1;
+		letter-spacing: -0.01em;
 	}
 
 	.kana-text {
-		font-size: 14px;
-		color: var(--fg-secondary);
+		font-size: 12px;
+		color: var(--fg-tertiary);
 		font-weight: 500;
 	}
 
 	.romaji-text {
 		font-size: 12px;
-		font-weight: 700;
+		font-weight: 600;
 		color: var(--hinomaru-red);
 		margin-top: 4px;
-		display: block;
 	}
 
 	.card-actions {
 		display: flex;
-		gap: 8px;
-		opacity: 0.2;
-		transition: opacity 0.2s;
+		gap: 6px;
 	}
 
-	.word-card:hover .card-actions {
-		opacity: 1;
-	}
-
-	.icon-btn {
-		width: 36px;
-		height: 36px;
-		border-radius: 12px;
+	.action-btn {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
 		border: none;
-		background: var(--ink-100);
+		background: var(--ink-50);
 		color: var(--fg-secondary);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 200ms ease;
 	}
 
-	.icon-btn:hover {
-		background: var(--sumi);
-		color: white;
+	@media (hover: hover) {
+		.action-btn:hover {
+			background: var(--ink-100);
+			color: var(--sumi);
+		}
+		.action-btn.del-btn:hover {
+			background: var(--error-wash);
+			color: var(--error);
+		}
 	}
 
-	.icon-btn.del:hover {
-		background: var(--error);
+	.action-btn:active {
+		transform: scale(0.9);
 	}
 
 	.card-body {
 		flex: 1;
+		margin-bottom: 20px;
 	}
 
 	.meaning {
-		font-size: 18px;
+		font-size: 15px;
 		font-weight: 600;
 		color: var(--fg-primary);
-		margin: 0 0 8px;
-		line-height: 1.3;
+		line-height: 1.4;
+		margin: 0 0 10px;
+	}
+
+	.tags-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.tag {
+		font-size: 10px;
+		font-weight: 700;
+		padding: 2px 6px;
+		border-radius: 6px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.pos-tag {
-		font-size: 11px;
-		font-weight: 700;
-		font-style: italic;
+		background: var(--ink-100);
 		color: var(--fg-tertiary);
-		background: var(--ink-50);
-		padding: 2px 8px;
-		border-radius: 6px;
+	}
+
+	.cat-tag {
+		background: color-mix(in srgb, var(--cat-color) 12%, transparent);
+		color: var(--cat-color);
 	}
 
 	.card-footer {
 		padding-top: 16px;
-		border-top: 1px dashed var(--ink-100);
+		border-top: 1px solid var(--ink-100);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -502,15 +638,18 @@
 
 	.status-label {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--fg-tertiary);
 	}
 
 	.review-info {
-		font-size: 11px;
-		font-weight: 700;
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 12px;
+		font-weight: 600;
 		color: var(--fg-tertiary);
 	}
 
@@ -521,25 +660,37 @@
 		border-radius: 6px;
 	}
 
-	.empty {
+	.empty-state {
 		text-align: center;
-		padding: 80px 24px;
+		padding: 60px 24px;
 		color: var(--fg-tertiary);
+		background: var(--bg-surface);
+		border: 1px dashed var(--ink-200);
+		border-radius: 24px;
 	}
 
 	.empty-icon {
-		font-size: 64px;
+		font-size: 48px;
 		margin-bottom: 16px;
+	}
+
+	.empty-title {
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--sumi);
+		margin-bottom: 8px;
+	}
+
+	.empty-desc {
+		font-size: 14px;
+		margin: 0;
 	}
 
 	@media (max-width: 600px) {
 		.cards-grid {
 			grid-template-columns: 1fr;
 		}
-		.card-actions {
-			opacity: 1;
-		}
-		.header h1 {
+		.page-title {
 			font-size: 32px;
 		}
 	}

@@ -152,18 +152,32 @@
 	<!-- Experience Section (Refined) -->
 	<section class="info-section" style="padding:100px 24px; max-width:1100px; margin:0 auto;">
 		<div style="text-align:center; margin-bottom:80px;">
-			<div class="label-meta" style="color:var(--hinomaru-red); margin-bottom:16px; letter-spacing:0.1em;">ESTUDIO INTELIGENTE</div>
-			<h2 use:fadeUp style="font-size:clamp(32px, 5vw, 48px); font-weight:800; letter-spacing:-0.04em;">{t('landing.features.title', $locale)}</h2>
+			<div
+				class="label-meta"
+				style="color:var(--hinomaru-red); margin-bottom:16px; letter-spacing:0.1em;"
+			>
+				ESTUDIO INTELIGENTE
+			</div>
+			<h2
+				use:fadeUp
+				style="font-size:clamp(32px, 5vw, 48px); font-weight:800; letter-spacing:-0.04em;"
+			>
+				{t('landing.features.title', $locale)}
+			</h2>
 		</div>
 
 		<div class="experience-grid">
 			<div use:fadeUp={{ delay: 0.1 }} class="experience-card">
-				<div class="minimal-icon-box"><Icon icon={BookOpen01Icon} size={28} color="var(--hinomaru-red)" /></div>
+				<div class="minimal-icon-box">
+					<Icon icon={BookOpen01Icon} size={28} color="var(--hinomaru-red)" />
+				</div>
 				<h3>{t('landing.immersion.title', $locale)}</h3>
 				<p>{t('landing.immersion.desc', $locale)}</p>
 			</div>
 			<div use:fadeUp={{ delay: 0.2 }} class="experience-card">
-				<div class="minimal-icon-box"><Icon icon={SparklesIcon} size={28} color="var(--sumi)" /></div>
+				<div class="minimal-icon-box">
+					<Icon icon={SparklesIcon} size={28} color="var(--sumi)" />
+				</div>
 				<h3>{t('landing.gamification.title', $locale)}</h3>
 				<p>{t('landing.gamification.desc', $locale)}</p>
 			</div>
@@ -176,7 +190,9 @@
 
 		<!-- Simplified Streak Preview -->
 		<div use:fadeUp={{ delay: 0.4 }} style="margin-top:80px; text-align:center;">
-			<div style="display:inline-flex; align-items:center; gap:16px; background:var(--bg-surface); border:1px solid var(--ink-200); padding:16px 32px; border-radius:100px; box-shadow:var(--shadow-sm);">
+			<div
+				style="display:inline-flex; align-items:center; gap:16px; background:var(--bg-surface); border:1px solid var(--ink-200); padding:16px 32px; border-radius:100px; box-shadow:var(--shadow-sm);"
+			>
 				<span style="font-size:28px;">🔥</span>
 				<span style="font-weight:800; color:var(--sumi); font-size:18px;">
 					{t('home.streak', $locale).replace('{n}', '15')}
@@ -190,9 +206,11 @@
 		<section style="padding:100px 24px; max-width:800px; margin:0 auto;">
 			<div style="text-align:center; margin-bottom:48px;">
 				<div class="label-meta" style="margin-bottom:12px; opacity:0.5;">CURRÍCULO JLPT</div>
-				<h2 style="font-size:32px; font-weight:800; letter-spacing:-0.02em;">{t('landing.preview.title', $locale)}</h2>
+				<h2 style="font-size:32px; font-weight:800; letter-spacing:-0.02em;">
+					{t('landing.preview.title', $locale)}
+				</h2>
 			</div>
-			
+
 			<div class="decks-list">
 				{#each previewDecks as deck (deck.id)}
 					<a href="/login" class="deck-item-minimal">
@@ -217,7 +235,9 @@
 	<!-- Testimonial (Clean) -->
 	<section style="padding:100px 24px; text-align:center; background:rgba(0,0,0,0.015);">
 		<div style="max-width:700px; margin:0 auto;">
-			<p style="font-size:22px; font-weight:500; line-height:1.6; color:var(--sumi); font-style:italic;">
+			<p
+				style="font-size:22px; font-weight:500; line-height:1.6; color:var(--sumi); font-style:italic;"
+			>
 				"{t('landing.testimonial', $locale)}"
 			</p>
 			<div class="label-meta" style="color:var(--hinomaru-red); margin-top:32px; font-size:12px;">
@@ -228,16 +248,34 @@
 
 	<!-- Minimal Final CTA -->
 	<section style="padding:120px 24px; text-align:center;">
-		<h2 use:fadeUp style="font-size:42px; font-weight:800; margin-bottom:16px; letter-spacing:-0.03em;">{t('home.title', $locale)}</h2>
-		<p use:fadeUp style="font-size:18px; color:var(--fg-secondary); margin-bottom:48px;">{t('landing.cta.subtitle', $locale)}</p>
-		
+		<h2
+			use:fadeUp
+			style="font-size:42px; font-weight:800; margin-bottom:16px; letter-spacing:-0.03em;"
+		>
+			{t('home.title', $locale)}
+		</h2>
+		<p use:fadeUp style="font-size:18px; color:var(--fg-secondary); margin-bottom:48px;">
+			{t('landing.cta.subtitle', $locale)}
+		</p>
+
 		<div style="display:flex; flex-direction:column; align-items:center; gap:32px;">
-			<a href="/login" class="hm-btn hm-btn-primary hm-btn-lg" style="padding:0 60px; height:64px; font-size:18px; box-shadow:var(--shadow-lg);">
+			<a
+				href="/login"
+				class="hm-btn hm-btn-primary hm-btn-lg"
+				style="padding:0 60px; height:64px; font-size:18px; box-shadow:var(--shadow-lg);"
+			>
 				{t('auth.signup', $locale)}
 			</a>
-			
-			<div style="display:flex; align-items:center; gap:24px; border-top:1px solid var(--ink-100); padding-top:32px; width:100%; max-width:400px; justify-content:center;">
-				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="kofi-link">
+
+			<div
+				style="display:flex; align-items:center; gap:24px; border-top:1px solid var(--ink-100); padding-top:32px; width:100%; max-width:400px; justify-content:center;"
+			>
+				<a
+					href="https://ko-fi.com/manujsx"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="kofi-link"
+				>
 					<img src={supportImg} alt="Support on Ko-fi" style="height:40px; width:auto;" />
 				</a>
 			</div>
@@ -254,11 +292,7 @@
 			<a href="/terms">{t('terms.title', $locale)}</a>
 			<a href="/privacy">{t('privacy.title', $locale)}</a>
 			<a href="/contact">{t('contact.title', $locale)}</a>
-			<a
-				href="https://ko-fi.com/manujsx"
-				target="_blank"
-				rel="noopener noreferrer">Ko-fi</a
-			>
+			<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer">Ko-fi</a>
 		</div>
 		<div class="footer-copyright">
 			© 2026 Hinomaru 日の丸. {t('landing.footer.crafted', $locale)}
@@ -295,7 +329,7 @@
 	}
 	.experience-grid h3 {
 		font-size: 20px;
-		font-weight: 800;
+		font-weight: 400;
 		margin: 24px 0 16px;
 		color: var(--sumi);
 	}
@@ -341,7 +375,7 @@
 		}
 	}
 	.deck-level {
-		font-weight: 800;
+		font-weight: 400;
 		color: var(--hinomaru-red);
 		font-size: 18px;
 		min-width: 40px;
@@ -513,7 +547,9 @@
 		transition: opacity 0.2s;
 	}
 	@media (hover: hover) {
-		.preview-all-link:hover { opacity: 0.7; }
+		.preview-all-link:hover {
+			opacity: 0.7;
+		}
 	}
 
 	.kofi-link {
@@ -521,6 +557,8 @@
 		display: inline-block;
 	}
 	@media (hover: hover) {
-		.kofi-link:hover { transform: scale(1.05); }
+		.kofi-link:hover {
+			transform: scale(1.05);
+		}
 	}
 </style>

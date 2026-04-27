@@ -13,10 +13,10 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		VolumeHighIcon, 
-		Award01Icon, 
-		BookOpen01Icon, 
+	import {
+		VolumeHighIcon,
+		Award01Icon,
+		BookOpen01Icon,
 		ArrowLeft02Icon,
 		Sun01Icon,
 		Moon01Icon,
@@ -70,10 +70,10 @@
 
 	const story = $derived(data.story);
 	const vocab: any[] = $derived(story?.vocab ?? []);
-	
+
 	// Enrich vocab with categories from registry
 	const enrichedVocab = $derived(
-		vocab.map(w => {
+		vocab.map((w) => {
 			const meta = getWordMetadata(w.jp);
 			return {
 				...w,
@@ -109,13 +109,14 @@
 			}, 300);
 		}
 	}
-	
+
 	$effect(() => {
 		if (story?.vocab?.length && supabase) {
 			const jpList = story.vocab.map((w: any) => w.jp);
 			supabase.auth.getUser().then(({ data: { user } }: any) => {
 				if (user) {
-					supabase.from('user_saved_words')
+					supabase
+						.from('user_saved_words')
 						.select('jp')
 						.eq('user_id', user.id)
 						.in('jp', jpList)
@@ -183,12 +184,16 @@
 	async function saveRead() {
 		if (!story || !supabase) return;
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (!user) return;
-			await supabase.from('user_story_reads').upsert(
-				{ user_id: user.id, story_id: story.id, quiz_score: score },
-				{ onConflict: 'user_id,story_id' }
-			);
+			await supabase
+				.from('user_story_reads')
+				.upsert(
+					{ user_id: user.id, story_id: story.id, quiz_score: score },
+					{ onConflict: 'user_id,story_id' }
+				);
 			await supabase.from('sessions').insert({
 				user_id: user.id,
 				mode: 'story',
@@ -222,13 +227,15 @@
 			window.speechSynthesis.cancel();
 			isSpeaking = false;
 		}
-		
+
 		isReadingMode = !isReadingMode;
 		if (isReadingMode) {
 			// Initialize theme based on system/global theme
-			const isDark = $theme === 'dark' || ($theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+			const isDark =
+				$theme === 'dark' ||
+				($theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 			readingTheme = isDark ? 'dark' : 'light';
-			
+
 			// Auto-scroll to top when entering
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		}
@@ -252,16 +259,18 @@
 	// Better language handling for questions and options
 	const qJp = $derived(currentQuestion?.q_jp || currentQuestion?.q);
 	const qRomaji = $derived(currentQuestion?.q_romaji);
-	const qTrans = $derived($locale === 'es' 
-		? (currentQuestion?.q_es || currentQuestion?.q_en || currentQuestion?.q)
-		: (currentQuestion?.q_en || currentQuestion?.q_es || currentQuestion?.q)
+	const qTrans = $derived(
+		$locale === 'es'
+			? currentQuestion?.q_es || currentQuestion?.q_en || currentQuestion?.q
+			: currentQuestion?.q_en || currentQuestion?.q_es || currentQuestion?.q
 	);
 
 	const optionsJp = $derived(currentQuestion?.o_jp || currentQuestion?.o || []);
 	const optionsRomaji = $derived(currentQuestion?.o_romaji || []);
-	const optionsTrans = $derived($locale === 'es'
-		? (currentQuestion?.o_es || currentQuestion?.o_en || currentQuestion?.o || [])
-		: (currentQuestion?.o_en || currentQuestion?.o_es || currentQuestion?.o || [])
+	const optionsTrans = $derived(
+		$locale === 'es'
+			? currentQuestion?.o_es || currentQuestion?.o_en || currentQuestion?.o || []
+			: currentQuestion?.o_en || currentQuestion?.o_es || currentQuestion?.o || []
 	);
 </script>
 
@@ -273,7 +282,12 @@
 	</title>
 </svelte:head>
 
-<div class="story-viewer-layout" class:reading-mode={isReadingMode} data-theme={readingTheme} style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}">
+<div
+	class="story-viewer-layout"
+	class:reading-mode={isReadingMode}
+	data-theme={isReadingMode ? readingTheme : undefined}
+	style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
+>
 	<!-- Standardized Container matching Dashboard -->
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
@@ -294,10 +308,13 @@
 				<div class="story-meta-tags">
 					<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{story.level}</span>
 					<span class="date-badge">
-						{new Date(story.publish_date + 'T12:00:00').toLocaleDateString($locale === 'es' ? 'es-MX' : 'en-US', {
-							month: 'long',
-							day: 'numeric'
-						})}
+						{new Date(story.publish_date + 'T12:00:00').toLocaleDateString(
+							$locale === 'es' ? 'es-MX' : 'en-US',
+							{
+								month: 'long',
+								day: 'numeric'
+							}
+						)}
 					</span>
 				</div>
 
@@ -316,13 +333,23 @@
 					{/if}
 				</div>
 
-				<div class="story-body-card" class:glass-reading={isReadingMode} class:is-preview={!isReadingMode}>
+				<div
+					class="story-body-card"
+					class:glass-reading={isReadingMode}
+					class:is-preview={!isReadingMode}
+				>
 					<p class="body-text-jp">
-						<InteractiveText text={isReadingMode ? bodyJp : ([...bodyJp].slice(0, 150).join('') + (bodyJp.length > 150 ? '...' : ''))} />
+						<InteractiveText
+							text={isReadingMode
+								? bodyJp
+								: [...bodyJp].slice(0, 150).join('') + (bodyJp.length > 150 ? '...' : '')}
+						/>
 					</p>
 
 					{#if $showRomaji && story.body_romaji}
-						<p class="body-text-romaji" use:fadeUp={{ y: 5 }}>{story.body_romaji.replace(/\\n/g, '\n')}</p>
+						<p class="body-text-romaji" use:fadeUp={{ y: 5 }}>
+							{story.body_romaji.replace(/\\n/g, '\n')}
+						</p>
 					{/if}
 
 					<div class="translation-section">
@@ -393,7 +420,7 @@
 										<div class="vocab-romaji">{kanaToRomaji(word.kana)}</div>
 									{/if}
 									<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
-									
+
 									<div class="vocab-tags">
 										{#if word.category}
 											<span class="vocab-cat-tag">
@@ -413,7 +440,6 @@
 				{/if}
 			</div>
 
-
 			{#if !isReadingMode}
 				<StickyFooter>
 					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={startQuiz}>
@@ -423,8 +449,8 @@
 			{/if}
 
 			{#if isReadingMode}
-				<div 
-					class="reading-mode-overlay" 
+				<div
+					class="reading-mode-overlay"
 					data-theme={readingTheme}
 					in:fly={{ y: 1000, duration: 500, easing: quintOut, opacity: 1 }}
 					style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
@@ -437,14 +463,13 @@
 						</div>
 
 						<div class="story-body-card">
-							<InteractiveText 
-								text={bodyJp} 
-								{vocab}
-							/>
+							<InteractiveText text={bodyJp} {vocab} />
 						</div>
 
 						{#if $showRomaji && story.body_romaji}
-							<p class="body-text-romaji" in:fade={{ duration: 200 }}>{story.body_romaji.replace(/\\n/g, '\n')}</p>
+							<p class="body-text-romaji" in:fade={{ duration: 200 }}>
+								{story.body_romaji.replace(/\\n/g, '\n')}
+							</p>
 						{/if}
 
 						{#if showTranslation}
@@ -460,21 +485,21 @@
 							<button class="tool-btn exit" onclick={toggleReadingMode} title="Salir">
 								<Icon icon={ArrowLeft02Icon} size={18} color="currentColor" strokeWidth={2} />
 							</button>
-							
+
 							<div class="tool-divider"></div>
-							
+
 							<div class="tool-group-pill">
-								<button 
-									class="tool-tab" 
-									class:active={!showTranslation} 
-									onclick={() => showTranslation = false}
+								<button
+									class="tool-tab"
+									class:active={!showTranslation}
+									onclick={() => (showTranslation = false)}
 								>
 									{$locale === 'es' ? 'Lectura' : 'Read'}
 								</button>
-								<button 
-									class="tool-tab" 
-									class:active={showTranslation} 
-									onclick={() => showTranslation = true}
+								<button
+									class="tool-tab"
+									class:active={showTranslation}
+									onclick={() => (showTranslation = true)}
 								>
 									{$locale === 'es' ? 'Trad.' : 'Trans'}
 								</button>
@@ -482,10 +507,20 @@
 
 							<div class="tool-divider"></div>
 
-							<button class="tool-btn" class:active-tool={isSpeaking} onclick={toggleAudio} title={isSpeaking ? 'Detener audio' : 'Escuchar'}>
+							<button
+								class="tool-btn"
+								class:active-tool={isSpeaking}
+								onclick={toggleAudio}
+								title={isSpeaking ? 'Detener audio' : 'Escuchar'}
+							>
 								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={2} />
 							</button>
-							<button class="tool-btn" onclick={() => showRomaji.toggle()} title="Romaji" class:active-tool={$showRomaji}>
+							<button
+								class="tool-btn"
+								onclick={() => showRomaji.toggle()}
+								title="Romaji"
+								class:active-tool={$showRomaji}
+							>
 								<Icon icon={TranslateIcon} size={18} color="currentColor" strokeWidth={2} />
 							</button>
 
@@ -513,12 +548,15 @@
 				<!-- Progress indicator -->
 				<div class="quiz-progress-row">
 					<span class="quiz-progress-label">
-						{$locale === 'es' ? 'Pregunta' : 'Question'} {currentQ + 1} {$locale === 'es' ? 'de' : 'of'} {quiz.length}
+						{$locale === 'es' ? 'Pregunta' : 'Question'}
+						{currentQ + 1}
+						{$locale === 'es' ? 'de' : 'of'}
+						{quiz.length}
 					</span>
 					<span class="quiz-score-live">{answers.filter((a, i) => a === quiz[i]?.a).length} ✓</span>
 				</div>
 				<div class="quiz-progress-bar">
-					<div class="quiz-progress-fill" style="width:{((currentQ) / quiz.length) * 100}%;"></div>
+					<div class="quiz-progress-fill" style="width:{(currentQ / quiz.length) * 100}%;"></div>
 				</div>
 
 				{#if currentQuestion}
@@ -529,9 +567,9 @@
 								<span class="question-romaji-hint">{qRomaji}</span>
 							{/if}
 						</div>
-						
+
 						<h2 class="question-text jp">{qJp}</h2>
-						
+
 						{#if qTrans && qTrans !== qJp}
 							<p class="question-translation">{qTrans}</p>
 						{/if}
@@ -564,14 +602,23 @@
 					</div>
 
 					{#if checked}
-						<div class="quiz-feedback-box" class:correct={isCorrect} class:wrong={!isCorrect} use:fadeUp={{ y: 5 }}>
+						<div
+							class="quiz-feedback-box"
+							class:correct={isCorrect}
+							class:wrong={!isCorrect}
+							use:fadeUp={{ y: 5 }}
+						>
 							<div class="feedback-icon">
 								{isCorrect ? '✓' : '✗'}
 							</div>
 							<div class="feedback-text">
-								{isCorrect 
-									? ($locale === 'es' ? '¡Excelente! Respuesta correcta.' : 'Excellent! Correct answer.') 
-									: ($locale === 'es' ? 'Vaya, esa no era. ¡Sigue intentando!' : "Oops, that wasn't it. Keep trying!")}
+								{isCorrect
+									? $locale === 'es'
+										? '¡Excelente! Respuesta correcta.'
+										: 'Excellent! Correct answer.'
+									: $locale === 'es'
+										? 'Vaya, esa no era. ¡Sigue intentando!'
+										: "Oops, that wasn't it. Keep trying!"}
 							</div>
 						</div>
 					{/if}
@@ -597,7 +644,11 @@
 			</StickyFooter>
 		{:else if phase === 'result'}
 			<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
-				<div class="result-badge" class:result-pass={scorePct >= 70} class:result-fail={scorePct < 70}>
+				<div
+					class="result-badge"
+					class:result-pass={scorePct >= 70}
+					class:result-fail={scorePct < 70}
+				>
 					<Icon
 						icon={score === quiz.length ? Award01Icon : BookOpen01Icon}
 						size={48}
@@ -607,8 +658,12 @@
 				</div>
 				<h2 class="result-headline">
 					{score === quiz.length
-						? ($locale === 'es' ? '¡Perfecto!' : 'Perfect!')
-						: ($locale === 'es' ? 'Lectura completada' : 'Reading complete')}
+						? $locale === 'es'
+							? '¡Perfecto!'
+							: 'Perfect!'
+						: $locale === 'es'
+							? 'Lectura completada'
+							: 'Reading complete'}
 				</h2>
 
 				<!-- Score percentage with color -->
@@ -630,8 +685,13 @@
 							{@const qJpLocal = q.q_jp || q.q}
 							{@const qRomajiLocal = q.q_romaji}
 							{@const optsJpLocal = q.o_jp || q.o}
-							
-							<div class="breakdown-row" class:correct={wasCorrect} class:wrong={!wasCorrect} use:fadeUp={{ delay: i * 0.05, y: 5 }}>
+
+							<div
+								class="breakdown-row"
+								class:correct={wasCorrect}
+								class:wrong={!wasCorrect}
+								use:fadeUp={{ delay: i * 0.05, y: 5 }}
+							>
 								<span class="breakdown-dot">{wasCorrect ? '✓' : '✗'}</span>
 								<div class="breakdown-content">
 									<div class="breakdown-q-group">
@@ -642,7 +702,7 @@
 									</div>
 									{#if !wasCorrect}
 										<span class="breakdown-correct-ans">
-											{$locale === 'es' ? 'Correcta:' : 'Correct:'} 
+											{$locale === 'es' ? 'Correcta:' : 'Correct:'}
 											<span class="jp">{optsJpLocal?.[q.a] ?? '—'}</span>
 										</span>
 									{/if}
@@ -653,11 +713,7 @@
 				{/if}
 
 				<StickyFooter>
-					<button
-						class="hm-btn hm-btn-ghost hm-btn-lg"
-						style="flex:1;"
-						onclick={restartRead}
-					>
+					<button class="hm-btn hm-btn-ghost hm-btn-lg" style="flex:1;" onclick={restartRead}>
 						{$locale === 'es' ? 'Leer de nuevo' : 'Read again'}
 					</button>
 					<button
@@ -1003,7 +1059,7 @@
 
 	.question-badge {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 400;
 		letter-spacing: 0.1em;
 		color: var(--hinomaru-red);
 		opacity: 0.8;
@@ -1163,7 +1219,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 20px;
-		font-weight: 800;
+		font-weight: 400;
 		flex-shrink: 0;
 	}
 
@@ -1183,8 +1239,14 @@
 	}
 
 	@keyframes bounceIn {
-		0% { transform: scale(0.9); opacity: 0; }
-		100% { transform: scale(1); opacity: 1; }
+		0% {
+			transform: scale(0.9);
+			opacity: 0;
+		}
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
 	}
 
 	/* --- Quiz progress --- */
@@ -1234,8 +1296,12 @@
 		justify-content: center;
 		margin: 0 auto 24px;
 	}
-	.result-badge.result-pass { background: var(--success); }
-	.result-badge.result-fail { background: var(--hinomaru-red); }
+	.result-badge.result-pass {
+		background: var(--success);
+	}
+	.result-badge.result-fail {
+		background: var(--hinomaru-red);
+	}
 
 	.result-headline {
 		font-size: 28px;
@@ -1252,12 +1318,16 @@
 	}
 	.result-pct {
 		font-size: 52px;
-		font-weight: 800;
+		font-weight: 400;
 		letter-spacing: -0.04em;
 		color: var(--sumi);
 	}
-	.result-pct.pass { color: var(--success); }
-	.result-pct.fail { color: var(--hinomaru-red); }
+	.result-pct.pass {
+		color: var(--success);
+	}
+	.result-pct.fail {
+		color: var(--hinomaru-red);
+	}
 	.result-fraction {
 		font-size: 18px;
 		color: var(--fg-secondary);
@@ -1291,7 +1361,9 @@
 		padding: 8px 0;
 		border-bottom: 1px solid var(--ink-50);
 	}
-	.breakdown-row:last-child { border-bottom: none; }
+	.breakdown-row:last-child {
+		border-bottom: none;
+	}
 	.breakdown-dot {
 		font-size: 14px;
 		font-weight: 700;
@@ -1299,8 +1371,12 @@
 		flex-shrink: 0;
 		margin-top: 1px;
 	}
-	.breakdown-row.correct .breakdown-dot { color: var(--success); }
-	.breakdown-row.wrong .breakdown-dot { color: var(--hinomaru-red); }
+	.breakdown-row.correct .breakdown-dot {
+		color: var(--success);
+	}
+	.breakdown-row.wrong .breakdown-dot {
+		color: var(--hinomaru-red);
+	}
 	.breakdown-content {
 		display: flex;
 		flex-direction: column;
@@ -1368,7 +1444,8 @@
 		color: var(--fg-primary);
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
-		padding: calc(60px + env(safe-area-inset-top)) 20px calc(140px + env(safe-area-inset-bottom)) 20px;
+		padding: calc(60px + env(safe-area-inset-top)) 20px calc(140px + env(safe-area-inset-bottom))
+			20px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -1564,18 +1641,26 @@
 		display: flex;
 		justify-content: center;
 		z-index: 2500;
-		padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
-		/* Optional: Add a subtle gradient behind the toolbar to ensure readability if scrolled to bottom */
-		background: linear-gradient(to top, var(--bg-page) 50%, transparent);
-		pointer-events: none; /* Let clicks pass through the gradient */
+		/* 
+		 * env(safe-area-inset-bottom) = ~34px iOS, = 0 Android/desktop.
+		 * max() ensures at least 16px clearance on Android/web.
+		 */
+		padding: 0 16px max(16px, env(safe-area-inset-bottom));
+		pointer-events: none;
+		/* GPU layer — prevents iOS scroll jitter on position:fixed */
+		transform: translateZ(0);
+		-webkit-transform: translateZ(0);
+		will-change: transform;
+	}
+
+	@media (min-width: 768px) {
+		.reading-toolbar-container {
+			padding: 0 16px 24px;
+		}
 	}
 
 	.reading-toolbar-pill {
 		pointer-events: auto; /* Re-enable clicks on the pill itself */
-		/* ... rest of pill styles are handled above/below ... */
-	}
-
-	.reading-toolbar-pill {
 		display: flex;
 		align-items: center;
 		gap: 8px;
