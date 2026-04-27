@@ -7,7 +7,7 @@
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 

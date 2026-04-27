@@ -80,11 +80,27 @@
 					.finished;
 			}
 			confetti({
-				particleCount: 100,
-				spread: 70,
-				origin: { y: 0.6 },
-				colors: ['#BC002D', '#1A1A1A', '#F9F8F6']
+				particleCount: 60,
+				angle: 60,
+				spread: 65,
+				startVelocity: 55,
+				decay: 0.88,
+				gravity: 1.1,
+				origin: { x: 0, y: 1 },
+				colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
+				scalar: 0.9
 			});
+			setTimeout(() => confetti({
+				particleCount: 60,
+				angle: 120,
+				spread: 65,
+				startVelocity: 55,
+				decay: 0.88,
+				gravity: 1.1,
+				origin: { x: 1, y: 1 },
+				colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
+				scalar: 0.9
+			}), 80);
 			await saveSession();
 			// Short delay to enjoy confetti
 			setTimeout(() => goto('/vocabulary'), 1500);

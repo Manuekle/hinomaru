@@ -5,47 +5,59 @@
 	interface Props {
 		fireOnMount?: boolean;
 		duration?: number;
-		colors?: string[];
 	}
 
-	let {
-		fireOnMount = false,
-		duration = 3000,
-		colors = ['#a786ff', '#fd8bbc', '#eca184', '#f8deb1']
-	} = $props<Props>();
+	let { fireOnMount = false, duration = 2500 } = $props<Props>();
+
+	// App palette: hinomaru-red, sumi, washi, gold
+	const COLORS = ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'];
 
 	export const fire = () => {
-		const end = Date.now() + duration;
+		// Burst 1: from bottom-left
+		confetti({
+			particleCount: 60,
+			angle: 60,
+			spread: 65,
+			startVelocity: 55,
+			decay: 0.88,
+			gravity: 1.1,
+			origin: { x: 0, y: 1 },
+			colors: COLORS,
+			scalar: 0.9
+		});
 
-		const frame = () => {
-			if (Date.now() > end) return;
-
+		// Burst 2: from bottom-right (slight delay)
+		setTimeout(() => {
 			confetti({
-				particleCount: 2,
-				angle: 60,
-				spread: 55,
-				startVelocity: 60,
-				origin: { x: 0, y: 0.5 },
-				colors: colors
-			});
-			confetti({
-				particleCount: 2,
+				particleCount: 60,
 				angle: 120,
-				spread: 55,
-				startVelocity: 60,
-				origin: { x: 1, y: 0.5 },
-				colors: colors
+				spread: 65,
+				startVelocity: 55,
+				decay: 0.88,
+				gravity: 1.1,
+				origin: { x: 1, y: 1 },
+				colors: COLORS,
+				scalar: 0.9
 			});
+		}, 80);
 
-			requestAnimationFrame(frame);
-		};
-
-		frame();
+		// Burst 3: center burst at half duration
+		setTimeout(() => {
+			confetti({
+				particleCount: 40,
+				angle: 90,
+				spread: 120,
+				startVelocity: 45,
+				decay: 0.9,
+				gravity: 0.9,
+				origin: { x: 0.5, y: 0.65 },
+				colors: COLORS,
+				scalar: 0.8
+			});
+		}, duration / 2);
 	};
 
 	onMount(() => {
-		if (fireOnMount) {
-			fire();
-		}
+		if (fireOnMount) fire();
 	});
 </script>

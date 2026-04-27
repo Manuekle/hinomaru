@@ -12,7 +12,7 @@
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { Award01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import type { PageData } from './$types';

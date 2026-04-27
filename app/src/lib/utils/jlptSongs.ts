@@ -667,7 +667,7 @@ export const jlptSongs: SongLesson[] = [
 		title: 'FLY HIGH!!',
 		artist: 'BURNOUT SYNDROMES',
 		start: '00:00',
-		end: '01:33',
+		end: '01:30',
 		focus: { es: 'Superación y esfuerzo', en: 'Overcoming and effort' },
 		difficulty: 3,
 		youtubeId: 'SV0B0KEgSqQ', // ✅ MV oficial Epic Records Japan

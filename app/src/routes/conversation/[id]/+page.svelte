@@ -13,7 +13,7 @@
 	import { VolumeHighIcon, Award01Icon, BubbleChatIcon } from '@hugeicons/core-free-icons';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import { conversations, type DialogueChoice } from '$lib/data/conversations';
 
 	const supabase = createClient();

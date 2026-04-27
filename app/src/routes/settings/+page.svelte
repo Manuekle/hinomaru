@@ -2,7 +2,7 @@
 	import { locale } from '$lib/stores/locale';
 	import { theme, type ThemeType } from '$lib/stores/theme';
 	import { showRomaji, preferredVoice, notificationsEnabled } from '$lib/stores/settings';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
 	import { fade, fly } from 'svelte/transition';

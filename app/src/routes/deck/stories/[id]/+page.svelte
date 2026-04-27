@@ -11,7 +11,7 @@
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { Award01Icon, BookOpen01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();

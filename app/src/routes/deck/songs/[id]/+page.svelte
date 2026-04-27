@@ -15,7 +15,7 @@
 		VolumeHighIcon
 	} from '@hugeicons/core-free-icons';
 	import { speakJapanese } from '$lib/utils/tts';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 

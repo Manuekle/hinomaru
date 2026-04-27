@@ -6,7 +6,7 @@
 	import { fadeUp, staggerChildren, popIn, animateNumber } from '$lib/motion';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
-	import { svileo } from 'svileo';
+	import { svileo } from '$lib/stores/toast';
 	import { addXP } from '$lib/utils/gamification';
 	import { createClient } from '$lib/supabase';
 	import type { PageData } from './$types';

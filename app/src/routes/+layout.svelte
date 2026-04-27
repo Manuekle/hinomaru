@@ -14,8 +14,7 @@
 	import { isBrowser } from '$lib/supabase';
 	import { inject } from '@vercel/analytics';
 	import { dev } from '$app/environment';
-	import { Toaster } from 'svileo';
-	import 'svileo/styles.css';
+	import ToastStack from '$lib/components/ToastStack.svelte';
 	import { swipeBack } from '$lib/actions/swipeBack';
 
 	let { children, data } = $props();
@@ -130,15 +129,9 @@
 </svelte:head>
 
 <div class="app-container" use:swipeBack>
-	<Toaster 
-		position="top-center" 
-		offset={{ top: 'env(safe-area-inset-top, 24px)' }} 
-		expand={true}
-		richColors
-		closeButton
-	/>
+	<ToastStack />
 	{@render children()}
-	{#if data.session}
+	{#if data.session && $page.url.pathname === '/'}
 		<DockBar />
 	{/if}
 	<InstallPrompt />
