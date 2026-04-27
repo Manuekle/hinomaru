@@ -1,19 +1,20 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
 	import type { HTMLAttributes } from "svelte/elements";
-	import type { Snippet } from "svelte";
-
-	type Props = HTMLAttributes<HTMLDivElement> & {
-		children: Snippet;
-	};
+	import { cn, type WithElementRef } from "$lib/lib/utils.js";
 
 	let {
-		class: className = undefined,
+		ref = $bindable(null),
+		class: className,
 		children,
-		...props
-	}: Props = $props();
+		...restProps
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
 </script>
 
-<div class={cn("grid gap-1.5 p-4 text-center sm:text-left", className)} {...props}>
-	{@render children()}
+<div
+	bind:this={ref}
+	data-slot="drawer-header"
+	class={cn("gap-0.5 p-4 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center group-data-[vaul-drawer-direction=top]/drawer-content:text-center md:gap-0.5 md:text-left flex flex-col", className)}
+	{...restProps}
+>
+	{@render children?.()}
 </div>
