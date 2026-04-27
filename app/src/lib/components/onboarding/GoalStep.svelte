@@ -128,9 +128,11 @@
 		position: relative;
 	}
 
-	.goal-card:hover {
-		border-color: var(--ink-300);
-		transform: translateY(-2px);
+	@media (hover: hover) {
+		.goal-card:hover {
+			border-color: var(--ink-300);
+			transform: translateY(-2px);
+		}
 	}
 
 	.goal-card.selected {

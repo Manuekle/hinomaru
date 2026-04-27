@@ -77,18 +77,18 @@
 				total: String(cards.length),
 				mode: 'quiz'
 			});
-			goto(`/deck/${data.deck.id}/summary?${params}`);
-			supabase.auth.getUser().then(({ data: { user } }) => {
-				if (!user) return;
-				supabase.from('sessions').insert({
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				await supabase.from('sessions').insert({
 					user_id: user.id,
 					deck_id: data.deck.id,
 					mode: 'quiz',
 					correct,
 					total: cards.length
 				});
-				updateStreak(supabase, user.id);
-			});
+				await updateStreak(supabase, user.id);
+			}
+			goto(`/deck/${data.deck.id}/summary?${params}`);
 		} else {
 			picked = null;
 			i++;
@@ -340,9 +340,11 @@
 		font-family: var(--font-ui);
 	}
 
-	.option-item:hover:not(:disabled) {
-		border-color: var(--ink-300);
-		background: var(--ink-50);
+	@media (hover: hover) {
+		.option-item:hover:not(:disabled) {
+			border-color: var(--ink-300);
+			background: var(--ink-50);
+		}
 	}
 
 	.option-item.is-correct {

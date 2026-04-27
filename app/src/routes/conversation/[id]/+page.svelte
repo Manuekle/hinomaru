@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -75,14 +75,15 @@
 		try {
 			const { data: { user } } = await supabase.auth.getUser();
 			if (user) {
-				supabase.from('sessions').insert({
+				await supabase.from('sessions').insert({
 					user_id: user.id,
 					mode: 'conversation',
 					correct: score,
 					total: totalChoices
 				});
-				updateStreak(supabase, user.id);
-				addXP(supabase, user.id, score * 5 + 10);
+				await updateStreak(supabase, user.id);
+				await addXP(supabase, user.id, score * 5 + 10);
+				await invalidateAll();
 			}
 		} catch { /* non-critical */ }
 		svileo.success({ title: $locale === 'es' ? '¡Conversación completada!' : 'Conversation complete!' });
@@ -239,7 +240,7 @@
 										class:is-dimmed={isRevealed && !isPicked && !choice.correct}
 										onclick={() => pickChoice(choice, idx)}
 										disabled={phase === 'feedback'}
-										touch-action="manipulation"
+										style="touch-action:manipulation"
 									>
 										<div class="option-marker">{String.fromCharCode(65 + idx)}</div>
 										<div class="option-content">
@@ -357,7 +358,7 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover { color: var(--sumi); }
+	@media (hover: hover) { .back-link-beautiful:hover { color: var(--sumi); } }
 
 	/* Scenario header */
 	.scenario-header {
@@ -449,8 +450,8 @@
 		flex-shrink: 0;
 		touch-action: manipulation;
 	}
-	.story-audio-btn:hover { background: var(--ink-200); transform: scale(1.05); }
 	.story-audio-btn:active { transform: scale(0.95); }
+	@media (hover: hover) { .story-audio-btn:hover { background: var(--ink-200); transform: scale(1.05); } }
 
 	.body-text-jp {
 		font-family: var(--font-jp);
@@ -532,9 +533,11 @@
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
-	.option-item:not(:disabled):hover {
-		border-color: var(--sumi);
-		background: var(--ink-50);
+	@media (hover: hover) {
+		.option-item:not(:disabled):hover {
+			border-color: var(--sumi);
+			background: var(--ink-50);
+		}
 	}
 	.option-item:disabled { cursor: default; }
 

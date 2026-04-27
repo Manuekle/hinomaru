@@ -23,7 +23,7 @@
 		{
 			title: t('onboarding.features.srs.title', $locale),
 			desc: t('onboarding.features.srs.desc', $locale),
-			icon: CardExchange01Icon
+			icon: Cards02Icon
 		},
 		{
 			title: t('onboarding.features.decks.title', $locale),

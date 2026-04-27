@@ -35,7 +35,7 @@
 	const supabase = $derived($page.data.supabase);
 
 	async function saveWord() {
-		if (!word || saved || saving) return;
+		if (!word || saved || saving || !supabase) return;
 		saving = true;
 		try {
 			const {
@@ -229,7 +229,9 @@
 		font-family: var(--font-ui);
 	}
 
-	.save-btn:hover:not(:disabled) {
-		background: var(--ink-200);
+	@media (hover: hover) {
+		.save-btn:hover:not(:disabled) {
+			background: var(--ink-200);
+		}
 	}
 </style>

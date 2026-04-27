@@ -103,9 +103,11 @@
 		text-align: left;
 	}
 
-	.option-btn:hover {
-		border-color: var(--ink-300);
-		background: var(--ink-50);
+	@media (hover: hover) {
+		.option-btn:hover {
+			border-color: var(--ink-300);
+			background: var(--ink-50);
+		}
 	}
 
 	.option-btn.selected {

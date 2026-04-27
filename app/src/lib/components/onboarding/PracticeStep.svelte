@@ -311,9 +311,11 @@
 			color 150ms,
 			border-color 150ms;
 	}
-	.clear-btn:hover {
-		color: var(--sumi);
-		border-color: var(--ink-400);
+	@media (hover: hover) {
+		.clear-btn:hover {
+			color: var(--sumi);
+			border-color: var(--ink-400);
+		}
 	}
 
 	.loading-state {

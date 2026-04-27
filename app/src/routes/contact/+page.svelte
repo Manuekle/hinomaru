@@ -141,8 +141,10 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover {
-		color: var(--sumi);
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
 	}
 
 	.page-title {
@@ -304,8 +306,10 @@
 		display: block;
 	}
 
-	.support-image-btn:hover {
-		transform: scale(1.05);
+	@media (hover: hover) {
+		.support-image-btn:hover {
+			transform: scale(1.05);
+		}
 	}
 
 	.support-image-btn:active {

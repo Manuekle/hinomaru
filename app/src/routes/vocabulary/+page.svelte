@@ -191,8 +191,10 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover {
-		color: var(--sumi);
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
 	}
 
 	.search-input-wrap {
@@ -242,10 +244,12 @@
 		margin-bottom: 4px;
 	}
 
-	.review-btn:hover {
-		background: var(--hinomaru-red);
-		color: white;
-		transform: translateY(-1px);
+	@media (hover: hover) {
+		.review-btn:hover {
+			background: var(--hinomaru-red);
+			color: white;
+			transform: translateY(-1px);
+		}
 	}
 
 	.vocab-list {
@@ -263,10 +267,12 @@
 		transition: all 0.24s var(--ease-brand);
 		cursor: default;
 	}
-	.word-card:hover {
-		transform: translateY(-2px) scale(1.01);
-		border-color: var(--ink-300);
-		box-shadow: var(--shadow-lg);
+	@media (hover: hover) {
+		.word-card:hover {
+			transform: translateY(-2px) scale(1.01);
+			border-color: var(--ink-300);
+			box-shadow: var(--shadow-lg);
+		}
 	}
 
 	.word-card-top {
@@ -343,13 +349,17 @@
 		transition: all 0.2s;
 	}
 
-	.action-btn.delete:hover {
-		background: var(--error-wash);
-		color: var(--error);
+	@media (hover: hover) {
+		.action-btn.delete:hover {
+			background: var(--error-wash);
+			color: var(--error);
+		}
 	}
 
-	.action-btn.audio:hover {
-		background: var(--ink-200);
+	@media (hover: hover) {
+		.action-btn.audio:hover {
+			background: var(--ink-200);
+		}
 	}
 
 	.word-romaji {

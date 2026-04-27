@@ -5,7 +5,7 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
@@ -120,18 +120,19 @@
 		try {
 			const { data: { user } } = await supabase.auth.getUser();
 			if (!user) return;
-			supabase.from('user_story_reads').upsert(
+			await supabase.from('user_story_reads').upsert(
 				{ user_id: user.id, story_id: story.id, quiz_score: score },
 				{ onConflict: 'user_id,story_id' }
 			);
-			supabase.from('sessions').insert({
+			await supabase.from('sessions').insert({
 				user_id: user.id,
 				mode: 'story',
 				correct: score,
 				total: quiz.length
 			});
-			updateStreak(supabase, user.id);
-			addXP(supabase, user.id, score * 5 + 10);
+			await updateStreak(supabase, user.id);
+			await addXP(supabase, user.id, score * 5 + 10);
+			await invalidateAll();
 		} catch {
 			// silent fail
 		}
@@ -477,8 +478,10 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover {
-		color: var(--sumi);
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
 	}
 
 	/* --- Story View --- */
@@ -526,9 +529,11 @@
 		flex-shrink: 0;
 	}
 
-	.story-audio-btn:hover {
-		background: var(--ink-200);
-		transform: scale(1.05);
+	@media (hover: hover) {
+		.story-audio-btn:hover {
+			background: var(--ink-200);
+			transform: scale(1.05);
+		}
 	}
 
 	.story-audio-btn:active {
@@ -665,8 +670,10 @@
 			background 150ms,
 			color 150ms;
 	}
-	.vocab-action-btn:hover:not(:disabled) {
-		background: var(--ink-200);
+	@media (hover: hover) {
+		.vocab-action-btn:hover:not(:disabled) {
+			background: var(--ink-200);
+		}
 	}
 	.vocab-action-btn:disabled {
 		opacity: 0.5;
@@ -759,10 +766,12 @@
 		position: relative;
 	}
 
-	.option-item:hover:not(:disabled) {
-		border-color: var(--ink-300);
-		transform: translateY(-2px);
-		box-shadow: var(--shadow-sm);
+	@media (hover: hover) {
+		.option-item:hover:not(:disabled) {
+			border-color: var(--ink-300);
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-sm);
+		}
 	}
 
 	.option-item:active:not(:disabled) {

@@ -56,10 +56,17 @@
 		line-height: inherit;
 	}
 
-	.vocab-chip:hover,
-	.vocab-chip[aria-expanded='true'] {
+	.vocab-chip[aria-expanded='true'],
+	.vocab-chip:active {
 		background: var(--hinomaru-red);
 		color: var(--paper);
+	}
+
+	@media (hover: hover) {
+		.vocab-chip:hover {
+			background: var(--hinomaru-red);
+			color: var(--paper);
+		}
 	}
 
 	.vocab-popup {

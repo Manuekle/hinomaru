@@ -96,20 +96,32 @@
 			<button
 				onclick={closePrompt}
 				aria-label="Close"
-				style="background:var(--ink-100); color:var(--fg-tertiary); border:none; width:44px; height:44px;
-                       border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
-                       transition: background 0.2s ease, color 0.2s ease;"
-				onmouseenter={(e) => {
-					e.currentTarget.style.background = 'var(--ink-200)';
-					e.currentTarget.style.color = 'var(--fg-primary)';
-				}}
-				onmouseleave={(e) => {
-					e.currentTarget.style.background = 'var(--ink-100)';
-					e.currentTarget.style.color = 'var(--fg-tertiary)';
-				}}
+				class="close-btn"
+				style="touch-action:manipulation"
 			>
 				<Icon icon={Cancel01Icon} size={14} strokeWidth={2.5} />
 			</button>
 		</div>
 	</div>
 {/if}
+
+<style>
+	.close-btn {
+		background: var(--ink-100);
+		color: var(--fg-tertiary);
+		border: none;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.2s ease, color 0.2s ease;
+		-webkit-tap-highlight-color: transparent;
+	}
+	@media (hover: hover) {
+		.close-btn:hover { background: var(--ink-200); color: var(--fg-primary); }
+	}
+	.close-btn:active { background: var(--ink-300); color: var(--fg-primary); }
+</style>

@@ -207,7 +207,7 @@
 			</div>
 
 			<div style="text-align:center; margin-top:40px;">
-				<a href="/login" style="font-size:15px; font-weight:700; color:var(--hinomaru-red); text-decoration:none; border-bottom:1.5px solid var(--hinomaru-red); padding-bottom:2px; transition:opacity 0.2s;" onmouseenter={(e) => e.currentTarget.style.opacity = '0.7'} onmouseleave={(e) => e.currentTarget.style.opacity = '1'}>
+				<a href="/login" class="preview-all-link">
 					{t('landing.preview.all', $locale)}
 				</a>
 			</div>
@@ -237,7 +237,7 @@
 			</a>
 			
 			<div style="display:flex; align-items:center; gap:24px; border-top:1px solid var(--ink-100); padding-top:32px; width:100%; max-width:400px; justify-content:center;">
-				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" style="transition:transform 0.2s;" onmouseenter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onmouseleave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
+				<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="kofi-link">
 					<img src={supportImg} alt="Support on Ko-fi" style="height:40px; width:auto;" />
 				</a>
 			</div>
@@ -286,10 +286,12 @@
 		box-shadow: var(--shadow-sm);
 		transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 	}
-	.experience-card:hover {
-		transform: translateY(-8px);
-		border-color: var(--sumi);
-		box-shadow: var(--shadow-lg);
+	@media (hover: hover) {
+		.experience-card:hover {
+			transform: translateY(-8px);
+			border-color: var(--sumi);
+			box-shadow: var(--shadow-lg);
+		}
 	}
 	.experience-grid h3 {
 		font-size: 20px;
@@ -332,9 +334,11 @@
 		text-decoration: none;
 		transition: all 0.2s ease;
 	}
-	.deck-item-minimal:hover {
-		border-color: var(--sumi);
-		transform: translateX(4px);
+	@media (hover: hover) {
+		.deck-item-minimal:hover {
+			border-color: var(--sumi);
+			transform: translateX(4px);
+		}
 	}
 	.deck-level {
 		font-weight: 800;
@@ -401,8 +405,10 @@
 		transition: color 0.2s;
 	}
 
-	.footer-links a:hover {
-		color: var(--sumi);
+	@media (hover: hover) {
+		.footer-links a:hover {
+			color: var(--sumi);
+		}
 	}
 
 	.footer-copyright {
@@ -495,5 +501,26 @@
 		.landing-footer {
 			padding: 40px 24px;
 		}
+	}
+
+	.preview-all-link {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		text-decoration: none;
+		border-bottom: 1.5px solid var(--hinomaru-red);
+		padding-bottom: 2px;
+		transition: opacity 0.2s;
+	}
+	@media (hover: hover) {
+		.preview-all-link:hover { opacity: 0.7; }
+	}
+
+	.kofi-link {
+		transition: transform 0.2s;
+		display: inline-block;
+	}
+	@media (hover: hover) {
+		.kofi-link:hover { transform: scale(1.05); }
 	}
 </style>

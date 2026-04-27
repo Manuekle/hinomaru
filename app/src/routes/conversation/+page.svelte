@@ -99,8 +99,10 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover {
-		color: var(--sumi);
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
 	}
 
 	.filter-chip {
@@ -145,12 +147,16 @@
 	.row:first-child {
 		border-top: 1px solid var(--ink-100);
 	}
-	.row:hover .row-title {
-		color: var(--hinomaru-red);
+	@media (hover: hover) {
+		.row:hover .row-title {
+			color: var(--hinomaru-red);
+		}
 	}
-	.row:hover .row-arrow {
-		color: var(--hinomaru-red);
-		transform: translateX(3px);
+	@media (hover: hover) {
+		.row:hover .row-arrow {
+			color: var(--hinomaru-red);
+			transform: translateX(3px);
+		}
 	}
 
 	.row-num {

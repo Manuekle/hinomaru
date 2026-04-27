@@ -334,8 +334,10 @@
 		touch-action: manipulation;
 	}
 
-	.vocab-primary-btn:hover {
-		box-shadow: 0 4px 20px rgba(188, 0, 45, 0.3);
+	@media (hover: hover) {
+		.vocab-primary-btn:hover {
+			box-shadow: 0 4px 20px rgba(188, 0, 45, 0.3);
+		}
 	}
 
 	.audio-btn {
@@ -355,8 +357,10 @@
 		transition: background 150ms ease;
 	}
 
-	.audio-btn:hover, .audio-btn:active {
-		background: var(--ink-100);
+	@media (hover: hover) {
+		.audio-btn:hover, .audio-btn:active {
+			background: var(--ink-100);
+		}
 	}
 
 	.audio-btn-sm {

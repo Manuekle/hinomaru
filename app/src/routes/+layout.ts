@@ -13,11 +13,9 @@ export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 			});
 
 	const {
-		data: { session }
-	} = await supabase.auth.getSession();
-	const {
 		data: { user }
 	} = await supabase.auth.getUser();
+	const session = data.session ?? null;
 
 	let profile = null;
 	if (user) {

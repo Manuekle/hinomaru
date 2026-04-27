@@ -287,8 +287,10 @@
 		margin: 0 auto;
 	}
 
-	.support-image-btn:hover {
-		transform: scale(1.05);
+	@media (hover: hover) {
+		.support-image-btn:hover {
+			transform: scale(1.05);
+		}
 	}
 
 	.support-image-btn:active {
@@ -309,9 +311,11 @@
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
-	.deck-card:hover {
-		box-shadow: var(--shadow-md);
-		transform: translateY(-2px);
+	@media (hover: hover) {
+		.deck-card:hover {
+			box-shadow: var(--shadow-md);
+			transform: translateY(-2px);
+		}
 	}
 	.deck-card:active {
 		transform: scale(0.98);
@@ -347,9 +351,11 @@
 		pointer-events: none;
 	}
 
-	.story-card:hover {
-		box-shadow: var(--shadow-md);
-		transform: translateY(-2px);
+	@media (hover: hover) {
+		.story-card:hover {
+			box-shadow: var(--shadow-md);
+			transform: translateY(-2px);
+		}
 	}
 
 	.story-card:active {
@@ -453,9 +459,11 @@
 		margin-right: -10px;
 	}
 
-	.dashboard-settings-btn:hover {
-		background: var(--ink-100);
-		color: var(--sumi);
+	@media (hover: hover) {
+		.dashboard-settings-btn:hover {
+			background: var(--ink-100);
+			color: var(--sumi);
+		}
 	}
 
 	.dashboard-settings-btn:active {

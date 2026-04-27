@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren, popIn, animateNumber } from '$lib/motion';
@@ -43,6 +44,7 @@
 		const { data: { user } } = await supabase.auth.getUser();
 		if (user && xpEarned > 0) {
 			await addXP(supabase, user.id, xpEarned);
+			await invalidateAll();
 		}
 
 		if (pct >= 70) {
@@ -100,7 +102,7 @@
 			<div
 				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;"
 			>
-				<span style="color:var(--fg-secondary);">XP {t('home.total', $locale) || 'Total'}</span>
+				<span style="color:var(--fg-secondary);">{t('summary.xp', $locale)}</span>
 				<span style="font-weight:700;color:#b59410;">+{displayXP} XP</span>
 			</div>
 			<div
@@ -126,9 +128,11 @@
 </div>
 
 <style>
-	.summary-back-btn:hover {
-		box-shadow: 0 8px 28px rgba(188, 0, 45, 0.3);
-		transform: translateY(-2px);
+	@media (hover: hover) {
+		.summary-back-btn:hover {
+			box-shadow: 0 8px 28px rgba(188, 0, 45, 0.3);
+			transform: translateY(-2px);
+		}
 	}
 
 	@keyframes pulse-bg {

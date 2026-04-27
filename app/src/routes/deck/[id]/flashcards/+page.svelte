@@ -242,8 +242,10 @@
 </div>
 
 <style>
-	.flash-primary-btn:hover {
-		box-shadow: 0 4px 20px rgba(188, 0, 45, 0.3);
+	@media (hover: hover) {
+		.flash-primary-btn:hover {
+			box-shadow: 0 4px 20px rgba(188, 0, 45, 0.3);
+		}
 	}
 
 	.audio-btn {

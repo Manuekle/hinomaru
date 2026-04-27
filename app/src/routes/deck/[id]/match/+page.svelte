@@ -209,47 +209,49 @@
 			>
 		</div>
 	{:else if !finished}
-		<!-- Game grid -->
-		<div class="match-grid" style="--cols:2;--rows:{Math.ceil(currentSet.length / 2)};">
-			{#each currentSet as item (item.id + item.type)}
-				{@const key = makeKey(item.id, item.type)}
-				{@const isMatched = matchedIds.has(item.id)}
-				{@const isSelected = selectedKey === key}
-				{@const isWrong = wrongKeys.has(key)}
-				<!-- Keep matched cards in DOM as placeholders so grid doesn't shift -->
-				<button
-					class="match-card"
-					class:selected={isSelected}
-					class:matched={isMatched}
-					class:wrong={isWrong}
-					class:jp-card={item.type === 'jp' && !isMatched}
-					onclick={() => select(item)}
-					disabled={isMatched || transitioning}
-					aria-pressed={isSelected}
-				>
-					{#if !isMatched}
-						<div class="card-inner">
-							<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
-							{#if isSelected && item.type === 'jp' && $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-								<div class="romaji-hint">{item.romaji}</div>
-							{/if}
-							{#if item.type === 'jp'}
-								<div class="audio-hint">
-									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-								</div>
-							{/if}
-						</div>
-					{:else}
-						<!-- Matched state: show checkmark briefly then collapse -->
-						<div class="matched-icon">✓</div>
-					{/if}
-				</button>
-			{/each}
-		</div>
+		<!-- Centered game area -->
+		<div class="game-area">
+			<div class="match-grid" style="--cols:2;--rows:{Math.ceil(currentSet.length / 2)};">
+				{#each currentSet as item (item.id + item.type)}
+					{@const key = makeKey(item.id, item.type)}
+					{@const isMatched = matchedIds.has(item.id)}
+					{@const isSelected = selectedKey === key}
+					{@const isWrong = wrongKeys.has(key)}
+					<!-- Keep matched cards in DOM as placeholders so grid doesn't shift -->
+					<button
+						class="match-card"
+						class:selected={isSelected}
+						class:matched={isMatched}
+						class:wrong={isWrong}
+						class:jp-card={item.type === 'jp' && !isMatched}
+						onclick={() => select(item)}
+						disabled={isMatched || transitioning}
+						aria-pressed={isSelected}
+					>
+						{#if !isMatched}
+							<div class="card-inner">
+								<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
+								{#if isSelected && item.type === 'jp' && $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+									<div class="romaji-hint">{item.romaji}</div>
+								{/if}
+								{#if item.type === 'jp'}
+									<div class="audio-hint">
+										<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+									</div>
+								{/if}
+							</div>
+						{:else}
+							<!-- Matched state: show checkmark briefly then collapse -->
+							<div class="matched-icon">✓</div>
+						{/if}
+					</button>
+				{/each}
+			</div>
 
-		<!-- Round hint -->
-		<div class="round-hint">
-			{t('session.matchHint', $locale) || 'Empareja el japonés con su significado'}
+			<!-- Round hint -->
+			<div class="round-hint">
+				{t('session.matchHint', $locale) || 'Empareja el japonés con su significado'}
+			</div>
 		</div>
 	{:else}
 		<!-- Finish screen -->
@@ -299,18 +301,26 @@
 		flex-direction: column;
 		min-height: 100dvh;
 		background: var(--paper);
-		padding-bottom: env(safe-area-inset-bottom, 12px);
+		padding-bottom: 0;
+	}
+
+	/* ── Centered game area ── */
+	.game-area {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 32px 0 max(24px, env(safe-area-inset-bottom));
 	}
 
 	/* ── Grid ── */
 	.match-grid {
-		flex: 1;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 10px;
-		padding: 16px;
+		padding: 0 16px;
 		max-width: 540px;
-		margin: 0 auto;
 		width: 100%;
 		box-sizing: border-box;
 		align-content: start;
@@ -349,10 +359,12 @@
 		border-radius: 16px;
 	}
 
-	.match-card:not(:disabled):hover {
-		border-color: var(--ink-300);
-		box-shadow: var(--shadow-sm);
-		transform: translateY(-1px);
+	@media (hover: hover) {
+		.match-card:not(:disabled):hover {
+			border-color: var(--ink-300);
+			box-shadow: var(--shadow-sm);
+			transform: translateY(-1px);
+		}
 	}
 
 	.match-card:not(:disabled):active {
@@ -563,9 +575,12 @@
 
 	/* ── Mobile tweaks ── */
 	@media (max-width: 420px) {
+		.game-area {
+			padding: 20px 0 max(20px, env(safe-area-inset-bottom));
+		}
 		.match-grid {
 			gap: 8px;
-			padding: 12px;
+			padding: 0 12px;
 		}
 		.match-card {
 			padding: 12px 8px;

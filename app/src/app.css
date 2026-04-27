@@ -248,6 +248,8 @@ body {
 		background var(--dur-micro) var(--ease-brand),
 		transform 80ms var(--ease-brand);
 	text-decoration: none;
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: transparent;
 }
 
 .hm-btn:active {
@@ -275,18 +277,10 @@ body {
 	color: var(--fg-inverse);
 }
 
-.hm-btn-primary:hover {
-	background: var(--hinomaru-red-ink);
-}
-
 .hm-btn-secondary {
 	background: var(--washi);
 	color: var(--fg-primary);
 	border-color: var(--ink-200);
-}
-
-.hm-btn-secondary:hover {
-	background: var(--ink-50);
 }
 
 .hm-btn-ghost {
@@ -294,17 +288,17 @@ body {
 	color: var(--fg-primary);
 }
 
-.hm-btn-ghost:hover {
-	background: var(--ink-100);
-}
-
 .hm-btn-dark {
 	background: var(--sumi);
 	color: var(--washi);
 }
 
-.hm-btn-dark:hover {
-	background: var(--ink-700);
+/* Hover only on pointer devices — prevents stuck hover state on mobile/touch */
+@media (hover: hover) {
+	.hm-btn-primary:hover { background: var(--hinomaru-red-ink); }
+	.hm-btn-secondary:hover { background: var(--ink-50); }
+	.hm-btn-ghost:hover { background: var(--ink-100); }
+	.hm-btn-dark:hover { background: var(--ink-700); }
 }
 
 .hm-pill {

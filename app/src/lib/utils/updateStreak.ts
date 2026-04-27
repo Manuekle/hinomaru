@@ -15,11 +15,11 @@ export async function updateStreak(supabase: SupabaseClient, userId: string): Pr
 	yesterday.setDate(yesterday.getDate() - 1);
 	const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-	// Fetch current profile row
+	// Fetch current profile row (PK is `id` = user uuid)
 	const { data: profile } = await supabase
 		.from('profiles')
 		.select('current_streak, last_study_date')
-		.eq('user_id', userId)
+		.eq('id', userId)
 		.maybeSingle();
 
 	const lastStudy: string | null = profile?.last_study_date ?? null;
@@ -30,12 +30,8 @@ export async function updateStreak(supabase: SupabaseClient, userId: string): Pr
 
 	const newStreak = lastStudy === yesterdayStr ? currentStreak + 1 : 1;
 
-	await supabase.from('profiles').upsert(
-		{
-			user_id: userId,
-			current_streak: newStreak,
-			last_study_date: today
-		},
-		{ onConflict: 'user_id' }
-	);
+	await supabase
+		.from('profiles')
+		.update({ current_streak: newStreak, last_study_date: today })
+		.eq('id', userId);
 }

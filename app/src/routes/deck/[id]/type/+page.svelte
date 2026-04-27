@@ -65,18 +65,18 @@
 				total: String(cards.length),
 				mode: 'type'
 			});
-			goto(`/deck/${data.deck.id}/summary?${params}`);
-			supabase.auth.getUser().then(({ data: { user } }) => {
-				if (!user) return;
-				supabase.from('sessions').insert({
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				await supabase.from('sessions').insert({
 					user_id: user.id,
 					deck_id: data.deck.id,
 					mode: 'type',
 					correct,
 					total: cards.length
 				});
-				updateStreak(supabase, user.id);
-			});
+				await updateStreak(supabase, user.id);
+			}
+			goto(`/deck/${data.deck.id}/summary?${params}`);
 		} else {
 			submitted = false;
 			answer = '';
@@ -143,10 +143,7 @@
 				<button
 					onclick={playAudio}
 					aria-label="Play pronunciation"
-					style="position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:var(--bg-surface);border:1px solid var(--ink-200);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sumi);box-shadow:var(--shadow-sm);transition:transform 100ms ease;"
-					onmousedown={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(0.92)')}
-					onmouseup={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
-					onmouseleave={(e) => ((e.currentTarget as HTMLElement).style.transform = 'scale(1)')}
+					class="audio-btn-type"
 				>
 					<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
 				</button>
@@ -275,3 +272,29 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.audio-btn-type {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: var(--sumi);
+		box-shadow: var(--shadow-sm);
+		transition: transform 100ms ease, background 150ms ease;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.audio-btn-type:active { transform: scale(0.92); }
+	@media (hover: hover) {
+		.audio-btn-type:hover { background: var(--ink-100); }
+	}
+</style>

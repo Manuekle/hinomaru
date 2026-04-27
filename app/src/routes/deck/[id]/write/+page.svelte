@@ -351,8 +351,8 @@
 				if (cardEl) {
 					animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
 				}
+				await saveSession(correctCount, data.cards.length);
 				goto(`/deck/${data.deck.id}/summary?${params}`);
-				saveSession(correctCount, data.cards.length);
 			} else {
 				if (cardEl) {
 					await animate(cardEl, { opacity: [1, 0], x: [0, -40] }, { duration: 0.2, ease: 'easeIn' })
@@ -685,8 +685,10 @@
 		cursor: pointer;
 		transition: background 150ms ease;
 	}
-	.toolbar-btn:hover {
-		background: var(--ink-200);
+	@media (hover: hover) {
+		.toolbar-btn:hover {
+			background: var(--ink-200);
+		}
 	}
 	.toolbar-btn:active {
 		background: var(--ink-300);

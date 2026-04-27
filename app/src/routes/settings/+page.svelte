@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { theme, type ThemeType } from '$lib/stores/theme';
-	import { showRomaji, preferredVoice, notificationsEnabled } from '$lib/stores/settings';
+	import { showRomaji, preferredVoice, notificationsEnabled, srsEnabled } from '$lib/stores/settings';
+	import { onMount } from 'svelte';
 	import { svileo } from '$lib/stores/toast';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
@@ -85,6 +86,38 @@
 			showEmojiPicker = false;
 		}
 	}
+
+	// Sync srs_enabled from DB on mount
+	onMount(async () => {
+		if (!user) return;
+		const { data: prof } = await supabase
+			.from('profiles')
+			.select('srs_enabled')
+			.eq('id', user.id)
+			.maybeSingle();
+		if (prof != null) srsEnabled.set(prof.srs_enabled);
+	});
+
+	async function toggleSRS() {
+		const newVal = !$srsEnabled;
+		srsEnabled.set(newVal);
+		if (!user) return;
+		await supabase.from('profiles').update({ srs_enabled: newVal }).eq('id', user.id);
+	}
+
+	async function toggleNotifications() {
+		if (!$notificationsEnabled) {
+			// Enabling — request permission
+			if ('Notification' in window) {
+				const perm = await Notification.requestPermission();
+				if (perm !== 'granted') {
+					svileo.error({ title: t('settings.notifications.denied', $locale) });
+					return;
+				}
+			}
+		}
+		notificationsEnabled.toggle();
+	}
 </script>
 
 <svelte:window onclick={handleOutsideClick} onkeydown={handleKeydown} />
@@ -132,7 +165,7 @@
 						role="menu"
 					>
 						<div class="emoji-grid" role="menu" aria-label={t('settings.avatar', $locale)}>
-							{#snippet emojiBtn(emoji)}
+							{#snippet emojiBtn(emoji: string)}
 								<button
 									class="emoji-btn"
 									onclick={() => setAvatar(emoji)}
@@ -156,7 +189,7 @@
 		</div>
 	</section>
 
-	{#snippet settingsItem(icon, title, subtext, active, onclick)}
+	{#snippet settingsItem(icon: string, title: string, subtext: string, active: boolean, onclick: () => void)}
 		<button class="list-item" {onclick} role="switch" aria-checked={active}>
 			<div class="item-icon-box" aria-hidden="true">{icon}</div>
 			<div class="item-text-stack">
@@ -251,15 +284,22 @@
 		<section class="settings-group">
 			<h2 class="group-label">{t('settings.preferences', $locale)}</h2>
 			<div class="settings-list">
-				{@render settingsItem('🇯🇵', t('settings.showRomaji', $locale), null, $showRomaji, () =>
+				{@render settingsItem('🇯🇵', t('settings.showRomaji', $locale), '', $showRomaji, () =>
 					showRomaji.toggle()
+				)}
+				{@render settingsItem(
+					'🧠',
+					t('settings.srs', $locale),
+					t('settings.srs.desc', $locale),
+					$srsEnabled,
+					toggleSRS
 				)}
 				{@render settingsItem(
 					'🔔',
 					t('settings.notifications', $locale),
 					t('settings.notifications.desc', $locale),
 					$notificationsEnabled,
-					() => notificationsEnabled.toggle()
+					toggleNotifications
 				)}
 			</div>
 		</section>
@@ -341,8 +381,10 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	.back-link-beautiful:hover {
-		color: var(--sumi);
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
 	}
 
 	.settings-group {
@@ -408,10 +450,12 @@
 		height: 100%;
 	}
 
-	.avatar:hover {
-		transform: scale(1.05);
-		border-color: var(--hinomaru-red);
-		box-shadow: var(--shadow-md);
+	@media (hover: hover) {
+		.avatar:hover {
+			transform: scale(1.05);
+			border-color: var(--hinomaru-red);
+			box-shadow: var(--shadow-md);
+		}
 	}
 
 	.avatar-edit-badge {
@@ -465,10 +509,12 @@
 		justify-content: center;
 	}
 
-	.emoji-btn:hover {
-		background: var(--paper);
-		border-color: var(--hinomaru-red);
-		transform: scale(1.05);
+	@media (hover: hover) {
+		.emoji-btn:hover {
+			background: var(--paper);
+			border-color: var(--hinomaru-red);
+			transform: scale(1.05);
+		}
 	}
 
 	.item-text-stack {
@@ -563,8 +609,10 @@
 		text-align: left;
 	}
 
-	.list-item:hover {
-		background: var(--ink-50);
+	@media (hover: hover) {
+		.list-item:hover {
+			background: var(--ink-50);
+		}
 	}
 
 	.item-icon-box {
@@ -632,11 +680,13 @@
 		box-shadow: var(--shadow-sm);
 	}
 
-	.lang-card:hover {
-		border-color: var(--ink-300);
-		background: var(--paper);
-		transform: translateY(-4px);
-		box-shadow: var(--shadow-md);
+	@media (hover: hover) {
+		.lang-card:hover {
+			border-color: var(--ink-300);
+			background: var(--paper);
+			transform: translateY(-4px);
+			box-shadow: var(--shadow-md);
+		}
 	}
 
 	.lang-card.active {
@@ -699,8 +749,10 @@
 		display: block;
 	}
 
-	.support-image-btn:hover {
-		transform: scale(1.05);
+	@media (hover: hover) {
+		.support-image-btn:hover {
+			transform: scale(1.05);
+		}
 	}
 
 	.support-image-btn:active {
@@ -720,9 +772,11 @@
 		cursor: pointer;
 		transition: all 0.2s;
 	}
-	.signout-btn:hover {
-		background: var(--hinomaru-red-wash);
-		border-color: var(--hinomaru-red);
+	@media (hover: hover) {
+		.signout-btn:hover {
+			background: var(--hinomaru-red-wash);
+			border-color: var(--hinomaru-red);
+		}
 	}
 
 	.debug-btn {

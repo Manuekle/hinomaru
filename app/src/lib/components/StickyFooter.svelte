@@ -35,8 +35,11 @@
 		z-index: 100;
 		background: var(--bg-page);
 		border-top: 1px solid var(--ink-100);
-		/* Tightest possible integration with safe-area */
-		padding: 12px 24px env(safe-area-inset-bottom, 12px);
+		/*
+		 * env(safe-area-inset-bottom) = ~34px on iOS (home bar), = 0 on Android/desktop.
+		 * max() ensures at least 20px bottom padding on Android/desktop.
+		 */
+		padding: 12px 24px max(20px, env(safe-area-inset-bottom));
 		display: flex;
 		justify-content: center;
 		pointer-events: auto;
@@ -47,20 +50,18 @@
 		max-width: 520px;
 		display: flex;
 		gap: 12px;
-		pointer-events: auto; /* Re-enable clicks for the buttons */
+		pointer-events: auto;
 	}
 
-	/* Optional: subtle blur for glass effect if preferred */
-	/* 
-	@supports (backdrop-filter: blur(10px)) {
-		.sticky-footer {
-			background: color-mix(in srgb, var(--bg-page) 80%, transparent);
-			backdrop-filter: blur(12px);
-		}
-	}
-	*/
 	.back-text {
 		display: inline;
+	}
+
+	/* Desktop: more generous padding, centered feel */
+	@media (min-width: 768px) {
+		.sticky-footer {
+			padding: 16px 32px 28px;
+		}
 	}
 
 	@media (max-width: 400px) {

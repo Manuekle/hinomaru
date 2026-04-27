@@ -117,9 +117,11 @@
 		box-shadow: 0 4px 12px rgba(255, 94, 91, 0.2);
 	}
 
-	.kofi-button:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 6px 16px rgba(255, 94, 91, 0.3);
+	@media (hover: hover) {
+		.kofi-button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(255, 94, 91, 0.3);
+		}
 	}
 
 	.kofi-button-large {
@@ -138,9 +140,11 @@
 		box-shadow: 0 8px 24px rgba(255, 94, 91, 0.25);
 	}
 
-	.kofi-button-large:hover {
-		transform: translateY(-2px) scale(1.02);
-		box-shadow: 0 12px 32px rgba(255, 94, 91, 0.35);
+	@media (hover: hover) {
+		.kofi-button-large:hover {
+			transform: translateY(-2px) scale(1.02);
+			box-shadow: 0 12px 32px rgba(255, 94, 91, 0.35);
+		}
 	}
 
 	.minimal-link {
@@ -154,9 +158,11 @@
 		transition: all 150ms ease;
 	}
 
-	.minimal-link:hover {
-		background: rgba(255, 94, 91, 0.1);
-		color: #ff5e5b;
+	@media (hover: hover) {
+		.minimal-link:hover {
+			background: rgba(255, 94, 91, 0.1);
+			color: #ff5e5b;
+		}
 	}
 
 	@media (max-width: 600px) {

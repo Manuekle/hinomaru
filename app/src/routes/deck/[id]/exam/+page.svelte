@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
@@ -231,8 +231,32 @@
 		}
 	}
 
+	beforeNavigate(({ cancel }) => {
+		if (phase === 'exam') {
+			cancel();
+		}
+	});
+
 	onMount(() => {
+		function handleVisibility() {
+			if (document.hidden && phase === 'exam') {
+				if (timerInterval) {
+					clearInterval(timerInterval);
+					timerInterval = null;
+				}
+			} else if (!document.hidden && phase === 'exam' && !timerInterval) {
+				timerInterval = setInterval(() => {
+					timeLeft -= 1;
+					if (timeLeft <= 0) {
+						timeLeft = 0;
+						endExam();
+					}
+				}, 1000);
+			}
+		}
+		document.addEventListener('visibilitychange', handleVisibility);
 		return () => {
+			document.removeEventListener('visibilitychange', handleVisibility);
 			if (timerInterval) clearInterval(timerInterval);
 			if (advanceTimeout) clearTimeout(advanceTimeout);
 		};
@@ -698,9 +722,11 @@
 		font-family: inherit;
 		transition: all 0.18s;
 	}
-	.option-item:hover:not(:disabled) {
-		border-color: var(--ink-300);
-		box-shadow: var(--shadow-sm);
+	@media (hover: hover) {
+		.option-item:hover:not(:disabled) {
+			border-color: var(--ink-300);
+			box-shadow: var(--shadow-sm);
+		}
 	}
 	.option-item:disabled { cursor: default; }
 	.option-item.is-selected {

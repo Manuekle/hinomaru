@@ -57,8 +57,11 @@
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		/* env() for iOS home indicator; removed extra 8px gap to keep it closer to bottom */
-		padding: 0 16px env(safe-area-inset-bottom, 12px);
+		/*
+		 * env(safe-area-inset-bottom) = ~34px iOS, = 0 Android/desktop.
+		 * max() ensures at least 16px clearance on Android/web.
+		 */
+		padding: 0 16px max(16px, env(safe-area-inset-bottom));
 		pointer-events: none;
 		/* GPU layer — prevents iOS scroll jitter on position:fixed */
 		transform: translateZ(0);
@@ -152,5 +155,12 @@
 
 	:global([data-theme='dark']) .dock-indicator {
 		background: var(--fg-primary);
+	}
+
+	/* Desktop / tablet: more generous bottom clearance */
+	@media (min-width: 768px) {
+		.dock-wrap {
+			padding: 0 16px 24px;
+		}
 	}
 </style>

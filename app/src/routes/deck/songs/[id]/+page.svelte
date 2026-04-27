@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { page } from '$app/stores';
+	import { invalidateAll } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
@@ -182,39 +183,37 @@
 		el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	}
 
-	function onClipEnd() {
+	async function onClipEnd() {
 		isPlaying = false;
 		stopTracking();
-		if (!completed) {
-			completed = true;
-			fireConfetti = true;
-			playFinish();
-			svileo.success({ title: t('songs.doneBravo', $locale) });
-			try {
-				const raw = localStorage.getItem('hinomaru_songs_completed');
-				const ids: number[] = raw ? JSON.parse(raw) : [];
-				if (!ids.includes(songId)) {
-					ids.push(songId);
-					localStorage.setItem('hinomaru_songs_completed', JSON.stringify(ids));
-				}
-			} catch {
-				// ignore
+		if (completed) return;
+		completed = true;
+		fireConfetti = true;
+		playFinish();
+		svileo.success({ title: t('songs.doneBravo', $locale) });
+		try {
+			const raw = localStorage.getItem('hinomaru_songs_completed');
+			const ids: number[] = raw ? JSON.parse(raw) : [];
+			if (!ids.includes(songId)) {
+				ids.push(songId);
+				localStorage.setItem('hinomaru_songs_completed', JSON.stringify(ids));
 			}
-			const client = supabase;
-			if (client) {
-				client.auth.getUser().then(({ data: { user } }) => {
-					if (!user) return;
-					client.from('sessions').insert({
-						user_id: user.id,
-						mode: 'song',
-						correct: 1,
-						total: 1
-					});
-					updateStreak(client, user.id);
-					addXP(client, user.id, 20);
-				});
-			}
+		} catch {
+			// ignore
 		}
+		const client = supabase;
+		if (!client) return;
+		const { data: { user } } = await client.auth.getUser();
+		if (!user) return;
+		await client.from('sessions').insert({
+			user_id: user.id,
+			mode: 'song',
+			correct: 1,
+			total: 1
+		});
+		await updateStreak(client, user.id);
+		await addXP(client, user.id, 20);
+		await invalidateAll();
 	}
 
 	function play() {
@@ -556,8 +555,10 @@
 		margin-bottom: 20px;
 		transition: color 150ms;
 	}
-	.back:hover {
-		color: var(--fg-primary);
+	@media (hover: hover) {
+		.back:hover {
+			color: var(--fg-primary);
+		}
 	}
 
 	/* Hero */
@@ -707,8 +708,10 @@
 		opacity: 0.35;
 		cursor: not-allowed;
 	}
-	.play-btn:not(:disabled):hover {
-		opacity: 0.85;
+	@media (hover: hover) {
+		.play-btn:not(:disabled):hover {
+			opacity: 0.85;
+		}
 	}
 	.play-btn:not(:disabled):active {
 		transform: scale(0.93);
@@ -734,9 +737,11 @@
 		opacity: 0.35;
 		cursor: not-allowed;
 	}
-	.icon-btn:not(:disabled):hover {
-		color: var(--fg-primary);
-		border-color: var(--ink-300);
+	@media (hover: hover) {
+		.icon-btn:not(:disabled):hover {
+			color: var(--fg-primary);
+			border-color: var(--ink-300);
+		}
 	}
 
 	.speed-wrap {
@@ -764,9 +769,11 @@
 		border-color: var(--fg-primary);
 		color: var(--bg-page);
 	}
-	.speed-btn:not(.active):hover {
-		color: var(--fg-primary);
-		border-color: var(--ink-300);
+	@media (hover: hover) {
+		.speed-btn:not(.active):hover {
+			color: var(--fg-primary);
+			border-color: var(--ink-300);
+		}
 	}
 
 	/* Waveform + progress */
@@ -865,8 +872,10 @@
 		will-change: opacity, transform;
 		font-family: inherit;
 	}
-	.lyric-line:hover {
-		opacity: 0.45;
+	@media (hover: hover) {
+		.lyric-line:hover {
+			opacity: 0.45;
+		}
 	}
 	.lyric-line.near {
 		opacity: 0.5;
@@ -983,8 +992,10 @@
 			background 150ms,
 			color 150ms;
 	}
-	.vocab-action-btn:hover:not(:disabled) {
-		background: var(--ink-200);
+	@media (hover: hover) {
+		.vocab-action-btn:hover:not(:disabled) {
+			background: var(--ink-200);
+		}
 	}
 	.vocab-action-btn:disabled {
 		opacity: 0.5;

@@ -30,8 +30,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	const { data: streakData } = user ? await locals.supabase.rpc('get_user_streak') : { data: 0 };
-	const streakDays = streakData ?? 0;
+	// Read streak directly from profiles (get_user_streak RPC does not exist)
+	let streakDays = 0;
+	if (user) {
+		const { data: streakRow } = await locals.supabase
+			.from('profiles')
+			.select('current_streak')
+			.eq('id', user.id)
+			.maybeSingle();
+		streakDays = streakRow?.current_streak ?? 0;
+	}
 
 	// Historia del día — la más reciente con publish_date <= hoy
 	const today = new Date().toISOString().split('T')[0];
@@ -72,10 +80,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (user) {
 		const { data: prof } = await locals.supabase
 			.from('profiles')
-			.select('xp, level, total_lessons, avatar')
+			.select('xp, level, total_lessons, avatar, current_streak, srs_enabled')
 			.eq('id', user.id)
 			.single();
 		profile = prof;
+		streakDays = prof?.current_streak ?? streakDays;
 
 		if (todayWord) {
 			const { data: savedWord } = await locals.supabase

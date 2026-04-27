@@ -28,7 +28,7 @@ function createPersistedStore<T>(key: string, initialValue: T) {
 				update((v: any) => {
 					const next = !v;
 					if (isBrowser()) localStorage.setItem(key, String(next));
-					return next;
+					return next as T;
 				});
 			}
 		}

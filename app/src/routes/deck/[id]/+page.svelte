@@ -124,10 +124,6 @@
 		touch-action: manipulation;
 	}
 
-	.back-link:hover {
-		color: var(--sumi);
-	}
-
 	.mode-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
@@ -143,15 +139,18 @@
 		-webkit-tap-highlight-color: transparent;
 	}
 
-	.mode-card:hover {
-		box-shadow: var(--shadow-md);
-		transform: translateX(4px);
-		border-color: var(--ink-300);
-	}
-
 	.mode-card:active {
 		transform: translateX(2px) scale(0.99);
 		box-shadow: var(--shadow-sm);
+	}
+
+	@media (hover: hover) {
+		.back-link:hover { color: var(--sumi); }
+		.mode-card:hover {
+			box-shadow: var(--shadow-md);
+			transform: translateX(4px);
+			border-color: var(--ink-300);
+		}
 	}
 
 	.mode-icon-box {

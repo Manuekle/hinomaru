@@ -119,9 +119,8 @@
 		padding: 0;
 	}
 
-	.close-btn:hover {
-		background: var(--ink-100);
-		color: var(--sumi);
+	@media (hover: hover) {
+		.close-btn:hover { background: var(--ink-100); color: var(--sumi); }
 	}
 
 	.progress-info {

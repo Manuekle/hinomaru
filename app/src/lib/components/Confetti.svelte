@@ -7,7 +7,7 @@
 		duration?: number;
 	}
 
-	let { fireOnMount = false, duration = 2500 } = $props<Props>();
+	let { fireOnMount = false, duration = 2500 }: Props = $props();
 
 	// App palette: hinomaru-red, sumi, washi, gold
 	const COLORS = ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'];
