@@ -33,13 +33,13 @@
 		left: 0;
 		right: 0;
 		z-index: 100;
-		/* Slightly smoother gradient, starting further down */
-		background: linear-gradient(to top, var(--bg-page) 0%, var(--bg-page) 60%, transparent 100%);
-		/* Relying solely on env() for iOS home indicator integration to keep it as low as possible */
-		padding: 20px 24px env(safe-area-inset-bottom, 12px);
+		background: var(--bg-page);
+		border-top: 1px solid var(--ink-100);
+		/* Tightest possible integration with safe-area */
+		padding: 12px 24px env(safe-area-inset-bottom, 12px);
 		display: flex;
 		justify-content: center;
-		pointer-events: none; /* Allow clicks through the gradient area */
+		pointer-events: auto;
 	}
 
 	.footer-content {
