@@ -183,14 +183,6 @@
 						</div>
 					</div>
 
-					<StickyFooter>
-						<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advance}>
-							{turnIndex >= scenario.turns.length - 1
-								? ($locale === 'es' ? 'Terminar →' : 'Finish →')
-								: ($locale === 'es' ? 'Continuar →' : 'Continue →')}
-						</button>
-					</StickyFooter>
-
 				{:else if currentTurn.type === 'choice'}
 					<!-- Choice prompt card -->
 					<div use:fadeUp={{ delay: 0.1, y: 12 }} class="story-body-card">
@@ -276,14 +268,6 @@
 								</div>
 							{/if}
 						</div>
-
-						<StickyFooter>
-							<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advance}>
-								{turnIndex >= scenario.turns.length - 1
-									? ($locale === 'es' ? 'Terminar →' : 'Finish →')
-									: ($locale === 'es' ? 'Continuar →' : 'Continue →')}
-							</button>
-						</StickyFooter>
 					{/if}
 				{/if}
 			{/if}
@@ -312,19 +296,37 @@
 						: `You got ${score} of ${totalChoices} correct. (${scorePct}%)`}
 				</p>
 
-				<StickyFooter>
-					<a
-						href="/conversation"
-						class="hm-btn hm-btn-ghost hm-btn-full hm-btn-lg"
-						style="text-decoration:none;flex:1;"
+				</div>
+			{/if}
+
+			<StickyFooter>
+				{#if phase === 'result'}
+					<button
+						class="hm-btn hm-btn-ghost hm-btn-lg"
+						style="flex:1;"
+						onclick={() => goto('/conversation')}
 					>
-						← {$locale === 'es' ? 'Otros escenarios' : 'Other scenarios'}
-					</a>
-					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" style="flex:1;" onclick={restart}>
-						↺ {$locale === 'es' ? 'Repetir' : 'Repeat'}
+						{$locale === 'es' ? 'Otros escenarios' : 'Other scenarios'}
 					</button>
-				</StickyFooter>
-			</div>
+					<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={restart}>
+						{$locale === 'es' ? 'Repetir' : 'Repeat'}
+					</button>
+				{:else}
+					<button
+						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
+						onclick={advance}
+						disabled={phase === 'choice'}
+					>
+						{#if phase === 'choice'}
+							{$locale === 'es' ? 'Elige una respuesta' : 'Choose a response'}
+						{:else}
+							{turnIndex >= scenario.turns.length - 1
+								? ($locale === 'es' ? 'Terminar' : 'Finish')
+								: ($locale === 'es' ? 'Continuar' : 'Continue')} →
+						{/if}
+					</button>
+				{/if}
+			</StickyFooter>
 		{/if}
 	{/if}
 </div>

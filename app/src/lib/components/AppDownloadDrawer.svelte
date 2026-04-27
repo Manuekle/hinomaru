@@ -101,15 +101,17 @@
 </script>
 
 <Drawer.Root bind:open>
-	<Drawer.Content class="p-0 border-none bg-transparent">
-		<div class="drawer-inner">
+	<Drawer.Content>
+		<div class="mx-auto w-full max-w-md p-6 pb-12">
 			<!-- Close button -->
-			<button class="close-btn" onclick={close} aria-label={s.close}>
-				<Icon icon={Cancel01Icon} size={20} strokeWidth={1.5} />
-			</button>
+			<div class="flex justify-end mb-2">
+				<Drawer.Close class="p-2 hover:bg-muted rounded-full transition-colors">
+					<Icon icon={Cancel01Icon} size={20} strokeWidth={1.5} />
+				</Drawer.Close>
+			</div>
 
-			<Drawer.Header class="p-0 mb-6">
-				<Drawer.Title class="drawer-title">
+			<Drawer.Header class="p-0 mb-8">
+				<Drawer.Title class="text-2xl font-bold tracking-tight">
 					{#if isMobile}
 						{s.title}
 					{:else}
@@ -155,68 +157,80 @@
 
 					<!-- Desktop content -->
 				{:else}
-					<p class="desktop-desc">{s.desktopDesc}</p>
+					<p class="desktop-desc mb-6 text-muted-foreground">{s.desktopDesc}</p>
 
 					<!-- QR placeholder -->
-					<div class="qr-block" use:scaleIn={{ delay: 0.1 }}>
+					<div class="qr-block mb-8" use:scaleIn={{ delay: 0.1 }}>
 						<Icon icon={QrCode01Icon} size={80} strokeWidth={1} color="var(--sumi)" />
-						<span class="qr-url">hinomaru.app</span>
+						<span class="qr-url font-mono mt-2">hinomaru.app</span>
 					</div>
 
 					<!-- Tabs -->
-					<div class="tabs">
+					<div class="tabs mb-6 bg-muted/50 p-1 rounded-xl flex gap-1">
 						<button
-							class="tab-btn"
+							class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
 							class:tab-btn-active={desktopTab === 'ios'}
+							class:bg-background={desktopTab === 'ios'}
+							class:shadow-sm={desktopTab === 'ios'}
 							onclick={() => (desktopTab = 'ios')}
 						>
-							<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
-							{s.tabIOS}
+							<div class="flex items-center justify-center gap-2">
+								<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
+								{s.tabIOS}
+							</div>
 						</button>
 						<button
-							class="tab-btn"
+							class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
 							class:tab-btn-active={desktopTab === 'android'}
+							class:bg-background={desktopTab === 'android'}
+							class:shadow-sm={desktopTab === 'android'}
 							onclick={() => (desktopTab = 'android')}
 						>
-							<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
-							{s.tabAndroid}
+							<div class="flex items-center justify-center gap-2">
+								<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
+								{s.tabAndroid}
+							</div>
 						</button>
 					</div>
 
 					<!-- Tab content -->
-					{#if desktopTab === 'ios'}
-						<div class="steps-list steps-list-compact">
-							{#each iosSteps as step, i (i)}
-								<div class="step-item">
-									<div class="step-number">{i + 1}</div>
-									<div class="step-icon-wrap">
-										<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
+					<div class="min-h-[200px]">
+						{#if desktopTab === 'ios'}
+							<div class="steps-list steps-list-compact">
+								{#each iosSteps as step, i (i)}
+									<div class="step-item">
+										<div class="step-number">{i + 1}</div>
+										<div class="step-icon-wrap">
+											<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
+										</div>
+										<div class="step-text">
+											<div class="step-label">{step.label}</div>
+											<div class="step-desc">{step.desc}</div>
+										</div>
 									</div>
-									<div class="step-text">
-										<div class="step-label">{step.label}</div>
-										<div class="step-desc">{step.desc}</div>
+								{/each}
+							</div>
+						{:else}
+							<div class="steps-list steps-list-compact">
+								{#each androidSteps as step, i (i)}
+									<div class="step-item">
+										<div class="step-number">{i + 1}</div>
+										<div class="step-icon-wrap">
+											<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
+										</div>
+										<div class="step-text">
+											<div class="step-label">{step.label}</div>
+											<div class="step-desc">{step.desc}</div>
+										</div>
 									</div>
-								</div>
-							{/each}
-						</div>
-					{:else}
-						<div class="steps-list steps-list-compact">
-							{#each androidSteps as step, i (i)}
-								<div class="step-item">
-									<div class="step-number">{i + 1}</div>
-									<div class="step-icon-wrap">
-										<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
-									</div>
-									<div class="step-text">
-										<div class="step-label">{step.label}</div>
-										<div class="step-desc">{step.desc}</div>
-									</div>
-								</div>
-							{/each}
-						</div>
-					{/if}
+								{/each}
+							</div>
+						{/if}
+					</div>
 
-					<p class="pwa-note">{s.desktopPWANote}</p>
+					<p class="pwa-note mt-8 pt-4 border-t text-xs text-muted-foreground opacity-70">
+						{s.desktopPWANote}
+					</p>
 				{/if}
 			</div>
 		</div>
@@ -224,68 +238,6 @@
 </Drawer.Root>
 
 <style>
-	.drawer-inner {
-		background: var(--bg-surface);
-		border-radius: 24px 24px 0 0;
-		padding: 32px 24px calc(24px + env(safe-area-inset-bottom, 20px));
-		box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
-		position: relative;
-	}
-
-	@media (min-width: 768px) {
-		.drawer-inner {
-			border-radius: 24px;
-			width: min(480px, 90vw);
-			margin: 0 auto 40px;
-			padding: 32px 32px 36px;
-		}
-	}
-
-	/* Force modal for Android */
-	:global(.is-android) .drawer-inner {
-		border-radius: 24px;
-		width: min(480px, 90vw);
-		margin: 0 auto 40px;
-		padding: 32px 32px 36px;
-	}
-
-	/* Close button */
-	.close-btn {
-		position: absolute;
-		top: 20px;
-		right: 20px;
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		border: 1px solid var(--ink-200);
-		background: var(--washi, var(--paper));
-		color: var(--fg-secondary);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition:
-			background 150ms ease,
-			color 150ms ease;
-		padding: 0;
-		z-index: 10;
-	}
-	.close-btn:hover {
-		background: var(--ink-100);
-		color: var(--sumi);
-	}
-
-	/* Title */
-	.drawer-title {
-		font-size: 22px;
-		font-weight: 400;
-		color: var(--sumi);
-		margin: 0;
-		letter-spacing: -0.02em;
-		padding-right: 40px;
-		text-align: left;
-	}
-
 	/* Steps list */
 	.steps-list {
 		display: flex;
@@ -356,15 +308,6 @@
 		line-height: 1.4;
 	}
 
-	/* Desktop-specific */
-	.desktop-desc {
-		font-size: 14px;
-		color: var(--fg-secondary);
-		margin: 0 0 20px;
-		line-height: 1.5;
-		text-align: left;
-	}
-
 	.qr-block {
 		display: flex;
 		flex-direction: column;
@@ -373,66 +316,11 @@
 		padding: 20px;
 		background: var(--ink-100, rgba(0, 0, 0, 0.04));
 		border-radius: 16px;
-		margin-bottom: 20px;
 		border: 1px solid var(--ink-200);
 	}
 
 	.qr-url {
 		font-size: 13px;
 		color: var(--fg-secondary);
-		font-weight: 600;
-	}
-
-	/* Tabs */
-	.tabs {
-		display: flex;
-		gap: 8px;
-		margin-bottom: 16px;
-		background: var(--ink-100, rgba(0, 0, 0, 0.04));
-		border-radius: 12px;
-		padding: 4px;
-	}
-
-	.tab-btn {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		padding: 8px 10px;
-		border-radius: 9px;
-		border: none;
-		background: transparent;
-		color: var(--fg-secondary);
-		font-size: 13px;
-		font-weight: 600;
-		cursor: pointer;
-		transition:
-			background 150ms ease,
-			color 150ms ease;
-		white-space: nowrap;
-	}
-
-	.tab-btn:hover {
-		background: var(--bg-surface);
-		color: var(--sumi);
-	}
-
-	.tab-btn-active {
-		background: var(--bg-surface);
-		color: var(--sumi);
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-	}
-
-	/* PWA note */
-	.pwa-note {
-		font-size: 12px;
-		color: var(--fg-secondary);
-		margin: 16px 0 0;
-		line-height: 1.5;
-		opacity: 0.7;
-		border-top: 1px solid var(--ink-100);
-		padding-top: 14px;
-		text-align: left;
 	}
 </style>
