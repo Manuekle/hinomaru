@@ -6,7 +6,15 @@
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import Icon from '$lib/Icon.svelte';
-	import { Cancel01Icon, VolumeHighIcon, Search01Icon, ZapIcon, Bookmark02Icon, ArrowLeft02Icon } from '@hugeicons/core-free-icons';
+	import { 
+		Cancel01Icon, 
+		VolumeHighIcon, 
+		Search01Icon, 
+		ZapIcon, 
+		Bookmark02Icon, 
+		ArrowLeft02Icon,
+		CheckmarkCircle02Icon
+	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
 
@@ -37,10 +45,10 @@
 	}
 
 	function getSRSStage(reps: number) {
-		if (reps === 0) return { key: 'new', color: 'var(--success)' };
-		if (reps < 4) return { key: 'apprentice', color: 'var(--warning)' };
-		if (reps < 7) return { key: 'learned', color: 'var(--hinomaru-red)' };
-		return { key: 'master', color: '#b59410' };
+		if (reps === 0) return { key: 'new', color: 'var(--success)', label: 'Nuevo' };
+		if (reps < 4) return { key: 'apprentice', color: 'var(--warning)', label: 'Aprendiz' };
+		if (reps < 7) return { key: 'learned', color: 'var(--hinomaru-red)', label: 'Aprendido' };
+		return { key: 'master', color: '#b59410', label: 'Maestro' };
 	}
 
 	function formatReviewDate(dateString: string) {
@@ -99,155 +107,161 @@
 			return a.localeCompare(b);
 		});
 	});
+
+	function getCategoryColor(cat: string) {
+		const c = cat.toLowerCase();
+		if (c.includes('food') || c.includes('comida')) return '#e67e22';
+		if (c.includes('animal')) return '#27ae60';
+		if (c.includes('natur')) return '#16a085';
+		if (c.includes('famil')) return '#8e44ad';
+		if (c.includes('verb')) return '#2980b9';
+		if (c.includes('adj')) return '#f39c12';
+		if (c.includes('plac') || c.includes('lugar')) return '#c0392b';
+		if (c.includes('color')) return '#e91e63';
+		return 'var(--fg-tertiary)';
+	}
 </script>
 
 <svelte:head>
 	<title>{t('nav.vocabulary', $locale) || 'Mi Vocabulario'} — Hinomaru</title>
 </svelte:head>
 
-<div class="page">
-	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
-		<a href="/" class="back-link-beautiful">← {t('deck.back', $locale)}</a>
-	</div>
-
-	<div class="hero">
-		<div class="hero-top" use:fadeUp={{ delay: 0.06, y: 16 }}>
-			<h1>{t('nav.vocabulary', $locale) || 'Vocabulario'}</h1>
+<div class="vocab-page">
+	<div class="container">
+		<!-- Minimalist Top Nav -->
+		<div use:fadeUp={{ delay: 0, y: 10 }} class="top-nav">
+			<a href="/" class="back-link">
+				<Icon icon={ArrowLeft02Icon} size={18} />
+				<span>{t('deck.back', $locale)}</span>
+			</a>
 			{#if data.dueCount > 0}
-				<a href="/vocabulary/review" class="review-btn">
-					<Icon icon={ZapIcon} size={14} strokeWidth={2.5} />
-					{t('nav.review', $locale)} ({data.dueCount})
+				<a href="/vocabulary/review" class="review-pill">
+					<Icon icon={ZapIcon} size={14} variant="solid" />
+					<span>{t('nav.review', $locale)} ({data.dueCount})</span>
 				</a>
 			{/if}
 		</div>
-		<p use:fadeUp={{ delay: 0.12, y: 12 }}>
-			{t('home.cards', $locale, { n: data.savedWords.length })} guardadas en tu colección personal.
-		</p>
-	</div>
 
-	<!-- Search -->
-	<div class="search-wrap" use:fadeIn={{ delay: 0.18 }}>
-		<Icon icon={Search01Icon} size={18} class="search-icon" />
-		<input 
-			type="text" 
-			placeholder={t('vocab.search', $locale)} 
-			bind:value={searchQuery} 
-		/>
-	</div>
+		<header class="header">
+			<h1 use:fadeUp={{ delay: 0.05, y: 15 }}>{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}</h1>
+			<p use:fadeUp={{ delay: 0.1, y: 10 }}>
+				{t('home.cards', $locale, { n: data.savedWords.length })} guardadas para estudiar.
+			</p>
 
-	<!-- List -->
-	<div class="list">
-		{#if filteredWords.length === 0}
-			<div class="empty-state" use:fadeIn>
-				<div class="empty-icon">📭</div>
-				<p>{searchQuery ? 'Sin resultados' : t('vocab.empty', $locale)}</p>
+			<div class="search-bar" use:fadeUp={{ delay: 0.15, y: 8 }}>
+				<Icon icon={Search01Icon} size={20} class="search-icon" />
+				<input 
+					type="text" 
+					placeholder={t('vocab.search', $locale)} 
+					bind:value={searchQuery} 
+				/>
 			</div>
-		{:else}
-			{#each wordsByCategory as [catKey, group] (catKey)}
-				<div class="section-group" use:fadeUp={{ delay: 0.2 }}>
-					<div class="section-label">
-						<span class="dot" class:is-general={catKey === 'General'}></span>
-						{group.label}
-					</div>
-					
-					<div class="rows" use:staggerChildren={{ delay: 0.25, stagger: 0.05, y: 8 }}>
-						{#each group.words as word, i (word.id)}
-							{@const stage = getSRSStage(word.repetitions)}
-							{@const review = formatReviewDate(word.next_review)}
-							<div class="row">
-								<div class="row-num">{i + 1 < 10 ? '0' + (i + 1) : i + 1}</div>
-								
-								<div class="row-body">
-									<div class="row-top">
-										<span class="row-title jp">{word.jp}</span>
-										<span class="row-kana jp">{word.kana}</span>
+		</header>
+
+		<main class="content">
+			{#if filteredWords.length === 0}
+				<div class="empty" use:fadeIn>
+					<div class="empty-icon">📭</div>
+					<h3>{searchQuery ? 'Sin resultados' : t('vocab.empty', $locale)}</h3>
+					<p>{searchQuery ? 'Prueba con otra búsqueda.' : 'Tus palabras guardadas aparecerán aquí.'}</p>
+				</div>
+			{:else}
+				{#each wordsByCategory as [catKey, group] (catKey)}
+					<section class="cat-section" use:fadeUp={{ delay: 0.1 }}>
+						<div class="cat-header">
+							<div class="cat-indicator" style="background: {getCategoryColor(catKey)}"></div>
+							<h2 class="cat-title">{group.label}</h2>
+							<span class="cat-count">{group.words.length}</span>
+						</div>
+
+						<div class="cards-grid" use:staggerChildren={{ delay: 0.2, stagger: 0.05, y: 10 }}>
+							{#each group.words as word (word.id)}
+								{@const stage = getSRSStage(word.repetitions)}
+								{@const review = formatReviewDate(word.next_review)}
+								<div class="word-card">
+									<div class="card-top">
+										<div class="word-info">
+											<div class="jp-group">
+												<span class="jp-text jp">{word.jp}</span>
+												<span class="kana-text jp">{word.kana}</span>
+											</div>
+											{#if $showRomaji}
+												<span class="romaji-text">{word.romaji || kanaToRomaji(word.kana)}</span>
+											{/if}
+										</div>
+										<div class="card-actions">
+											<button class="icon-btn audio" onclick={() => speakJapanese(word.jp)}>
+												<Icon icon={VolumeHighIcon} size={18} />
+											</button>
+											<button class="icon-btn del" onclick={() => removeWord(word.id)}>
+												<Icon icon={Cancel01Icon} size={16} />
+											</button>
+										</div>
+									</div>
+
+									<div class="card-body">
+										<p class="meaning">{$locale === 'es' ? word.es : word.en}</p>
 										{#if word.pos}
-											<span class="row-pos">{word.pos_es || word.pos}</span>
+											<span class="pos-tag">{word.pos_es || word.pos}</span>
 										{/if}
 									</div>
-									<div class="row-sub">{$locale === 'es' ? word.es : word.en}</div>
-									{#if $showRomaji}
-										<div class="row-meta-inline">
-											{word.romaji || kanaToRomaji(word.kana)}
-										</div>
-									{/if}
-								</div>
 
-								<div class="row-meta">
-									<div class="meta-tags">
+									<div class="card-footer">
+										<div class="srs-status">
+											<div class="status-dot" style="background: {stage.color}"></div>
+											<span class="status-label">{stage.label}</span>
+										</div>
 										{#if review}
-											<span class="tag-review" class:urgent={review.urgent}>
+											<span class="review-info" class:urgent={review.urgent}>
 												{review.text}
 											</span>
 										{/if}
-										<span class="tag-srs" style="color: {stage.color}">
-											{t('vocab.stage.' + stage.key, $locale)}
-										</span>
-									</div>
-									<div class="row-actions">
-										<button class="action-btn" onclick={() => speakJapanese(word.jp)} title="Escuchar">
-											<Icon icon={VolumeHighIcon} size={16} />
-										</button>
-										<button class="action-btn del" onclick={() => removeWord(word.id)} title="Eliminar">
-											<Icon icon={Cancel01Icon} size={14} />
-										</button>
 									</div>
 								</div>
-							</div>
-						{/each}
-					</div>
-				</div>
-			{/each}
-		{/if}
+							{/each}
+						</div>
+					</section>
+				{/each}
+			{/if}
+		</main>
 	</div>
 </div>
 
 <style>
-	.page {
-		max-width: 680px;
+	.vocab-page {
+		min-height: 100dvh;
+		background: var(--paper);
+	}
+
+	.container {
+		max-width: 800px;
 		margin: 0 auto;
-		padding: calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
+		padding: calc(24px + env(safe-area-inset-top)) 24px 140px;
 	}
 
-	.back-link-beautiful {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 13px;
-		color: var(--fg-secondary);
-		text-decoration: none;
-		transition: color 150ms ease;
-	}
-	.back-link-beautiful:hover {
-		color: var(--fg-primary);
-	}
-
-	/* Hero */
-	.hero {
-		margin-bottom: 28px;
-		margin-top: 12px;
-	}
-
-	.hero-top {
+	.top-nav {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 6px;
+		margin-bottom: 32px;
 	}
 
-	.hero h1 {
-		font-size: 38px;
-		font-weight: 700;
-		letter-spacing: -0.03em;
-		color: var(--fg-primary);
-		margin: 0;
-		line-height: 1.1;
-	}
-
-	.review-btn {
-		display: inline-flex;
+	.back-link {
+		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 8px;
+		color: var(--fg-secondary);
+		text-decoration: none;
+		font-size: 14px;
+		font-weight: 600;
+		transition: color 0.2s;
+	}
+	.back-link:hover { color: var(--sumi); }
+
+	.review-pill {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 		padding: 8px 16px;
 		background: var(--hinomaru-red);
 		color: white;
@@ -258,219 +272,176 @@
 		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
 		transition: all 0.2s;
 	}
-
-	.review-btn:hover {
+	.review-pill:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 6px 16px rgba(188, 0, 45, 0.3);
 	}
 
-	.hero p {
-		font-size: 15px;
-		color: var(--fg-secondary);
-		margin: 0;
-		line-height: 1.5;
+	.header {
+		margin-bottom: 48px;
 	}
 
-	/* Search */
-	.search-wrap {
+	.header h1 {
+		font-size: 42px;
+		font-weight: 800;
+		letter-spacing: -0.04em;
+		margin: 0 0 8px;
+		color: var(--sumi);
+	}
+
+	.header p {
+		font-size: 16px;
+		color: var(--fg-secondary);
+		margin: 0 0 32px;
+	}
+
+	.search-bar {
 		position: relative;
-		margin-bottom: 32px;
+		display: flex;
+		align-items: center;
 	}
 
 	:global(.search-icon) {
 		position: absolute;
-		left: 14px;
-		top: 50%;
-		transform: translateY(-50%);
+		left: 18px;
 		color: var(--fg-tertiary);
 		pointer-events: none;
 	}
 
-	.search-wrap input {
+	.search-bar input {
 		width: 100%;
-		height: 48px;
-		background: var(--ink-50);
-		border: 1px solid var(--ink-100);
-		border-radius: 14px;
-		padding: 0 16px 0 42px;
-		font-size: 15px;
-		color: var(--fg-primary);
-		transition: all 0.2s;
+		height: 56px;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 0 20px 0 54px;
+		font-size: 17px;
+		color: var(--sumi);
+		box-shadow: var(--shadow-sm);
+		transition: all 0.3s;
 	}
 
-	.search-wrap input:focus {
-		background: var(--bg-page);
+	.search-bar input:focus {
 		border-color: var(--hinomaru-red);
-		box-shadow: 0 0 0 4px var(--hinomaru-red-wash);
+		box-shadow: 0 0 0 4px var(--hinomaru-red-wash), var(--shadow-md);
+		transform: translateY(-1px);
 	}
 
-	/* List */
-	.list {
-		display: flex;
-		flex-direction: column;
+	/* Content */
+	.cat-section {
+		margin-bottom: 56px;
 	}
 
-	.section-group {
-		margin-bottom: 32px;
-	}
-
-	.section-label {
+	.cat-header {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		font-size: 11px;
+		gap: 12px;
+		margin-bottom: 24px;
+		padding-left: 4px;
+	}
+
+	.cat-indicator {
+		width: 4px;
+		height: 20px;
+		border-radius: 2px;
+	}
+
+	.cat-title {
+		font-size: 16px;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		color: var(--fg-tertiary);
-		margin-bottom: 12px;
-		padding-left: 2px;
-	}
-
-	.dot {
-		width: 7px;
-		height: 7px;
-		background: var(--hinomaru-red);
-		border-radius: 50%;
-	}
-
-	.dot.is-general {
-		background: var(--fg-tertiary);
-	}
-
-	.rows {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.row {
-		display: flex;
-		align-items: flex-start;
-		gap: 16px;
-		padding: 16px 0;
-		border-bottom: 1px solid var(--ink-100);
-		text-decoration: none;
-		color: inherit;
-		transition: background 150ms;
-	}
-
-	.row:first-child {
-		border-top: 1px solid var(--ink-100);
-	}
-
-	.row-num {
-		font-size: 11px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		font-variant-numeric: tabular-nums;
-		padding-top: 3px;
-		min-width: 24px;
-		letter-spacing: 0.02em;
-	}
-
-	.row-body {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.row-top {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 2px;
-		flex-wrap: wrap;
-	}
-
-	.row-title {
-		font-size: 18px;
-		font-weight: 700;
-		color: var(--fg-primary);
-		line-height: 1.2;
-	}
-
-	.row-kana {
-		font-size: 12px;
-		color: var(--fg-tertiary);
-		font-weight: 500;
-	}
-
-	.row-pos {
-		font-size: 9px;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		background: var(--ink-100);
-		color: var(--fg-tertiary);
-		padding: 1px 6px;
-		border-radius: 4px;
-		font-style: italic;
-	}
-
-	.row-sub {
-		font-size: 14px;
+		letter-spacing: 0.1em;
 		color: var(--fg-secondary);
-		font-weight: 600;
-		margin-bottom: 2px;
+		margin: 0;
 	}
 
-	.row-meta-inline {
+	.cat-count {
 		font-size: 12px;
+		font-weight: 700;
 		color: var(--fg-tertiary);
-		font-weight: 500;
-		font-style: italic;
+		background: var(--ink-100);
+		padding: 2px 8px;
+		border-radius: 6px;
 	}
 
-	.row-meta {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 8px;
-		padding-top: 3px;
-		flex-shrink: 0;
+	.cards-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 16px;
 	}
 
-	.meta-tags {
+	/* Word Card */
+	.word-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 24px;
+		padding: 20px;
 		display: flex;
 		flex-direction: column;
-		align-items: flex-end;
+		gap: 16px;
+		box-shadow: var(--shadow-sm);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.word-card:hover {
+		transform: translateY(-4px) scale(1.01);
+		box-shadow: var(--shadow-lg), 0 12px 24px rgba(0,0,0,0.04);
+		border-color: var(--ink-300);
+	}
+
+	.card-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+
+	.jp-group {
+		display: flex;
+		flex-direction: column;
 		gap: 2px;
 	}
 
-	.tag-review {
-		font-size: 10px;
+	.jp-text {
+		font-size: 32px;
 		font-weight: 700;
-		color: var(--fg-tertiary);
+		color: var(--sumi);
+		line-height: 1;
 	}
 
-	.tag-review.urgent {
-		color: var(--error);
+	.kana-text {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		font-weight: 500;
 	}
 
-	.tag-srs {
-		font-size: 9px;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
+	.romaji-text {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		margin-top: 4px;
+		display: block;
 	}
 
-	.row-actions {
+	.card-actions {
 		display: flex;
 		gap: 8px;
-		opacity: 0;
+		opacity: 0.2;
 		transition: opacity 0.2s;
 	}
 
-	.row:hover .row-actions {
+	.word-card:hover .card-actions {
 		opacity: 1;
 	}
 
-	.action-btn {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		border: 1.5px solid var(--ink-200);
-		background: transparent;
-		color: var(--fg-tertiary);
+	.icon-btn {
+		width: 36px;
+		height: 36px;
+		border-radius: 12px;
+		border: none;
+		background: var(--ink-100);
+		color: var(--fg-secondary);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -478,35 +449,97 @@
 		transition: all 0.2s;
 	}
 
-	.action-btn:hover {
-		background: var(--fg-primary);
-		color: var(--bg-page);
-		border-color: var(--fg-primary);
-	}
-
-	.action-btn.del:hover {
-		background: var(--error);
-		border-color: var(--error);
+	.icon-btn:hover {
+		background: var(--sumi);
 		color: white;
 	}
 
-	.empty-state {
+	.icon-btn.del:hover {
+		background: var(--error);
+	}
+
+	.card-body {
+		flex: 1;
+	}
+
+	.meaning {
+		font-size: 18px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		margin: 0 0 8px;
+		line-height: 1.3;
+	}
+
+	.pos-tag {
+		font-size: 11px;
+		font-weight: 700;
+		font-style: italic;
+		color: var(--fg-tertiary);
+		background: var(--ink-50);
+		padding: 2px 8px;
+		border-radius: 6px;
+	}
+
+	.card-footer {
+		padding-top: 16px;
+		border-top: 1px dashed var(--ink-100);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.srs-status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.status-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+	}
+
+	.status-label {
+		font-size: 11px;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--fg-tertiary);
+	}
+
+	.review-info {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+	}
+
+	.review-info.urgent {
+		color: var(--error);
+		background: var(--error-wash);
+		padding: 2px 8px;
+		border-radius: 6px;
+	}
+
+	.empty {
 		text-align: center;
-		padding: 60px 24px;
+		padding: 80px 24px;
 		color: var(--fg-tertiary);
 	}
 
 	.empty-icon {
-		font-size: 48px;
-		margin-bottom: 12px;
-		display: block;
+		font-size: 64px;
+		margin-bottom: 16px;
 	}
 
-	@media (max-width: 500px) {
-		.row-actions {
+	@media (max-width: 600px) {
+		.cards-grid {
+			grid-template-columns: 1fr;
+		}
+		.card-actions {
 			opacity: 1;
 		}
-		.hero h1 {
+		.header h1 {
 			font-size: 32px;
 		}
 	}

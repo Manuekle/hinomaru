@@ -18,6 +18,7 @@
 	let direction = $state<'up' | 'down'>('up');
 	let clampedX = $state(0);
 	let clampedY = $state(0);
+	const meta = $derived(word ? getWordMetadata(word) : null);
 
 	$effect(() => {
 		if (visible && popupEl) {
@@ -127,7 +128,7 @@
 		transform: translate(-50%, 0);
 	}
 
-	:global(.reading-mode) .word-popup {
+	:global(.reading-mode-overlay) .word-popup {
 		background: var(--bg-page);
 		border-color: var(--ink-200);
 	}

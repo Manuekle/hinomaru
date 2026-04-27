@@ -6,6 +6,7 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
+	import { fade } from 'svelte/transition';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -89,6 +90,24 @@
 	let isReadingMode = $state(false);
 	let readingTheme = $state<'light' | 'sepia' | 'dark'>('light');
 	let fontSize = $state<'sm' | 'md' | 'lg'>('md');
+	let isSpeaking = $state(false);
+
+	function toggleAudio() {
+		if (typeof window === 'undefined' || !window.speechSynthesis) return;
+		if (isSpeaking) {
+			window.speechSynthesis.cancel();
+			isSpeaking = false;
+		} else {
+			speakJapanese(bodyJp);
+			isSpeaking = true;
+			const poll = setInterval(() => {
+				if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+					isSpeaking = false;
+					clearInterval(poll);
+				}
+			}, 300);
+		}
+	}
 	
 	$effect(() => {
 		if (story?.vocab?.length && supabase) {
@@ -200,6 +219,7 @@
 	function toggleReadingMode() {
 		if (typeof window !== 'undefined' && window.speechSynthesis) {
 			window.speechSynthesis.cancel();
+			isSpeaking = false;
 		}
 		
 		isReadingMode = !isReadingMode;
@@ -392,7 +412,6 @@
 				{/if}
 			</div>
 
-			</div>
 
 			{#if !isReadingMode}
 				<StickyFooter>
@@ -406,7 +425,8 @@
 				<div 
 					class="reading-mode-overlay" 
 					data-theme={readingTheme}
-					transition:fade={{ duration: 300 }}
+					in:fade={{ duration: 250 }}
+					out:fade={{ duration: 200 }}
 					style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
 				>
 					<div class="reading-mode-content">
@@ -423,8 +443,12 @@
 							/>
 						</div>
 
+						{#if $showRomaji && story.body_romaji}
+							<p class="body-text-romaji" in:fade={{ duration: 200 }}>{story.body_romaji}</p>
+						{/if}
+
 						{#if showTranslation}
-							<p class="body-text-translated" transition:fade>
+							<p class="body-text-translated" in:fade={{ duration: 200 }}>
 								{$locale === 'es' ? story.body_es : story.body_en}
 							</p>
 						{/if}
@@ -458,7 +482,7 @@
 
 							<div class="tool-divider"></div>
 
-							<button class="tool-btn" onclick={() => speakJapanese(bodyJp)} title="Escuchar">
+							<button class="tool-btn" class:active-tool={isSpeaking} onclick={toggleAudio} title={isSpeaking ? 'Detener audio' : 'Escuchar'}>
 								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={2} />
 							</button>
 							<button class="tool-btn" onclick={() => showRomaji.toggle()} title="Romaji" class:active-tool={$showRomaji}>
@@ -748,7 +772,7 @@
 		margin-bottom: 24px;
 		transition: all 0.3s ease;
 		position: relative;
-		overflow: hidden;
+		overflow: visible;
 	}
 
 	.story-body-card.is-preview {
@@ -756,6 +780,7 @@
 		background: var(--ink-50);
 		border-color: var(--ink-100);
 		box-shadow: none;
+		overflow: hidden;
 	}
 
 	.story-body-card.is-preview::after {
@@ -1339,8 +1364,10 @@
 		inset: 0;
 		z-index: 2000;
 		background: var(--bg-page);
+		color: var(--fg-primary);
 		overflow-y: auto;
-		padding: 60px 24px 140px;
+		-webkit-overflow-scrolling: touch;
+		padding: calc(60px + env(safe-area-inset-top)) 20px calc(140px + env(safe-area-inset-bottom)) 20px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -1365,11 +1392,17 @@
 	}
 
 	.reading-mode-overlay[data-theme='light'] {
-		--bg-page: var(--paper);
+		--bg-page: #f9f7f4;
 		--bg-surface: transparent;
-		--bg-toolbar: rgba(255, 255, 255, 0.85);
-		--fg-toolbar: #000;
-		--ink-200: transparent;
+		--bg-toolbar: rgba(255, 255, 255, 0.92);
+		--fg-primary: #1a1a1a;
+		--fg-secondary: #555;
+		--fg-tertiary: #888;
+		--fg-toolbar: #111;
+		--ink-50: rgba(0, 0, 0, 0.03);
+		--ink-100: rgba(0, 0, 0, 0.06);
+		--ink-200: rgba(0, 0, 0, 0.1);
+		--paper: #f9f7f4;
 	}
 
 	.reading-mode-overlay[data-theme='sepia'] {
@@ -1384,14 +1417,14 @@
 		--paper: #f4ecd8;
 	}
 
-	.reading-mode .story-display-title,
-	.reading-mode .body-text-jp,
-	.reading-mode .body-text-translated,
-	.reading-mode .story-content {
+	.reading-mode-overlay .story-display-title,
+	.reading-mode-overlay :global(.interactive-text),
+	.reading-mode-overlay .body-text-translated,
+	.reading-mode-overlay .body-text-romaji {
 		transition: color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	.reading-mode .story-display-title {
+	.reading-mode-overlay .story-display-title {
 		font-family: var(--font-heading);
 		font-size: 52px;
 		font-weight: 700;
@@ -1408,6 +1441,8 @@
 		background: transparent;
 		max-width: 680px;
 		margin: 0 auto;
+		overflow: visible;
+		border-radius: 0;
 	}
 
 	.reading-mode-overlay .body-text-jp {
@@ -1416,18 +1451,40 @@
 		line-height: 2.2;
 		margin-bottom: 40px;
 		letter-spacing: 0.02em;
+		color: var(--fg-primary);
 	}
 
-	.reading-mode .body-text-romaji {
+	/* Force InteractiveText to pick up reading mode colors and font size */
+	.reading-mode-overlay :global(.interactive-text) {
+		font-family: var(--font-jp);
+		font-size: var(--story-fs);
+		line-height: 2.2;
+		color: var(--fg-primary);
+		letter-spacing: 0.02em;
+		white-space: pre-wrap;
+		text-align: left;
+	}
+
+	@media (min-width: 600px) {
+		.reading-mode-overlay :global(.interactive-text) {
+			text-align: justify;
+		}
+	}
+	.reading-mode-overlay :global(.interactive-text span) {
+		color: var(--fg-primary);
+	}
+
+	.reading-mode-overlay .body-text-romaji {
 		font-size: calc(var(--story-fs) * 0.65);
 		opacity: 0.7;
 		margin-top: -30px;
 		margin-bottom: 40px;
 		text-align: justify;
 		font-style: italic;
+		color: var(--hinomaru-red);
 	}
 
-	.reading-mode .body-text-translated {
+	.reading-mode-overlay .body-text-translated {
 		font-size: calc(var(--story-fs) - 4px);
 		line-height: 1.8;
 		opacity: 0.7;
@@ -1435,6 +1492,7 @@
 		padding-left: 24px;
 		margin-top: 40px;
 		font-style: italic;
+		color: var(--fg-secondary);
 	}
 
 	.reading-mode-overlay :global(.word-link) {
@@ -1490,13 +1548,21 @@
 	/* --- Floating Reading Toolbar --- */
 	.reading-toolbar-container {
 		position: fixed;
-		bottom: 32px;
+		bottom: 0;
 		left: 0;
 		right: 0;
 		display: flex;
 		justify-content: center;
 		z-index: 2500;
-		padding: 0 20px;
+		padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+		/* Optional: Add a subtle gradient behind the toolbar to ensure readability if scrolled to bottom */
+		background: linear-gradient(to top, var(--bg-page) 50%, transparent);
+		pointer-events: none; /* Let clicks pass through the gradient */
+	}
+
+	.reading-toolbar-pill {
+		pointer-events: auto; /* Re-enable clicks on the pill itself */
+		/* ... rest of pill styles are handled above/below ... */
 	}
 
 	.reading-toolbar-pill {
@@ -1541,19 +1607,22 @@
 	}
 
 	.tool-btn.exit {
-		background: var(--fg-primary);
-		color: var(--bg-page);
+		background: var(--fg-toolbar, #fff);
+		color: var(--bg-toolbar, rgba(26, 26, 26, 0.95));
+		opacity: 1;
 	}
 
 	.tool-btn.exit:hover {
 		transform: scale(1.05);
+		opacity: 0.9;
 	}
 
 	.tool-divider {
 		width: 1px;
 		height: 24px;
-		background: rgba(255, 255, 255, 0.15);
+		background: var(--ink-200);
 		margin: 0 4px;
+		opacity: 0.5;
 	}
 
 	.tool-group-pill {
