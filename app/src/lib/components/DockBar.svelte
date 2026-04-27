@@ -57,8 +57,8 @@
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		/* env() for iOS home indicator; reduced gap from 16px to 10px */
-		padding: 0 20px calc(10px + env(safe-area-inset-bottom, 0px));
+		/* env() for iOS home indicator; 8px gap for a more "docked" feel */
+		padding: 0 16px calc(8px + env(safe-area-inset-bottom, 0px));
 		pointer-events: none;
 		/* GPU layer — prevents iOS scroll jitter on position:fixed */
 		transform: translateZ(0);
@@ -70,29 +70,30 @@
 		display: flex;
 		align-items: center;
 		gap: 2px;
-		/* Frosted glass: works on iOS Safari and Chrome Android */
-		background: rgba(255, 255, 255, 0.82);
-		backdrop-filter: blur(20px) saturate(180%);
-		-webkit-backdrop-filter: blur(20px) saturate(180%);
+		/* Frosted glass: more transparent and higher blur */
+		background: rgba(255, 255, 255, 0.75);
+		backdrop-filter: blur(24px) saturate(190%);
+		-webkit-backdrop-filter: blur(24px) saturate(190%);
 		border-radius: 999px;
-		padding: 6px 10px;
+		padding: 4px 8px;
+		/* Subtle border for glass effect */
+		border: 0.5px solid rgba(0, 0, 0, 0.05);
 		box-shadow:
-			0 4px 28px rgba(0, 0, 0, 0.12),
-			0 1px 6px rgba(0, 0, 0, 0.06),
-			inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+			0 10px 30px rgba(0, 0, 0, 0.08),
+			0 1px 8px rgba(0, 0, 0, 0.04);
 		pointer-events: auto;
-		max-width: 360px;
+		max-width: 420px;
 		width: 100%;
 		/* Prevent content repaints underneath */
 		isolation: isolate;
 	}
 
 	:global([data-theme='dark']) .dock-bar {
-		background: rgba(22, 22, 24, 0.82);
+		background: rgba(28, 28, 30, 0.75);
+		border-color: rgba(255, 255, 255, 0.1);
 		box-shadow:
-			0 4px 28px rgba(0, 0, 0, 0.4),
-			0 1px 6px rgba(0, 0, 0, 0.25),
-			inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+			0 10px 30px rgba(0, 0, 0, 0.4),
+			0 1px 8px rgba(0, 0, 0, 0.2);
 	}
 
 	.dock-item {
@@ -101,10 +102,10 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		/* min 44×44 px tap target — Apple HIG + Material requirement */
-		min-height: 44px;
+		/* Standard tap target height */
+		min-height: 48px;
 		min-width: 44px;
-		padding: 8px 2px;
+		padding: 4px 2px;
 		position: relative;
 		text-decoration: none;
 		color: var(--fg-tertiary);
@@ -113,17 +114,20 @@
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 		-webkit-touch-callout: none;
-		transition: color 150ms ease, background 150ms ease, transform 120ms ease;
+		transition:
+			color 150ms ease,
+			background 150ms ease,
+			transform 120ms ease;
 	}
 
 	/* :active fires on iOS only when ontouchstart is present on the element */
 	.dock-item:active {
-		transform: scale(0.86);
-		background: rgba(0, 0, 0, 0.06);
+		transform: scale(0.92);
+		background: rgba(0, 0, 0, 0.04);
 	}
 
 	:global([data-theme='dark']) .dock-item:active {
-		background: rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255, 0.06);
 	}
 
 	.dock-item.active {
@@ -136,13 +140,14 @@
 
 	.dock-indicator {
 		position: absolute;
-		bottom: 3px;
+		bottom: 6px;
 		left: 50%;
 		transform: translateX(-50%);
-		width: 16px;
-		height: 2px;
-		border-radius: 999px;
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
 		background: var(--sumi);
+		opacity: 0.8;
 	}
 
 	:global([data-theme='dark']) .dock-indicator {
