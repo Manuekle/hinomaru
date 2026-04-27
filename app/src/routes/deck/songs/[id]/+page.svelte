@@ -17,12 +17,9 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { svileo } from '$lib/stores/toast';
 	import { playFinish } from '$lib/utils/sounds';
-	import { createClient } from '$lib/supabase';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
 	import Confetti from '$lib/components/Confetti.svelte';
-
-	const supabase = createClient();
 	import DotLoader from '$lib/components/DotLoader.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
