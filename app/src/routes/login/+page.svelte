@@ -235,20 +235,16 @@
 	<title>{pageTitle}</title>
 </svelte:head>
 
-<div
-	style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));"
->
-	<div style="width:100%;max-width:400px;">
+<div class="login-layout">
+	<div class="login-container">
 		<!-- Brand / Logo -->
 		<div
 			bind:this={brandEl}
-			style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:36px;"
+			class="brand-header"
 		>
-			<span
-				style="width:48px;height:48px;background:var(--hinomaru-red);border-radius:50%;display:block;box-shadow:0 4px 16px rgba(188,0,45,0.25);"
-			></span>
-			<div style="font-size:24px;font-weight:700;letter-spacing:-0.02em;">Hinomaru</div>
-			<div style="font-size:14px;color:var(--fg-secondary);text-align:center;">
+			<div class="brand-logo"></div>
+			<h1 class="brand-name">Hinomaru</h1>
+			<p class="brand-subtitle">
 				{#if mode === 'signin'}{t('auth.signin.subtitle', $locale)}{:else if mode === 'signup'}{t(
 						'auth.signup.subtitle',
 						$locale
@@ -256,20 +252,18 @@
 						'auth.magic.subtitle',
 						$locale
 					)}{/if}
-			</div>
+			</p>
 		</div>
 
 		{#if signupDone}
-			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
-			>
-				<div style="font-size:40px;margin-bottom:16px;display:flex;justify-content:center;">
+			<div class="feedback-card">
+				<div class="feedback-icon">
 					<Icon icon={Mail01Icon} size={40} color="var(--fg-primary)" strokeWidth={1.5} />
 				</div>
-				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">
+				<h2 class="feedback-title">
 					{t('auth.signup.done.title', $locale)}
 				</h2>
-				<p style="font-size:14px;color:var(--fg-secondary);line-height:1.5;">
+				<p class="feedback-desc">
 					{t('auth.signup.done.desc', $locale, { email })}
 				</p>
 				<button
@@ -281,16 +275,14 @@
 				</button>
 			</div>
 		{:else if forgotDone}
-			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
-			>
-				<div style="font-size:40px;margin-bottom:16px;display:flex;justify-content:center;">
+			<div class="feedback-card">
+				<div class="feedback-icon">
 					<Icon icon={Mail01Icon} size={40} color="var(--fg-primary)" strokeWidth={1.5} />
 				</div>
-				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">
+				<h2 class="feedback-title">
 					{t('auth.forgot.done.title', $locale)}
 				</h2>
-				<p style="font-size:14px;color:var(--fg-secondary);line-height:1.5;">
+				<p class="feedback-desc">
 					{t('auth.forgot.done.desc', $locale, { email })}
 				</p>
 				<button
@@ -302,16 +294,14 @@
 				</button>
 			</div>
 		{:else if magicDone}
-			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
-			>
-				<div style="font-size:40px;margin-bottom:16px;display:flex;justify-content:center;">
+			<div class="feedback-card">
+				<div class="feedback-icon">
 					<Icon icon={SparklesIcon} size={40} color="var(--fg-primary)" strokeWidth={1.5} />
 				</div>
-				<h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">
+				<h2 class="feedback-title">
 					{t('auth.magic.done.title', $locale)}
 				</h2>
-				<p style="font-size:14px;color:var(--fg-secondary);line-height:1.5;">
+				<p class="feedback-desc">
 					{t('auth.magic.done.desc', $locale, { email })}
 				</p>
 				<button
@@ -325,7 +315,7 @@
 		{:else}
 			<div
 				bind:this={formEl}
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:20px;"
+				class="auth-card"
 			>
 				<!-- Tabs -->
 				{#if mode === 'signin' || mode === 'signup'}
@@ -349,18 +339,16 @@
 					</div>
 				{/if}
 
-				<form onsubmit={handleSubmit} style="display:flex;flex-direction:column;gap:16px;">
+				<form onsubmit={handleSubmit} class="auth-form">
 					{#if globalError}
-						<div
-							style="font-size:13px;color:var(--hinomaru-red);padding:10px 12px;background:var(--hinomaru-red-wash);border-radius:var(--radius-sm);display:flex;align-items:center;gap:6px;"
-						>
-							⚠ {globalError}
+						<div class="global-error">
+							<span class="error-icon">⚠</span> {globalError}
 						</div>
 					{/if}
 
 					<!-- Email -->
 					<div class="field">
-						<div class="label-meta" style="margin-bottom:8px;">{t('auth.email', $locale)}</div>
+						<div class="label-meta">{t('auth.email', $locale)}</div>
 						<input
 							type="email"
 							bind:value={email}
@@ -391,7 +379,7 @@
 					<!-- Password -->
 					{#if mode === 'signin' || mode === 'signup'}
 						<div class="field">
-							<div class="label-meta" style="margin-bottom:8px;">{t('auth.password', $locale)}</div>
+							<div class="label-meta">{t('auth.password', $locale)}</div>
 							<div class="pw-wrap">
 								<input
 									type={showPassword ? 'text' : 'password'}
@@ -459,7 +447,7 @@
 					<!-- Confirm Password (Signup) -->
 					{#if mode === 'signup'}
 						<div class="field">
-							<div class="label-meta" style="margin-bottom:8px;">
+							<div class="label-meta">
 								{t('auth.confirmPassword', $locale)}
 							</div>
 							<div class="pw-wrap">
@@ -528,20 +516,20 @@
 
 					<!-- Forgot password link -->
 					{#if mode === 'signin'}
-						<div style="text-align:right;margin-top:-8px;">
+						<div class="forgot-password-row">
 							<button
 								type="button"
 								onclick={() => toggleMode('forgot')}
-								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;text-decoration:underline;"
+								class="forgot-link"
 							>
 								{t('auth.forgotPassword', $locale)}
 							</button>
 						</div>
 					{/if}
 
-					<button type="submit" class="hm-btn hm-btn-primary hm-btn-full" disabled={loading}>
+					<button type="submit" class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" disabled={loading}>
 						{#if loading}
-							<ButtonLoader size={20} />
+							<ButtonLoader size={24} />
 						{:else if mode === 'signin'}
 							{t('auth.signin', $locale)}
 						{:else if mode === 'signup'}
@@ -560,35 +548,35 @@
 						<div class="social-row">
 							<button
 								type="button"
-								class="hm-btn hm-btn-secondary social-btn"
+								class="social-btn google"
 								onclick={() => handleSocialLogin('google')}
 								disabled={loading}
 								aria-label="Sign in with Google"
 							>
-								{@render googleIcon()}
+								<span class="social-icon">{@render googleIcon()}</span>
+								<span class="social-text">Google</span>
 							</button>
 
 							<button
 								type="button"
-								class="hm-btn hm-btn-secondary social-btn"
+								class="social-btn facebook"
 								onclick={() => handleSocialLogin('facebook')}
 								disabled={loading}
 								aria-label="Sign in with Facebook"
 							>
-								{@render facebookIcon()}
+								<span class="social-icon">{@render facebookIcon()}</span>
+								<span class="social-text">Facebook</span>
 							</button>
 						</div>
 					{/if}
 
 					<!-- Bottom options -->
-					{#if mode === 'signin'}
-						<div style="text-align:center;"></div>
-					{:else}
-						<div style="text-align:center;">
+					{#if mode !== 'signin'}
+						<div class="back-to-signin">
 							<button
 								type="button"
 								onclick={() => toggleMode('signin')}
-								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;text-decoration:underline;"
+								class="forgot-link"
 							>
 								{t('auth.backToSigninBtn', $locale)}
 							</button>
@@ -601,18 +589,125 @@
 </div>
 
 <style>
+	.login-layout {
+		min-height: 100dvh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--bg-page);
+		padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
+	}
+
+	.login-container {
+		width: 100%;
+		max-width: 400px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.brand-header {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+		margin-bottom: 36px;
+	}
+
+	.brand-logo {
+		width: 48px;
+		height: 48px;
+		background: var(--hinomaru-red);
+		border-radius: 50%;
+		box-shadow: 0 4px 16px rgba(188, 0, 45, 0.25);
+	}
+
+	.brand-name {
+		font-size: 24px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: var(--fg-primary);
+	}
+
+	.brand-subtitle {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		text-align: center;
+		max-width: 280px;
+		line-height: 1.5;
+	}
+
+	.auth-card,
+	.feedback-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 28px;
+		padding: 28px;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		box-shadow: var(--shadow-lg);
+	}
+
+	.feedback-card {
+		text-align: center;
+		padding: 32px;
+	}
+
+	.feedback-icon {
+		margin-bottom: 16px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.feedback-title {
+		font-size: 20px;
+		font-weight: 700;
+		margin-bottom: 8px;
+		color: var(--fg-primary);
+	}
+
+	.feedback-desc {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		line-height: 1.5;
+	}
+
+	.auth-form {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.global-error {
+		font-size: 13px;
+		color: var(--hinomaru-red);
+		padding: 12px 14px;
+		background: var(--hinomaru-red-wash);
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		border: 1px solid rgba(188, 0, 45, 0.1);
+	}
+
+	.error-icon {
+		font-weight: 700;
+	}
+
 	.field {
 		display: flex;
 		flex-direction: column;
-		gap: 0;
+		gap: 8px;
 	}
 
 	.pw-wrap {
 		position: relative;
 	}
+
 	.pw-wrap input {
 		padding-right: 44px;
 	}
+
 	.pw-toggle {
 		position: absolute;
 		right: 12px;
@@ -621,67 +716,90 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		color: var(--ink-400);
+		color: var(--fg-tertiary);
 		padding: 4px;
 		display: flex;
 		align-items: center;
 		transition: color 120ms;
 	}
+
 	.pw-toggle:hover {
-		color: var(--sumi);
+		color: var(--fg-primary);
 	}
 
 	.field-error {
 		font-size: 12px;
 		color: var(--hinomaru-red);
-		margin-top: 5px;
+		margin-top: 2px;
 		display: flex;
 		align-items: center;
 		gap: 4px;
+		padding-left: 2px;
 	}
 
-	/* Input error state */
 	.input-error {
 		border-color: var(--hinomaru-red) !important;
 		box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.1);
 	}
 
-	/* Mode tabs */
 	.tab-row {
 		display: flex;
 		gap: 4px;
 		background: var(--ink-100);
-		border-radius: var(--radius-md);
+		border-radius: 14px;
 		padding: 4px;
 		margin-bottom: 4px;
 	}
+
 	.tab-btn {
 		flex: 1;
-		height: 36px;
+		height: 38px;
 		border: none;
-		border-radius: 10px;
+		border-radius: 11px;
 		font-family: var(--font-ui);
 		font-size: 13px;
 		font-weight: 600;
 		cursor: pointer;
 		background: transparent;
 		color: var(--fg-secondary);
-		transition:
-			background 120ms,
-			color 120ms;
+		transition: all 150ms ease;
 	}
+
 	.tab-btn.active {
 		background: var(--bg-surface);
-		color: var(--sumi);
-		box-shadow: 0 1px 3px rgba(26, 26, 26, 0.08);
+		color: var(--fg-primary);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+	}
+
+	.forgot-password-row {
+		text-align: right;
+		margin-top: -8px;
+	}
+
+	.forgot-link {
+		background: none;
+		border: none;
+		font-family: var(--font-ui);
+		font-size: 13px;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		padding: 4px;
+		text-decoration: none;
+		font-weight: 500;
+		transition: color 120ms;
+	}
+
+	.forgot-link:hover {
+		color: var(--hinomaru-red);
 	}
 
 	.divider {
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		margin: 4px 0;
+		margin: 8px 0;
 	}
+
 	.divider::before,
 	.divider::after {
 		content: '';
@@ -689,6 +807,7 @@
 		height: 1px;
 		background: var(--ink-200);
 	}
+
 	.divider span {
 		font-size: 11px;
 		font-weight: 700;
@@ -698,15 +817,58 @@
 	}
 
 	.social-row {
-		display: flex;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		gap: 12px;
 	}
+
 	.social-btn {
-		flex: 1;
 		height: 52px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0;
+		gap: 8px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		border-radius: 16px;
+		cursor: pointer;
+		transition: all 150ms ease;
+		padding: 0 16px;
+	}
+
+	.social-btn:active {
+		transform: scale(0.96);
+		background: var(--ink-50);
+	}
+
+	.social-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.social-text {
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-primary);
+	}
+
+	.back-to-signin {
+		text-align: center;
+		margin-top: 8px;
+	}
+
+	@media (max-width: 480px) {
+		.auth-card {
+			border: none;
+			box-shadow: none;
+			background: transparent;
+			padding: 0;
+		}
+		
+		.login-layout {
+			align-items: flex-start;
+			padding-top: 64px;
+		}
 	}
 </style>

@@ -206,7 +206,7 @@
 			} catch {}
 			await supabase.auth.signOut();
 			await invalidateAll();
-			goto('/');
+			goto('/login');
 		}
 	}
 </script>
@@ -567,7 +567,7 @@
 					{t('settings.deleteAccount.otpSent', $locale, { email: user?.email || '' })}
 				</p>
 				<div class="otp-wrapper">
-					<InputOTP.Root maxlength={6} bind:value={otpCode}>
+					<InputOTP.Root maxlength={6} bind:value={otpCode} aria-label={t('settings.deleteAccount.verify', $locale)}>
 						{#snippet children({ cells })}
 							<div class="otp-slots-container">
 								{#each cells as cell (cell)}
@@ -1126,6 +1126,7 @@
 		display: flex;
 		justify-content: center;
 		margin-bottom: 24px;
+		cursor: pointer;
 	}
 
 	.otp-slots-container {
