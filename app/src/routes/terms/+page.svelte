@@ -4,51 +4,148 @@
 	import { locale } from '$lib/stores/locale';
 </script>
 
-<div
-	style="max-width:800px; margin:0 auto; padding:calc(40px + env(safe-area-inset-top)) 24px 100px; min-height:100vh;"
->
-	<h1
-		use:fadeUp
-		style="font-size:40px; font-weight:800; margin-bottom:40px; letter-spacing:-0.02em;"
-	>
-		{t('terms.title', $locale)}
-	</h1>
+<svelte:head>
+	<title>{t('terms.title', $locale)} | Hinomaru</title>
+</svelte:head>
 
-	<div
-		use:fadeUp={{ delay: 0.1 }}
-		style="color:var(--fg-secondary); line-height:1.7; font-size:16px;"
-	>
-		<p>{t('terms.updated', $locale)}</p>
+<div class="legal-page">
+	<header class="legal-header">
+		<div class="header-inner">
+			<a href="/" class="brand-link">
+				<span class="brand-dot"></span>
+				<span class="brand-name">Hinomaru</span>
+			</a>
+		</div>
+	</header>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
-			{t('terms.s1.title', $locale)}
-		</h2>
-		<p>{t('terms.s1.desc', $locale)}</p>
+	<main class="legal-content">
+		<h1 use:fadeUp>
+			{t('terms.title', $locale)}
+		</h1>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
-			{t('terms.s2.title', $locale)}
-		</h2>
-		<p>{t('terms.s2.desc', $locale)}</p>
+		<div class="content-body" use:fadeUp={{ delay: 0.1 }}>
+			<p class="updated-date">{t('terms.updated', $locale)}</p>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
-			{t('terms.s3.title', $locale)}
-		</h2>
-		<p>{t('terms.s3.desc', $locale)}</p>
+			<section>
+				<h2>{t('terms.s1.title', $locale)}</h2>
+				<p>{t('terms.s1.desc', $locale)}</p>
+			</section>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
-			{t('terms.s4.title', $locale)}
-		</h2>
-		<p>{t('terms.s4.desc', $locale)}</p>
+			<section>
+				<h2>{t('terms.s2.title', $locale)}</h2>
+				<p>{t('terms.s2.desc', $locale)}</p>
+			</section>
 
-		<h2 style="color:var(--sumi); margin-top:32px; font-size:24px;">
-			{t('terms.s5.title', $locale)}
-		</h2>
-		<p>{t('terms.s5.desc', $locale)}</p>
-	</div>
+			<section>
+				<h2>{t('terms.s3.title', $locale)}</h2>
+				<p>{t('terms.s3.desc', $locale)}</p>
+			</section>
 
-	<div style="margin-top:60px;">
-		<a href="/" style="color:var(--hinomaru-red); font-weight:600; text-decoration:none;"
-			>← {t('deck.back', $locale)}</a
-		>
-	</div>
+			<section>
+				<h2>{t('terms.s4.title', $locale)}</h2>
+				<p>{t('terms.s4.desc', $locale)}</p>
+			</section>
+
+			<section>
+				<h2>{t('terms.s5.title', $locale)}</h2>
+				<p>{t('terms.s5.desc', $locale)}</p>
+			</section>
+		</div>
+
+		<div class="legal-footer" use:fadeUp={{ delay: 0.2 }}>
+			<a href="/" class="back-link">← {t('deck.back', $locale)}</a>
+		</div>
+	</main>
 </div>
+
+<style>
+	.legal-page {
+		min-height: 100vh;
+		background: var(--bg-surface);
+		color: var(--sumi);
+		font-family: var(--font-ui);
+	}
+
+	.legal-header {
+		padding: 24px;
+		border-bottom: 1px solid var(--ink-100);
+	}
+	.header-inner {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+	.brand-link {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		text-decoration: none;
+		color: inherit;
+	}
+	.brand-dot {
+		width: 12px;
+		height: 12px;
+		background: var(--brand-primary);
+		border-radius: 50%;
+	}
+	.brand-name {
+		font-weight: 800;
+		font-size: 18px;
+		letter-spacing: -0.02em;
+	}
+
+	.legal-content {
+		max-width: 800px;
+		margin: 0 auto;
+		padding: 80px 24px;
+	}
+
+	h1 {
+		font-size: clamp(32px, 8vw, 48px);
+		font-weight: 900;
+		margin-bottom: 48px;
+		letter-spacing: -0.04em;
+	}
+
+	.content-body section {
+		margin-bottom: 40px;
+	}
+
+	h2 {
+		font-size: 22px;
+		font-weight: 800;
+		margin-bottom: 16px;
+		color: var(--sumi);
+		letter-spacing: -0.01em;
+	}
+
+	p {
+		font-size: 16px;
+		line-height: 1.7;
+		color: var(--fg-secondary);
+	}
+
+	.updated-date {
+		font-weight: 700;
+		font-size: 14px;
+		color: var(--brand-primary);
+		margin-bottom: 32px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.legal-footer {
+		margin-top: 80px;
+		padding-top: 40px;
+		border-top: 1px solid var(--ink-100);
+	}
+
+	.back-link {
+		font-weight: 700;
+		color: var(--brand-primary);
+		text-decoration: none;
+		transition: opacity 200ms;
+	}
+	.back-link:hover {
+		opacity: 0.7;
+	}
+</style>

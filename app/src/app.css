@@ -148,6 +148,15 @@
 	--cat-places: #9de1fe;
 	--cat-colors: #fa8072;
 	--cat-general: var(--ink-400);
+
+	/* Landing Page Theme (Hinomaru Brand) */
+	--brand-primary: #bc002d;
+	--brand-primary-hover: #9a0025;
+	--brand-secondary: #1a1a1a;
+	--cta-accent: #ffffff;
+	--bg-yellow-wash: #FFF9E5;
+	--bg-pink-wash: #FDF2F4;
+	--bg-light-gray: #F8F9FA;
 }
 
 [data-theme='dark'] {
@@ -176,6 +185,9 @@
 	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.25);
 	--shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
 	--shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+	--bg-yellow-wash: #2d2a1e;
+	--bg-pink-wash: #2d1e22;
+	--bg-light-gray: #222222;
 }
 
 .hm-input::placeholder {
