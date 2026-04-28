@@ -1,24 +1,29 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { theme, type ThemeType } from '$lib/stores/theme';
-	import { showRomaji, preferredVoice, notificationsEnabled, srsEnabled } from '$lib/stores/settings';
+	import {
+		showRomaji,
+		preferredVoice,
+		notificationsEnabled,
+		srsEnabled
+	} from '$lib/stores/settings';
 	import { onMount } from 'svelte';
 	import { svileo } from '$lib/stores/toast';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
-	import { fade, fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { goto, invalidate } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
-	import supportImg from '$lib/assets/support.png';
 	import Icon from '$lib/Icon.svelte';
+	import supportImg from '$lib/assets/support.png';
 	import {
-		SparklesIcon,
-		MonitorDotIcon,
-		Sun01Icon,
-		Moon01Icon,
-		VolumeHighIcon,
+		SiriIcon,
+		ComputerPhoneSyncIcon,
+		Sun03Icon,
+		Moon02Icon,
+		Mic02Icon,
 		AlphabetJapaneseIcon,
-		AiBrain01Icon,
+		Brain02Icon,
 		Notification01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
@@ -38,10 +43,9 @@
 			try {
 				await supabase.from('profiles').update({ onboarding_completed: false }).eq('id', user.id);
 			} catch {
-				// Quietly ignore if DB update fails in debug mode
+				// ignore
 			}
 		}
-		// Force full reload to reset state
 		window.location.href = '/onboarding';
 	}
 
@@ -55,11 +59,27 @@
 
 	function setVoice(v: 'standard' | 'kaito') {
 		preferredVoice.set(v);
-		// Play a small sample to confirm
-		speakJapanese('こんにちは');
+		speakJapanese('みなさん、こんにちは');
 	}
 
-	const japaneseEmojis = ['🎎', '🏮', '⛩️', '🍣', '🍡', '🍵', '🏯', '🗻', '🎏', '🎴', '🌸', '🎋', '🦊', '👺', '👹', '🍱'];
+	const japaneseEmojis = [
+		'🎎',
+		'🏮',
+		'⛩️',
+		'🍣',
+		'🍡',
+		'🍵',
+		'🏯',
+		'🗻',
+		'🎏',
+		'🎴',
+		'🌸',
+		'🎋',
+		'🦊',
+		'👺',
+		'👹',
+		'🍱'
+	];
 	let showEmojiPicker = $state(false);
 
 	async function setAvatar(emoji: string) {
@@ -67,7 +87,6 @@
 		const { error } = await supabase.from('profiles').update({ avatar: emoji }).eq('id', user.id);
 		if (!error) {
 			svileo.success({ title: t('settings.avatar.success', $locale) });
-			// Trigger data refresh
 			await invalidate('supabase:auth');
 		} else {
 			svileo.error({ title: t('settings.avatar.error', $locale) });
@@ -76,21 +95,15 @@
 		showEmojiPicker = false;
 	}
 
-	// Close on click outside or Escape
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape' && showEmojiPicker) {
-			showEmojiPicker = false;
-		}
+		if (e.key === 'Escape' && showEmojiPicker) showEmojiPicker = false;
 	}
 
 	function handleOutsideClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if (showEmojiPicker && !target.closest('.avatar-wrapper')) {
-			showEmojiPicker = false;
-		}
+		if (showEmojiPicker && !target.closest('.avatar-wrapper')) showEmojiPicker = false;
 	}
 
-	// Sync srs_enabled from DB on mount
 	onMount(async () => {
 		if (!user) return;
 		const { data: prof } = await supabase
@@ -110,7 +123,6 @@
 
 	async function toggleNotifications() {
 		if (!$notificationsEnabled) {
-			// Enabling — request permission
 			if ('Notification' in window) {
 				const perm = await Notification.requestPermission();
 				if (perm !== 'granted') {
@@ -129,27 +141,18 @@
 	<title>{t('settings.title', $locale)} — Hinomaru</title>
 </svelte:head>
 
-<div
-	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
->
-	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
-		<a href="/" class="back-link-beautiful">
-			← {t('deck.back', $locale)}
-		</a>
+<div class="settings-page">
+	<div use:fadeUp={{ delay: 0, y: 10 }}>
+		<a href="/" class="back-link">← {t('deck.back', $locale)}</a>
 	</div>
 
-	<h1
-		use:fadeUp={{ delay: 0.06, y: 16 }}
-		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 32px;"
-	>
+	<h1 use:fadeUp={{ delay: 0.05, y: 14 }} class="page-title">
 		{t('settings.title', $locale)}
 	</h1>
 
-	<div use:fadeUp={{ delay: 0.1, y: 16 }} style="display:flex;flex-direction:column;gap:40px;">
-	<!-- Profile Section -->
-	<section class="settings-group">
-		<h2 class="group-label">{t('settings.profile', $locale)}</h2>
-		<div class="profile-card">
+	<div use:fadeUp={{ delay: 0.1, y: 16 }} class="sections">
+		<!-- ── Profile ── -->
+		<div class="card profile-card">
 			<div class="avatar-wrapper">
 				<button
 					class="avatar"
@@ -159,24 +162,36 @@
 					aria-haspopup="true"
 				>
 					<span class="avatar-emoji">{data.profile?.avatar || '🎏'}</span>
-					<div class="avatar-edit-badge" aria-hidden="true">✎</div>
+					<div class="avatar-edit-badge" aria-hidden="true">
+						<svg
+							width="10"
+							height="10"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+						</svg>
+					</div>
 				</button>
 				{#if showEmojiPicker}
 					<div
 						class="emoji-picker-popover"
-						transition:fly={{ duration: 200, y: 10, opacity: 0 }}
+						transition:fly={{ duration: 180, y: 8, opacity: 0 }}
 						role="menu"
 					>
-						<div class="emoji-grid" role="menu" aria-label={t('settings.avatar', $locale)}>
+						<div class="emoji-grid">
 							{#snippet emojiBtn(emoji: string)}
 								<button
 									class="emoji-btn"
 									onclick={() => setAvatar(emoji)}
 									type="button"
-									aria-label={emoji}
+									aria-label={emoji}>{emoji}</button
 								>
-									{emoji}
-								</button>
 							{/snippet}
 							{#each japaneseEmojis as emoji (emoji)}
 								{@render emojiBtn(emoji)}
@@ -186,473 +201,507 @@
 				{/if}
 			</div>
 			<div class="profile-info">
-				<div class="email-label">{t('settings.email', $locale)}</div>
-				<div class="email-value">{user?.email}</div>
+				<div class="profile-name">{t('settings.email', $locale)}</div>
+				<div class="profile-email">{user?.email}</div>
 			</div>
 		</div>
-	</section>
 
-	{#snippet settingsItem(icon: any, title: string, subtext: string, active: boolean, onclick: () => void)}
-		<button class="list-item" {onclick} role="switch" aria-checked={active}>
-			<div class="item-icon-box" aria-hidden="true">
-				<Icon {icon} size={20} color="currentColor" strokeWidth={1.8} />
-			</div>
-			<div class="item-text-stack">
-				<span class="item-text">{title}</span>
-				{#if subtext}<span class="item-subtext">{subtext}</span>{/if}
-			</div>
-			<div class="hm-switch" class:active aria-hidden="true">
-				<div class="switch-handle"></div>
-			</div>
-		</button>
-	{/snippet}
-
-	<div style="display:flex;flex-direction:column;gap:32px;">
-		<!-- Theme Section (Premium Pill Toggle) -->
-		<section class="settings-group">
-			<h2 class="group-label">{t('settings.theme', $locale)}</h2>
-			<div class="segmented-pill-track" role="radiogroup" aria-label={t('settings.theme', $locale)}>
+		<!-- ── Tema ── -->
+		<div>
+			<p class="section-label">{t('settings.theme', $locale)}</p>
+			<div class="segmented" role="radiogroup" aria-label={t('settings.theme', $locale)}>
 				<div
-					class="pill-glider"
-					style="width: calc(33.333% - 4px); transform: translateX({$theme === 'system'
+					class="seg-glider"
+					style="width:calc(33.333% - 5.33px);transform:translateX({$theme === 'system'
 						? '0'
 						: $theme === 'light'
 							? '100%'
 							: '200%'})"
 				></div>
 				<button
-					class="pill-option"
+					class="seg-btn"
 					class:active={$theme === 'system'}
 					onclick={() => setTheme('system')}
 					role="radio"
 					aria-checked={$theme === 'system'}
 				>
-					<Icon icon={MonitorDotIcon} size={14} color="currentColor" />
-					{t('settings.theme.system', $locale)}
+					<Icon icon={ComputerPhoneSyncIcon} size={13} color="currentColor" />{t(
+						'settings.theme.system',
+						$locale
+					)}
 				</button>
 				<button
-					class="pill-option"
+					class="seg-btn"
 					class:active={$theme === 'light'}
 					onclick={() => setTheme('light')}
 					role="radio"
 					aria-checked={$theme === 'light'}
 				>
-					<Icon icon={Sun01Icon} size={14} color="currentColor" />
-					{t('settings.theme.light', $locale)}
+					<Icon icon={Sun03Icon} size={13} color="currentColor" />{t(
+						'settings.theme.light',
+						$locale
+					)}
 				</button>
 				<button
-					class="pill-option"
+					class="seg-btn"
 					class:active={$theme === 'dark'}
 					onclick={() => setTheme('dark')}
 					role="radio"
 					aria-checked={$theme === 'dark'}
 				>
-					<Icon icon={Moon01Icon} size={14} color="currentColor" />
-					{t('settings.theme.dark', $locale)}
+					<Icon icon={Moon02Icon} size={13} color="currentColor" />{t(
+						'settings.theme.dark',
+						$locale
+					)}
 				</button>
 			</div>
-		</section>
+		</div>
 
-		<section class="settings-group">
-			<h2 class="group-label">{t('onboarding.voice.title', $locale)}</h2>
-			<div class="segmented-pill-track" role="radiogroup" aria-label={t('onboarding.voice.title', $locale)}>
+		<!-- ── Voz ── -->
+		<div>
+			<p class="section-label">{t('onboarding.voice.title', $locale)}</p>
+			<div class="segmented" role="radiogroup" aria-label={t('onboarding.voice.title', $locale)}>
 				<div
-					class="pill-glider"
-					style="width: calc(50% - 4px); transform: translateX({$preferredVoice === 'standard'
+					class="seg-glider"
+					style="width:calc(50% - 4px);transform:translateX({$preferredVoice === 'standard'
 						? '0'
 						: '100%'})"
 				></div>
 				<button
-					class="pill-option"
+					class="seg-btn"
 					class:active={$preferredVoice === 'standard'}
 					onclick={() => setVoice('standard')}
 					role="radio"
 					aria-checked={$preferredVoice === 'standard'}
 				>
-					<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
-					{t('onboarding.voice.standard.name', $locale)}
+					<Icon icon={Mic02Icon} size={13} color="currentColor" />{t(
+						'onboarding.voice.standard.name',
+						$locale
+					)}
 				</button>
 				<button
-					class="pill-option"
+					class="seg-btn"
 					class:active={$preferredVoice === 'kaito'}
 					onclick={() => setVoice('kaito')}
 					role="radio"
 					aria-checked={$preferredVoice === 'kaito'}
 				>
-					<Icon icon={SparklesIcon} size={14} color="currentColor" />
-					{t('onboarding.voice.kaito.name', $locale)}
+					<Icon icon={SiriIcon} size={13} color="currentColor" />{t(
+						'onboarding.voice.kaito.name',
+						$locale
+					)}
 				</button>
 			</div>
-		</section>
+		</div>
 
-		<!-- Preferences -->
-		<section class="settings-group">
-			<h2 class="group-label">{t('settings.preferences', $locale)}</h2>
-			<div class="settings-list">
-				{@render settingsItem(AlphabetJapaneseIcon, t('settings.showRomaji', $locale), '', $showRomaji, () =>
-					showRomaji.toggle()
-				)}
-				{@render settingsItem(
-					AiBrain01Icon,
-					t('settings.srs', $locale),
-					t('settings.srs.desc', $locale),
-					$srsEnabled,
-					toggleSRS
-				)}
-				{@render settingsItem(
-					Notification01Icon,
-					t('settings.notifications', $locale),
-					t('settings.notifications.desc', $locale),
-					$notificationsEnabled,
-					toggleNotifications
-				)}
-			</div>
-		</section>
-
-		<section class="settings-group">
-			<h2 class="group-label">{t('settings.language', $locale)}</h2>
-			<div class="language-grid" role="radiogroup" aria-label={t('settings.language', $locale)}>
+		<!-- ── Idioma ── -->
+		<div>
+			<p class="section-label">{t('settings.language', $locale)}</p>
+			<div
+				class="segmented segmented-lang"
+				role="radiogroup"
+				aria-label={t('settings.language', $locale)}
+			>
+				<div
+					class="seg-glider"
+					style="width:calc(50% - 4px);transform:translateX({$locale === 'es' ? '0' : '100%'})"
+				></div>
 				<button
-					class="lang-card"
+					class="seg-btn seg-btn-lang"
 					class:active={$locale === 'es'}
 					onclick={() => setLanguage('es')}
 					role="radio"
 					aria-checked={$locale === 'es'}
 				>
-					<img
-						class="lang-flag"
-						src="https://flagcdn.com/32x24/es.png"
-						srcset="https://flagcdn.com/64x48/es.png 2x, https://flagcdn.com/96x72/es.png 3x"
-						width="32"
-						height="24"
-						alt="España"
-						aria-hidden="true"
-					/>
-					<div class="lang-info">
-						<span class="lang-name">{t('settings.spanish', $locale)}</span>
-						<span class="lang-native">Español</span>
-					</div>
+					<span class="fi fi-es flag-circle-sm" aria-hidden="true"></span>
+					Español
 				</button>
-
 				<button
-					class="lang-card"
+					class="seg-btn seg-btn-lang"
 					class:active={$locale === 'en'}
 					onclick={() => setLanguage('en')}
 					role="radio"
 					aria-checked={$locale === 'en'}
 				>
-					<img
-						class="lang-flag"
-						src="https://flagcdn.com/32x24/us.png"
-						srcset="https://flagcdn.com/64x48/us.png 2x, https://flagcdn.com/96x72/us.png 3x"
-						width="32"
-						height="24"
-						alt="United States"
-						aria-hidden="true"
-					/>
-					<div class="lang-info">
-						<span class="lang-name">{t('settings.english', $locale)}</span>
-						<span class="lang-native">English</span>
+					<span class="fi fi-us flag-circle-sm" aria-hidden="true"></span>
+					English
+				</button>
+			</div>
+		</div>
+
+		<!-- ── Preferencias ── -->
+		<div>
+			<p class="section-label">{t('settings.preferences', $locale)}</p>
+			<div class="card pref-list">
+				<button
+					class="pref-row"
+					onclick={() => showRomaji.toggle()}
+					role="switch"
+					aria-checked={$showRomaji}
+				>
+					<div class="pref-icon" style="background:#ff2d5514;color:#ff2d55;">
+						<Icon icon={AlphabetJapaneseIcon} size={18} color="currentColor" strokeWidth={1.8} />
+					</div>
+					<div class="pref-text">
+						<span class="pref-title">{t('settings.showRomaji', $locale)}</span>
+					</div>
+					<div class="hm-switch" class:active={$showRomaji}><div class="switch-handle"></div></div>
+				</button>
+				<div class="pref-divider"></div>
+				<button class="pref-row" onclick={toggleSRS} role="switch" aria-checked={$srsEnabled}>
+					<div class="pref-icon" style="background:#007aff14;color:#007aff;">
+						<Icon icon={Brain02Icon} size={18} color="currentColor" strokeWidth={1.8} />
+					</div>
+					<div class="pref-text">
+						<span class="pref-title">{t('settings.srs', $locale)}</span>
+						<span class="pref-sub">{t('settings.srs.desc', $locale)}</span>
+					</div>
+					<div class="hm-switch" class:active={$srsEnabled}><div class="switch-handle"></div></div>
+				</button>
+				<div class="pref-divider"></div>
+				<button
+					class="pref-row"
+					onclick={toggleNotifications}
+					role="switch"
+					aria-checked={$notificationsEnabled}
+				>
+					<div class="pref-icon" style="background:#af52de14;color:#af52de;">
+						<Icon icon={Notification01Icon} size={18} color="currentColor" strokeWidth={1.8} />
+					</div>
+					<div class="pref-text">
+						<span class="pref-title">{t('settings.notifications', $locale)}</span>
+						<span class="pref-sub">{t('settings.notifications.desc', $locale)}</span>
+					</div>
+					<div class="hm-switch" class:active={$notificationsEnabled}>
+						<div class="switch-handle"></div>
 					</div>
 				</button>
 			</div>
-		</section>
+		</div>
 
-		<!-- Support Section -->
-		<section class="settings-group">
-			<h2 class="group-label">{t('settings.support.title', $locale)}</h2>
-			<div class="support-container">
-				<p class="support-text">{t('settings.support.desc', $locale)}</p>
-				<a
-					href="https://ko-fi.com/manujsx"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="support-image-btn"
-				>
-					<img src={supportImg} alt="Support on Ko-fi" />
-				</a>
-			</div>
-		</section>
+		<!-- ── Support ── -->
+		<div class="card support-card">
+			<p class="support-text">{t('settings.support.desc', $locale)}</p>
+			<a
+				href="https://ko-fi.com/manujsx"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="support-btn"
+			>
+				<img src={supportImg} alt="Support on Ko-fi" />
+			</a>
+		</div>
 
-		<!-- Danger/Signout Zone -->
-		<section class="settings-group">
-			<button onclick={signOut} class="signout-btn">
-				{t('nav.signout', $locale)}
-			</button>
-
+		<!-- ── Sign out ── -->
+		<div>
+			<button onclick={signOut} class="signout-btn">{t('nav.signout', $locale)}</button>
 			{#if import.meta.env.DEV}
-				<div style="margin-top: 24px; text-align: center;">
-					<button onclick={debugResetOnboarding} class="debug-btn">
-						{t('settings.debugReset', $locale)}
-					</button>
+				<div style="margin-top:16px;text-align:center;">
+					<button onclick={debugResetOnboarding} class="debug-btn"
+						>{t('settings.debugReset', $locale)}</button
+					>
 				</div>
 			{/if}
-		</section>
+		</div>
 	</div>
-</div>
 </div>
 
 <style>
-	.back-link-beautiful {
+	.settings-page {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
+	}
+
+	.back-link {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
 		font-size: 13px;
-		color: var(--fg-secondary);
+		color: var(--fg-tertiary);
 		text-decoration: none;
-		transition: color 150ms ease;
+		transition: color 120ms;
+		margin-bottom: 6px;
 	}
 	@media (hover: hover) {
-		.back-link-beautiful:hover {
+		.back-link:hover {
 			color: var(--sumi);
 		}
 	}
 
-	.settings-group {
+	.page-title {
+		font-size: 34px;
+		font-weight: 700;
+		letter-spacing: -0.025em;
+		margin: 0 0 28px;
+		color: var(--fg-primary);
+	}
+
+	.sections {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 24px;
 	}
 
-	.group-label {
+	.section-label {
 		font-size: 11px;
-		font-weight: 600;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 		color: var(--fg-tertiary);
-		margin-bottom: 4px;
-		padding-left: 4px;
+		margin: 0 0 8px 4px;
 	}
 
-	/* Profile Card */
-	.profile-card {
+	/* ── Card shell ── */
+	.card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 24px;
-		padding: 24px;
+		border-radius: 20px;
+		overflow: hidden;
+		box-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.05),
+			0 4px 14px rgba(0, 0, 0, 0.05);
+	}
+	:global([data-theme='dark']) .card {
+		box-shadow:
+			0 1px 4px rgba(0, 0, 0, 0.3),
+			0 4px 16px rgba(0, 0, 0, 0.2);
+	}
+
+	.card-row {
+		padding: 12px 14px;
+	}
+
+	.card-divider {
+		height: 1px;
+		background: var(--ink-100);
+		margin: 0 14px;
+	}
+
+	/* ── Profile ── */
+	.profile-card {
 		display: flex;
 		align-items: center;
-		gap: 20px;
-		box-shadow: var(--shadow-sm);
+		gap: 16px;
+		padding: 20px;
 	}
 
 	.avatar-wrapper {
 		position: relative;
+		flex-shrink: 0;
 	}
 
 	.avatar {
-		width: 72px;
-		height: 72px;
+		width: 64px;
+		height: 64px;
 		border-radius: 50%;
 		background: var(--ink-100);
-		color: var(--sumi);
+		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-weight: 700;
-		font-size: 38px;
-		border: 2px solid var(--ink-200);
+		font-size: 32px;
 		cursor: pointer;
-		transition:
-			transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-			border-color 0.2s ease,
-			box-shadow 0.2s ease;
-		position: relative;
 		padding: 0;
-		box-shadow: var(--shadow-sm);
+		transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	@media (hover: hover) {
+		.avatar:hover {
+			transform: scale(1.06);
+		}
+	}
+	.avatar:active {
+		transform: scale(0.93);
 	}
 
 	.avatar-emoji {
+		line-height: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		line-height: 1;
-		width: 100%;
-		height: 100%;
-	}
-
-	@media (hover: hover) {
-		.avatar:hover {
-			transform: scale(1.05);
-			border-color: var(--hinomaru-red);
-			box-shadow: var(--shadow-md);
-		}
 	}
 
 	.avatar-edit-badge {
 		position: absolute;
 		bottom: 0;
 		right: 0;
-		width: 24px;
-		height: 24px;
-		background: var(--hinomaru-red);
+		width: 22px;
+		height: 22px;
+		background: var(--sumi);
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: white;
-		font-size: 11px;
 		border: 2px solid var(--bg-surface);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
 	.emoji-picker-popover {
 		position: absolute;
-		top: calc(100% + 12px);
+		top: calc(100% + 10px);
 		left: 0;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-300);
+		border: 1px solid var(--ink-200);
 		border-radius: 16px;
-		padding: 12px;
+		padding: 10px;
 		box-shadow: var(--shadow-lg);
-		z-index: 1000;
-		width: 210px;
-		transform-origin: top left;
+		z-index: 200;
+		width: 196px;
 	}
 
 	.emoji-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
-		gap: 8px;
+		gap: 6px;
 	}
 
 	.emoji-btn {
-		background: var(--ink-100);
-		border: 1px solid var(--ink-200);
-		font-size: 24px;
+		background: var(--ink-50);
+		border: 1px solid transparent;
+		font-size: 22px;
 		aspect-ratio: 1;
 		padding: 0;
 		cursor: pointer;
-		border-radius: 12px;
-		transition: all 0.2s ease;
+		border-radius: 10px;
+		transition: all 0.15s;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
-
 	@media (hover: hover) {
 		.emoji-btn:hover {
 			background: var(--paper);
 			border-color: var(--hinomaru-red);
-			transform: scale(1.05);
+			transform: scale(1.08);
 		}
 	}
 
-	.item-text-stack {
-		display: flex;
-		flex-direction: column;
-		gap: 1px;
+	.profile-info {
 		flex: 1;
+		min-width: 0;
 	}
-
-	.item-subtext {
-		font-size: 13px;
-		color: var(--fg-tertiary);
-		font-weight: 400;
-		line-height: 1.3;
-	}
-
-	.email-label {
+	.profile-name {
 		font-size: 12px;
-		color: var(--fg-tertiary);
-		margin-bottom: 2px;
-		font-weight: 500;
+		font-weight: 600;
+		color: var(--fg-secondary);
+		margin-bottom: 3px;
 	}
-
-	.email-value {
-		font-size: 16px;
+	.profile-email {
+		font-size: 15px;
 		font-weight: 600;
 		color: var(--fg-primary);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
-	/* Segmented Pill (Theme Switcher) */
-	.segmented-pill-track {
+	/* ── Segmented control ── */
+	.segmented {
 		background: var(--ink-100);
-		border-radius: 16px;
+		border-radius: 999px;
 		display: flex;
 		padding: 4px;
 		position: relative;
-		height: 48px;
+		height: 42px;
 	}
 
-	.pill-glider {
+	.seg-glider {
 		position: absolute;
 		top: 4px;
 		left: 4px;
-		width: calc(33.333% - 4px);
 		height: calc(100% - 8px);
 		background: var(--bg-surface);
-		border-radius: 12px;
-		box-shadow: var(--shadow-sm);
-		transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+		border-radius: 999px;
+		box-shadow:
+			0 1px 4px rgba(0, 0, 0, 0.12),
+			0 0 0 0.5px rgba(0, 0, 0, 0.06);
+		transition: transform 0.26s cubic-bezier(0.23, 1, 0.32, 1);
 		z-index: 1;
 	}
+	:global([data-theme='dark']) .seg-glider {
+		box-shadow:
+			0 1px 6px rgba(0, 0, 0, 0.4),
+			0 0 0 0.5px rgba(255, 255, 255, 0.06);
+	}
 
-	.pill-option {
+	.seg-btn {
 		flex: 1;
 		background: none;
 		border: none;
-		font-size: 13px;
+		font-size: 12px;
 		font-weight: 700;
-		color: var(--fg-secondary);
+		color: var(--fg-tertiary);
 		cursor: pointer;
 		position: relative;
 		z-index: 2;
-		transition: color 0.3s;
+		transition: color 0.22s;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: 5px;
+		letter-spacing: -0.01em;
 	}
-
-	.pill-option.active {
+	.seg-btn.active {
 		color: var(--sumi);
 	}
 
-	/* Settings List (Romaji) */
-	.settings-list {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		overflow: hidden;
+	/* ── Preferences list ── */
+	.pref-list {
+		overflow: visible;
 	}
 
-	.list-item {
+	.pref-row {
 		width: 100%;
 		display: flex;
 		align-items: center;
-		padding: 18px 20px;
+		gap: 13px;
+		padding: 13px 16px;
 		background: none;
 		border: none;
 		cursor: pointer;
-		transition: background 0.2s;
-		gap: 16px;
 		text-align: left;
+		transition: background 0.1s;
 	}
-
 	@media (hover: hover) {
-		.list-item:hover {
+		.pref-row:hover {
 			background: var(--ink-50);
 		}
 	}
 
-	.item-icon-box {
-		width: 32px;
-		height: 32px;
+	.pref-icon {
+		width: 36px;
+		height: 36px;
+		border-radius: 11px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--fg-secondary);
 		flex-shrink: 0;
 	}
 
-	.item-text {
+	.pref-text {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+	}
+	.pref-title {
+		font-size: 15px;
 		font-weight: 600;
 		color: var(--fg-primary);
-		font-size: 16px;
+		letter-spacing: -0.01em;
+	}
+	.pref-sub {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		line-height: 1.3;
 	}
 
-	/* Custom Switch */
+	.pref-divider {
+		height: 1px;
+		background: var(--ink-100);
+		margin: 0 16px 0 65px;
+	}
+
+	/* ── Switch ── */
 	.hm-switch {
 		width: 48px;
 		height: 28px;
@@ -660,7 +709,7 @@
 		border-radius: 14px;
 		position: relative;
 		flex-shrink: 0;
-		transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: background 0.22s ease;
 	}
 	.hm-switch.active {
 		background: var(--hinomaru-red);
@@ -670,149 +719,101 @@
 		width: 22px;
 		height: 22px;
 		background: white;
-		border-radius: 11px;
+		border-radius: 50%;
 		position: absolute;
 		top: 3px;
 		left: 3px;
 		transition:
 			transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-			width 0.15s ease;
-		box-shadow: 0 1px 4px rgba(0,0,0,0.25), 0 0 0 0.5px rgba(0,0,0,0.06);
+			width 0.12s ease;
+		box-shadow:
+			0 1px 4px rgba(0, 0, 0, 0.22),
+			0 0 0 0.5px rgba(0, 0, 0, 0.05);
 	}
-	.list-item:active .switch-handle {
+	.pref-row:active .switch-handle {
 		width: 26px;
 	}
 	.hm-switch.active .switch-handle {
 		transform: translateX(20px);
 	}
-	.hm-switch.active .list-item:active .switch-handle {
-		transform: translateX(16px);
+
+	/* ── Language tabs ── */
+	.segmented-lang {
+		height: 44px;
 	}
 
-	/* Language Grid */
-	.language-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 12px;
+	.seg-btn-lang {
+		gap: 8px;
+		font-size: 13px;
 	}
 
-	.lang-card {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 24px;
-		padding: 20px;
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		cursor: pointer;
-		transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-		position: relative;
-		text-align: left;
-		box-shadow: var(--shadow-sm);
-	}
-
-	@media (hover: hover) {
-		.lang-card:hover {
-			border-color: var(--ink-300);
-			background: var(--paper);
-			transform: translateY(-4px);
-			box-shadow: var(--shadow-md);
-		}
-	}
-
-	.lang-card.active {
-		border-color: var(--hinomaru-red);
-		background: var(--bg-surface);
-		box-shadow:
-			0 0 0 1px var(--hinomaru-red),
-			var(--shadow-md);
-		transform: scale(1.02);
-		z-index: 1;
-	}
-
-	.lang-card.active .lang-name {
-		color: var(--hinomaru-red);
-	}
-
-	.lang-flag {
-		width: 32px;
-		height: 24px;
-		border-radius: 4px;
-		object-fit: cover;
+	.flag-circle-sm {
+		width: 24px !important;
+		height: 24px !important;
+		border-radius: 6px !important;
+		background-size: cover !important;
+		background-position: center !important;
 		flex-shrink: 0;
-		box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+		box-shadow:
+			0 1px 4px rgba(0, 0, 0, 0.18),
+			0 0 0 0.5px rgba(0, 0, 0, 0.08);
+		display: inline-block;
 	}
 
-	.lang-info {
-		display: flex;
-		flex-direction: column;
-	}
-	.lang-name {
-		font-size: 14px;
-		font-weight: 700;
-		color: var(--fg-primary);
-	}
-	.lang-native {
-		font-size: 12px;
-		color: var(--fg-tertiary);
-	}
-
-	/* Support Section */
-	.support-container {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 24px;
-		box-shadow: var(--shadow-sm);
+	/* ── Support ── */
+	.support-card {
+		padding: 20px;
 		text-align: center;
 	}
-
 	.support-text {
-		font-size: 14px;
+		font-size: 13px;
 		color: var(--fg-secondary);
 		line-height: 1.5;
-		margin: 0 0 16px;
+		margin: 0 0 14px;
 	}
-
-	.support-image-btn {
+	.support-btn {
 		display: inline-block;
-		transition: transform 0.2s;
+		transition: transform 0.18s;
 	}
-
-	.support-image-btn img {
-		height: 44px;
+	.support-btn img {
+		height: 38px;
 		width: auto;
 		display: block;
 	}
-
 	@media (hover: hover) {
-		.support-image-btn:hover {
-			transform: scale(1.05);
+		.support-btn:hover {
+			transform: scale(1.04);
 		}
 	}
-
-	.support-image-btn:active {
-		transform: scale(0.95);
+	.support-btn:active {
+		transform: scale(0.96);
 	}
 
-	/* Buttons */
+	/* ── Sign out ── */
 	.signout-btn {
 		width: 100%;
-		height: 56px;
+		height: 50px;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 18px;
+		border: 1.5px solid var(--ink-200);
+		border-radius: 16px;
 		color: var(--hinomaru-red);
 		font-weight: 700;
 		font-size: 15px;
 		cursor: pointer;
-		transition: all 0.2s;
+		letter-spacing: -0.01em;
+		transition:
+			background 0.15s,
+			border-color 0.15s,
+			transform 0.12s;
 	}
 	@media (hover: hover) {
 		.signout-btn:hover {
 			background: var(--hinomaru-red-wash);
 			border-color: var(--hinomaru-red);
 		}
+	}
+	.signout-btn:active {
+		transform: scale(0.98);
 	}
 
 	.debug-btn {
@@ -822,6 +823,5 @@
 		font-size: 11px;
 		cursor: pointer;
 		text-decoration: underline;
-		font-weight: 600;
 	}
 </style>

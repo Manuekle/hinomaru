@@ -16,6 +16,7 @@
 	import { dev } from '$app/environment';
 	import { Toaster } from 'svileo';
 	import 'svileo/styles.css';
+	import 'flag-icons/css/flag-icons.min.css';
 	import { swipeBack } from '$lib/actions/swipeBack';
 
 	let { children, data } = $props();

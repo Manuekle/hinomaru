@@ -18,8 +18,8 @@
 		Award01Icon,
 		BookOpen01Icon,
 		ArrowLeft02Icon,
-		Sun01Icon,
-		Moon01Icon,
+		Sun03Icon,
+		Moon02Icon,
 		TextFontIcon,
 		TranslateIcon
 	} from '@hugeicons/core-free-icons';
@@ -528,11 +528,11 @@
 
 							<button class="tool-btn" onclick={cycleTheme} title="Tema">
 								{#if readingTheme === 'light'}
-									<Icon icon={Sun01Icon} size={18} color="currentColor" strokeWidth={2} />
+									<Icon icon={Sun03Icon} size={18} color="currentColor" strokeWidth={2} />
 								{:else if readingTheme === 'sepia'}
 									<Icon icon={TextFontIcon} size={18} color="currentColor" strokeWidth={2} />
 								{:else}
-									<Icon icon={Moon01Icon} size={18} color="currentColor" strokeWidth={2} />
+									<Icon icon={Moon02Icon} size={18} color="currentColor" strokeWidth={2} />
 								{/if}
 							</button>
 
