@@ -69,12 +69,6 @@
 	<Drawer.Content>
 		<div class="drawer-wrap">
 			<!-- Close button -->
-			<div class="drawer-header-visual">
-				<div class="header-icon">
-					<Icon icon={Download02Icon} size={32} color="#fff" />
-				</div>
-			</div>
-
 			<Drawer.Header class="drawer-header-custom">
 				<Drawer.Title class="drawer-title-custom">
 					{s.title}
@@ -85,12 +79,9 @@
 				<div class="body-inner">
 					<div class="steps-grid">
 						{#each steps as step, i (i)}
-							<div class="step-card" use:fadeUp={{ delay: 0.1 * i }}>
+							<div class="step-card" use:fadeUp={{ delay: 0.08 * i }}>
 								<div class="step-header">
 									<div class="step-badge">{i + 1}</div>
-									<div class="step-icon-ios">
-										<Icon icon={step.icon} size={22} strokeWidth={2} />
-									</div>
 								</div>
 								<div class="step-content">
 									<div class="step-label">{step.label}</div>
@@ -161,72 +152,63 @@
 
 	/* ── Header ── */
 	:global(.drawer-header-custom) {
-		padding: 24px 24px 16px !important;
-		text-align: center;
+		padding: 20px 24px 12px !important;
+		text-align: left;
 	}
 
 	:global(.drawer-title-custom) {
 		font-family: var(--font-ui) !important;
-		font-size: 24px !important;
-		font-weight: 900 !important;
-		letter-spacing: -0.03em !important;
+		font-size: 20px !important;
+		font-weight: 800 !important;
+		letter-spacing: -0.02em !important;
 		color: var(--fg-primary) !important;
-		line-height: 1.1 !important;
 	}
 
 	.body-inner {
-		padding: 0 24px;
+		padding: 0 24px 32px;
 	}
 	.steps-grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 12px;
+		gap: 8px;
 	}
 	.step-card {
+		display: flex;
+		align-items: center;
+		gap: 16px;
 		background: var(--bg-muted);
-		padding: 16px;
-		border-radius: 20px;
+		padding: 12px 16px;
+		border-radius: 16px;
 		border: 1px solid var(--ink-200);
-		transition: transform 0.2s;
 	}
 	.step-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 8px;
+		flex-shrink: 0;
 	}
 	.step-badge {
-		width: 22px;
-		height: 22px;
+		width: 24px;
+		height: 24px;
 		background: var(--brand-primary);
 		color: #fff;
-		border-radius: 50%;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: 800;
-	}
-	.step-icon-ios {
-		color: var(--brand-primary);
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 	.step-content {
-		padding-right: 12px;
+		flex: 1;
 	}
 	.step-label {
-		font-size: 16px;
-		font-weight: 800;
+		font-size: 15px;
+		font-weight: 700;
 		color: var(--fg-primary);
-		line-height: 1.1;
-		margin-bottom: 2px;
+		line-height: 1.2;
 	}
 	.step-desc {
-		font-size: 13px;
+		font-size: 12px;
 		color: var(--fg-secondary);
-		line-height: 1.3;
+		line-height: 1.2;
 		opacity: 0.8;
 	}
 
@@ -299,12 +281,12 @@
 
 	/* ── PWA Note ── */
 	.pwa-note {
-		margin-top: 24px;
-		padding-top: 16px;
-		border-top: 1px solid var(--ink-200);
-		font-size: 12px;
+		margin-top: 16px;
+		padding-top: 12px;
+		border-top: 1px solid var(--ink-100);
+		font-size: 11px;
 		color: var(--fg-tertiary);
-		line-height: 1.5;
+		line-height: 1.4;
 		font-family: var(--font-ui);
 	}
 </style>
