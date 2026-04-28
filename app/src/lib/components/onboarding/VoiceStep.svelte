@@ -5,6 +5,7 @@
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { speakVoicevox, stopVoicevox } from '$lib/services/voicevox';
 
 	let { onSelect, onBack } = $props();
 
@@ -34,43 +35,21 @@
 		onSelect(selected);
 	}
 
-	// IMPORTANT: speechSynthesis MUST be called from a direct <button> onclick
-	// for it to work on iOS Safari / PWA mode. A div with role="button" is blocked.
-	function playSample(id: string) {
-		if (!('speechSynthesis' in window)) return;
-		window.speechSynthesis.cancel();
-		playingId = id;
-
-		const utterance = new SpeechSynthesisUtterance('こんにちは、日本語の勉強を始めましょう');
-		utterance.lang = 'ja-JP';
-
-		// Try to find different Japanese voices
-		const availableVoices = window.speechSynthesis
-			.getVoices()
-			.filter((v) => v.lang.includes('ja') || v.lang.includes('JP'));
-
-		if (id === 'cool' && availableVoices.length > 1) {
-			// Find a male-sounding voice if possible, or just pick the second voice
-			const coolVoice =
-				availableVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) || availableVoices[1];
-			utterance.voice = coolVoice;
-			utterance.pitch = 0.8; // Deeper pitch
-		} else if (availableVoices.length > 0) {
-			utterance.voice = availableVoices[0];
-			if (id === 'cool') utterance.pitch = 0.8; // Fallback to pitch change if only 1 voice
-		} else {
-			// Absolute fallback if no voices loaded yet (Chrome loads them async)
-			if (id === 'cool') utterance.pitch = 0.8;
+	async function playSample(id: string) {
+		if (playingId === id) {
+			stopVoicevox();
+			playingId = null;
+			return;
 		}
-
-		utterance.rate = 0.9;
-		utterance.onend = () => {
+		stopVoicevox();
+		playingId = id;
+		try {
+			await speakVoicevox('こんにちは、日本語の勉強を始めましょう', id as 'kawaii' | 'cool');
+		} catch {
+			// VOICEVOX unavailable — silent fail in onboarding
+		} finally {
 			playingId = null;
-		};
-		utterance.onerror = () => {
-			playingId = null;
-		};
-		window.speechSynthesis.speak(utterance);
+		}
 	}
 </script>
 

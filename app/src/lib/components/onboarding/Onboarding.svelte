@@ -179,7 +179,7 @@
 		margin-left: auto;
 		margin-right: auto;
 		width: 100%;
-		padding-bottom: 20px;
+		padding-bottom: 0;
 	}
 
 	@media (max-height: 600px) and (orientation: landscape) {

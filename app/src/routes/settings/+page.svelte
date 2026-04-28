@@ -28,6 +28,7 @@
 		AlphabetJapaneseIcon,
 		Brain02Icon,
 		Notification01Icon,
+		TwentyFourHoursClockIcon,
 		EarthIcon,
 		JupiterIcon,
 		Delete02Icon,
@@ -464,7 +465,7 @@
 					<div class="pref-divider"></div>
 					<div class="pref-row" style="cursor:default;">
 						<div class="pref-icon" style="background:#af52de14;color:#af52de;">
-							<Icon icon={Notification01Icon} size={18} color="currentColor" strokeWidth={1.8} />
+							<Icon icon={TwentyFourHoursClockIcon} size={18} color="currentColor" strokeWidth={1.8} />
 						</div>
 						<div class="pref-text">
 							<span class="pref-title">{t('settings.reminderHour', $locale)}</span>

@@ -78,7 +78,7 @@ npm install
 Ensure you have Docker installed:
 ```bash
 cd tts-service
-docker-compose up -d --build
+docker-compose up -d --build o sudo docker compose up -d --build
 ```
 
 ### 3. Environment Setup
