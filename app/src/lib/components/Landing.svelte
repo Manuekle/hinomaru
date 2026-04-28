@@ -1260,17 +1260,18 @@
 		}
 		.feature-image {
 			order: -1;
-			height: 340px;
+			height: 420px;
 			width: 100%;
+			padding: 0 !important;
 			position: relative;
 			overflow: hidden;
 			background: var(--bg-surface);
 		}
 		.mockup-mobile-wrapper {
 			position: absolute;
+			top: 20px;
 			left: 50%;
-			top: 30px;
-			width: 240px;
+			width: 280px;
 			transform: translateX(-50%);
 			z-index: 5;
 			display: flex;
@@ -1279,11 +1280,27 @@
 		.iphone-16-mockup.mini {
 			width: 100%;
 			margin: 0;
-			filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.12));
+			filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
 		}
-		/* Decorative fade to hide the cut */
+		/* Ultra-smooth fade to integrate with title */
 		.feature-image::after {
-			display: none;
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 160px;
+			background: linear-gradient(
+				to bottom,
+				transparent 0%,
+				rgba(255, 255, 255, 0) 20%,
+				rgba(255, 255, 255, 0.4) 50%,
+				rgba(255, 255, 255, 0.8) 80%,
+				var(--bg-surface) 100%
+			);
+			z-index: 10;
+			pointer-events: none;
+			display: block;
 		}
 		.stats-grid {
 			grid-template-columns: repeat(3, 1fr);
@@ -1421,13 +1438,6 @@
 		}
 		.feature-content p {
 			font-size: 15px;
-		}
-		.feature-image {
-			height: 300px;
-		}
-		.iphone-16-mockup.mini {
-			max-width: 200px;
-			transform: translateX(-50%) scale(1.3);
 		}
 		.feature-item {
 			border-radius: 24px;
