@@ -3,7 +3,7 @@
 	import { fadeUp, fadeIn, animateNumber, inView, inViewStagger, floatLoop } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
-	import { theme } from '$lib/stores/theme';
+	import { theme, resolvedTheme } from '$lib/stores/theme';
 	import Icon from '$lib/Icon.svelte';
 	import supportImg from '$lib/assets/support.png';
 	import {
@@ -34,12 +34,7 @@
 	let statDays = $state(0);
 
 	// Determine if dark mode is active
-	let isDark = $derived(
-		$theme === 'dark' ||
-			($theme === 'system' &&
-				typeof window !== 'undefined' &&
-				window.matchMedia('(prefers-color-scheme: dark)').matches)
-	);
+	let isDark = $derived($resolvedTheme === 'dark');
 
 	// Select a few N5 decks for preview
 	const previewDecks = $derived(decks.filter((d: any) => d.level === 'N5').slice(0, 3));
@@ -93,7 +88,7 @@
 		<div class="hero-inner">
 			<div class="hero-badge" use:fadeUp={{ delay: 0 }}>
 				<div class="badge-icon">
-					<Icon icon={StarIcon} size={20} color="var(--brand-primary)" variant="solid" />
+					<Icon icon={StarIcon} size={20} color={isDark ? 'var(--warning)' : 'var(--brand-primary)'} variant="solid" />
 				</div>
 				<span>{t('landing.hero.badge', $locale)}</span>
 			</div>
@@ -385,7 +380,7 @@
 		height: 56px;
 		padding: 0 32px;
 		font-size: 16px;
-		font-weight: 700;
+		font-weight: 600;
 		border-radius: 16px;
 		text-decoration: none;
 		cursor: pointer;
@@ -421,6 +416,10 @@
 		position: relative;
 		text-align: center;
 		z-index: 5;
+		transition: background 0.4s ease;
+	}
+	:global(.dark) .hero-section {
+		background: var(--bg-page);
 	}
 	.hero-inner {
 		max-width: 1000px;
@@ -440,6 +439,12 @@
 		margin-bottom: 24px;
 		backdrop-filter: blur(8px);
 		border: 1px solid rgba(255, 255, 255, 0.1);
+		color: #fff;
+	}
+	:global(.dark) .hero-badge {
+		background: var(--bg-surface-glass);
+		border-color: var(--ink-200);
+		color: var(--fg-primary);
 	}
 	.badge-icon {
 		background: #fff;
@@ -460,6 +465,7 @@
 	}
 	.hero-subtitle {
 		font-size: clamp(16px, 4vw, 20px);
+		font-weight: 500;
 		opacity: 0.9;
 		max-width: 600px;
 		margin: 0 auto 40px;
@@ -569,8 +575,11 @@
 	}
 	.float-lines .bar {
 		height: 4px;
-		background: var(--ink-100);
+		background: rgba(0, 0, 0, 0.1);
 		border-radius: 2px;
+	}
+	:global(.dark) .float-lines .bar {
+		background: rgba(255, 255, 255, 0.2);
 	}
 
 	.hero-curve {
@@ -671,7 +680,7 @@
 		font-size: 13px;
 	}
 	.deck-preview-title {
-		font-weight: 700;
+		font-weight: 600;
 		font-size: 17px;
 	}
 	.deck-preview-arrow {
@@ -714,8 +723,8 @@
 		letter-spacing: -0.02em;
 	}
 	.stat-label {
-		font-size: 14px;
-		font-weight: 700;
+		font-size: 12px;
+		font-weight: 600;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 	}
@@ -764,13 +773,14 @@
 	}
 	.feature-content h3 {
 		font-size: 32px;
-		font-weight: 900;
+		font-weight: 800;
 		letter-spacing: -0.04em;
 		color: var(--sumi);
 		margin-bottom: 20px;
 	}
 	.feature-content p {
 		font-size: 18px;
+		font-weight: 500;
 		color: var(--fg-secondary);
 		line-height: 1.6;
 	}
@@ -863,7 +873,7 @@
 	}
 	.final-content h2 {
 		font-size: 40px;
-		font-weight: 900;
+		font-weight: 800;
 		margin-bottom: 16px;
 	}
 	.final-content p {
@@ -942,7 +952,7 @@
 	}
 	.brand-name {
 		font-size: 22px;
-		font-weight: 900;
+		font-weight: 800;
 		letter-spacing: -0.02em;
 	}
 	.brand-tagline {
@@ -955,7 +965,7 @@
 
 	.footer-links-col h4 {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		margin-bottom: 24px;
@@ -1005,25 +1015,46 @@
 			grid-template-columns: 1fr;
 			text-align: center;
 		}
+		.test-grid {
+			grid-template-columns: 1fr;
+			gap: 20px;
+		}
 		.feature-item:nth-child(even) {
 			direction: ltr;
+		}
+		.feature-item {
+			min-height: unset;
 		}
 		.feature-content {
 			padding: 40px;
 		}
+		.feature-content h3 {
+			font-size: 26px;
+		}
 		.feature-image {
 			order: -1;
-			height: 320px;
+			height: 280px;
+			padding: 32px;
+		}
+		.iphone-16-mockup.mini {
+			max-width: 180px;
 		}
 		.stats-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+		.stats-grid .stat-card:last-child {
+			grid-column: 1 / -1;
 		}
 		.final-visual {
-			height: 240px;
+			height: 200px;
 		}
 		.final-content {
 			padding: 40px;
 			align-items: center;
+		}
+		.final-content h2 {
+			font-size: 32px;
 		}
 		.brand-wrap {
 			justify-content: center;
@@ -1040,17 +1071,75 @@
 			max-width: 320px;
 			margin: 0 auto 40px;
 		}
+		.levels-section {
+			padding: 64px 24px 32px;
+		}
+		.preview-section {
+			padding: 48px 24px;
+		}
+		.features-section {
+			padding: 64px 24px;
+		}
+		.testimonial-section {
+			padding: 64px 24px;
+		}
+		.final-cta {
+			padding: 64px 24px;
+		}
+		.stat-value {
+			font-size: 32px;
+		}
 	}
 	@media (max-width: 600px) {
 		.hero-float-card {
 			display: none;
 		}
 		.hero-section h1 {
-			font-size: 40px;
+			font-size: 38px;
 		}
 		.level-pill {
 			width: 100%;
 			justify-content: center;
+		}
+		.feature-content {
+			padding: 28px 24px;
+		}
+		.feature-content h3 {
+			font-size: 22px;
+		}
+		.feature-content p {
+			font-size: 16px;
+		}
+		.feature-image {
+			height: 240px;
+			padding: 24px;
+		}
+		.test-card {
+			padding: 28px 24px;
+		}
+		.test-quote {
+			font-size: 17px;
+		}
+		.final-content {
+			padding: 32px 24px;
+		}
+		.final-content h2 {
+			font-size: 26px;
+		}
+		.final-card {
+			border-radius: 28px;
+		}
+		.stats-grid {
+			grid-template-columns: 1fr;
+		}
+		.stats-grid .stat-card:last-child {
+			grid-column: auto;
+		}
+		.stat-value {
+			font-size: 36px;
+		}
+		.landing-footer {
+			padding: 48px 24px 32px;
 		}
 	}
 </style>

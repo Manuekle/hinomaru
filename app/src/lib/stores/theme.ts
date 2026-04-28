@@ -31,11 +31,16 @@ function createThemeStore() {
 	};
 }
 
+export const resolvedTheme = writable<ThemeType>('light');
+
 function applyTheme(theme: ThemeType) {
 	if (typeof document === 'undefined') return;
 	const isDark =
 		theme === 'dark' ||
 		(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+	
+	resolvedTheme.set(isDark ? 'dark' : 'light');
+
 	if (isDark) {
 		document.documentElement.setAttribute('data-theme', 'dark');
 		document.documentElement.classList.add('dark');
