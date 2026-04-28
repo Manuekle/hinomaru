@@ -293,7 +293,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'onboarding.srs.desc':
 			'We use Spaced Repetition System (SRS) to help you remember things forever. We need your permission to enable this feature',
 		'onboarding.srs.enable': 'Enable SRS',
-		'onboarding.srs.later': 'Maybe later',
+		'onboarding.srs.later': 'Later',
 		'onboarding.voice.title': 'Choose a voice',
 		'onboarding.voice.subtitle':
 			'Select the voice for pronunciation. You can change this later in settings.',
@@ -671,7 +671,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'onboarding.srs.desc':
 			'Usamos el Sistema de Repetición Espaciada (SRS) para que recuerdes todo para siempre. Necesitamos tu permiso.',
 		'onboarding.srs.enable': 'Activar SRS',
-		'onboarding.srs.later': 'Quizás más tarde',
+		'onboarding.srs.later': 'Más tarde',
 		'onboarding.voice.title': 'Elige una voz',
 		'onboarding.voice.subtitle': 'Selecciona la voz para la pronunciación. Puedes cambiarla luego.',
 		'onboarding.voice.kawaii.name': 'Kawaii',

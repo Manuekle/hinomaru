@@ -20,12 +20,14 @@ class VoicevoxService:
         speaker: int,
         speed: float,
         pitch: float,
-        volume: float = 1.0
+        volume: float = 1.0,
+        intonation: float = 1.0,
+        post_phoneme: float = 0.1,
     ) -> bytes:
         last_error: Exception | None = None
         for attempt in range(MAX_RETRIES + 1):
             try:
-                return await self._generate(text, speaker, speed, pitch, volume)
+                return await self._generate(text, speaker, speed, pitch, volume, intonation, post_phoneme)
             except httpx.TimeoutException as e:
                 last_error = e
                 logger.warning(f"VOICEVOX timeout (attempt {attempt + 1}/{MAX_RETRIES + 1}): {e}")
@@ -50,6 +52,8 @@ class VoicevoxService:
         speed: float,
         pitch: float,
         volume: float,
+        intonation: float = 1.0,
+        post_phoneme: float = 0.1,
     ) -> bytes:
         async with httpx.AsyncClient() as client:
             query_response = await client.post(
@@ -63,6 +67,8 @@ class VoicevoxService:
             query_data["speedScale"] = speed
             query_data["pitchScale"] = pitch
             query_data["volumeScale"] = volume
+            query_data["intonationScale"] = intonation
+            query_data["postPhonemeLength"] = post_phoneme
 
             synthesis_response = await client.post(
                 f"{self.base_url}/synthesis",

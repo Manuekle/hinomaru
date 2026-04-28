@@ -11,9 +11,26 @@ class Settings(BaseSettings):
     CACHE_TTL: int = 86400
     
     # TTS Presets
+    # speaker IDs: 2=春日部つむぎ (female), 5=玄野武宏 (male), 6=白上虎太郎 (male)
+    # intonation >1.0 = more pitch variation = less robotic, more natural
+    # post_phoneme = trailing silence (s) — prevents vowels from cutting off abruptly
     PRESETS: Dict[str, Dict[str, Any]] = {
-        "kawaii": { "speaker": 2, "speed": 1.05, "pitch": 0.05, "volume": 1.2 },
-        "cool": { "speaker": 3, "speed": 0.95, "pitch": -0.05, "volume": 1.8 }
+        "kawaii": {
+            "speaker": 2,        # 春日部つむぎ — female
+            "speed": 1.0,        # natural speed (1.05 cut phoneme tails)
+            "pitch": 0.05,
+            "volume": 1.2,
+            "intonation": 1.15,  # livelier pitch variation
+            "post_phoneme": 0.15 # tail silence so final vowels don't cut abruptly
+        },
+        "cool": {
+            "speaker": 6,        # 白上虎太郎 — male
+            "speed": 0.95,
+            "pitch": -0.05,
+            "volume": 1.2,
+            "intonation": 1.05,
+            "post_phoneme": 0.15
+        }
     }
     
     class Config:

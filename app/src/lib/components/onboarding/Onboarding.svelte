@@ -132,6 +132,7 @@
 		padding-top: env(safe-area-inset-top);
 		/* safe-area-inset-bottom handled by StickyFooter */
 		touch-action: none;
+		overscroll-behavior: none;
 		--step-title: clamp(24px, 7vw, 32px);
 		--step-subtitle: clamp(15px, 4vw, 20px);
 		--step-body: clamp(13px, 3.5vw, 17px);
@@ -173,8 +174,7 @@
 		inset: 0;
 		display: flex;
 		flex-direction: column;
-		overflow-y: auto;
-		overflow-x: hidden;
+		overflow: hidden;
 		max-width: 600px;
 		margin-left: auto;
 		margin-right: auto;
@@ -195,6 +195,7 @@
 	 * because flex-grow consumes remaining space before justify-content runs.
 	 */
 	.step-inner :global(.step-content) {
+		box-sizing: border-box; /* height:100% must include padding, else content overflows and scrolls */
 		justify-content: center;
 	}
 

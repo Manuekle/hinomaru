@@ -36,12 +36,17 @@ async def _generate_audio_bytes(
     preset: Optional[str],
 ) -> tuple[bytes, str]:
     """Returns (audio_bytes, media_type). Handles preset, cache, and format conversion."""
+    intonation = 1.0
+    post_phoneme = 0.1
+
     if preset and preset in settings.PRESETS:
         p = settings.PRESETS[preset]
         speaker = p.get("speaker", speaker)
         speed = p.get("speed", speed)
         pitch = p.get("pitch", pitch)
         volume = p.get("volume", volume)
+        intonation = p.get("intonation", intonation)
+        post_phoneme = p.get("post_phoneme", post_phoneme)
 
     cache_key = get_cache_key(text, speaker, speed, pitch, volume, format)
     cached_audio = await cache_service.get_audio(cache_key)
@@ -50,7 +55,7 @@ async def _generate_audio_bytes(
     if cached_audio:
         return cached_audio, media_type
 
-    wav_audio = await voicevox_service.generate_audio(text, speaker, speed, pitch, volume)
+    wav_audio = await voicevox_service.generate_audio(text, speaker, speed, pitch, volume, intonation, post_phoneme)
 
     final_audio = wav_audio
     if format == "mp3":
