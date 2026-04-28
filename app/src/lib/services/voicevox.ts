@@ -19,17 +19,14 @@ export async function speakVoicevox(
             speed: speed.toString(),
             pitch: pitch.toString(),
             volume: volume.toString(),
-            format: 'wav'
+            format: 'wav',
+            api_key: 'hinomaru-secret-key'
         });
 
         const url = `${VOICEVOX_URL}/tts/audio?${params.toString()}`;
         
-        // Fetch with API Key header
-        const response = await fetch(url, {
-            headers: {
-                'X-API-Key': 'hinomaru-secret-key' // We'll move this to an env var later
-            }
-        });
+        // Fetch without custom headers to avoid CORS preflight issues
+        const response = await fetch(url);
 
         if (!response.ok) throw new Error('TTS Service Error');
 
@@ -52,14 +49,16 @@ export async function preloadVoicevox(
     preset: 'kawaii' | 'cool' = 'kawaii'
 ): Promise<void> {
     try {
-        const params = new URLSearchParams({ text, preset, format: 'wav' });
+        const params = new URLSearchParams({ 
+            text, 
+            preset, 
+            format: 'wav',
+            api_key: 'hinomaru-secret-key'
+        });
         const url = `${VOICEVOX_URL}/tts/audio?${params.toString()}`;
         
         // Just fetch it to trigger the microservice's generation and disk caching
-        await fetch(url, { 
-            method: 'GET',
-            headers: { 'X-API-Key': 'hinomaru-secret-key' }
-        });
+        await fetch(url, { method: 'GET' });
     } catch (error) {
         // Silently fail for preloads
         console.warn('VOICEVOX preload failed:', text);

@@ -11,10 +11,11 @@ from app.services.cache import cache_service
 
 router = APIRouter()
 
-async def verify_api_key(x_api_key: str = Header(None)):
-    if x_api_key != settings.API_KEY:
+async def verify_api_key(x_api_key: str = Header(None), api_key: Optional[str] = Query(None)):
+    token = x_api_key or api_key
+    if token != settings.API_KEY:
         raise HTTPException(status_code=403, detail="Invalid API Key")
-    return x_api_key
+    return token
 
 def get_cache_key(text: str, speaker: int, speed: float, pitch: float, volume: float, format: str) -> str:
     payload = f"{text}:{speaker}:{speed}:{pitch}:{volume}:{format}"
