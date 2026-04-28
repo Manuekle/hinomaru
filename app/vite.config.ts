@@ -39,6 +39,6 @@ export default defineConfig({
 		})
 	],
 	ssr: {
-		noExternal: ['@hugeicons/svelte']
+		noExternal: ['@hugeicons/svelte', '@lucide/svelte', 'bits-ui', 'vaul-svelte']
 	}
 });

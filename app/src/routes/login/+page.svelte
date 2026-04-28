@@ -38,7 +38,7 @@
 	});
 
 	// ── State ─────────────────────────────────────────────────
-	type Mode = 'signin' | 'signup' | 'forgot' | 'magic';
+	type Mode = 'signin' | 'signup' | 'forgot';
 	let mode = $state<Mode>('signin');
 
 	let email = $state('');
@@ -148,13 +148,6 @@
 				});
 				if (err) throw err;
 				forgotDone = true;
-			} else if (mode === 'magic') {
-				const { error: err } = await supabase.auth.signInWithOtp({
-					email,
-					options: { emailRedirectTo: `${$page.url.origin}/auth/callback` }
-				});
-				if (err) throw err;
-				magicDone = true;
 			}
 		} catch (err: any) {
 			console.error('Auth error:', err);
@@ -589,18 +582,7 @@
 
 					<!-- Bottom options -->
 					{#if mode === 'signin'}
-						<div style="text-align:center;">
-							<button
-								type="button"
-								onclick={() => toggleMode('magic')}
-								style="background:none;border:none;font-family:var(--font-ui);font-size:13px;color:var(--fg-secondary);cursor:pointer;padding:0;"
-							>
-								{t('auth.magic.hint', $locale)}
-								<span style="color:var(--sumi);font-weight:600;text-decoration:underline;"
-									>{t('auth.magic.hintLink', $locale)}</span
-								>
-							</button>
-						</div>
+						<div style="text-align:center;"></div>
 					{:else}
 						<div style="text-align:center;">
 							<button

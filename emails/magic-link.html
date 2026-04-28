@@ -125,41 +125,25 @@
     </div>
 
     <div class="card">
-      <div class="icon-wrap">✨</div>
+      <div class="icon-wrap">🛡️</div>
 
-      <h1>Tu enlace mágico</h1>
-      <p class="jp-accent">マジックリンク</p>
+      <h1>Código de seguridad</h1>
+      <p class="jp-accent">セキュリティコード</p>
 
       <p class="subtitle">
-        Solicitaste acceder a <strong>Hinomaru</strong> sin contraseña.
-        Usa el código de un solo uso o el botón de abajo para entrar.
+        Solicitaste realizar una acción de seguridad en <strong>Hinomaru</strong>.
+        Introduce este código para verificar tu identidad.
       </p>
 
       <!-- OTP Code -->
       <div class="otp-box">
-        <div class="otp-label">Código de acceso</div>
+        <div class="otp-label">Código de verificación</div>
         <div class="otp-code">{{ .Token }}</div>
-        <div class="otp-expires">Expira en 10 minutos · Uso único</div>
+        <div class="otp-expires">Expira en 5 minutos · Uso único</div>
       </div>
-
-      <div class="or-row">
-        <div class="or-line"></div>
-        <span class="or-text">o accede directamente</span>
-        <div class="or-line"></div>
-      </div>
-
-      <a href="{{ .ConfirmationURL }}" class="btn">
-        Entrar a Hinomaru
-      </a>
-
-      <div class="divider"></div>
-
-      <div class="fallback-label">¿El botón no funciona? Copia este enlace</div>
-      <div class="fallback-url">{{ .ConfirmationURL }}</div>
 
       <div class="warning-box">
-        ⚠️ Si no solicitaste este acceso, ignora este correo. Tu cuenta
-        permanece segura.
+        ⚠️ Si no solicitaste este código, ignora este correo. Te recomendamos revisar tu seguridad.
       </div>
     </div>
 

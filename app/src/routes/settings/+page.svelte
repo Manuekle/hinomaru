@@ -26,9 +26,12 @@
 		Brain02Icon,
 		Notification01Icon,
 		EarthIcon,
-		JupiterIcon
+		JupiterIcon,
+		Delete02Icon,
+		BubbleChatIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
+	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
 
 	let { data } = $props<{ data: PageData }>();
 	let { supabase, user } = $derived(data);
@@ -134,6 +137,53 @@
 			}
 		}
 		notificationsEnabled.toggle();
+	}
+
+	let showDeleteConfirm = $state(false);
+	let deleteStep = $state<'confirm' | 'otp'>('confirm');
+	let otpCode = $state('');
+	let isDeleting = $state(false);
+
+	async function initiateDeletion() {
+		if (!user?.email) return;
+		isDeleting = true;
+		const { error } = await supabase.auth.signInWithOtp({
+			email: user.email,
+			options: { shouldCreateUser: false }
+		});
+		isDeleting = false;
+		if (error) {
+			svileo.error({ title: t('settings.deleteAccount.error', $locale) });
+		} else {
+			deleteStep = 'otp';
+		}
+	}
+
+	async function confirmDeletion() {
+		if (!user?.email) return;
+		isDeleting = true;
+
+		const { error: otpError } = await supabase.auth.verifyOtp({
+			email: user.email,
+			token: otpCode,
+			type: 'email'
+		});
+
+		if (otpError) {
+			isDeleting = false;
+			svileo.error({ title: t('settings.deleteAccount.error', $locale) });
+			return;
+		}
+
+		const { error: delError } = await supabase.rpc('delete_user_account');
+		if (delError) {
+			isDeleting = false;
+			svileo.error({ title: delError.message });
+		} else {
+			await supabase.auth.signOut();
+			await invalidate('supabase:auth');
+			goto('/');
+		}
 	}
 </script>
 
@@ -408,8 +458,105 @@
 				</div>
 			{/if}
 		</div>
+
+		<!-- ── Danger Zone ── -->
+		<div class="card danger-card">
+			<button class="pref-row" onclick={() => (showDeleteConfirm = true)}>
+				<div class="pref-icon" style="background:#ff3b3014;color:#ff3b30;">
+					<Icon icon={Delete02Icon} size={18} color="currentColor" strokeWidth={1.8} />
+				</div>
+				<div class="pref-text">
+					<span class="pref-title" style="color:#ff3b30;">{t('settings.deleteAccount', $locale)}</span>
+					<span class="pref-sub">{t('settings.deleteAccount.desc', $locale)}</span>
+				</div>
+				<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg
+					>
+				</div>
+			</button>
+		</div>
 	</div>
 </div>
+
+{#if showDeleteConfirm}
+	<div class="modal-overlay" transition:fly={{ duration: 200, opacity: 0 }}>
+		<div class="modal-content" use:fadeUp={{ delay: 0.05, y: 20 }}>
+			<div class="modal-header">
+				<div class="warning-icon" style="background: var(--ink-100); color: var(--fg-secondary);">
+					<Icon icon={BubbleChatIcon} size={24} color="currentColor" />
+				</div>
+				<h2 class="modal-title" style="text-align: left; margin-left: 4px;">
+					{deleteStep === 'confirm'
+						? t('settings.deleteAccount.confirm', $locale)
+						: t('settings.deleteAccount.verify', $locale)}
+				</h2>
+			</div>
+
+			{#if deleteStep === 'confirm'}
+				<p class="modal-desc" style="text-align: left; margin-left: 4px;">
+					{t('settings.deleteAccount.desc', $locale)}
+				</p>
+				<div class="modal-actions">
+					<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
+						{t('deck.back', $locale)}
+					</button>
+					<button class="modal-btn-danger" onclick={initiateDeletion} disabled={isDeleting}>
+						{#if isDeleting}
+							<div class="spinner"></div>
+						{:else}
+							{t('settings.deleteAccount.confirmBtn', $locale)}
+						{/if}
+					</button>
+				</div>
+			{:else}
+				<p class="modal-desc" style="text-align: left; margin-left: 4px;">
+					{t('settings.deleteAccount.otpSent', $locale, { email: user?.email || '' })}
+				</p>
+				<div class="otp-wrapper">
+					<InputOTP.Root maxlength={6} bind:value={otpCode}>
+						{#snippet children({ cells })}
+							<div class="otp-slots-container">
+								{#each cells as cell (cell)}
+									<InputOTP.Slot {cell} />
+								{/each}
+							</div>
+						{/snippet}
+					</InputOTP.Root>
+				</div>
+				<div class="modal-actions">
+					<button
+						class="modal-btn-secondary"
+						onclick={() => {
+							deleteStep = 'confirm';
+							otpCode = '';
+						}}
+					>
+						{t('deck.back', $locale)}
+					</button>
+					<button
+						class="modal-btn-danger"
+						onclick={confirmDeletion}
+						disabled={isDeleting || otpCode.length < 6}
+					>
+						{#if isDeleting}
+							<div class="spinner"></div>
+						{:else}
+							{t('settings.deleteAccount.btn', $locale)}
+						{/if}
+					</button>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
 
 <style>
 	.settings-page {
@@ -802,8 +949,7 @@
 		transition: transform 0.18s;
 	}
 	.support-btn img {
-		height: 38px;
-		width: auto;
+		height: 42px;
 		display: block;
 	}
 	@media (hover: hover) {
@@ -849,5 +995,170 @@
 		font-size: 11px;
 		cursor: pointer;
 		text-decoration: underline;
+	}
+
+	/* ── Danger Zone ── */
+	.danger-card {
+		border-color: #ff3b3020;
+		margin-top: 8px;
+	}
+	:global([data-theme='dark']) .danger-card {
+		background: #ff3b3008;
+		border-color: #ff3b3030;
+	}
+
+	.arrow-right {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s;
+	}
+	.pref-row:hover .arrow-right {
+		transform: translateX(2px);
+		opacity: 1 !important;
+	}
+
+	/* ── Modal ── */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.4);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 24px;
+		z-index: 1000;
+	}
+
+	.modal-content {
+		background: var(--bg-surface);
+		border-radius: 28px;
+		width: 100%;
+		max-width: 400px;
+		padding: 32px;
+		box-shadow: var(--shadow-xl);
+		border: 1px solid var(--ink-200);
+		text-align: center;
+	}
+
+	.modal-header {
+		margin-bottom: 20px;
+	}
+
+	.warning-icon {
+		width: 56px;
+		height: 56px;
+		background: #ff3b3014;
+		color: #ff3b30;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 auto 16px;
+	}
+
+	.modal-title {
+		font-size: 20px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+
+	.modal-desc {
+		font-size: 15px;
+		color: var(--fg-secondary);
+		line-height: 1.5;
+		margin-bottom: 24px;
+	}
+
+	.otp-wrapper {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 24px;
+	}
+
+	.otp-slots-container {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+		background: var(--ink-100);
+		padding: 8px 16px;
+		border-radius: 20px;
+		border: 1.5px solid var(--ink-200);
+	}
+	:global([data-theme='dark']) .otp-slots-container {
+		background: var(--ink-50);
+		border-color: var(--ink-200);
+	}
+
+	.modal-actions {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
+	}
+
+	.modal-btn-secondary {
+		background: var(--ink-100);
+		border: none;
+		padding: 18px;
+		border-radius: 20px;
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.modal-btn-secondary:hover {
+		background: var(--ink-200);
+		color: var(--fg-primary);
+	}
+
+	.modal-btn-danger {
+		background: var(--hinomaru-red);
+		border: none;
+		padding: 18px;
+		border-radius: 20px;
+		font-size: 16px;
+		font-weight: 700;
+		color: white;
+		cursor: pointer;
+		transition: all 0.2s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
+	}
+	.modal-btn-danger:hover:not(:disabled) {
+		transform: translateY(-1px);
+		box-shadow: 0 6px 16px rgba(188, 0, 45, 0.3);
+	}
+	.modal-btn-danger:active:not(:disabled) {
+		transform: translateY(0);
+	}
+	.modal-btn-danger:disabled {
+		background: var(--ink-200);
+		color: var(--fg-tertiary);
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	.spinner {
+		width: 20px;
+		height: 20px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		border-top-color: white;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

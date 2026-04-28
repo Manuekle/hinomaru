@@ -365,7 +365,16 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.reset.error.same': 'The new password must be different from the current one.',
 		'auth.reset.label': 'Password',
 		'auth.reset.show': 'Show password',
-		'auth.reset.hide': 'Hide password'
+		'auth.reset.hide': 'Hide password',
+		'settings.deleteAccount': 'Delete Account',
+		'settings.deleteAccount.desc': 'This will permanently remove your account and all your progress.',
+		'settings.deleteAccount.confirm': 'Are you sure you want to delete your account?',
+		'settings.deleteAccount.verify': 'Enter Code',
+		'settings.deleteAccount.otpSent': 'We sent a verification code to your email {email}.',
+		'settings.deleteAccount.otpPlaceholder': 'Enter 6-digit code',
+		'settings.deleteAccount.btn': 'Verify',
+		'settings.deleteAccount.error': 'Verification failed. Please try again.',
+		'settings.deleteAccount.confirmBtn': 'Confirm'
 	},
 	es: {
 		'auth.signin.subtitle': 'Inicia sesión para guardar tu progreso.',
@@ -730,7 +739,16 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.reset.error.same': 'La nueva contraseña debe ser diferente a la actual.',
 		'auth.reset.label': 'Contraseña',
 		'auth.reset.show': 'Ver contraseña',
-		'auth.reset.hide': 'Ocultar contraseña'
+		'auth.reset.hide': 'Ocultar contraseña',
+		'settings.deleteAccount': 'Eliminar cuenta',
+		'settings.deleteAccount.desc': 'Esto eliminará permanentemente tu cuenta y todo tu progreso.',
+		'settings.deleteAccount.confirm': '¿Estás seguro de que quieres eliminar tu cuenta?',
+		'settings.deleteAccount.verify': 'Introduce el código',
+		'settings.deleteAccount.otpSent': 'Hemos enviado un código de verificación a tu correo {email}.',
+		'settings.deleteAccount.otpPlaceholder': 'Introduce el código',
+		'settings.deleteAccount.btn': 'Verificar',
+		'settings.deleteAccount.error': 'La verificación falló. Inténtalo de nuevo.',
+		'settings.deleteAccount.confirmBtn': 'Confirmar'
 	}
 };
 
