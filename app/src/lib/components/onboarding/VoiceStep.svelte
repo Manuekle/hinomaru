@@ -107,7 +107,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 32px 24px 140px;
+		padding: 32px 24px 100px;
 	}
 
 	.header {

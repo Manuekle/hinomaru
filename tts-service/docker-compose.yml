@@ -2,14 +2,14 @@ services:
   fastapi:
     build: .
     ports:
-      - "8000:8000"
+      - "8000:7860"
     environment:
       - REDIS_URL=redis://redis:6379/0
       - VOICEVOX_URL=http://voicevox:50021
     depends_on:
       - voicevox
     volumes:
-      - ./storage:/app/storage
+      - ./storage:/backend/storage
 
   redis:
     image: redis:7-alpine

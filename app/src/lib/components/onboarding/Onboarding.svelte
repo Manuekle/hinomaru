@@ -182,6 +182,22 @@
 		padding-bottom: 0;
 	}
 
+	/*
+	 * Distribute short-content steps vertically so there's no large dead
+	 * space between content and the fixed footer. Steps that already have
+	 * a flex-grow child (PracticeStep, WelcomeStep) are unaffected because
+	 * justify-content is a no-op when a child consumes all remaining space.
+	 */
+	/*
+	 * Center short-content steps vertically so there's equal breathing room
+	 * above and below the content block. Steps that have a flex-grow child
+	 * (PracticeStep writing area, WelcomeStep main-visual) are unaffected
+	 * because flex-grow consumes remaining space before justify-content runs.
+	 */
+	.step-inner :global(.step-content) {
+		justify-content: center;
+	}
+
 	@media (max-height: 600px) and (orientation: landscape) {
 		.progress-wrapper {
 			margin: 12px 24px;

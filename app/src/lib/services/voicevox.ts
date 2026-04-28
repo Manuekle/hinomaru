@@ -27,9 +27,9 @@ export async function speakVoicevox(
     preset: 'kawaii' | 'cool' = 'kawaii',
     speed = 1.0,
     pitch = 0.0,
-    volume = 1.0
+    volume = 1.0,
+    onStart?: () => void
 ): Promise<void> {
-    // Stop any currently playing audio
     stopVoicevox();
 
     const params = new URLSearchParams({
@@ -71,12 +71,16 @@ export async function speakVoicevox(
             currentResolve = null;
             reject(new Error('Audio playback error'));
         };
-        audio.play().catch((err) => {
-            URL.revokeObjectURL(audioUrl);
-            currentAudio = null;
-            currentResolve = null;
-            reject(err);
-        });
+        // Two-arg form: success callback and error callback separated cleanly
+        audio.play().then(
+            () => onStart?.(),
+            (err) => {
+                URL.revokeObjectURL(audioUrl);
+                currentAudio = null;
+                currentResolve = null;
+                reject(err);
+            }
+        );
     });
 }
 

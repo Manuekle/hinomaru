@@ -27,12 +27,11 @@ export function cleanForTTS(text: string): string {
 
 import { get } from 'svelte/store';
 import { preferredVoice } from '$lib/stores/settings';
-
 import { speakVoicevox } from '$lib/services/voicevox';
+import { svileo } from '$lib/stores/toast';
 
 /**
  * Fallback to browser's built-in Web Speech API if microservice is offline.
- * This is the original logic you had before.
  */
 function speakBrowser(text: string): void {
 	if (typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -47,11 +46,11 @@ function speakBrowser(text: string): void {
 
 	if (voiceMode === 'cool') {
 		utterance.pitch = 0.8;
-		const kaitoVoice =
+		const coolVoice =
 			japaneseVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) ||
 			japaneseVoices[1] ||
 			japaneseVoices[0];
-		if (kaitoVoice) utterance.voice = kaitoVoice;
+		if (coolVoice) utterance.voice = coolVoice;
 	} else {
 		utterance.pitch = 1.0;
 		if (japaneseVoices[0]) utterance.voice = japaneseVoices[0];
@@ -62,6 +61,8 @@ function speakBrowser(text: string): void {
 
 /**
  * Speaks Japanese text using the VOICEVOX microservice.
+ * Shows a loading toast during fetch latency only — resolves the toast
+ * the moment audio begins playing, not when it finishes.
  * Falls back to browser TTS if the service is unavailable.
  */
 export async function speakJapanese(text: string): Promise<void> {
@@ -71,8 +72,39 @@ export async function speakJapanese(text: string): Promise<void> {
 	const voiceMode = get(preferredVoice);
 	const preset = voiceMode === 'cool' ? 'cool' : 'kawaii';
 
-	// Attempt high-quality VOICEVOX first
-	await speakVoicevox(cleaned, preset).catch((err) => {
+	// Only show loading toast if audio hasn't started within 2 seconds.
+	let markStarted!: () => void;
+	let markFailed!: (e: unknown) => void;
+	const audioStarted = new Promise<void>((res, rej) => {
+		markStarted = res;
+		markFailed = rej;
+	});
+	// Prevent unhandled rejection if error occurs before the 2s toast timer fires
+	audioStarted.catch(() => {});
+
+	const toastTimer = setTimeout(() => {
+		svileo.promise(audioStarted, {
+			loading: { title: '🔊 Cargando voz...' },
+			success: { title: '' },
+			error: { title: 'Voz no disponible' }
+		});
+	}, 2000);
+
+	// markStarted resolves audioStarted → clears toast (if shown)
+	// If audio starts before 2s, clearTimeout prevents toast from appearing
+	const origMarkStarted = markStarted;
+	markStarted = () => {
+		clearTimeout(toastTimer);
+		origMarkStarted();
+	};
+	const origMarkFailed = markFailed;
+	markFailed = (e: unknown) => {
+		clearTimeout(toastTimer);
+		origMarkFailed(e);
+	};
+
+	await speakVoicevox(cleaned, preset, 1.0, 0.0, 1.0, markStarted).catch((err) => {
+		markFailed(err);
 		console.warn('VOICEVOX offline, falling back to browser TTS:', err);
 		speakBrowser(cleaned);
 	});
