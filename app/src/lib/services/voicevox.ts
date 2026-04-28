@@ -22,6 +22,22 @@ export function stopVoicevox(): void {
     }
 }
 
+export function pauseVoicevox(): void {
+    if (currentAudio && !currentAudio.paused) {
+        currentAudio.pause();
+    }
+}
+
+export function resumeVoicevox(): void {
+    if (currentAudio && currentAudio.paused) {
+        currentAudio.play();
+    }
+}
+
+export function isVoicevoxPaused(): boolean {
+    return currentAudio ? currentAudio.paused : true;
+}
+
 export async function speakVoicevox(
     text: string,
     preset: 'kawaii' | 'cool' = 'kawaii',

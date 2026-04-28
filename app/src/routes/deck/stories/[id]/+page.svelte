@@ -3,8 +3,9 @@
 	import { theme } from '$lib/stores/theme';
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
-	import { speakJapanese } from '$lib/utils/tts';
-	import { preloadVoicevox, stopVoicevox } from '$lib/services/voicevox';
+	import { speakJapanese, stopJapanese } from '$lib/utils/tts';
+	import { preloadVoicevox } from '$lib/services/voicevox';
+	import ScrollingWaveform from '$lib/components/ScrollingWaveform.svelte';
 	import { preferredVoice } from '$lib/stores/settings';
 	import { get } from 'svelte/store';
 	import { t } from '$lib/i18n';
@@ -24,7 +25,10 @@
 		Sun03Icon,
 		Moon02Icon,
 		TextFontIcon,
-		TranslateIcon
+		TranslateIcon,
+		Heading01Icon,
+		Heading02Icon,
+		Heading03Icon
 	} from '@hugeicons/core-free-icons';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { updateStreak } from '$lib/utils/updateStreak';
@@ -98,8 +102,8 @@
 
 	async function toggleAudio() {
 		if (isSpeaking) {
+			stopJapanese();
 			isSpeaking = false;
-			stopVoicevox();
 		} else {
 			isSpeaking = true;
 			try {
@@ -128,9 +132,7 @@
 		}
 
 		return () => {
-			if (typeof window !== 'undefined' && window.speechSynthesis) {
-				window.speechSynthesis.cancel();
-			}
+			stopJapanese();
 		};
 	});
 
@@ -147,9 +149,7 @@
 	// Stop audio on unmount or navigation
 	$effect(() => {
 		return () => {
-			if (typeof window !== 'undefined' && window.speechSynthesis) {
-				window.speechSynthesis.cancel();
-			}
+			stopJapanese();
 		};
 	});
 
@@ -356,15 +356,6 @@
 					<h1 class="story-display-title">
 						{$locale === 'es' ? story.title_es : story.title_en}
 					</h1>
-					{#if !isReadingMode}
-						<button
-							class="story-audio-btn"
-							onclick={() => speakJapanese(bodyJp)}
-							title="Escuchar historia"
-						>
-							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-						</button>
-					{/if}
 				</div>
 
 				<div
@@ -498,19 +489,19 @@
 
 						<div class="story-body-card">
 							<InteractiveText text={bodyJp} {vocab} />
+
+							{#if $showRomaji && story.body_romaji}
+								<p class="body-text-romaji" in:fade={{ duration: 200 }}>
+									{story.body_romaji.replace(/\\n/g, '\n')}
+								</p>
+							{/if}
+
+							{#if showTranslation}
+								<p class="body-text-translated" in:fade={{ duration: 200 }}>
+									{$locale === 'es' ? story.body_es : story.body_en}
+								</p>
+							{/if}
 						</div>
-
-						{#if $showRomaji && story.body_romaji}
-							<p class="body-text-romaji" in:fade={{ duration: 200 }}>
-								{story.body_romaji.replace(/\\n/g, '\n')}
-							</p>
-						{/if}
-
-						{#if showTranslation}
-							<p class="body-text-translated" in:fade={{ duration: 200 }}>
-								{$locale === 'es' ? story.body_es : story.body_en}
-							</p>
-						{/if}
 					</div>
 
 					<!-- Floating Reading Toolbar -->
@@ -545,9 +536,14 @@
 								class="tool-btn"
 								class:active-tool={isSpeaking}
 								onclick={toggleAudio}
-								title={isSpeaking ? 'Detener audio' : 'Escuchar'}
+								title={isSpeaking ? t('stories.audio.stop', $locale) : t('stories.audio.listen', $locale)}
 							>
-								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={2} />
+								<Icon
+									icon={VolumeHighIcon}
+									size={18}
+									color={isSpeaking ? 'var(--hinomaru-red)' : 'currentColor'}
+									strokeWidth={2}
+								/>
 							</button>
 							<button
 								class="tool-btn"
@@ -571,7 +567,13 @@
 							</button>
 
 							<button class="tool-btn" onclick={cycleFontSize} title="Tamaño">
-								<Icon icon={TextFontIcon} size={18} color="currentColor" strokeWidth={2} />
+								{#if fontSize === 'sm'}
+									<Icon icon={Heading03Icon} size={18} color="currentColor" strokeWidth={2} />
+								{:else if fontSize === 'md'}
+									<Icon icon={Heading02Icon} size={18} color="currentColor" strokeWidth={2} />
+								{:else}
+									<Icon icon={Heading01Icon} size={18} color="currentColor" strokeWidth={2} />
+								{/if}
 							</button>
 						</div>
 					</div>
@@ -764,6 +766,20 @@
 	</div>
 </div>
 
+{#if isSpeaking}
+	<div class="now-playing-toast" transition:fly={{ y: -60, duration: 300, easing: quintOut }}>
+		<div class="now-playing-wave">
+			<ScrollingWaveform playing={true} height={28} barWidth={3} barGap={2} speed={8} barColor="var(--hinomaru-red)" />
+		</div>
+		<span class="now-playing-label">{t('stories.audio.playing', $locale)}</span>
+		<button class="now-playing-stop" onclick={toggleAudio} aria-label="Stop">
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+				<rect x="1" y="1" width="12" height="12" rx="2"/>
+			</svg>
+		</button>
+	</div>
+{/if}
+
 <style>
 	.story-viewer-layout {
 		display: flex;
@@ -935,7 +951,8 @@
 	.body-text-translated {
 		font-size: 15px;
 		line-height: 1.6;
-		color: var(--fg-secondary);
+		color: var(--fg-primary);
+		opacity: 0.8;
 		margin: 0;
 		white-space: pre-wrap;
 	}
@@ -1559,7 +1576,7 @@
 
 	.reading-mode-overlay .body-text-jp {
 		font-size: var(--story-fs);
-		text-align: justify;
+		text-align: left;
 		line-height: 2.2;
 		margin-bottom: 40px;
 		letter-spacing: 0.02em;
@@ -1577,46 +1594,48 @@
 		text-align: left;
 	}
 
-	@media (min-width: 600px) {
-		.reading-mode-overlay :global(.interactive-text) {
-			text-align: justify;
-		}
-	}
 	.reading-mode-overlay :global(.interactive-text span) {
 		color: var(--fg-primary);
 	}
 
 	.reading-mode-overlay .body-text-romaji {
 		font-size: calc(var(--story-fs) * 0.65);
-		opacity: 0.8;
 		margin-top: 10px;
 		margin-bottom: 40px;
 		text-align: left;
 		font-style: italic;
 		color: var(--hinomaru-red);
 		white-space: pre-wrap;
+		opacity: 1;
 	}
 
 	.reading-mode-overlay[data-theme='dark'] .body-text-romaji {
-		color: #ff6b6b; /* Lighter red for dark mode contrast */
-		opacity: 0.9;
+		color: #ff8080;
 	}
 
-	@media (min-width: 600px) {
-		.reading-mode-overlay .body-text-romaji {
-			text-align: justify;
-		}
+	.reading-mode-overlay[data-theme='sepia'] .body-text-romaji {
+		color: #c0392b;
 	}
 
 	.reading-mode-overlay .body-text-translated {
 		font-size: calc(var(--story-fs) - 4px);
 		line-height: 1.8;
-		opacity: 0.7;
 		border-left: 2px solid var(--hinomaru-red);
 		padding-left: 24px;
-		margin-top: 40px;
+		margin-top: 24px;
 		font-style: italic;
-		color: var(--fg-secondary);
+		color: var(--fg-primary);
+		opacity: 0.75;
+	}
+
+	.reading-mode-overlay[data-theme='dark'] .body-text-translated {
+		color: #e0e0e0;
+		opacity: 0.9;
+	}
+
+	.reading-mode-overlay[data-theme='sepia'] .body-text-translated {
+		color: #4a3728;
+		opacity: 0.9;
 	}
 
 	.reading-mode-overlay :global(.word-link) {
@@ -1805,5 +1824,64 @@
 			font-size: 32px;
 			margin-bottom: 40px;
 		}
+	}
+
+	/* Now Playing toast */
+	:global(.now-playing-toast) {
+		position: fixed;
+		top: 16px;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 14px 10px 16px;
+		background: rgba(255, 255, 255, 0.9);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border: 1px solid rgba(188, 0, 45, 0.18);
+		border-radius: 999px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(188, 0, 45, 0.08);
+		z-index: 3000;
+		min-width: 200px;
+	}
+
+	:global([data-theme='dark'] .now-playing-toast) {
+		background: rgba(26, 26, 26, 0.92);
+		border-color: rgba(188, 0, 45, 0.25);
+	}
+
+	:global(.now-playing-wave) {
+		width: 80px;
+		flex-shrink: 0;
+	}
+
+	:global(.now-playing-label) {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		font-family: var(--font-jp, serif);
+		flex: 1;
+		white-space: nowrap;
+	}
+
+	:global(.now-playing-stop) {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		border: none;
+		background: var(--hinomaru-red);
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: transform 0.15s ease, opacity 0.15s ease;
+	}
+
+	:global(.now-playing-stop:hover) {
+		transform: scale(1.1);
+		opacity: 0.9;
 	}
 </style>

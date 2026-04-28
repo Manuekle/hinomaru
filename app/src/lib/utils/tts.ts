@@ -27,36 +27,41 @@ export function cleanForTTS(text: string): string {
 
 import { get } from 'svelte/store';
 import { preferredVoice } from '$lib/stores/settings';
-import { speakVoicevox } from '$lib/services/voicevox';
+import { speakVoicevox, stopVoicevox } from '$lib/services/voicevox';
 import { svileo } from '$lib/stores/toast';
 
 /**
  * Fallback to browser's built-in Web Speech API if microservice is offline.
  */
-function speakBrowser(text: string): void {
+async function speakBrowser(text: string): Promise<void> {
 	if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
 	window.speechSynthesis.cancel();
-	const utterance = new SpeechSynthesisUtterance(text);
-	utterance.lang = 'ja-JP';
+	return new Promise((resolve) => {
+		const utterance = new SpeechSynthesisUtterance(text);
+		utterance.lang = 'ja-JP';
 
-	const voiceMode = get(preferredVoice);
-	const voices = window.speechSynthesis.getVoices();
-	const japaneseVoices = voices.filter((v) => v.lang === 'ja-JP' || v.lang.startsWith('ja'));
+		const voiceMode = get(preferredVoice);
+		const voices = window.speechSynthesis.getVoices();
+		const japaneseVoices = voices.filter((v) => v.lang === 'ja-JP' || v.lang.startsWith('ja'));
 
-	if (voiceMode === 'cool') {
-		utterance.pitch = 0.8;
-		const coolVoice =
-			japaneseVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) ||
-			japaneseVoices[1] ||
-			japaneseVoices[0];
-		if (coolVoice) utterance.voice = coolVoice;
-	} else {
-		utterance.pitch = 1.0;
-		if (japaneseVoices[0]) utterance.voice = japaneseVoices[0];
-	}
+		if (voiceMode === 'cool') {
+			utterance.pitch = 0.8;
+			const coolVoice =
+				japaneseVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) ||
+				japaneseVoices[1] ||
+				japaneseVoices[0];
+			if (coolVoice) utterance.voice = coolVoice;
+		} else {
+			utterance.pitch = 1.0;
+			if (japaneseVoices[0]) utterance.voice = japaneseVoices[0];
+		}
 
-	window.speechSynthesis.speak(utterance);
+		utterance.onend = () => resolve();
+		utterance.onerror = () => resolve();
+
+		window.speechSynthesis.speak(utterance);
+	});
 }
 
 /**
@@ -103,9 +108,19 @@ export async function speakJapanese(text: string): Promise<void> {
 		origMarkFailed(e);
 	};
 
-	await speakVoicevox(cleaned, preset, 1.0, 0.0, 1.0, markStarted).catch((err) => {
+	await speakVoicevox(cleaned, preset, 1.0, 0.0, 1.0, markStarted).catch(async (err) => {
 		markFailed(err);
 		console.warn('VOICEVOX offline, falling back to browser TTS:', err);
-		speakBrowser(cleaned);
+		await speakBrowser(cleaned);
 	});
+}
+
+/**
+ * Stops all Japanese TTS playback (both Voicevox and Browser fallback).
+ */
+export function stopJapanese(): void {
+	stopVoicevox();
+	if (typeof window !== 'undefined' && window.speechSynthesis) {
+		window.speechSynthesis.cancel();
+	}
 }
