@@ -27,7 +27,6 @@
 	let i = $state(0);
 	let flipped = $state(false);
 	let struggled = $state(false);
-	let finishing = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const word = $derived(words[i]);
@@ -89,7 +88,6 @@
 		flipped = false;
 
 		if (i >= words.length - 1) {
-			finishing = true;
 			playFinish();
 			if (cardEl) {
 				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });

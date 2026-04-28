@@ -17,6 +17,7 @@ export interface SongVocab {
 }
 
 export interface SongLesson {
+	id: string;
 	level: JLPTLevel;
 	title: string;
 	artist: string;
@@ -37,6 +38,7 @@ export function parseTime(mmss: string): number {
 export const jlptSongs: SongLesson[] = [
 	// 🟢 Nivel N5 (Muy básico)
 	{
+		id: 'anpanman-march',
 		level: 'N5',
 		title: 'アンパンマンのマーチ',
 		artist: 'ドリーミング',
@@ -107,6 +109,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'odoru-ponpokorin',
 		level: 'N5',
 		title: 'おどるポンポコリン',
 		artist: 'Ado',
@@ -245,6 +248,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'we-are',
 		level: 'N5',
 		title: 'ウィーアー！ (We Are!)',
 		artist: 'きただにひろし',
@@ -322,6 +326,7 @@ export const jlptSongs: SongLesson[] = [
 
 	// 🟢 Nivel N4 (Básico)
 	{
+		id: 'blue-bird',
 		level: 'N4',
 		title: 'ブルーバード',
 		artist: 'いきものがかり',
@@ -412,6 +417,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'hikaru-nara',
 		level: 'N4',
 		title: '光るなら (Hikaru Nara)',
 		artist: 'Goose house',
@@ -508,6 +514,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'butterfly',
 		level: 'N4',
 		title: 'Butter-Fly',
 		artist: '和田光司',
@@ -606,6 +613,7 @@ export const jlptSongs: SongLesson[] = [
 
 	// 🟡 Nivel N3 (Intermedio)
 	{
+		id: 'guren-no-yumiya',
 		level: 'N3',
 		title: '紅蓮の弓矢',
 		artist: 'Linked Horizon',
@@ -710,6 +718,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'fly-high',
 		level: 'N3',
 		title: 'FLY HIGH!!',
 		artist: 'BURNOUT SYNDROMES',
@@ -833,6 +842,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'again',
 		level: 'N3',
 		title: 'Again',
 		artist: 'YUI',
@@ -983,6 +993,7 @@ export const jlptSongs: SongLesson[] = [
 
 	// 🟠 Nivel N2 (Intermedio alto)
 	{
+		id: 'goya-no-machiawase',
 		level: 'N2',
 		title: '午夜の待ち合わせ',
 		artist: 'Hello Sleepwalkers',
@@ -1167,6 +1178,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 're-re',
 		level: 'N2',
 		title: 'Re:Re:',
 		artist: 'ASIAN KUNG-FU GENERATION',
@@ -1284,6 +1296,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'unravel',
 		level: 'N2',
 		title: 'unravel',
 		artist: 'TK from 凛として時雨',
@@ -1400,6 +1413,7 @@ export const jlptSongs: SongLesson[] = [
 
 	// 🔴 Nivel N1 (Avanzado)
 	{
+		id: 'kaikai-kitan',
 		level: 'N1',
 		title: '廻廻奇譚',
 		artist: 'Eve',
@@ -1543,6 +1557,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'idol',
 		level: 'N1',
 		title: 'アイドル',
 		artist: 'YOASOBI',
@@ -1703,6 +1718,7 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
+		id: 'zankoku-na-tenshi-no-teeze',
 		level: 'N1',
 		title: '残酷な天使のテーゼ',
 		artist: '高橋洋子',

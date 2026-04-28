@@ -49,6 +49,16 @@
 				direction = 'up';
 				clampedY = y - 10; // 10px offset from the top of the word
 			}
+
+			// Auto-close on scroll (Capture phase to catch scrolls in overlays too)
+			const handleScroll = () => {
+				onclose();
+			};
+			
+			window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+			return () => {
+				window.removeEventListener('scroll', handleScroll, { capture: true });
+			};
 		}
 	});
 </script>
@@ -171,6 +181,12 @@
 		font-size: 11px;
 		color: var(--fg-tertiary);
 		margin-top: -1px;
+		opacity: 0.8;
+	}
+
+	:global(.reading-mode-overlay[data-theme='dark']) .kana-text {
+		color: var(--ink-300);
+		opacity: 1;
 	}
 
 	.audio-btn {
@@ -185,6 +201,11 @@
 		color: var(--fg-secondary);
 		cursor: pointer;
 		transition: all 0.2s;
+	}
+
+	:global(.reading-mode-overlay[data-theme='dark']) .audio-btn {
+		background: var(--ink-200);
+		color: var(--fg-primary);
 	}
 
 	.audio-btn:hover {
@@ -202,22 +223,28 @@
 	}
 
 	.tag {
-		font-size: 9px;
-		font-weight: 400;
+		font-size: 10px;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		padding: 2px 6px;
-		border-radius: 4px;
+		letter-spacing: 0.04em;
+		padding: 3px 8px;
+		border-radius: 6px;
+		line-height: 1;
+		display: inline-flex;
+		align-items: center;
+		white-space: nowrap;
 	}
 
 	.cat-tag {
-		background: var(--hinomaru-red-wash);
+		background: color-mix(in srgb, var(--hinomaru-red) 8%, transparent);
 		color: var(--hinomaru-red);
+		border: 1px solid color-mix(in srgb, var(--hinomaru-red) 15%, transparent);
 	}
 
 	.pos-tag {
-		background: var(--ink-100);
+		background: var(--ink-50);
 		color: var(--fg-tertiary);
+		border: 1px solid var(--ink-200);
 	}
 
 	.meaning {
@@ -247,6 +274,11 @@
 		color: var(--fg-tertiary);
 		font-style: italic;
 		margin: 0;
+	}
+
+	:global(.reading-mode-overlay[data-theme='dark']) .ex-tr {
+		color: var(--fg-secondary);
+		opacity: 0.8;
 	}
 
 	.popup-tail {

@@ -7,6 +7,7 @@
 	import { theme } from '$lib/stores/theme';
 	import { t } from '$lib/i18n';
 	import { untrack } from 'svelte';
+	// @ts-ignore - Virtual module from vite-plugin-pwa
 	import { pwaInfo } from 'virtual:pwa-info';
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';

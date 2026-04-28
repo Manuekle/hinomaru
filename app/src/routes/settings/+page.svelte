@@ -24,7 +24,9 @@
 		Mic02Icon,
 		AlphabetJapaneseIcon,
 		Brain02Icon,
-		Notification01Icon
+		Notification01Icon,
+		EarthIcon,
+		JupiterIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -316,8 +318,8 @@
 					role="radio"
 					aria-checked={$locale === 'es'}
 				>
-					<span class="fi fi-es flag-circle-sm" aria-hidden="true"></span>
-					Español
+					<Icon icon={JupiterIcon} size={18} color="currentColor" />
+					{t('settings.spanish', $locale)}
 				</button>
 				<button
 					class="seg-btn seg-btn-lang"
@@ -326,8 +328,8 @@
 					role="radio"
 					aria-checked={$locale === 'en'}
 				>
-					<span class="fi fi-us flag-circle-sm" aria-hidden="true"></span>
-					English
+					<Icon icon={EarthIcon} size={18} color="currentColor" />
+					{t('settings.english', $locale)}
 				</button>
 			</div>
 		</div>

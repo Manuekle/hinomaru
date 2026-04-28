@@ -6,6 +6,7 @@ export interface CardData {
 	example: string;
 	example_en: string;
 	example_es: string;
+	kana?: string;
 	category?: string;
 	category_es?: string;
 	pos?: string;

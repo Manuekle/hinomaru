@@ -49,6 +49,7 @@
 	let currentTime = $state(0);
 	let speed = $state(1);
 	let completed = $state(false);
+	let isCompletedInDB = $state(false);
 	let fireConfetti = $state(false);
 	let trackInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -58,22 +59,38 @@
 	let savingVocab = $state(new Set<string>());
 
 	// Pre-load which vocab words are already saved for this song
+	// Pre-load completion status and saved vocab
 	$effect(() => {
-		const v = song?.vocab;
-		if (!v?.length || !supabase) return;
-		const jpList = v.map((w: any) => w.jp);
+		if (!song?.id || !supabase) return;
+		const jpList = song.vocab?.map((w: any) => w.jp) || [];
+		
 		supabase.auth.getUser().then(({ data: { user } }: any) => {
 			if (!user) return;
+			
+			// Check completion
 			supabase
-				.from('user_saved_words')
-				.select('jp')
+				.from('user_song_completions')
+				.select('id')
 				.eq('user_id', user.id)
-				.in('jp', jpList)
+				.eq('song_id', song.id)
+				.maybeSingle()
 				.then(({ data }) => {
-					if (data?.length) {
-						savedVocab = new Set(data.map((r: { jp: string }) => r.jp));
-					}
+					if (data) isCompletedInDB = true;
 				});
+
+			// Check saved vocab
+			if (jpList.length > 0) {
+				supabase
+					.from('user_saved_words')
+					.select('jp')
+					.eq('user_id', user.id)
+					.in('jp', jpList)
+					.then(({ data }) => {
+						if (data?.length) {
+							savedVocab = new Set(data.map((r: { jp: string }) => r.jp));
+						}
+					});
+			}
 		});
 	});
 
@@ -192,29 +209,61 @@
 		completed = true;
 		fireConfetti = true;
 		playFinish();
-		svileo.success({ title: t('songs.doneBravo', $locale) });
-		try {
-			const raw = localStorage.getItem('hinomaru_songs_completed');
-			const ids: number[] = raw ? JSON.parse(raw) : [];
-			if (!ids.includes(songId)) {
-				ids.push(songId);
-				localStorage.setItem('hinomaru_songs_completed', JSON.stringify(ids));
-			}
-		} catch {
-			// ignore
-		}
+
 		const client = supabase;
-		if (!client) return;
-		const { data: { user } } = await client.auth.getUser();
-		if (!user) return;
-		await client.from('sessions').insert({
-			user_id: user.id,
-			mode: 'song',
-			correct: 1,
-			total: 1
-		});
-		await updateStreak(client, user.id);
-		await addXP(client, user.id, 20);
+		if (!client) {
+			svileo.success({ title: t('songs.doneBravo', $locale) });
+			return;
+		}
+
+		const {
+			data: { user }
+		} = await client.auth.getUser();
+		if (!user) {
+			svileo.success({ title: t('songs.doneBravo', $locale) });
+			return;
+		}
+
+		// Only award XP and session if first time completion
+		if (!isCompletedInDB) {
+			svileo.success({
+				title: t('songs.doneBravo', $locale),
+				description: '+20 XP'
+			});
+
+			await client.from('user_song_completions').insert({
+				user_id: user.id,
+				song_id: song.id
+			});
+
+			await client.from('sessions').insert({
+				user_id: user.id,
+				mode: 'song',
+				correct: 1,
+				total: 1
+			});
+			await updateStreak(client, user.id);
+			await addXP(client, user.id, 20);
+			isCompletedInDB = true;
+
+			// Also update local storage for guest-like persistence
+			try {
+				const raw = localStorage.getItem('hinomaru_songs_completed');
+				const ids: number[] = raw ? JSON.parse(raw) : [];
+				if (!ids.includes(songId)) {
+					ids.push(songId);
+					localStorage.setItem('hinomaru_songs_completed', JSON.stringify(ids));
+				}
+			} catch {
+				/* ignore */
+			}
+		} else {
+			svileo.success({
+				title: t('songs.doneBravo', $locale),
+				description: 'Canción ya completada anteriormente'
+			});
+		}
+
 		await invalidateAll();
 	}
 
@@ -474,7 +523,7 @@
 							}}
 						>
 							<div class="lyric-jp jp">
-								<InteractiveText text={line.text} />
+								<InteractiveText text={line.text} disabled={true} />
 							</div>
 							{#if $showRomaji && line.romaji}
 								<div class="lyric-romaji">{line.romaji}</div>

@@ -2,7 +2,11 @@
 	import { getAllRegistryWords } from '$lib/utils/vocab_registry';
 	import WordPopup from './WordPopup.svelte';
 
-	let { text } = $props<{ text: string }>();
+	let { text, vocab = [], disabled = false } = $props<{ 
+		text: string; 
+		vocab?: any[];
+		disabled?: boolean;
+	}>();
 
 	let popupState = $state({
 		visible: false,
@@ -12,7 +16,12 @@
 	});
 
 	// Simple tokenizer: find all words from registry in the text
-	const words = getAllRegistryWords();
+	const words = $derived.by(() => {
+		const registry = getAllRegistryWords();
+		const local = vocab.map((v: any) => v.jp).filter(Boolean);
+		// Merge and sort by length descending for greedy match
+		return Array.from(new Set([...registry, ...local])).sort((a, b) => b.length - a.length);
+	});
 	
 	function renderText(txt: string) {
 		// This is a naive implementation. For a real app, use a proper Japanese tokenizer.
@@ -65,7 +74,7 @@
 
 <div class="interactive-text">
 	{#each parts as part, i (i)}
-		{#if part.isWord}
+		{#if part.isWord && !disabled}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<span 

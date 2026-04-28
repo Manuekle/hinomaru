@@ -560,7 +560,7 @@
 				</div>
 
 				{#if currentQuestion}
-					<div class="question-box" style="margin-top:16px;" use:fadeUp={{ y: 8 }}>
+					<div class="question-box" style="margin-top:24px;" use:fadeUp={{ y: 8 }}>
 						<div class="question-header">
 							<span class="question-badge">{$locale === 'es' ? 'PREGUNTA' : 'QUESTION'}</span>
 							{#if $showRomaji && qRomaji}
@@ -1041,20 +1041,17 @@
 
 	/* --- Quiz --- */
 	.question-box {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 32px;
-		padding: 32px;
-		box-shadow: var(--shadow-md);
 		position: relative;
-		overflow: hidden;
+		overflow: visible;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.question-header {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
-		margin-bottom: 16px;
+		gap: 6px;
+		margin-bottom: 20px;
 	}
 
 	.question-badge {
@@ -1072,19 +1069,19 @@
 	}
 
 	.question-text {
-		font-size: 24px;
-		font-weight: 700;
-		line-height: 1.3;
-		margin-bottom: 8px;
+		font-size: 28px;
+		font-weight: 800;
+		line-height: 1.2;
+		margin-bottom: 12px;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
 	}
 
 	.question-translation {
-		font-size: 15px;
+		font-size: 16px;
 		color: var(--fg-secondary);
-		margin-bottom: 24px;
-		font-style: italic;
-		opacity: 0.8;
+		margin-bottom: 32px;
+		line-height: 1.5;
 	}
 
 	.options-grid {
@@ -1097,8 +1094,8 @@
 		display: flex;
 		align-items: center;
 		gap: 16px;
-		padding: 16px 20px;
-		border: 2px solid var(--ink-200);
+		padding: 18px 20px;
+		border: 1.5px solid var(--ink-200);
 		border-radius: 20px;
 		background: var(--bg-surface);
 		cursor: pointer;
@@ -1556,13 +1553,18 @@
 
 	.reading-mode-overlay .body-text-romaji {
 		font-size: calc(var(--story-fs) * 0.65);
-		opacity: 0.7;
+		opacity: 0.8;
 		margin-top: 10px;
 		margin-bottom: 40px;
 		text-align: left;
 		font-style: italic;
 		color: var(--hinomaru-red);
 		white-space: pre-wrap;
+	}
+
+	.reading-mode-overlay[data-theme='dark'] .body-text-romaji {
+		color: #ff6b6b; /* Lighter red for dark mode contrast */
+		opacity: 0.9;
 	}
 
 	@media (min-width: 600px) {
