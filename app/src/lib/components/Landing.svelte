@@ -24,6 +24,7 @@
 		GlobeIcon
 	} from '@hugeicons/core-free-icons';
 	import AppDownloadDrawer from '$lib/components/AppDownloadDrawer.svelte';
+	import { deferredPrompt, isInstalled } from '$lib/stores/pwa';
 
 	let { decks = [] } = $props();
 
@@ -80,15 +81,39 @@
 		const theme = dark ? 'dark' : 'light';
 		return `/landing/${id}_${locale}_${theme}.webp`;
 	}
+
+	function playSample() {
+		const msg = new SpeechSynthesisUtterance('こんにちは');
+		msg.lang = 'ja-JP';
+		window.speechSynthesis.speak(msg);
+	}
+	async function handleDownload() {
+		if (isIOS) {
+			showDownload = true;
+		} else if ($deferredPrompt) {
+			$deferredPrompt.prompt();
+			const { outcome } = await $deferredPrompt.userChoice;
+			if (outcome === 'accepted') {
+				deferredPrompt.set(null);
+			}
+		} else {
+			// Fallback: show drawer if no native prompt is available (desktop browsers that don't support it or already rejected)
+			showDownload = true;
+		}
+	}
 </script>
 
 <div class="landing-root">
-	<!-- ════ HERO ════ -->
 	<section class="hero-section">
 		<div class="hero-inner">
 			<div class="hero-badge" use:fadeUp={{ delay: 0 }}>
 				<div class="badge-icon">
-					<Icon icon={StarIcon} size={20} color={isDark ? 'var(--warning)' : 'var(--brand-primary)'} variant="solid" />
+					<Icon
+						icon={StarIcon}
+						size={20}
+						color={isDark ? 'var(--warning)' : 'var(--brand-primary)'}
+						variant="solid"
+					/>
 				</div>
 				<span>{t('landing.hero.badge', $locale)}</span>
 			</div>
@@ -102,16 +127,22 @@
 				{t('landing.hero.sub', $locale)}
 			</p>
 
-			<div use:fadeUp={{ delay: 0.3 }} class="hero-actions">
+				<div use:fadeUp={{ delay: 0.3 }} class="hero-actions">
 				<a href="/login" class="cta-btn cta-white">
 					{t('landing.cta', $locale)}
 				</a>
 
-				<!-- Restore original Download button behavior (mostly for iOS) -->
-				{#if isIOS}
-					<button class="cta-btn cta-ghost" onclick={() => (showDownload = true)}>
-						<Icon icon={Download02Icon} size={20} />
-						{t('landing.cta.secondary', $locale).replace('O ', '').replace(' →', '')}
+				{#if !$isInstalled}
+					<button class="cta-btn cta-ghost" onclick={handleDownload}>
+						{#if isIOS}
+							<svg width="20" height="20" fill="currentColor" xml:space="preserve" viewBox="0 0 814 1000" class="os-icon">
+								<path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76.5 0-103.7 40.8-165.9 40.8s-105.6-57-155.5-127C46.7 790.7 0 663 0 541.8c0-194.4 126.4-297.5 250.8-297.5 66.1 0 121.2 43.4 162.7 43.4 39.5 0 101.1-46 176.3-46 28.5 0 130.9 2.6 198.3 99.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/>
+							</svg>
+						{:else}
+							<svg width="20" height="20" preserveAspectRatio="xMidYMid" viewBox="0 0 256 150" class="os-icon">
+								<path fill="currentColor" d="M255.285 143.47c-.084-.524-.164-1.042-.251-1.56a128.119 128.119 0 0 0-12.794-38.288 128.778 128.778 0 0 0-23.45-31.86 129.166 129.166 0 0 0-22.713-18.005c.049-.08.09-.168.14-.25 2.582-4.461 5.172-8.917 7.755-13.38l7.576-13.068c1.818-3.126 3.632-6.26 5.438-9.386a11.776 11.776 0 0 0 .662-10.484 11.668 11.668 0 0 0-4.823-5.536 11.85 11.85 0 0 0-5.004-1.61 11.963 11.963 0 0 0-2.218.018 11.738 11.738 0 0 0-8.968 5.798c-1.814 3.127-3.628 6.26-5.438 9.386l-7.576 13.069c-2.583 4.462-5.173 8.918-7.755 13.38-.282.487-.567.973-.848 1.467-.392-.157-.78-.313-1.172-.462-14.24-5.43-29.688-8.4-45.836-8.4-.442 0-.879 0-1.324.006-14.357.143-28.152 2.64-41.022 7.12a119.434 119.434 0 0 0-4.42 1.642c-.262-.455-.532-.911-.79-1.367-2.583-4.462-5.173-8.918-7.755-13.38L65.123 15.25c-1.818-3.126-3.632-6.259-5.439-9.386A11.736 11.736 0 0 0 48.5.048 11.71 11.71 0 0 0 43.49 1.66a11.716 11.716 0 0 0-4.077 4.063c-.281.474-.532.967-.742 1.473a11.808 11.808 0 0 0-.365 8.188c.259.786.594 1.554 1.023 2.296a3973.32 3973.32 0 0 1 5.439 9.386c2.53 4.357 5.054 8.713 7.58 13.069 2.582 4.462 5.168 8.918 7.75 13.38.02.038.046.075.065.112A129.184 129.184 0 0 0 45.32 64.38a129.693 129.693 0 0 0-22.2 24.015 127.737 127.737 0 0 0-9.34 15.24 128.238 128.238 0 0 0-10.843 28.764 130.743 130.743 0 0 0-1.951 9.524c-.087.518-.167 1.042-.247 1.56A124.978 124.978 0 0 0 0 149.118h256c-.205-1.891-.449-3.77-.734-5.636l.019-.012Z"/><path fill="currentColor" d="M194.59 113.712c5.122-3.41 5.867-11.3 1.661-17.62-4.203-6.323-11.763-8.682-16.883-5.273-5.122 3.41-5.868 11.3-1.662 17.621 4.203 6.322 11.764 8.682 16.883 5.272ZM78.518 108.462c4.206-6.321 3.46-14.21-1.662-17.62-5.123-3.41-12.68-1.05-16.886 5.27-4.203 6.323-3.458 14.212 1.662 17.622 5.122 3.41 12.683 1.05 16.886-5.272Z"/></svg>
+						{/if}
+						{t('landing.cta.download', $locale)}
 					</button>
 				{/if}
 			</div>
@@ -121,11 +152,13 @@
 			<div class="hero-visual">
 				<div class="hero-phone-container">
 					<div class="iphone-16-mockup">
-						<!-- App Content -->
 						<div class="mockup-screen">
-							<img src={getFeatureImg('hero', $locale, isDark)} alt="Hinomaru App" class="app-screenshot" />
+							<img
+								src={getFeatureImg('hero', $locale, isDark)}
+								alt="Hinomaru App"
+								class="app-screenshot"
+							/>
 						</div>
-						<!-- Device Frame -->
 						<img src="/mockups/iphone16pro_frame.png" alt="iPhone 16 Pro" class="device-frame" />
 					</div>
 				</div>
@@ -142,13 +175,16 @@
 				</div>
 				<div class="hero-float-card right" use:fadeUp={{ delay: 0.7, y: 20 }}>
 					<div use:floatLoop={{ duration: 5, y: 8, delay: 0.5 }}>
-						<div class="float-row">
+						<button class="float-row tts-btn" onclick={playSample} aria-label="Play sample">
 							<span class="float-emoji">🇯🇵</span>
 							<div class="float-lines">
 								<div class="line jp-text">こんにちは</div>
 								<div class="line bar w-12"></div>
 							</div>
-						</div>
+							<div class="play-indicator">
+								<Icon icon={PlayIcon} size={14} variant="solid" />
+							</div>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -159,39 +195,54 @@
 				<path d="M0,0 C480,120 960,120 1440,0 L1440,120 L0,120 Z" fill="var(--bg-surface)"></path>
 			</svg>
 		</div>
+
+		<!-- Decorative blurred blobs -->
+		<div class="hero-blob blob-1"></div>
+		<div class="hero-blob blob-2"></div>
 	</section>
 
-	<!-- ════ LEVELS SECTION ════ -->
 	<section class="levels-section">
 		<h2 use:inView>{t('landing.hero.path', $locale)}</h2>
-		<div class="levels-grid" use:inViewStagger={{ stagger: 0.05 }}>
+		<div class="levels-grid" use:inViewStagger={{ stagger: 0.05, y: 20 }}>
 			{#each levels as level}
-				<div class="level-pill">
-					<span class="level-flag">{level.flag}</span>
+				<div class="level-tag">
 					<span class="level-name">{level.id}</span>
-					<span class="level-label font-semibold tracking-tight">{level.label}</span>
+					<span class="level-label">{level.label}</span>
 				</div>
 			{/each}
 		</div>
 	</section>
 
-	<!-- ════ DECK PREVIEW SECTION ════ -->
 	{#if previewDecks.length > 0}
 		<section class="preview-section">
 			<div class="section-header text-center">
 				<span class="label-meta">{t('landing.preview.label', $locale)}</span>
 				<h2 use:inView>{t('landing.preview.title', $locale)}</h2>
 			</div>
-			<div class="preview-grid" use:inViewStagger={{ stagger: 0.08 }}>
+			<div class="preview-grid" use:inViewStagger={{ stagger: 0.1, y: 20 }}>
 				{#each previewDecks as deck}
 					<a href="/deck/{deck.id}" class="deck-preview-card">
-						<div class="deck-preview-left">
-							<span class="deck-level-pill">{deck.level}</span>
-							<span class="deck-preview-title"
-								>{$locale === 'es' ? deck.title_es : deck.title_en}</span
-							>
+						<div class="deck-card-icon">
+							{#if deck.title_es.includes('hiragana') || deck.title_en.includes('hiragana')}
+								<Icon icon={FlashIcon} size={24} color="var(--brand-primary)" />
+							{:else if deck.title_es.includes('katakana') || deck.title_en.includes('katakana')}
+								<Icon icon={ZapIcon} size={24} color="var(--brand-primary)" />
+							{:else}
+								<Icon icon={BookOpen01Icon} size={24} color="var(--brand-primary)" />
+							{/if}
 						</div>
-						<span class="deck-preview-arrow">→</span>
+						<div class="deck-preview-content">
+							<div class="deck-meta">
+								<span class="deck-level-pill">{deck.level}</span>
+								<span class="deck-count">{deck.card_count || 46} {t('home.cards', $locale).split(' ')[1]}</span>
+							</div>
+							<span class="deck-preview-title">
+								{$locale === 'es' ? deck.title_es : deck.title_en}
+							</span>
+						</div>
+						<div class="deck-arrow-wrap">
+							<Icon icon={PlayIcon} size={20} variant="solid" />
+						</div>
 					</a>
 				{/each}
 			</div>
@@ -203,7 +254,6 @@
 		</section>
 	{/if}
 
-	<!-- ════ STATS SECTION ════ -->
 	<section class="stats-section">
 		<div class="stats-grid" use:inViewStagger={{ stagger: 0.1 }}>
 			<div class="stat-card">
@@ -221,7 +271,6 @@
 		</div>
 	</section>
 
-	<!-- ════ FEATURES SECTION ════ -->
 	<section class="features-section">
 		<div class="section-header text-center">
 			<span class="label-meta">{t('landing.why.label', $locale)}</span>
@@ -252,7 +301,6 @@
 		</div>
 	</section>
 
-	<!-- ════ TESTIMONIALS ════ -->
 	<section class="testimonial-section">
 		<div class="section-header text-center font-semibold">
 			<h2 use:inView>{t('landing.testimonials.title', $locale)}</h2>
@@ -282,7 +330,6 @@
 		</div>
 	</section>
 
-	<!-- ════ FINAL CTA ════ -->
 	<section class="final-cta">
 		<div class="final-card" use:inView={{ y: 36, duration: 0.7 }}>
 			<div class="final-content">
@@ -292,9 +339,6 @@
 					<a href="/login" class="cta-btn cta-white">
 						{t('landing.cta.primary', $locale)}
 					</a>
-					<button class="cta-link-btn" onclick={() => (showDownload = true)}>
-						{t('landing.cta.secondary', $locale)}
-					</button>
 				</div>
 			</div>
 			<div class="final-visual">
@@ -304,7 +348,6 @@
 		</div>
 	</section>
 
-	<!-- ════ FOOTER ════ -->
 	<footer class="landing-footer">
 		<div class="footer-grid">
 			<div class="footer-brand-col">
@@ -313,13 +356,6 @@
 					<span class="brand-name">Hinomaru</span>
 				</div>
 				<p class="brand-tagline">{t('landing.brand.tagline', $locale)}</p>
-			</div>
-
-			<div class="footer-links-col">
-				<h4>{t('footer.product', $locale)}</h4>
-				<a href="/login">{t('footer.login', $locale)}</a>
-				<a href="/vocabulary">{t('nav.vocabulary', $locale)}</a>
-				<a href="/alphabet">{t('nav.alphabet', $locale)}</a>
 			</div>
 
 			<div class="footer-links-col">
@@ -392,34 +428,48 @@
 	.cta-white {
 		background: #ffffff;
 		color: var(--brand-primary);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 	}
 	.cta-white:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+		transform: translateY(-3px) scale(1.02);
+		box-shadow: 0 15px 35px rgba(255, 255, 255, 0.25);
+		background: #fdfdfd;
 	}
 	.cta-ghost {
-		background: rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.05);
 		color: #fff;
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(8px);
+		backdrop-filter: blur(12px);
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 	}
 	.cta-ghost:hover {
-		background: rgba(255, 255, 255, 0.2);
-		transform: translateY(-2px);
+		background: rgba(255, 255, 255, 0.15);
+		transform: translateY(-3px) scale(1.02);
+		border-color: rgba(255, 255, 255, 0.4);
 	}
 
 	/* ── HERO ── */
 	.hero-section {
 		background: var(--brand-primary);
 		color: #fff;
-		padding: calc(80px + env(safe-area-inset-top)) 24px 0;
+		padding: calc(100px + env(safe-area-inset-top)) 24px 0;
 		position: relative;
 		text-align: center;
 		z-index: 5;
 		transition: background 0.4s ease;
+		overflow: hidden;
 	}
 	:global(.dark) .hero-section {
-		background: var(--bg-page);
+		background: radial-gradient(circle at 50% 0%, #2a0a10 0%, var(--bg-page) 100%);
+	}
+	/* Mesh Gradient / Decorative background for Light Mode */
+	.hero-section::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(circle at 20% 30%, rgba(188, 0, 45, 0.05) 0%, transparent 40%),
+					radial-gradient(circle at 80% 20%, rgba(188, 0, 45, 0.08) 0%, transparent 40%);
+		pointer-events: none;
 	}
 	.hero-inner {
 		max-width: 1000px;
@@ -427,25 +477,33 @@
 		position: relative;
 		z-index: 2;
 	}
+
+	/* ── Glassmorphism Ajustado ── */
 	.hero-badge {
 		display: inline-flex;
 		align-items: center;
 		gap: 10px;
-		background: rgba(255, 255, 255, 0.1);
-		padding: 8px 16px;
+		padding: 10px 20px;
 		border-radius: 99px;
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 700;
-		margin-bottom: 24px;
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		margin-bottom: 32px;
 		color: #fff;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
 	}
 	:global(.dark) .hero-badge {
-		background: var(--bg-surface-glass);
-		border-color: var(--ink-200);
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 		color: var(--fg-primary);
 	}
+
 	.badge-icon {
 		background: #fff;
 		width: 28px;
@@ -496,7 +554,7 @@
 		max-width: 320px;
 		margin: 0 auto;
 		position: relative;
-		perspective: 1000px;
+		perspective: 1200px;
 	}
 	.iphone-16-mockup {
 		position: relative;
@@ -509,7 +567,7 @@
 		transition: transform 0.4s var(--ease-brand);
 	}
 	.iphone-16-mockup:hover {
-		transform: translateY(-8px) scale(1.02);
+		transform: translateY(-4px) scale(1.01);
 	}
 	.device-frame {
 		width: 100%;
@@ -538,19 +596,26 @@
 
 	.hero-float-card {
 		position: absolute;
-		background: var(--bg-surface-glass);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		padding: 12px 16px;
-		border-radius: 20px;
+		padding: 16px 20px;
+		border-radius: 24px;
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		box-shadow: var(--shadow-lg);
-		border: 1px solid var(--ink-200);
 		z-index: 10;
 		color: var(--fg-primary);
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(24px);
+		-webkit-backdrop-filter: blur(24px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+		transition: transform 0.3s ease;
 	}
+	:global(.dark) .hero-float-card {
+		background: rgba(30, 30, 30, 0.5);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+	}
+
 	.hero-float-card.left {
 		top: 30%;
 		left: -60px;
@@ -572,6 +637,33 @@
 		font-weight: 700;
 		font-size: 15px;
 		margin-bottom: 4px;
+	}
+	.tts-btn {
+		background: transparent;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		text-align: left;
+		color: inherit;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.play-indicator {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: var(--brand-primary);
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: 4px;
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.3);
+		transition: transform 0.2s;
+	}
+	.tts-btn:hover .play-indicator {
+		transform: scale(1.1);
 	}
 	.float-lines .bar {
 		height: 4px;
@@ -598,10 +690,25 @@
 
 	/* ── LEVELS SECTION ── */
 	.levels-section {
-		padding: 120px 24px 40px;
+		padding: 120px 24px 60px;
 		text-align: center;
-		max-width: 900px;
+		max-width: 1000px;
 		margin: 0 auto;
+		position: relative;
+	}
+	.levels-section::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 120%;
+		height: 120%;
+		background-image: radial-gradient(var(--ink-200) 1px, transparent 1px);
+		background-size: 32px 32px;
+		transform: translate(-50%, -50%);
+		opacity: 0.2;
+		z-index: -1;
+		pointer-events: none;
 	}
 	.levels-section h2 {
 		font-size: 20px;
@@ -612,29 +719,36 @@
 	.levels-grid {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 16px;
+		gap: 12px;
 		justify-content: center;
+		max-width: 800px;
+		margin: 0 auto;
 	}
-	.level-pill {
+	.level-tag {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		color: var(--fg-primary);
-		padding: 12px 24px;
+		padding: 10px 20px;
 		border-radius: 99px;
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 8px;
 		box-shadow: var(--shadow-sm);
-		transition: all 0.2s ease;
+		transition: all 300ms var(--ease-brand);
 	}
-	.level-pill:hover {
+	.level-tag:hover {
 		transform: translateY(-2px);
-		box-shadow: var(--shadow-md);
 		border-color: var(--brand-primary);
+		box-shadow: var(--shadow-md);
 	}
 	.level-name {
 		color: var(--brand-primary);
-		font-size: 18px;
+		font-size: 16px;
+		font-weight: 800;
+	}
+	.level-label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--fg-secondary);
 	}
 
 	/* ── PREVIEW SECTION ── */
@@ -644,48 +758,94 @@
 		margin: 0 auto;
 	}
 	.preview-grid {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		margin-top: 40px;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 20px;
+		margin-top: 48px;
 	}
 	.deck-preview-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		padding: 24px;
-		border-radius: 24px;
+		border-radius: 32px;
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		flex-direction: column;
+		gap: 20px;
 		text-decoration: none;
 		color: var(--fg-primary);
 		box-shadow: var(--shadow-sm);
-		transition: all 0.2s ease;
+		transition: all 400ms var(--ease-brand);
+		position: relative;
 	}
 	.deck-preview-card:hover {
 		border-color: var(--brand-primary);
-		transform: translateX(4px);
+		transform: translateY(-6px);
+		box-shadow: var(--shadow-lg);
 	}
-	.deck-preview-left {
+	.deck-card-icon {
+		width: 48px;
+		height: 48px;
+		background: var(--bg-muted);
+		border-radius: 14px;
 		display: flex;
 		align-items: center;
-		gap: 16px;
+		justify-content: center;
+		transition: all 300ms var(--ease-brand);
+	}
+	.deck-preview-card:hover .deck-card-icon {
+		background: var(--brand-primary);
+		color: #fff !important;
+	}
+	.deck-preview-card:hover .deck-card-icon :global(svg) {
+		color: #fff !important;
+	}
+	.deck-meta {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-bottom: 8px;
 	}
 	.deck-level-pill {
 		background: var(--brand-primary);
 		color: #fff;
-		padding: 4px 10px;
-		border-radius: 8px;
+		padding: 2px 8px;
+		border-radius: 6px;
+		font-weight: 700;
+		font-size: 11px;
+		text-transform: uppercase;
+	}
+	.deck-count {
+		font-size: 12px;
 		font-weight: 600;
-		font-size: 13px;
+		color: var(--fg-tertiary);
 	}
 	.deck-preview-title {
-		font-weight: 600;
-		font-size: 17px;
+		font-weight: 800;
+		font-size: 18px;
+		line-height: 1.3;
+		color: var(--sumi);
 	}
-	.deck-preview-arrow {
-		font-size: 20px;
-		opacity: 0.3;
+	.deck-arrow-wrap {
+		position: absolute;
+		bottom: 24px;
+		right: 24px;
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: var(--ink-100);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-tertiary);
+		transition: all 300ms var(--ease-brand);
+		opacity: 0;
+		transform: scale(0.8);
+	}
+	.deck-preview-card:hover .deck-arrow-wrap {
+		opacity: 1;
+		transform: scale(1);
+		background: var(--brand-primary);
+		color: #fff;
 	}
 	.preview-all-link {
 		font-size: 16px;
@@ -709,11 +869,17 @@
 	}
 	.stat-card {
 		background: var(--bg-surface);
-		padding: 32px;
-		border-radius: 24px;
+		padding: 40px 32px;
+		border-radius: 32px;
 		text-align: center;
 		border: 1px solid var(--ink-200);
-		box-shadow: var(--shadow-sm);
+		box-shadow: var(--shadow-md);
+		transition: all 400ms var(--ease-brand);
+	}
+	.stat-card:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-lg);
+		border-color: var(--brand-primary);
 	}
 	.stat-value {
 		font-size: 40px;
@@ -752,15 +918,20 @@
 	.features-stack {
 		display: flex;
 		flex-direction: column;
-		gap: 32px;
+		gap: 24px;
 	}
 	.feature-item {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		align-items: center;
-		border-radius: 48px;
+		border-radius: 56px;
 		overflow: hidden;
-		min-height: 640px;
+		min-height: 600px;
+		box-shadow: var(--shadow-md);
+		border: 1px solid rgba(0, 0, 0, 0.05);
+	}
+	:global(.dark) .feature-item {
+		border: 1px solid rgba(255, 255, 255, 0.05);
 	}
 	.feature-item:nth-child(even) {
 		direction: rtl;
@@ -814,7 +985,10 @@
 		padding: 40px;
 		border-radius: 32px;
 		border: 1px solid var(--ink-200);
-		box-shadow: var(--shadow-sm);
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.02),
+			0 4px 16px rgba(0, 0, 0, 0.04);
+		transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 	}
 	.test-quote {
 		font-size: 20px;
@@ -857,13 +1031,15 @@
 		margin: 0 auto;
 	}
 	.final-card {
-		background: #1a1a1a;
+		background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
 		border-radius: 48px;
 		display: grid;
 		grid-template-columns: 1.2fr 0.8fr;
 		overflow: hidden;
 		min-height: 440px;
 		color: #fff;
+		box-shadow: var(--shadow-lg);
+		border: 1px solid rgba(255, 255, 255, 0.05);
 	}
 	.final-content {
 		padding: 64px;
@@ -926,17 +1102,35 @@
 
 	/* ── FOOTER ── */
 	.landing-footer {
-		background: var(--bg-muted);
-		border-top: 1px solid var(--ink-200);
-		padding: 80px 24px 40px;
+		background: #0a0a0a;
+		color: #fff;
+		padding: 100px 24px 60px;
+		position: relative;
+		overflow: hidden;
+	}
+	:global(.dark) .landing-footer {
+		background: #050505;
+	}
+	.landing-footer::after {
+		content: '';
+		position: absolute;
+		bottom: -100px;
+		right: -100px;
+		width: 400px;
+		height: 400px;
+		background: radial-gradient(circle, rgba(188, 0, 45, 0.1) 0%, transparent 70%);
+		pointer-events: none;
+		z-index: 1;
 	}
 	.footer-grid {
-		max-width: 1100px;
+		max-width: 1200px;
 		margin: 0 auto;
 		display: grid;
-		grid-template-columns: 1.5fr 1fr 1fr 1fr;
-		gap: 64px;
-		margin-bottom: 64px;
+		grid-template-columns: 1.5fr 1fr 1fr;
+		gap: 80px;
+		margin-bottom: 80px;
+		position: relative;
+		z-index: 2;
 	}
 	.brand-wrap {
 		display: flex;
@@ -951,18 +1145,24 @@
 		border-radius: 50%;
 	}
 	.brand-name {
-		font-size: 22px;
+		font-size: 24px;
 		font-weight: 800;
 		letter-spacing: -0.02em;
+		color: #fff;
 	}
 	.brand-tagline {
 		font-size: 15px;
-		opacity: 0.7;
-		line-height: 1.5;
+		opacity: 0.6;
+		line-height: 1.6;
 		margin-bottom: 24px;
-		color: var(--fg-secondary);
+		color: #fff;
+		max-width: 240px;
 	}
 
+	.footer-links-col {
+		display: flex;
+		flex-direction: column;
+	}
 	.footer-links-col h4 {
 		font-size: 11px;
 		font-weight: 700;
@@ -973,47 +1173,51 @@
 	}
 	.footer-links-col a {
 		display: block;
-		color: var(--fg-primary);
-		opacity: 0.7;
+		color: rgba(255, 255, 255, 0.6);
 		text-decoration: none;
-		margin-bottom: 12px;
+		margin-bottom: 14px;
 		font-size: 15px;
-		transition: all 200ms;
+		transition: all 240ms var(--ease-brand);
 	}
 	.footer-links-col a:hover {
-		opacity: 1;
+		color: #fff;
 		transform: translateX(4px);
 	}
 
 	.kofi-link-badge {
 		opacity: 1 !important;
+		display: inline-block;
+		transition: transform 300ms var(--ease-brand);
 	}
 	.kofi-link-badge img {
 		height: 44px;
-		transition: transform 200ms;
+		display: block;
 	}
 	.kofi-link-badge:hover {
-		transform: none !important;
+		transform: scale(1.08) !important;
 	}
 
 	.footer-bottom {
-		max-width: 1100px;
+		max-width: 1200px;
 		margin: 0 auto;
-		padding-top: 32px;
-		border-top: 1px solid var(--ink-200);
+		padding-top: 40px;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		text-align: center;
 		font-size: 14px;
-		opacity: 0.6;
-		color: var(--fg-secondary);
+		color: rgba(255, 255, 255, 0.4);
 	}
 
 	/* ── RESPONSIVE ── */
 	@media (max-width: 900px) {
 		.feature-item,
-		.final-card,
-		.footer-grid {
+		.final-card {
 			grid-template-columns: 1fr;
 			text-align: center;
+		}
+		.footer-grid {
+			grid-template-columns: repeat(2, 1fr);
+			text-align: left;
+			gap: 40px;
 		}
 		.test-grid {
 			grid-template-columns: 1fr;
@@ -1033,18 +1237,25 @@
 		}
 		.feature-image {
 			order: -1;
-			height: 280px;
-			padding: 32px;
+			height: 420px;
+			padding: 20px;
 		}
 		.iphone-16-mockup.mini {
 			max-width: 180px;
 		}
 		.stats-grid {
-			grid-template-columns: 1fr 1fr;
-			gap: 16px;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 12px;
 		}
-		.stats-grid .stat-card:last-child {
-			grid-column: 1 / -1;
+		.stat-card {
+			padding: 20px 12px;
+			border-radius: 20px;
+		}
+		.stat-value {
+			font-size: 22px;
+		}
+		.stat-label {
+			font-size: 10px;
 		}
 		.final-visual {
 			height: 200px;
@@ -1054,7 +1265,7 @@
 			align-items: center;
 		}
 		.final-content h2 {
-			font-size: 32px;
+			font-size: 28px;
 		}
 		.brand-wrap {
 			justify-content: center;
@@ -1067,9 +1278,14 @@
 		}
 		.hero-actions {
 			flex-direction: column;
-			align-items: stretch;
-			max-width: 320px;
-			margin: 0 auto 40px;
+			align-items: center; /* Ajustado para centrar */
+			width: 100%;
+			gap: 12px;
+			margin: 0 auto 32px;
+		}
+		.cta-btn {
+			width: 100%;
+			max-width: 320px; /* Limita el ancho del botón en móvil */
 		}
 		.levels-section {
 			padding: 64px 24px 32px;
@@ -1087,59 +1303,172 @@
 			padding: 64px 24px;
 		}
 		.stat-value {
-			font-size: 32px;
+			font-size: 28px;
 		}
 	}
 	@media (max-width: 600px) {
-		.hero-float-card {
-			display: none;
+		.hero-section {
+			padding: calc(60px + env(safe-area-inset-top)) 20px 0;
 		}
 		.hero-section h1 {
-			font-size: 38px;
+			font-size: clamp(32px, 10vw, 40px); /* Escalado más fluido */
+			line-height: 1.1;
 		}
-		.level-pill {
-			width: 100%;
+		.hero-subtitle {
+			font-size: 16px;
+			margin-bottom: 32px;
+		}
+
+		/* Ajuste de tarjetas flotantes para no ocultarlas en móvil */
+		.hero-float-card {
+			transform: scale(0.7);
+			padding: 8px 12px;
+		}
+		.hero-float-card.left {
+			left: 0;
+			top: 15%;
+		}
+		.hero-float-card.right {
+			right: 0;
+			bottom: 25%;
+		}
+
+		.levels-section h2 {
+			font-size: 24px;
+			margin-bottom: 24px;
+		}
+		.levels-grid {
+			display: flex;
+			flex-wrap: wrap;
 			justify-content: center;
+			gap: 8px;
+		}
+		.level-tag {
+			padding: 8px 16px;
+		}
+		.preview-grid {
+			grid-template-columns: 1fr;
+			gap: 16px;
+		}
+		.deck-preview-card {
+			flex-direction: row;
+			align-items: center;
+			gap: 16px;
+			padding: 20px;
+		}
+		.deck-arrow-wrap {
+			position: static;
+			opacity: 1;
+			transform: none;
+			flex-shrink: 0;
+		}
+		.level-card {
+			padding: 20px 12px;
+		}
+		.preview-section {
+			padding: 48px 20px;
+		}
+		.section-header h2 {
+			font-size: 28px;
 		}
 		.feature-content {
-			padding: 28px 24px;
+			padding: 32px 20px;
 		}
 		.feature-content h3 {
-			font-size: 22px;
+			font-size: 24px;
 		}
 		.feature-content p {
-			font-size: 16px;
+			font-size: 15px;
 		}
 		.feature-image {
-			height: 240px;
-			padding: 24px;
+			height: 380px;
+			padding: 16px;
+		}
+		.iphone-16-mockup.mini {
+			max-width: 160px;
+		}
+		.feature-item {
+			border-radius: 24px;
 		}
 		.test-card {
-			padding: 28px 24px;
+			padding: 24px 20px;
 		}
 		.test-quote {
-			font-size: 17px;
+			font-size: 16px;
 		}
 		.final-content {
-			padding: 32px 24px;
+			padding: 40px 20px;
 		}
 		.final-content h2 {
-			font-size: 26px;
+			font-size: 28px;
 		}
 		.final-card {
-			border-radius: 28px;
+			border-radius: 24px;
 		}
 		.stats-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 8px;
 		}
-		.stats-grid .stat-card:last-child {
-			grid-column: auto;
+		.stat-card {
+			padding: 16px 8px;
 		}
 		.stat-value {
-			font-size: 36px;
+			font-size: 18px;
+		}
+		.stat-label {
+			font-size: 9px;
+			letter-spacing: 0;
+		}
+		.final-emoji {
+			font-size: 80px;
 		}
 		.landing-footer {
-			padding: 48px 24px 32px;
+			padding: 48px 20px 32px;
 		}
+		.footer-grid {
+			grid-template-columns: 1fr;
+			text-align: center;
+			gap: 48px;
+		}
+		.footer-links-col {
+			align-items: center;
+		}
+		.brand-wrap {
+			justify-content: center;
+		}
+		.brand-tagline {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.iphone-16-mockup {
+			max-width: 280px;
+		}
+	}
+
+	/* Decorative Blobs */
+	.hero-blob {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(80px);
+		z-index: 1;
+		pointer-events: none;
+		opacity: 0.4;
+	}
+	.blob-1 {
+		width: 400px;
+		height: 400px;
+		background: rgba(255, 255, 255, 0.15);
+		top: -100px;
+		left: -100px;
+	}
+	.blob-2 {
+		width: 300px;
+		height: 300px;
+		background: rgba(188, 0, 45, 0.3);
+		bottom: 100px;
+		right: -50px;
+	}
+	:global(.dark) .blob-2 {
+		background: rgba(188, 0, 45, 0.15);
 	}
 </style>

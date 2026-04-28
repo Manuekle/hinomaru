@@ -7,7 +7,8 @@
 	import { Cancel01Icon, InformationCircleIcon } from '@hugeicons/core-free-icons';
 	import AppDownloadDrawer from './AppDownloadDrawer.svelte';
 
-	let deferredPrompt = $state<any>(null);
+	import { deferredPrompt, isInstalled } from '$lib/stores/pwa';
+	
 	let showPrompt = $state(false);
 	let isIOS = $state(false);
 	let showDrawer = $state(false);
@@ -16,33 +17,34 @@
 		// Detect iOS
 		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 
-		// Handle Android/Chrome Install Prompt
-		window.addEventListener('beforeinstallprompt', (e) => {
-			e.preventDefault();
-			deferredPrompt = e;
-			// Only show if not already installed
-			if (!window.matchMedia('(display-mode: standalone)').matches) {
+		// Subscribe to store to show prompt
+		const unsubPrompt = deferredPrompt.subscribe(prompt => {
+			if (prompt && !$isInstalled) {
 				showPrompt = true;
 			}
 		});
 
-		// For iOS, we can't detect 'beforeinstallprompt', so we show it once or based on a timer
-		if (isIOS && !window.matchMedia('(display-mode: standalone)').matches) {
+		// For iOS, show it once or based on a timer
+		if (isIOS && !$isInstalled) {
 			const hasSeen = localStorage.getItem('ios_prompt_seen');
 			if (!hasSeen) {
 				setTimeout(() => (showPrompt = true), 3000);
 			}
 		}
+
+		return () => {
+			unsubPrompt();
+		};
 	});
 
 	async function handleInstall() {
-		if (deferredPrompt) {
-			deferredPrompt.prompt();
-			const { outcome } = await deferredPrompt.userChoice;
+		if ($deferredPrompt) {
+			$deferredPrompt.prompt();
+			const { outcome } = await $deferredPrompt.userChoice;
 			if (outcome === 'accepted') {
 				showPrompt = false;
 			}
-			deferredPrompt = null;
+			deferredPrompt.set(null);
 		}
 	}
 
