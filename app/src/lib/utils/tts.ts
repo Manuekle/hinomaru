@@ -85,8 +85,8 @@ export async function speakJapanese(text: string): Promise<void> {
 	const toastTimer = setTimeout(() => {
 		svileo.promise(audioStarted, {
 			loading: { title: '🔊 Cargando voz...' },
-			success: { title: '' },
-			error: { title: 'Voz no disponible' }
+			success: { title: '✓ Voz lista' },
+			error: { title: '✗ Voz no disponible' }
 		});
 	}, 2000);
 
