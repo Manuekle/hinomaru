@@ -7,22 +7,32 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
+WORKDIR /backend
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
 
 COPY . .
 
 RUN mkdir -p storage && chmod 777 storage
 
-# Hugging Face usa el puerto 7860
+# Usamos la ruta que confirmamos en tus logs: /opt/voicevox_engine
 RUN echo '#!/bin/bash\n\
-./run --host 0.0.0.0 --port 50021 &\n\
-sleep 10\n\
+echo "Iniciando motor VOICEVOX en /opt/voicevox_engine..."\n\
+\n\
+# Intentar arrancar con el binario "run" o con python si falla\n\
+if [ -f "/opt/voicevox_engine/run" ]; then\n\
+    cd /opt/voicevox_engine && ./run --host 0.0.0.0 --port 50021 &\n\
+else\n\
+    echo "No se encontro ./run, intentando con run.py..."\n\
+    cd /opt/voicevox_engine && python3 run.py --host 0.0.0.0 --port 50021 &\n\
+fi\n\
+\n\
+cd /backend\n\
+sleep 20\n\
+\n\
+echo "Iniciando FastAPI..."\n\
 exec uvicorn app.main:app --host 0.0.0.0 --port 7860\n\
-' > /app/start.sh && chmod +x /app/start.sh
+' > /backend/start.sh && chmod +x /backend/start.sh
 
 EXPOSE 7860
-
-CMD ["/app/start.sh"]
+CMD ["/backend/start.sh"]

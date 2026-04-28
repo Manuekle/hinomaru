@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import Optional
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ class CacheService:
     def _get_path(self, key: str) -> str:
         return os.path.join(STORAGE_DIR, f"{key}.audio")
 
-    async def get_audio(self, key: str) -> bytes | None:
+    async def get_audio(self, key: str) -> Optional[bytes]:
         path = self._get_path(key)
         try:
             if os.path.exists(path):

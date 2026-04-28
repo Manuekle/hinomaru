@@ -1,0 +1,35 @@
+FROM voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+
+USER root
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-dev \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Guardamos la ruta original del motor
+ENV VV_PATH=/opt/voicevox_engine
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
+
+COPY . .
+
+RUN mkdir -p storage && chmod 777 storage
+
+# Modificamos el inicio para usar la ruta correcta del motor
+RUN echo '#!/bin/bash\n\
+# Iniciar VOICEVOX desde su carpeta original\n\
+cd /opt/voicevox_engine && ./run --host 0.0.0.0 --port 50021 &\n\
+\n\
+# Volver a /app y esperar\n\
+cd /app\n\
+sleep 15\n\
+\n\
+# Iniciar nuestra API\n\
+exec uvicorn app.main:app --host 0.0.0.0 --port 7860\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+EXPOSE 7860
+CMD ["/app/start.sh"]
