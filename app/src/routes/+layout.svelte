@@ -143,7 +143,9 @@
 	{#if data.session && $page.url.pathname === '/'}
 		<DockBar />
 	{/if}
-	<InstallPrompt />
+	{#if !data.session && $page.url.pathname === '/'}
+		<InstallPrompt />
+	{/if}
 	<PWASplash visible={booting} />
 </div>
 
