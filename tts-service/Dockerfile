@@ -1,4 +1,5 @@
-FROM voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+# Cambiamos a la versión 22.04 que tiene Python 3.10
+FROM voicevox/voicevox_engine:cpu-ubuntu22.04-latest
 
 USER root
 RUN apt-get update && apt-get install -y \
@@ -15,20 +16,22 @@ COPY . .
 
 RUN mkdir -p storage && chmod 777 storage
 
-# Usamos la ruta que confirmamos en tus logs: /opt/voicevox_engine
+# En Ubuntu 22.04 el motor suele estar en /app o /opt/voicevox_engine
 RUN echo '#!/bin/bash\n\
-echo "Iniciando motor VOICEVOX en /opt/voicevox_engine..."\n\
+echo "Buscando el ejecutable del motor..."\n\
+# Intentar encontrar la ruta real del motor\n\
+REAL_PATH=$(find /opt /app -name "run" -type f -executable | head -n 1)\n\
+echo "Motor encontrado en: $REAL_PATH"\n\
 \n\
-# Intentar arrancar con el binario "run" o con python si falla\n\
-if [ -f "/opt/voicevox_engine/run" ]; then\n\
-    cd /opt/voicevox_engine && ./run --host 0.0.0.0 --port 50021 &\n\
+if [ -n "$REAL_PATH" ]; then\n\
+    cd $(dirname $REAL_PATH)\n\
+    ./run --host 0.0.0.0 --port 50021 &\n\
 else\n\
-    echo "No se encontro ./run, intentando con run.py..."\n\
-    cd /opt/voicevox_engine && python3 run.py --host 0.0.0.0 --port 50021 &\n\
+    echo "ERROR: No se encontro el binario run"\n\
 fi\n\
 \n\
 cd /backend\n\
-sleep 20\n\
+sleep 25\n\
 \n\
 echo "Iniciando FastAPI..."\n\
 exec uvicorn app.main:app --host 0.0.0.0 --port 7860\n\
