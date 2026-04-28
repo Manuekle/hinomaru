@@ -34,7 +34,7 @@ async def _generate_audio_bytes(
     volume: float,
     format: str,
     preset: Optional[str],
-) -> Tuple[bytes, str]:
+) -> tuple[bytes, str]:
     """Returns (audio_bytes, media_type). Handles preset, cache, and format conversion."""
     if preset and preset in settings.PRESETS:
         p = settings.PRESETS[preset]
