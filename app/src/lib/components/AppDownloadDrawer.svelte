@@ -87,6 +87,9 @@
 									<div class="step-label">{step.label}</div>
 									<div class="step-desc">{step.desc}</div>
 								</div>
+								<div class="step-icon-ios">
+									<Icon icon={step.icon} size={20} strokeWidth={2.5} />
+								</div>
 							</div>
 						{/each}
 					</div>
@@ -196,8 +199,21 @@
 		font-size: 12px;
 		font-weight: 800;
 	}
+	.step-icon-ios {
+		width: 36px;
+		height: 36px;
+		background: var(--bg-surface);
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--brand-primary);
+		flex-shrink: 0;
+		box-shadow: var(--shadow-sm);
+	}
 	.step-content {
 		flex: 1;
+		padding: 0 4px;
 	}
 	.step-label {
 		font-size: 15px;
