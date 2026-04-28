@@ -51,7 +51,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		padding: 40px 24px;
+		padding: 40px 24px 140px;
 	}
 
 	.header {
