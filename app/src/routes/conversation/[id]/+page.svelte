@@ -38,6 +38,16 @@
 	const progressPct = $derived(scenario ? Math.round((turnIndex / scenario.turns.length) * 100) : 0);
 	const scorePct = $derived(totalChoices > 0 ? Math.round((score / totalChoices) * 100) : 0);
 
+	const shuffledChoices = $derived.by(() => {
+		if (currentTurn?.type !== 'choice') return [];
+		const choices = [...currentTurn.choices].map((c, i) => ({ ...c, originalIdx: i }));
+		for (let i = choices.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[choices[i], choices[j]] = [choices[j], choices[i]];
+		}
+		return choices;
+	});
+
 	function advance() {
 		if (!scenario) return;
 		showTranslation = false;
@@ -234,8 +244,8 @@
 							</p>
 
 							<div class="options-grid">
-								{#each currentTurn.choices as choice, idx (idx)}
-									{@const isPicked = selectedIdx === idx}
+								{#each shuffledChoices as choice, loopIdx (choice.originalIdx)}
+									{@const isPicked = selectedIdx === loopIdx}
 									{@const isRevealed = phase === 'feedback'}
 									<button
 										class="option-item"
@@ -243,11 +253,11 @@
 										class:is-correct={isRevealed && choice.correct}
 										class:is-wrong={isRevealed && isPicked && !choice.correct}
 										class:is-dimmed={isRevealed && !isPicked && !choice.correct}
-										onclick={() => pickChoice(choice, idx)}
+										onclick={() => pickChoice(choice, loopIdx)}
 										disabled={phase === 'feedback'}
 										style="touch-action:manipulation"
 									>
-										<div class="option-marker">{String.fromCharCode(65 + idx)}</div>
+										<div class="option-marker">{String.fromCharCode(65 + loopIdx)}</div>
 										<div class="option-content">
 											<div class="option-label jp">{choice.jp}</div>
 											{#if $showRomaji}

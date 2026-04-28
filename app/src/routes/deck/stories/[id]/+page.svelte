@@ -272,6 +272,17 @@
 			? currentQuestion?.o_es || currentQuestion?.o_en || currentQuestion?.o || []
 			: currentQuestion?.o_en || currentQuestion?.o_es || currentQuestion?.o || []
 	);
+
+	const shuffledIndices = $derived.by(() => {
+		if (!currentQuestion) return [];
+		const len = optionsJp.length;
+		const indices = Array.from({ length: len }, (_, i) => i);
+		for (let i = indices.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[indices[i], indices[j]] = [indices[j], indices[i]];
+		}
+		return indices;
+	});
 </script>
 
 <svelte:head>
@@ -575,7 +586,8 @@
 						{/if}
 
 						<div class="options-grid">
-							{#each optionsJp as optionJp, i (i)}
+							{#each shuffledIndices as i, loopIdx (i)}
+								{@const optionJp = optionsJp[i]}
 								{@const optRomaji = optionsRomaji[i]}
 								{@const optTrans = optionsTrans[i]}
 								<button
@@ -586,7 +598,7 @@
 									onclick={() => selectAnswer(i)}
 									disabled={checked}
 								>
-									<div class="option-marker">{String.fromCharCode(65 + i)}</div>
+									<div class="option-marker">{String.fromCharCode(65 + loopIdx)}</div>
 									<div class="option-content">
 										<div class="option-label jp">{optionJp}</div>
 										{#if $showRomaji && optRomaji}
@@ -1151,7 +1163,7 @@
 
 	.is-selected .option-marker {
 		background: var(--sumi);
-		color: white;
+		color: var(--washi);
 	}
 
 	.is-correct .option-marker {
