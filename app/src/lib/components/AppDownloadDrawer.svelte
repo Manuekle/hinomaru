@@ -33,70 +33,35 @@
 		}
 	});
 
-	function close() {
-		open = false;
-	}
 
 	// i18n strings
 	const strings = {
 		es: {
-			title: 'Instalar la app',
-			iosStep1Label: 'Abrir en Safari',
-			iosStep1Desc: 'Asegúrate de usar el navegador Safari',
-			iosStep2Label: 'Tocar el botón Compartir',
-			iosStep2Desc: 'El ícono de flecha arriba en la barra inferior',
-			iosStep3Label: 'Seleccionar "Agregar a inicio"',
-			iosStep3Desc: 'Se instalará como una app nativa',
-			androidStep1Label: 'Abrir en Chrome',
-			androidStep1Desc: 'Asegúrate de usar el navegador Chrome',
-			androidStep2Label: 'Tocar el menú ⋮',
-			androidStep2Desc: 'Los tres puntos en la esquina superior derecha',
-			androidStep3Label: 'Tocar "Instalar app"',
-			androidStep3Desc: 'La app se añadirá a tu pantalla principal',
-			desktopTitle: 'Instala Hinomaru en tu móvil',
-			desktopDesc: 'Escanea el código QR con tu teléfono o elige tu sistema operativo:',
-			tabIOS: 'iOS (iPhone / iPad)',
-			tabAndroid: 'Android',
-			desktopPWANote:
-				'También puedes instalar la app desde este navegador usando el ícono de instalación en la barra de dirección.',
-			close: 'Cerrar'
+			title: 'Instalar Hinomaru',
+			step1: 'Toca el botón Compartir',
+			step1Desc: 'Búscalo en la barra inferior de Safari',
+			step2: 'Desliza hacia abajo',
+			step2Desc: 'Busca la opción en el menú',
+			step3: 'Tocar "Agregar a Inicio"',
+			step3Desc: 'La app aparecerá en tu pantalla principal'
 		},
 		en: {
-			title: 'Install the app',
-			iosStep1Label: 'Open in Safari',
-			iosStep1Desc: 'Make sure you are using the Safari browser',
-			iosStep2Label: 'Tap the Share button',
-			iosStep2Desc: 'The arrow-up icon in the bottom toolbar',
-			iosStep3Label: 'Select "Add to Home Screen"',
-			iosStep3Desc: 'It will be installed as a native app',
-			androidStep1Label: 'Open in Chrome',
-			androidStep1Desc: 'Make sure you are using Chrome',
-			androidStep2Label: 'Tap the ⋮ menu',
-			androidStep2Desc: 'Three dots in the top-right corner',
-			androidStep3Label: 'Tap "Install app"',
-			androidStep3Desc: 'The app will be added to your home screen',
-			desktopTitle: 'Install Hinomaru on your phone',
-			desktopDesc: 'Scan the QR code with your phone or choose your OS:',
-			tabIOS: 'iOS (iPhone / iPad)',
-			tabAndroid: 'Android',
-			desktopPWANote:
-				'You can also install from this browser using the install icon in the address bar.',
-			close: 'Close'
+			title: 'Install Hinomaru',
+			step1: 'Tap the Share button',
+			step1Desc: 'Find it in the Safari bottom bar',
+			step2: 'Scroll down',
+			step2Desc: 'Look for the option in the menu',
+			step3: 'Tap "Add to Home Screen"',
+			step3Desc: 'The app will appear on your home screen'
 		}
 	};
 
 	const s = $derived(strings[$locale as 'es' | 'en'] ?? strings.es);
 
-	const iosSteps = $derived([
-		{ icon: SmartPhone01Icon, label: s.iosStep1Label, desc: s.iosStep1Desc },
-		{ icon: ArrowUp01Icon, label: s.iosStep2Label, desc: s.iosStep2Desc },
-		{ icon: Add01Icon, label: s.iosStep3Label, desc: s.iosStep3Desc }
-	]);
-
-	const androidSteps = $derived([
-		{ icon: SmartPhone01Icon, label: s.androidStep1Label, desc: s.androidStep1Desc },
-		{ icon: More01Icon, label: s.androidStep2Label, desc: s.androidStep2Desc },
-		{ icon: Download02Icon, label: s.androidStep3Label, desc: s.androidStep3Desc }
+	const steps = $derived([
+		{ icon: ArrowUp01Icon, label: s.step1, desc: s.step1Desc },
+		{ icon: SmartPhone01Icon, label: s.step2, desc: s.step2Desc },
+		{ icon: Add01Icon, label: s.step3, desc: s.step3Desc }
 	]);
 </script>
 
@@ -112,51 +77,28 @@
 
 			<Drawer.Header class="drawer-header-custom">
 				<Drawer.Title class="drawer-title-custom">
-					{#if isMobile}
-						{s.title}
-					{:else}
-						{s.desktopTitle}
-					{/if}
+					{s.title}
 				</Drawer.Title>
 			</Drawer.Header>
 
 			<div class="drawer-body">
-				<!-- Content wrapper for padding -->
 				<div class="body-inner">
-					<!-- iOS content -->
-					{#if isIOS}
-						<div class="steps-grid">
-							{#each iosSteps as step, i (i)}
-								<div class="step-card">
-									<div class="step-header">
-										<div class="step-badge">{i + 1}</div>
-										<Icon icon={step.icon} size={20} strokeWidth={2} color="var(--brand-primary)" />
+					<div class="steps-grid">
+						{#each steps as step, i (i)}
+							<div class="step-card" use:fadeUp={{ delay: 0.1 * i }}>
+								<div class="step-header">
+									<div class="step-badge">{i + 1}</div>
+									<div class="step-icon-ios">
+										<Icon icon={step.icon} size={22} strokeWidth={2} />
 									</div>
+								</div>
+								<div class="step-content">
 									<div class="step-label">{step.label}</div>
 									<div class="step-desc">{step.desc}</div>
 								</div>
-							{/each}
-						</div>
-
-						<!-- Android content -->
-					{:else if isAndroid}
-						<div class="steps-grid">
-							{#each androidSteps as step, i (i)}
-								<div class="step-card">
-									<div class="step-header">
-										<div class="step-badge">{i + 1}</div>
-										<Icon icon={step.icon} size={20} strokeWidth={2} color="var(--brand-primary)" />
-									</div>
-									<div class="step-label">{step.label}</div>
-									<div class="step-desc">{step.desc}</div>
-								</div>
-							{/each}
-						</div>
-					{:else}
-						<!-- Desktop stays similar but refined -->
-						<p class="desktop-desc">{s.desktopDesc}</p>
-						...
-					{/if}
+							</div>
+						{/each}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -265,17 +207,27 @@
 		font-size: 11px;
 		font-weight: 800;
 	}
+	.step-icon-ios {
+		color: var(--brand-primary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.step-content {
+		padding-right: 12px;
+	}
 	.step-label {
-		font-size: 15px;
+		font-size: 16px;
 		font-weight: 800;
 		color: var(--fg-primary);
-		line-height: 1.2;
-		margin-bottom: 4px;
+		line-height: 1.1;
+		margin-bottom: 2px;
 	}
 	.step-desc {
 		font-size: 13px;
 		color: var(--fg-secondary);
-		line-height: 1.4;
+		line-height: 1.3;
+		opacity: 0.8;
 	}
 
 	/* ── QR block ── */

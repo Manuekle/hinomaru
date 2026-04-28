@@ -91,14 +91,15 @@
 		if (isIOS) {
 			showDownload = true;
 		} else if ($deferredPrompt) {
-			$deferredPrompt.prompt();
-			const { outcome } = await $deferredPrompt.userChoice;
-			if (outcome === 'accepted') {
-				deferredPrompt.set(null);
+			try {
+				$deferredPrompt.prompt();
+				const { outcome } = await $deferredPrompt.userChoice;
+				if (outcome === 'accepted') {
+					deferredPrompt.set(null);
+				}
+			} catch (err) {
+				console.error('Install prompt failed:', err);
 			}
-		} else {
-			// Fallback: show drawer if no native prompt is available (desktop browsers that don't support it or already rejected)
-			showDownload = true;
 		}
 	}
 </script>
