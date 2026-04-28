@@ -8,6 +8,19 @@ import { PUBLIC_VOICEVOX_URL } from '$env/static/public';
 export const VOICEVOX_URL = PUBLIC_VOICEVOX_URL || 'http://localhost:8000';
 
 let currentAudio: HTMLAudioElement | null = null;
+let currentResolve: (() => void) | null = null;
+
+export function stopVoicevox(): void {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = '';
+        currentAudio = null;
+    }
+    if (currentResolve) {
+        currentResolve();
+        currentResolve = null;
+    }
+}
 
 export async function speakVoicevox(
     text: string,
@@ -17,11 +30,7 @@ export async function speakVoicevox(
     volume = 1.0
 ): Promise<void> {
     // Stop any currently playing audio
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.src = '';
-        currentAudio = null;
-    }
+    stopVoicevox();
 
     const params = new URLSearchParams({
         text,
@@ -45,19 +54,27 @@ export async function speakVoicevox(
     currentAudio = audio;
 
     await new Promise<void>((resolve, reject) => {
+        currentResolve = () => {
+            URL.revokeObjectURL(audioUrl);
+            resolve();
+        };
         audio.onended = () => {
             URL.revokeObjectURL(audioUrl);
             currentAudio = null;
+            currentResolve = null;
             resolve();
         };
         audio.onerror = () => {
+            audio.pause();
             URL.revokeObjectURL(audioUrl);
             currentAudio = null;
+            currentResolve = null;
             reject(new Error('Audio playback error'));
         };
         audio.play().catch((err) => {
             URL.revokeObjectURL(audioUrl);
             currentAudio = null;
+            currentResolve = null;
             reject(err);
         });
     });

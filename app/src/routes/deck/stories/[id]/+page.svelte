@@ -4,7 +4,7 @@
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { speakJapanese } from '$lib/utils/tts';
-	import { preloadVoicevox } from '$lib/services/voicevox';
+	import { preloadVoicevox, stopVoicevox } from '$lib/services/voicevox';
 	import { preferredVoice } from '$lib/stores/settings';
 	import { get } from 'svelte/store';
 	import { t } from '$lib/i18n';
@@ -99,6 +99,7 @@
 	async function toggleAudio() {
 		if (isSpeaking) {
 			isSpeaking = false;
+			stopVoicevox();
 		} else {
 			isSpeaking = true;
 			try {
@@ -155,7 +156,7 @@
 	// --- Preload TTS Audio ---
 	$effect(() => {
 		if (story && typeof window !== 'undefined') {
-			const preset = get(preferredVoice) === 'kaito' ? 'cool' : 'kawaii';
+			const preset = get(preferredVoice) === 'cool' ? 'cool' : 'kawaii';
 			
 			// Preload story body (if within limits)
 			if (bodyJp && bodyJp.length < 200) {

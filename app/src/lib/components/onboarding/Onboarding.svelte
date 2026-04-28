@@ -20,7 +20,7 @@
 		motivation: '',
 		experience: '',
 		srsEnabled: false,
-		voice: 'standard',
+		voice: 'kawaii',
 		goal: 5
 	});
 
@@ -52,7 +52,7 @@
 
 	function handleVoice(val: string) {
 		selections.voice = val;
-		preferredVoice.set(val as 'standard' | 'kaito');
+		preferredVoice.set(val as 'kawaii' | 'cool');
 		nextStep();
 	}
 
@@ -130,7 +130,7 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: env(safe-area-inset-top);
-		padding-bottom: env(safe-area-inset-bottom);
+		/* safe-area-inset-bottom handled by StickyFooter */
 		touch-action: none;
 		--step-title: clamp(24px, 7vw, 32px);
 		--step-subtitle: clamp(15px, 4vw, 20px);

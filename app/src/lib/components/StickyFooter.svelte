@@ -52,31 +52,9 @@
 		transition: all 0.3s ease;
 	}
 
-	/* iOS Floating Style */
+	/* iOS: same layout, just adjust bottom padding for home bar */
 	.sticky-footer.ios {
-		background: transparent;
-		border-top: none;
-		padding: 0 16px max(16px, calc(env(safe-area-inset-bottom, 0px) - 10px));
-	}
-
-	.sticky-footer.ios .footer-content {
-		background: rgba(255, 255, 255, 0.75);
-		backdrop-filter: blur(24px) saturate(190%);
-		-webkit-backdrop-filter: blur(24px) saturate(190%);
-		border-radius: 28px;
-		padding: 12px 16px;
-		border: 0.5px solid rgba(0, 0, 0, 0.05);
-		box-shadow: 
-			0 12px 32px rgba(0, 0, 0, 0.12),
-			0 2px 8px rgba(0, 0, 0, 0.06);
-	}
-
-	:global([data-theme='dark']) .sticky-footer.ios .footer-content {
-		background: rgba(28, 28, 30, 0.8);
-		border-color: rgba(255, 255, 255, 0.1);
-		box-shadow: 
-			0 10px 30px rgba(0, 0, 0, 0.4),
-			0 1px 8px rgba(0, 0, 0, 0.2);
+		padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
 	}
 
 	.footer-content {
@@ -95,9 +73,6 @@
 	@media (min-width: 768px) {
 		.sticky-footer {
 			padding: 12px 32px 24px;
-		}
-		.sticky-footer.ios {
-			padding-bottom: 24px;
 		}
 	}
 

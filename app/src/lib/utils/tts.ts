@@ -45,7 +45,7 @@ function speakBrowser(text: string): void {
 	const voices = window.speechSynthesis.getVoices();
 	const japaneseVoices = voices.filter((v) => v.lang === 'ja-JP' || v.lang.startsWith('ja'));
 
-	if (voiceMode === 'kaito') {
+	if (voiceMode === 'cool') {
 		utterance.pitch = 0.8;
 		const kaitoVoice =
 			japaneseVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) ||
@@ -69,7 +69,7 @@ export async function speakJapanese(text: string): Promise<void> {
 	if (!cleaned) return;
 
 	const voiceMode = get(preferredVoice);
-	const preset = voiceMode === 'kaito' ? 'cool' : 'kawaii';
+	const preset = voiceMode === 'cool' ? 'cool' : 'kawaii';
 
 	// Attempt high-quality VOICEVOX first
 	await speakVoicevox(cleaned, preset).catch((err) => {

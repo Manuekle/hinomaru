@@ -10,20 +10,20 @@
 
 	const voices = $derived([
 		{
-			id: 'standard',
-			name: t('onboarding.voice.standard.name', $locale),
-			desc: t('onboarding.voice.standard.desc', $locale),
+			id: 'kawaii',
+			name: t('onboarding.voice.kawaii.name', $locale),
+			desc: t('onboarding.voice.kawaii.desc', $locale),
 			icon: VolumeHighIcon
 		},
 		{
-			id: 'kaito',
-			name: t('onboarding.voice.kaito.name', $locale),
-			desc: t('onboarding.voice.kaito.desc', $locale),
+			id: 'cool',
+			name: t('onboarding.voice.cool.name', $locale),
+			desc: t('onboarding.voice.cool.desc', $locale),
 			icon: VolumeHighIcon
 		}
 	]);
 
-	let selected = $state('standard');
+	let selected = $state('kawaii');
 	let playingId = $state<string | null>(null);
 
 	function handleSelect(id: string) {
@@ -49,18 +49,18 @@
 			.getVoices()
 			.filter((v) => v.lang.includes('ja') || v.lang.includes('JP'));
 
-		if (id === 'kaito' && availableVoices.length > 1) {
+		if (id === 'cool' && availableVoices.length > 1) {
 			// Find a male-sounding voice if possible, or just pick the second voice
-			const kaitoVoice =
+			const coolVoice =
 				availableVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) || availableVoices[1];
-			utterance.voice = kaitoVoice;
+			utterance.voice = coolVoice;
 			utterance.pitch = 0.8; // Deeper pitch
 		} else if (availableVoices.length > 0) {
 			utterance.voice = availableVoices[0];
-			if (id === 'kaito') utterance.pitch = 0.8; // Fallback to pitch change if only 1 voice
+			if (id === 'cool') utterance.pitch = 0.8; // Fallback to pitch change if only 1 voice
 		} else {
 			// Absolute fallback if no voices loaded yet (Chrome loads them async)
-			if (id === 'kaito') utterance.pitch = 0.8;
+			if (id === 'cool') utterance.pitch = 0.8;
 		}
 
 		utterance.rate = 0.9;

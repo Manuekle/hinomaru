@@ -36,9 +36,9 @@
 			id: 'voice',
 			label: t('onboarding.summary.voice', $locale),
 			value:
-				selections.voice === 'kaito'
-					? t('onboarding.voice.kaito.name', $locale)
-					: t('onboarding.voice.standard.name', $locale),
+				selections.voice === 'cool'
+					? t('onboarding.voice.cool.name', $locale)
+					: t('onboarding.voice.kawaii.name', $locale),
 			icon: VolumeHighIcon
 		},
 		{

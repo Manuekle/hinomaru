@@ -16,7 +16,7 @@
 	import { fly } from 'svelte/transition';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
-	import { speakVoicevox } from '$lib/services/voicevox';
+	import { speakVoicevox, preloadVoicevox } from '$lib/services/voicevox';
 	import Icon from '$lib/Icon.svelte';
 	import supportImg from '$lib/assets/support.png';
 	import {
@@ -66,7 +66,7 @@
 		theme.set(t);
 	}
 
-	function setVoice(v: 'standard' | 'kaito') {
+	function setVoice(v: 'kawaii' | 'cool') {
 		preferredVoice.set(v);
 		speakJapanese('みなさん、こんにちは');
 	}
@@ -114,6 +114,9 @@
 	}
 
 	onMount(async () => {
+		preloadVoicevox('みなさん、こんにちは', 'kawaii');
+		preloadVoicevox('みなさん、こんにちは', 'cool');
+
 		if (!user) return;
 		const { data: prof } = await supabase
 			.from('profiles')
@@ -344,31 +347,31 @@
 			<div class="segmented" role="radiogroup" aria-label={t('onboarding.voice.title', $locale)}>
 				<div
 					class="seg-glider"
-					style="width:calc(50% - 4px);transform:translateX({$preferredVoice === 'standard'
+					style="width:calc(50% - 4px);transform:translateX({$preferredVoice === 'kawaii'
 						? '0'
 						: '100%'})"
 				></div>
 				<button
 					class="seg-btn"
-					class:active={$preferredVoice === 'standard'}
-					onclick={() => setVoice('standard')}
+					class:active={$preferredVoice === 'kawaii'}
+					onclick={() => setVoice('kawaii')}
 					role="radio"
-					aria-checked={$preferredVoice === 'standard'}
+					aria-checked={$preferredVoice === 'kawaii'}
 				>
 					<Icon icon={Mic02Icon} size={13} color="currentColor" />{t(
-						'onboarding.voice.standard.name',
+						'onboarding.voice.kawaii.name',
 						$locale
 					)}
 				</button>
 				<button
 					class="seg-btn"
-					class:active={$preferredVoice === 'kaito'}
-					onclick={() => setVoice('kaito')}
+					class:active={$preferredVoice === 'cool'}
+					onclick={() => setVoice('cool')}
 					role="radio"
-					aria-checked={$preferredVoice === 'kaito'}
+					aria-checked={$preferredVoice === 'cool'}
 				>
 					<Icon icon={SiriIcon} size={13} color="currentColor" />{t(
-						'onboarding.voice.kaito.name',
+						'onboarding.voice.cool.name',
 						$locale
 					)}
 				</button>
