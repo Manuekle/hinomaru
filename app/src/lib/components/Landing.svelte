@@ -1282,7 +1282,7 @@
 			margin: 0;
 			filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
 		}
-		/* Ultra-smooth fade to integrate with title */
+		/* Ultra-smooth fade to integrate with title - now theme aware */
 		.feature-image::after {
 			content: '';
 			position: absolute;
@@ -1293,9 +1293,9 @@
 			background: linear-gradient(
 				to bottom,
 				transparent 0%,
-				rgba(255, 255, 255, 0) 20%,
-				rgba(255, 255, 255, 0.4) 50%,
-				rgba(255, 255, 255, 0.8) 80%,
+				color-mix(in srgb, var(--bg-surface) 0%, transparent) 20%,
+				color-mix(in srgb, var(--bg-surface) 40%, transparent) 50%,
+				color-mix(in srgb, var(--bg-surface) 80%, transparent) 80%,
 				var(--bg-surface) 100%
 			);
 			z-index: 10;
