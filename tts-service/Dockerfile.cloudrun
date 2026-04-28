@@ -1,0 +1,40 @@
+# Usamos la imagen de VOICEVOX como base
+FROM voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+
+# Instalamos Python y dependencias necesarias
+USER root
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-dev \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copiamos los requerimientos e instalamos
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Copiamos el código de nuestra API
+COPY . .
+
+# Creamos la carpeta de storage
+RUN mkdir -p storage
+
+# Script de inicio para arrancar ambas cosas
+RUN echo '#!/bin/bash\n\
+# Iniciar VOICEVOX en segundo plano\n\
+./run --host 0.0.0.0 --port 50021 &\n\
+\n\
+# Esperar a que VOICEVOX esté listo\n\
+sleep 10\n\
+\n\
+# Iniciar FastAPI en el puerto que pide Cloud Run ($PORT)\n\
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+# Cloud Run usa la variable de entorno PORT
+EXPOSE 8080
+
+CMD ["/app/start.sh"]

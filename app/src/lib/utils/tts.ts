@@ -28,31 +28,24 @@ export function cleanForTTS(text: string): string {
 import { get } from 'svelte/store';
 import { preferredVoice } from '$lib/stores/settings';
 
+import { speakVoicevox } from '$lib/services/voicevox';
+
 /**
- * Speaks Japanese text using the Web Speech API.
- * Automatically cleans the text before synthesis.
+ * Fallback to browser's built-in Web Speech API if microservice is offline.
+ * This is the original logic you had before.
  */
-export function speakJapanese(text: string, rate = 0.85): void {
+function speakBrowser(text: string): void {
 	if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
-	const cleaned = cleanForTTS(text);
-	if (!cleaned) return;
-
-	// Cancel any ongoing speech
 	window.speechSynthesis.cancel();
-
-	const utterance = new SpeechSynthesisUtterance(cleaned);
+	const utterance = new SpeechSynthesisUtterance(text);
 	utterance.lang = 'ja-JP';
-	utterance.rate = rate;
 
 	const voiceMode = get(preferredVoice);
-
-	// Prefer a Japanese voice if available
 	const voices = window.speechSynthesis.getVoices();
 	const japaneseVoices = voices.filter((v) => v.lang === 'ja-JP' || v.lang.startsWith('ja'));
 
 	if (voiceMode === 'kaito') {
-		// Kaito effect: deeper pitch and try to find a male-sounding voice
 		utterance.pitch = 0.8;
 		const kaitoVoice =
 			japaneseVoices.find((v) => !v.name.toLowerCase().includes('kyoko')) ||
@@ -60,10 +53,27 @@ export function speakJapanese(text: string, rate = 0.85): void {
 			japaneseVoices[0];
 		if (kaitoVoice) utterance.voice = kaitoVoice;
 	} else {
-		// Standard voice
 		utterance.pitch = 1.0;
 		if (japaneseVoices[0]) utterance.voice = japaneseVoices[0];
 	}
 
 	window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Speaks Japanese text using the VOICEVOX microservice.
+ * Falls back to browser TTS if the service is unavailable.
+ */
+export function speakJapanese(text: string): void {
+	const cleaned = cleanForTTS(text);
+	if (!cleaned) return;
+
+	const voiceMode = get(preferredVoice);
+	const preset = voiceMode === 'kaito' ? 'cool' : 'kawaii';
+
+	// Attempt high-quality VOICEVOX first
+	speakVoicevox(cleaned, preset).catch((err) => {
+		console.warn('VOICEVOX offline, falling back to browser TTS:', err);
+		speakBrowser(cleaned);
+	});
 }

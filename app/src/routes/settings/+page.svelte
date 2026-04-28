@@ -16,6 +16,7 @@
 	import { fly } from 'svelte/transition';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { speakVoicevox } from '$lib/services/voicevox';
 	import Icon from '$lib/Icon.svelte';
 	import supportImg from '$lib/assets/support.png';
 	import {
@@ -30,7 +31,8 @@
 		EarthIcon,
 		JupiterIcon,
 		Delete02Icon,
-		BubbleChatIcon
+		BubbleChatIcon,
+		Settings02Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
@@ -497,10 +499,32 @@
 		<div>
 			<button onclick={signOut} class="signout-btn">{t('nav.signout', $locale)}</button>
 			{#if import.meta.env.DEV}
-				<div style="margin-top:16px;text-align:center;">
+				<div style="margin-top:16px; display: flex; flex-direction: column; gap: 8px;">
 					<button onclick={debugResetOnboarding} class="debug-btn"
 						>{t('settings.debugReset', $locale)}</button
 					>
+					
+					<!-- Debug VOICEVOX Laboratory -->
+					<a 
+						href="/debug/tts" 
+						class="card debug-voicevox" 
+						style="padding: 16px; text-align: left; text-decoration: none; display: block;"
+					>
+						<div style="display: flex; align-items: center; justify-content: space-between;">
+							<div style="display: flex; align-items: center; gap: 12px;">
+								<div class="pref-icon" style="background: #af52de14; color: #af52de; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+									<Icon icon={Settings02Icon} size={18} color="currentColor" />
+								</div>
+								<div>
+									<span class="pref-title" style="display: block; font-size: 14px; font-weight: 600; color: var(--fg-primary);">TTS Laboratory</span>
+									<span class="pref-sub" style="display: block; font-size: 11px; color: var(--fg-tertiary);">Test anime voices & parameters</span>
+								</div>
+							</div>
+							<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+							</div>
+						</div>
+					</a>
 				</div>
 			{/if}
 		</div>

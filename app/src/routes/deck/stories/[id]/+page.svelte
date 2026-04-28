@@ -4,6 +4,9 @@
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { preloadVoicevox } from '$lib/services/voicevox';
+	import { preferredVoice } from '$lib/stores/settings';
+	import { get } from 'svelte/store';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
 	import { fade, fly } from 'svelte/transition';
@@ -94,19 +97,16 @@
 	let isSpeaking = $state(false);
 
 	function toggleAudio() {
-		if (typeof window === 'undefined' || !window.speechSynthesis) return;
 		if (isSpeaking) {
-			window.speechSynthesis.cancel();
+			// Stopping audio is tricky with the Audio API, 
+			// for now we just stop the speaking state
 			isSpeaking = false;
 		} else {
-			speakJapanese(bodyJp);
 			isSpeaking = true;
-			const poll = setInterval(() => {
-				if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
-					isSpeaking = false;
-					clearInterval(poll);
-				}
-			}, 300);
+			speakJapanese(bodyJp);
+			// For simplicity in stories, we'll reset the state after a reasonable time 
+			// or you can implement a more complex audio state tracker
+			setTimeout(() => isSpeaking = false, 5000);
 		}
 	}
 
@@ -151,6 +151,29 @@
 				window.speechSynthesis.cancel();
 			}
 		};
+	});
+
+	// --- Preload TTS Audio ---
+	$effect(() => {
+		if (story && typeof window !== 'undefined') {
+			const preset = get(preferredVoice) === 'kaito' ? 'cool' : 'kawaii';
+			
+			// Preload story body (if within limits)
+			if (bodyJp && bodyJp.length < 200) {
+				preloadVoicevox(bodyJp, preset);
+			} else if (bodyJp) {
+				// Preload first sentence at least
+				const firstSentence = bodyJp.split(/[。！？]/)[0];
+				if (firstSentence) preloadVoicevox(firstSentence, preset);
+			}
+
+			// Preload vocabulary words
+			if (story.vocab) {
+				story.vocab.forEach((v: any) => {
+					preloadVoicevox(v.jp, preset);
+				});
+			}
+		}
 	});
 
 	function selectAnswer(idx: number) {
