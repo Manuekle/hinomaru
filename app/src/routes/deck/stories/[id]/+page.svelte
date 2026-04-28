@@ -767,7 +767,7 @@
 </div>
 
 {#if isSpeaking}
-	<div class="now-playing-toast" transition:fly={{ y: -60, duration: 300, easing: quintOut }}>
+	<div class="now-playing-toast" data-theme={isReadingMode ? readingTheme : undefined} transition:fly={{ y: -60, duration: 300, easing: quintOut }}>
 		<div class="now-playing-wave">
 			<ScrollingWaveform playing={true} height={28} barWidth={3} barGap={2} speed={8} barColor="var(--hinomaru-red)" />
 		</div>
@@ -1829,7 +1829,7 @@
 	/* Now Playing toast */
 	:global(.now-playing-toast) {
 		position: fixed;
-		top: 16px;
+		top: calc(16px + env(safe-area-inset-top));
 		left: 50%;
 		transform: translateX(-50%);
 		display: flex;
@@ -1846,9 +1846,16 @@
 		min-width: 200px;
 	}
 
-	:global([data-theme='dark'] .now-playing-toast) {
-		background: rgba(26, 26, 26, 0.92);
-		border-color: rgba(188, 0, 45, 0.25);
+	:global(.now-playing-toast[data-theme='dark']) {
+		background: rgba(18, 18, 18, 0.92);
+		border-color: rgba(188, 0, 45, 0.3);
+		color: #e0e0e0;
+	}
+
+	:global(.now-playing-toast[data-theme='sepia']) {
+		background: rgba(242, 231, 213, 0.92);
+		border-color: rgba(188, 0, 45, 0.2);
+		color: #4a3728;
 	}
 
 	:global(.now-playing-wave) {
@@ -1860,7 +1867,6 @@
 		font-size: 13px;
 		font-weight: 700;
 		color: var(--hinomaru-red);
-		font-family: var(--font-jp, serif);
 		flex: 1;
 		white-space: nowrap;
 	}
