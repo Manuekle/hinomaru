@@ -102,16 +102,16 @@
 
 <Drawer.Root bind:open>
 	<Drawer.Content>
-		<div class="mx-auto w-full max-w-md p-6 pb-12">
+		<div class="drawer-wrap">
 			<!-- Close button -->
-			<div class="flex justify-end mb-2">
-				<Drawer.Close class="p-2 hover:bg-muted rounded-full transition-colors">
+			<div class="drawer-close-row">
+				<Drawer.Close class="drawer-close-btn">
 					<Icon icon={Cancel01Icon} size={20} strokeWidth={1.5} />
 				</Drawer.Close>
 			</div>
 
-			<Drawer.Header class="p-0 mb-8">
-				<Drawer.Title class="text-2xl font-bold tracking-tight">
+			<Drawer.Header class="drawer-header-custom">
+				<Drawer.Title class="drawer-title-custom">
 					{#if isMobile}
 						{s.title}
 					{:else}
@@ -157,50 +157,42 @@
 
 					<!-- Desktop content -->
 				{:else}
-					<p class="desktop-desc mb-6 text-muted-foreground">{s.desktopDesc}</p>
+					<p class="desktop-desc">{s.desktopDesc}</p>
 
 					<!-- QR placeholder -->
-					<div class="qr-block mb-8" use:scaleIn={{ delay: 0.1 }}>
-						<Icon icon={QrCode01Icon} size={80} strokeWidth={1} color="var(--sumi)" />
-						<span class="qr-url font-mono mt-2">hinomaru.app</span>
+					<div class="qr-block" use:scaleIn={{ delay: 0.1 }}>
+						<Icon icon={QrCode01Icon} size={80} strokeWidth={1} color="var(--fg-primary)" />
+						<span class="qr-url">hinomaru.app</span>
 					</div>
 
 					<!-- Tabs -->
-					<div class="tabs mb-6 bg-muted/50 p-1 rounded-xl flex gap-1">
+					<div class="tabs-wrap">
 						<button
-							class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
-							class:tab-btn-active={desktopTab === 'ios'}
-							class:bg-background={desktopTab === 'ios'}
-							class:shadow-sm={desktopTab === 'ios'}
+							class="tab-btn"
+							class:tab-active={desktopTab === 'ios'}
 							onclick={() => (desktopTab = 'ios')}
 						>
-							<div class="flex items-center justify-center gap-2">
-								<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
-								{s.tabIOS}
-							</div>
+							<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
+							{s.tabIOS}
 						</button>
 						<button
-							class="tab-btn flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all"
-							class:tab-btn-active={desktopTab === 'android'}
-							class:bg-background={desktopTab === 'android'}
-							class:shadow-sm={desktopTab === 'android'}
+							class="tab-btn"
+							class:tab-active={desktopTab === 'android'}
 							onclick={() => (desktopTab = 'android')}
 						>
-							<div class="flex items-center justify-center gap-2">
-								<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
-								{s.tabAndroid}
-							</div>
+							<Icon icon={SmartPhone01Icon} size={16} strokeWidth={1.5} />
+							{s.tabAndroid}
 						</button>
 					</div>
 
 					<!-- Tab content -->
-					<div class="min-h-[200px]">
+					<div class="tab-content">
 						{#if desktopTab === 'ios'}
 							<div class="steps-list steps-list-compact">
 								{#each iosSteps as step, i (i)}
 									<div class="step-item">
 										<div class="step-number">{i + 1}</div>
-										<div class="step-icon-wrap">
+										<div class="step-icon-wrap step-icon-sm">
 											<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
 										</div>
 										<div class="step-text">
@@ -215,7 +207,7 @@
 								{#each androidSteps as step, i (i)}
 									<div class="step-item">
 										<div class="step-number">{i + 1}</div>
-										<div class="step-icon-wrap">
+										<div class="step-icon-wrap step-icon-sm">
 											<Icon icon={step.icon} size={18} strokeWidth={1.5} color="var(--hinomaru-red)" />
 										</div>
 										<div class="step-text">
@@ -228,7 +220,7 @@
 						{/if}
 					</div>
 
-					<p class="pwa-note mt-8 pt-4 border-t text-xs text-muted-foreground opacity-70">
+					<p class="pwa-note">
 						{s.desktopPWANote}
 					</p>
 				{/if}
@@ -238,7 +230,59 @@
 </Drawer.Root>
 
 <style>
-	/* Steps list */
+	/* ── Drawer wrapper ── */
+	.drawer-wrap {
+		max-width: 28rem;
+		margin: 0 auto;
+		width: 100%;
+		padding: 24px 24px 48px;
+		font-family: var(--font-ui);
+	}
+
+	/* ── Close row ── */
+	.drawer-close-row {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 8px;
+	}
+
+	:global(.drawer-close-btn) {
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: var(--ink-100);
+		color: var(--fg-secondary);
+		border: none;
+		cursor: pointer;
+		transition: background 150ms, color 150ms;
+	}
+	@media (hover: hover) {
+		:global(.drawer-close-btn:hover) {
+			background: var(--ink-200);
+			color: var(--fg-primary);
+		}
+	}
+
+	/* ── Header ── */
+	:global(.drawer-header-custom) {
+		padding: 0 !important;
+		margin-bottom: 24px !important;
+		gap: 0 !important;
+	}
+
+	:global(.drawer-title-custom) {
+		font-family: var(--font-ui) !important;
+		font-size: 22px !important;
+		font-weight: 800 !important;
+		letter-spacing: -0.02em !important;
+		color: var(--fg-primary) !important;
+		line-height: 1.2 !important;
+	}
+
+	/* ── Steps list ── */
 	.steps-list {
 		display: flex;
 		flex-direction: column;
@@ -248,7 +292,6 @@
 		gap: 12px;
 	}
 
-	/* Step item */
 	.step-item {
 		display: flex;
 		align-items: flex-start;
@@ -263,11 +306,12 @@
 		background: var(--hinomaru-red);
 		color: #fff;
 		font-size: 13px;
-		font-weight: 400;
+		font-weight: 600;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		margin-top: 2px;
+		font-family: var(--font-ui);
 	}
 
 	.step-icon-wrap {
@@ -282,7 +326,7 @@
 		justify-content: center;
 	}
 
-	.steps-list-compact .step-icon-wrap {
+	.step-icon-sm {
 		width: 34px;
 		height: 34px;
 		border-radius: 10px;
@@ -297,8 +341,9 @@
 	.step-label {
 		font-size: 15px;
 		font-weight: 700;
-		color: var(--fg-primary, var(--sumi));
+		color: var(--fg-primary);
 		line-height: 1.3;
+		font-family: var(--font-ui);
 	}
 
 	.step-desc {
@@ -306,21 +351,84 @@
 		color: var(--fg-secondary);
 		margin-top: 2px;
 		line-height: 1.4;
+		font-family: var(--font-ui);
 	}
 
+	/* ── QR block ── */
 	.qr-block {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: 8px;
 		padding: 20px;
-		background: var(--ink-100, rgba(0, 0, 0, 0.04));
+		background: var(--ink-100);
 		border-radius: 16px;
 		border: 1px solid var(--ink-200);
+		margin-bottom: 24px;
 	}
 
 	.qr-url {
 		font-size: 13px;
 		color: var(--fg-secondary);
+		font-family: monospace;
+	}
+
+	/* ── Desktop description ── */
+	.desktop-desc {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		line-height: 1.5;
+		margin: 0 0 24px;
+		font-family: var(--font-ui);
+	}
+
+	/* ── Tabs ── */
+	.tabs-wrap {
+		display: flex;
+		gap: 4px;
+		padding: 4px;
+		background: var(--ink-100);
+		border-radius: 12px;
+		margin-bottom: 24px;
+	}
+
+	.tab-btn {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 10px 16px;
+		border-radius: 10px;
+		font-size: 13px;
+		font-weight: 600;
+		font-family: var(--font-ui);
+		color: var(--fg-secondary);
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		transition: all 180ms ease;
+	}
+
+	.tab-active {
+		background: var(--bg-surface);
+		color: var(--fg-primary);
+		box-shadow: var(--shadow-sm);
+	}
+
+	/* ── Tab content ── */
+	.tab-content {
+		min-height: 200px;
+	}
+
+	/* ── PWA Note ── */
+	.pwa-note {
+		margin-top: 24px;
+		padding-top: 16px;
+		border-top: 1px solid var(--ink-200);
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		line-height: 1.5;
+		font-family: var(--font-ui);
 	}
 </style>

@@ -527,16 +527,38 @@ body {
 
 /* ── Svileo (Sileo) overrides ───────────────────────────────────────────── */
 :root {
-  /* Match app palette */
-  --svileo-state-success: oklch(0.65 0.18 142);
-  --svileo-state-error: oklch(0.48 0.22 25);      /* closer to --hinomaru-red */
-  --svileo-state-warning: oklch(0.75 0.18 75);
-  --svileo-state-info: oklch(0.56 0 0);           /* sumi-toned */
+  /* Brand-aligned state colors — light mode */
+  --svileo-state-success: oklch(0.60 0.18 142);
+  --svileo-state-error:   #bc002d;                /* --hinomaru-red exact */
+  --svileo-state-warning: oklch(0.68 0.18 75);
+  --svileo-state-info:    oklch(0.52 0 0);
 
   /* Snappier animation */
   --svileo-duration: 420ms;
-  --svileo-width: 360px;
-  --svileo-height: 44px;
+  --svileo-width:    360px;
+  --svileo-height:   44px;
+}
+
+/* Dark mode — brighter, more legible state colors */
+[data-theme='dark'] {
+  --svileo-state-success: oklch(0.75 0.20 142);
+  --svileo-state-error:   oklch(0.72 0.22 25);    /* softer red on dark bg */
+  --svileo-state-warning: oklch(0.82 0.18 75);
+  --svileo-state-info:    oklch(0.72 0 0);
+}
+
+/* ── Fix description text (library defaults are inverted!) ──
+   dark theme → dark text on dark bg = invisible → use light text
+   light theme → light text on light bg = invisible → use dark text  */
+[data-svileo-viewport][data-theme='dark'] [data-svileo-description] {
+  color: rgba(242, 242, 241, 0.65); /* --sumi inverted / --ink-50 */
+}
+[data-svileo-viewport][data-theme='light'] [data-svileo-description] {
+  color: rgba(26, 26, 26, 0.55);   /* --sumi */
+}
+/* No theme set (undefined) — follow page foreground */
+[data-svileo-viewport]:not([data-theme]) [data-svileo-description] {
+  color: var(--fg-secondary);
 }
 
 /* Real slide-in from top — was only -6px, override to 64px */

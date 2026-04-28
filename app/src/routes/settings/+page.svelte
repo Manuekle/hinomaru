@@ -12,7 +12,7 @@
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
 	import { fly } from 'svelte/transition';
-	import { goto, invalidate } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { speakJapanese } from '$lib/utils/tts';
 	import Icon from '$lib/Icon.svelte';
 	import supportImg from '$lib/assets/support.png';
@@ -38,7 +38,7 @@
 
 	async function signOut() {
 		await supabase.auth.signOut();
-		await invalidate('supabase:auth');
+		await invalidateAll();
 		goto('/login');
 	}
 
@@ -92,7 +92,7 @@
 		const { error } = await supabase.from('profiles').update({ avatar: emoji }).eq('id', user.id);
 		if (!error) {
 			svileo.success({ title: t('settings.avatar.success', $locale) });
-			await invalidate('supabase:auth');
+			await invalidateAll();
 		} else {
 			svileo.error({ title: t('settings.avatar.error', $locale) });
 			console.error('Avatar update error:', error);
@@ -181,7 +181,7 @@
 			svileo.error({ title: delError.message });
 		} else {
 			await supabase.auth.signOut();
-			await invalidate('supabase:auth');
+			await invalidateAll();
 			goto('/');
 		}
 	}
