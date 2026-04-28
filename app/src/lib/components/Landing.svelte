@@ -280,22 +280,24 @@
 
 		<div class="features-stack" use:inViewStagger={{ stagger: 0.15, y: 28 }}>
 			{#each features as feature}
-				<div class="feature-item" style="background: {feature.color}">
+				<div class="feature-item">
+					<div class="feature-image">
+						<div class="mockup-mobile-wrapper">
+							<div class="iphone-16-mockup mini">
+								<div class="mockup-screen">
+									<img
+										src={getFeatureImg(feature.id, $locale, isDark)}
+										alt={feature.title}
+										class="app-screenshot"
+									/>
+								</div>
+								<img src="/mockups/iphone16pro_frame.png" alt="iPhone 16 Pro" class="device-frame" />
+							</div>
+						</div>
+					</div>
 					<div class="feature-content">
 						<h3>{feature.title}</h3>
 						<p>{feature.desc}</p>
-					</div>
-					<div class="feature-image">
-						<div class="iphone-16-mockup mini">
-							<div class="mockup-screen">
-								<img
-									src={getFeatureImg(feature.id, $locale, isDark)}
-									alt={feature.title}
-									class="app-screenshot"
-								/>
-							</div>
-							<img src="/mockups/iphone16pro_frame.png" alt="iPhone 16 Pro" class="device-frame" />
-						</div>
 					</div>
 				</div>
 			{/each}
@@ -1231,18 +1233,57 @@
 			min-height: unset;
 		}
 		.feature-content {
-			padding: 40px;
+			padding: 40px 24px;
+			background: var(--bg-surface);
+			z-index: 10;
+			text-align: center;
 		}
 		.feature-content h3 {
-			font-size: 26px;
+			font-size: 24px;
+			font-weight: 900;
+			margin-bottom: 12px;
+		}
+		.feature-content p {
+			font-size: 16px;
+			color: var(--fg-secondary);
+			line-height: 1.5;
+		}
+		.feature-item {
+			min-height: unset;
+			display: flex;
+			flex-direction: column;
+			border-radius: 40px;
+			overflow: hidden;
+			background: var(--bg-surface) !important; /* Force white/surface base */
+			border: 1px solid var(--ink-200);
+			margin-bottom: 24px;
 		}
 		.feature-image {
 			order: -1;
-			height: 420px;
-			padding: 20px;
+			height: 340px;
+			width: 100%;
+			position: relative;
+			overflow: hidden;
+			background: var(--bg-surface);
+		}
+		.mockup-mobile-wrapper {
+			position: absolute;
+			left: 50%;
+			top: 30px;
+			width: 240px;
+			transform: translateX(-50%);
+			z-index: 5;
+			display: flex;
+			justify-content: center;
 		}
 		.iphone-16-mockup.mini {
-			max-width: 180px;
+			width: 100%;
+			margin: 0;
+			filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.12));
+		}
+		/* Decorative fade to hide the cut */
+		.feature-image::after {
+			display: none;
 		}
 		.stats-grid {
 			grid-template-columns: repeat(3, 1fr);
@@ -1382,11 +1423,11 @@
 			font-size: 15px;
 		}
 		.feature-image {
-			height: 380px;
-			padding: 16px;
+			height: 300px;
 		}
 		.iphone-16-mockup.mini {
-			max-width: 160px;
+			max-width: 200px;
+			transform: translateX(-50%) scale(1.3);
 		}
 		.feature-item {
 			border-radius: 24px;
