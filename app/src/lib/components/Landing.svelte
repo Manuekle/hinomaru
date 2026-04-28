@@ -1505,15 +1505,23 @@
 		}
 	}
 
-	/* Hardware acceleration for all animations */
-	:global(.landing-root [use]) {
-		backface-visibility: hidden;
-		perspective: 1000px;
-		transform: translateZ(0);
+	/* Reduce paint pressure on small viewports */
+	@media (max-width: 768px) {
+		.hero-float-card {
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+		}
+		.hero-blob {
+			filter: blur(40px);
+		}
 	}
 
-	.iphone-16-mockup, .hero-float-card, .stat-card, .feature-item {
-		will-change: transform, opacity;
+	@media (prefers-reduced-motion: reduce) {
+		.hero-float-card,
+		.iphone-16-mockup {
+			animation: none !important;
+			transform: none !important;
+		}
 	}
 
 	/* Prevent layout shifts */

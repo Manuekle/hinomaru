@@ -12,7 +12,6 @@
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
 	import DockBar from '$lib/components/DockBar.svelte';
-	import { isBrowser } from '$lib/supabase';
 	import { inject } from '@vercel/analytics';
 	import { dev } from '$app/environment';
 	import { Toaster } from 'svileo';
@@ -48,7 +47,12 @@
 
 		const {
 			data: { subscription }
-		} = supabase.auth.onAuthStateChange((_event, newSession) => {
+		} = supabase.auth.onAuthStateChange((event, newSession) => {
+			if (event === 'SIGNED_OUT') {
+				try {
+					localStorage.removeItem('hinomaru_onboarding_completed');
+				} catch {}
+			}
 			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
@@ -93,10 +97,7 @@
 		};
 	});
 
-	const onboardingCompleted = $derived(
-		!!data.profile?.onboarding_completed ||
-			(isBrowser() && localStorage.getItem('hinomaru_onboarding_completed') === 'true')
-	);
+	const onboardingCompleted = $derived(!!data.profile?.onboarding_completed);
 
 	// Reactively handle onboarding redirects after login/signup
 	$effect(() => {

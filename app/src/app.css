@@ -173,8 +173,8 @@
 	--ink-700: #e8e6e2;
 	--ink-900: var(--sumi);
 	--fg-primary: var(--sumi);
-	--fg-secondary: var(--ink-600);
-	--fg-tertiary: var(--ink-500);
+	--fg-secondary: var(--ink-700);
+	--fg-tertiary: var(--ink-600);
 	--fg-inverse: #ffffff;
 	--hinomaru-red-wash: rgba(188, 0, 45, 0.2);
 	--hinomaru-red-ink: #ff6b8b;

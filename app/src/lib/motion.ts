@@ -62,6 +62,13 @@ type FloatOpts = { duration?: number; y?: number; delay?: number };
 /** Reveal on scroll into view (one-shot) */
 export function inView(node: HTMLElement, opts: InViewOpts = {}) {
 	const { delay = 0, duration = 0.55, y = 24, threshold = 0.15 } = opts;
+	const reduced =
+		typeof window !== 'undefined' &&
+		window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+	if (reduced) {
+		node.style.opacity = '1';
+		return { destroy() {} };
+	}
 	node.style.opacity = '0';
 	node.style.willChange = 'opacity, transform';
 	node.style.transform = `translateY(${y}px)`;
@@ -69,7 +76,15 @@ export function inView(node: HTMLElement, opts: InViewOpts = {}) {
 		(entries) => {
 			for (const e of entries) {
 				if (e.isIntersecting) {
-					animate(node, { opacity: [0, 1], y: [y, 0] }, { duration, delay, ease: spring });
+					const a = animate(
+						node,
+						{ opacity: [0, 1], y: [y, 0] },
+						{ duration, delay, ease: spring }
+					);
+					const clear = () => {
+						node.style.willChange = '';
+					};
+					(a as any).finished?.then(clear).catch(clear) ?? (a as any).then?.(clear, clear);
 					observer.disconnect();
 				}
 			}
@@ -84,6 +99,13 @@ export function inView(node: HTMLElement, opts: InViewOpts = {}) {
 export function inViewStagger(node: HTMLElement, opts: InViewStaggerOpts = {}) {
 	const { delay = 0, duration = 0.5, y = 18, stagger = 0.08, threshold = 0.15 } = opts;
 	const children = Array.from(node.children) as HTMLElement[];
+	const reduced =
+		typeof window !== 'undefined' &&
+		window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+	if (reduced) {
+		for (const c of children) c.style.opacity = '1';
+		return { destroy() {} };
+	}
 	for (const c of children) {
 		c.style.opacity = '0';
 		c.style.willChange = 'opacity, transform';
@@ -94,11 +116,15 @@ export function inViewStagger(node: HTMLElement, opts: InViewStaggerOpts = {}) {
 			for (const e of entries) {
 				if (e.isIntersecting) {
 					children.forEach((c, i) => {
-						animate(
+						const a = animate(
 							c,
 							{ opacity: [0, 1], y: [y, 0] },
 							{ duration, delay: delay + i * stagger, ease: spring }
 						);
+						const clear = () => {
+							c.style.willChange = '';
+						};
+						(a as any).finished?.then(clear).catch(clear) ?? (a as any).then?.(clear, clear);
 					});
 					observer.disconnect();
 				}

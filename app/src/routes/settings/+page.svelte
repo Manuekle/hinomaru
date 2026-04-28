@@ -180,6 +180,9 @@
 			isDeleting = false;
 			svileo.error({ title: delError.message });
 		} else {
+			try {
+				localStorage.removeItem('hinomaru_onboarding_completed');
+			} catch {}
 			await supabase.auth.signOut();
 			await invalidateAll();
 			goto('/');
