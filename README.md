@@ -2,7 +2,8 @@
 
 [![Vercel Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Ready-BC002D?style=flat-square)](https://hinomaru.app)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Manuekle-BC002D?style=flat-square&logo=github)](https://github.com/Manuekle)
 
 **Hinomaru** is a premium, minimalist Japanese study tool designed for clarity, focus, and long-term retention. Master JLPT levels from N5 to N1 through a scientifically-backed study flow.
 
@@ -110,6 +111,27 @@ npm run dev
 
 ## 📜 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for the full text.
+
+---
+
+## 📝 Licencia y Código Abierto
+
+**Hinomaru** es software de código abierto bajo la [Licencia MIT](LICENSE).
+
+Esto significa que puedes:
+- ✅ Usar el código libremente, incluso en proyectos comerciales
+- ✅ Modificarlo y distribuirlo
+- ✅ Contribuir al proyecto
+
+Siempre que se mantenga el aviso de copyright original en todas las copias. El código fue creado originalmente por **Manuekle** y toda redistribución debe reconocer la autoría.
+
+---
+
+## 👤 Autor
+
+**Manuekle**
+
+- GitHub: [@Manuekle](https://github.com/Manuekle)
 
 Crafted with ❤️ for the love of the Japanese language.
