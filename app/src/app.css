@@ -175,6 +175,7 @@
 	--bg-surface-glass: rgba(28, 28, 28, 0.9);
 	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.25);
 	--shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+	--shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
 }
 
 .hm-input::placeholder {

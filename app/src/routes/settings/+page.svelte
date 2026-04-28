@@ -181,9 +181,12 @@
 				{#if showEmojiPicker}
 					<div
 						class="emoji-picker-popover"
-						transition:fly={{ duration: 180, y: 8, opacity: 0 }}
+						transition:fly={{ duration: 240, y: 12, opacity: 0 }}
 						role="menu"
 					>
+						<div class="emoji-picker-header">
+							{t('settings.avatar', $locale)}
+						</div>
 						<div class="emoji-grid">
 							{#snippet emojiBtn(emoji: string)}
 								<button
@@ -483,6 +486,7 @@
 		align-items: center;
 		gap: 16px;
 		padding: 20px;
+		overflow: visible;
 	}
 
 	.avatar-wrapper {
@@ -531,48 +535,68 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: white;
+		color: var(--bg-surface);
 		border: 2px solid var(--bg-surface);
 	}
 
 	.emoji-picker-popover {
 		position: absolute;
-		top: calc(100% + 10px);
+		top: calc(100% + 14px);
 		left: 0;
-		background: var(--bg-surface);
+		background: var(--bg-surface-glass);
+		backdrop-filter: blur(24px);
+		-webkit-backdrop-filter: blur(24px);
 		border: 1px solid var(--ink-200);
-		border-radius: 16px;
-		padding: 10px;
-		box-shadow: var(--shadow-lg);
+		border-radius: 20px;
+		padding: 16px;
+		box-shadow:
+			var(--shadow-lg),
+			inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 		z-index: 200;
-		width: 196px;
+		width: 240px;
+	}
+
+	.emoji-picker-header {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		margin-bottom: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		text-align: center;
 	}
 
 	.emoji-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
-		gap: 6px;
+		gap: 8px;
 	}
 
 	.emoji-btn {
-		background: var(--ink-50);
+		background: transparent;
 		border: 1px solid transparent;
-		font-size: 22px;
+		font-size: 26px;
 		aspect-ratio: 1;
 		padding: 0;
 		cursor: pointer;
-		border-radius: 10px;
-		transition: all 0.15s;
+		border-radius: 14px;
+		transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		position: relative;
 	}
 	@media (hover: hover) {
 		.emoji-btn:hover {
-			background: var(--paper);
-			border-color: var(--hinomaru-red);
-			transform: scale(1.08);
+			background: var(--ink-100);
+			transform: scale(1.18) translateY(-2px);
+			z-index: 2;
+			box-shadow: var(--shadow-sm);
 		}
+	}
+	.emoji-btn:active {
+		transform: scale(0.9);
+		background: var(--ink-200);
 	}
 
 	.profile-info {
