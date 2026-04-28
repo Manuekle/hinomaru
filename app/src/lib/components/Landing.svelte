@@ -42,9 +42,13 @@
 
 	onMount(() => {
 		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-		animateNumber((v) => (statLearners = v), 15000, { delay: 0.2, duration: 1.2 });
-		animateNumber((v) => (statWords = v), 5000, { delay: 0.4, duration: 1.2 });
-		animateNumber((v) => (statDays = v), 365, { delay: 0.6, duration: 1.2 });
+		
+		// Use requestAnimationFrame to avoid layout thrashing
+		requestAnimationFrame(() => {
+			animateNumber((v) => (statLearners = v), 15000, { delay: 0.2, duration: 1.2 });
+			animateNumber((v) => (statWords = v), 5000, { delay: 0.4, duration: 1.2 });
+			animateNumber((v) => (statDays = v), 365, { delay: 0.6, duration: 1.2 });
+		});
 	});
 
 	const levels = [
@@ -1281,6 +1285,8 @@
 			width: 100%;
 			margin: 0;
 			filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+			backface-visibility: hidden;
+			transform: translateZ(0);
 		}
 		/* Ultra-smooth fade to integrate with title - now theme aware */
 		.feature-image::after {
@@ -1494,7 +1500,29 @@
 		}
 		.iphone-16-mockup {
 			max-width: 280px;
+			will-change: transform;
+			backface-visibility: hidden;
 		}
+	}
+
+	/* Hardware acceleration for all animations */
+	:global(.landing-root [use]) {
+		backface-visibility: hidden;
+		perspective: 1000px;
+		transform: translateZ(0);
+	}
+
+	.iphone-16-mockup, .hero-float-card, .stat-card, .feature-item {
+		will-change: transform, opacity;
+	}
+
+	/* Prevent layout shifts */
+	.device-frame {
+		aspect-ratio: 430 / 932;
+	}
+	.app-screenshot {
+		aspect-ratio: 430 / 932;
+		object-fit: cover;
 	}
 
 	/* Decorative Blobs */
