@@ -3,7 +3,9 @@
  * Calls the local microservice to generate high-quality anime-style Japanese audio.
  */
 
-export const VOICEVOX_URL = 'http://localhost:8000';
+import { PUBLIC_VOICEVOX_URL } from '$env/static/public';
+
+export const VOICEVOX_URL = PUBLIC_VOICEVOX_URL || 'http://localhost:8000';
 
 export async function speakVoicevox(
     text: string, 
