@@ -183,20 +183,35 @@
 	}
 
 	/*
-	 * Distribute short-content steps vertically so there's no large dead
-	 * space between content and the fixed footer. Steps that already have
-	 * a flex-grow child (PracticeStep, WelcomeStep) are unaffected because
-	 * justify-content is a no-op when a child consumes all remaining space.
+	 * Pull StickyFooter out of fixed positioning into the flex flow.
+	 * With position:fixed it is always viewport-relative, creating a
+	 * ~167px dead zone between content and the button on tall iPhones.
+	 * As a relative/in-flow item it becomes part of the step-content
+	 * flex column and justify-content:center works on the whole block.
 	 */
+	.step-inner :global(.sticky-footer) {
+		position: relative !important;
+		bottom: auto;
+		left: auto;
+		right: auto;
+		z-index: auto;
+		pointer-events: auto;
+		border-top: none;
+		background: transparent;
+		padding: 16px 24px max(16px, env(safe-area-inset-bottom, 0px));
+		transition: none;
+	}
+
 	/*
-	 * Center short-content steps vertically so there's equal breathing room
-	 * above and below the content block. Steps that have a flex-grow child
-	 * (PracticeStep writing area, WelcomeStep main-visual) are unaffected
-	 * because flex-grow consumes remaining space before justify-content runs.
+	 * box-sizing:border-box — height:100% includes padding, no overflow.
+	 * justify-content:center — centers the whole content+button block.
+	 * padding-bottom:0 — the 100px footer clearance was for position:fixed;
+	 *   now footer is in flow it sits naturally at bottom of centered block.
 	 */
 	.step-inner :global(.step-content) {
-		box-sizing: border-box; /* height:100% must include padding, else content overflows and scrolls */
+		box-sizing: border-box;
 		justify-content: center;
+		padding-bottom: 0 !important;
 	}
 
 	@media (max-height: 600px) and (orientation: landscape) {
