@@ -18,6 +18,9 @@
 	import 'svileo/styles.css';
 	import 'flag-icons/css/flag-icons.min.css';
 	import { swipeBack } from '$lib/actions/swipeBack';
+	import { scheduleReminder, clearReminder } from '$lib/utils/reminders';
+	import { notificationsEnabled, reminderHour } from '$lib/stores/settings';
+	import { get } from 'svelte/store';
 
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
@@ -52,11 +55,19 @@
 				try {
 					localStorage.removeItem('hinomaru_onboarding_completed');
 				} catch {}
+				clearReminder();
 			}
 			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
 		});
+
+		// Daily review reminder (local). Honors profile.reminder_hour if present,
+		// falls back to local store. Only schedules if user granted permission.
+		if (data.user) {
+			const hour = (data.profile as any)?.reminder_hour ?? get(reminderHour);
+			scheduleReminder(supabase, data.user.id, hour, get(notificationsEnabled));
+		}
 
 		// Handle PWA specific redirects and URL cleanup
 		if (isPWA) {
@@ -94,6 +105,7 @@
 		return () => {
 			subscription.unsubscribe();
 			clearTimeout(timer);
+			clearReminder();
 		};
 	});
 

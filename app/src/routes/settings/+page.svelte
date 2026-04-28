@@ -5,8 +5,10 @@
 		showRomaji,
 		preferredVoice,
 		notificationsEnabled,
-		srsEnabled
+		srsEnabled,
+		reminderHour
 	} from '$lib/stores/settings';
+	import { scheduleReminder, clearReminder } from '$lib/utils/reminders';
 	import { onMount } from 'svelte';
 	import { svileo } from '$lib/stores/toast';
 	import { t } from '$lib/i18n';
@@ -113,10 +115,13 @@
 		if (!user) return;
 		const { data: prof } = await supabase
 			.from('profiles')
-			.select('srs_enabled')
+			.select('srs_enabled, reminder_hour')
 			.eq('id', user.id)
 			.maybeSingle();
-		if (prof != null) srsEnabled.set(prof.srs_enabled);
+		if (prof != null) {
+			srsEnabled.set(prof.srs_enabled);
+			if (typeof prof.reminder_hour === 'number') reminderHour.set(prof.reminder_hour);
+		}
 	});
 
 	async function toggleSRS() {
@@ -137,6 +142,22 @@
 			}
 		}
 		notificationsEnabled.toggle();
+		if (user) {
+			if ($notificationsEnabled) {
+				scheduleReminder(supabase, user.id, $reminderHour, true);
+			} else {
+				clearReminder();
+			}
+		}
+	}
+
+	async function setReminderHour(h: number) {
+		const safe = Math.max(0, Math.min(23, h | 0));
+		reminderHour.set(safe);
+		if (user) {
+			await supabase.from('profiles').update({ reminder_hour: safe }).eq('id', user.id);
+			scheduleReminder(supabase, user.id, safe, $notificationsEnabled);
+		}
 	}
 
 	let showDeleteConfirm = $state(false);
@@ -434,6 +455,28 @@
 						<div class="switch-handle"></div>
 					</div>
 				</button>
+				{#if $notificationsEnabled}
+					<div class="pref-divider"></div>
+					<div class="pref-row" style="cursor:default;">
+						<div class="pref-icon" style="background:#af52de14;color:#af52de;">
+							<Icon icon={Notification01Icon} size={18} color="currentColor" strokeWidth={1.8} />
+						</div>
+						<div class="pref-text">
+							<span class="pref-title">{t('settings.reminderHour', $locale)}</span>
+							<span class="pref-sub">{t('settings.reminderHour.desc', $locale)}</span>
+						</div>
+						<select
+							class="hour-select"
+							value={$reminderHour}
+							onchange={(e) => setReminderHour(Number((e.target as HTMLSelectElement).value))}
+							aria-label={t('settings.reminderHour', $locale)}
+						>
+							{#each Array(24) as _, h}
+								<option value={h}>{String(h).padStart(2, '0')}:00</option>
+							{/each}
+						</select>
+					</div>
+				{/if}
 			</div>
 		</div>
 
@@ -1163,5 +1206,23 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	.hour-select {
+		appearance: none;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: var(--radius-sm);
+		padding: 6px 12px;
+		font-family: inherit;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		cursor: pointer;
+		transition: border-color 150ms ease;
+	}
+	.hour-select:focus {
+		outline: none;
+		border-color: var(--brand-primary);
 	}
 </style>

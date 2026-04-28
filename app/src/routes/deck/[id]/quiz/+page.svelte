@@ -13,19 +13,21 @@
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
-	const cards = $derived(data.cards as any[]);
 	const supabase = createClient();
+	const queue = createMistakeQueue<any>(data.cards as any[]);
 
-	let i = $state(0);
 	let picked = $state<string | null>(null);
 	let correct = $state(0);
 	let struggled = $state(false);
 
-	const card = $derived(cards[i]);
-	const pct = $derived(((i + 1) / cards.length) * 100);
+	const cards = $derived(queue.cards);
+	const i = $derived(queue.index);
+	const card = $derived(queue.current);
+	const pct = $derived(queue.progressPct);
 	const isCorrect = $derived(picked === ($locale === 'es' ? card?.es : card?.en));
 
 	const options = $derived.by(() => {
@@ -71,10 +73,15 @@
 	async function next() {
 		updateCardProgress(card, isCorrect, struggled);
 
-		if (i >= cards.length - 1) {
+		// Re-queue wrong cards at end of session (Duolingo-style)
+		if (!isCorrect) {
+			queue.requeueCurrent();
+		}
+
+		if (queue.isLast) {
 			const params = new URLSearchParams({
 				correct: String(correct),
-				total: String(cards.length),
+				total: String(queue.originalTotal),
 				mode: 'quiz'
 			});
 			const { data: { user } } = await supabase.auth.getUser();
@@ -84,14 +91,14 @@
 					deck_id: data.deck.id,
 					mode: 'quiz',
 					correct,
-					total: cards.length
+					total: queue.originalTotal
 				});
 				await updateStreak(supabase, user.id);
 			}
 			goto(`/deck/${data.deck.id}/summary?${params}`);
 		} else {
 			picked = null;
-			i++;
+			queue.advance();
 			struggled = false;
 		}
 	}

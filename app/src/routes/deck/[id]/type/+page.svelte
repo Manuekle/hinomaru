@@ -12,6 +12,7 @@
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import type { PageData } from './$types';
 
 	function focusOnMount(node: HTMLElement) {
@@ -19,18 +20,19 @@
 	}
 
 	let { data } = $props<{ data: PageData }>();
-	const cards = $derived(data.cards as any[]);
 	const supabase = createClient();
+	const queue = createMistakeQueue<any>(data.cards as any[]);
 
-	let i = $state(0);
 	let answer = $state('');
 	let submitted = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
 	let inputEl = $state<HTMLInputElement | null>(null);
 
-	const card = $derived(cards[i]);
-	const pct = $derived(((i + 1) / cards.length) * 100);
+	const cards = $derived(queue.cards);
+	const i = $derived(queue.index);
+	const card = $derived(queue.current);
+	const pct = $derived(queue.progressPct);
 
 	const isCorrect = $derived.by(() => {
 		if (!card || !answer) return false;
@@ -59,10 +61,15 @@
 	async function next() {
 		updateCardProgress(card, isCorrect, struggled);
 
-		if (i >= cards.length - 1) {
+		// Re-queue wrong cards at end of session
+		if (!isCorrect) {
+			queue.requeueCurrent();
+		}
+
+		if (queue.isLast) {
 			const params = new URLSearchParams({
 				correct: String(correct),
-				total: String(cards.length),
+				total: String(queue.originalTotal),
 				mode: 'type'
 			});
 			const { data: { user } } = await supabase.auth.getUser();
@@ -72,7 +79,7 @@
 					deck_id: data.deck.id,
 					mode: 'type',
 					correct,
-					total: cards.length
+					total: queue.originalTotal
 				});
 				await updateStreak(supabase, user.id);
 			}
@@ -80,7 +87,7 @@
 		} else {
 			submitted = false;
 			answer = '';
-			i++;
+			queue.advance();
 		}
 	}
 

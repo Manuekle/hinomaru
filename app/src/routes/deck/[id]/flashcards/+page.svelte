@@ -16,21 +16,23 @@
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
+	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
-	const cards = $derived(data.cards as any[]);
 	const supabase = createClient();
+	const queue = createMistakeQueue<any>(data.cards as any[]);
 
-	let i = $state(0);
 	let flipped = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
-	const card = $derived(cards[i]);
+	const cards = $derived(queue.cards);
+	const i = $derived(queue.index);
+	const card = $derived(queue.current);
 	const meta = $derived(card ? getWordMetadata(card.jp) : null);
-	const pct = $derived(((i + 1) / cards.length) * 100);
+	const pct = $derived(queue.progressPct);
 
 	// Animate card in on mount
 	onMount(() => {
@@ -69,21 +71,25 @@
 			correct++;
 			playCorrect();
 		}
+		// Re-queue at end of session if user struggled (clicked Again at least once)
+		if (!gotIt || struggled) {
+			queue.requeueCurrent();
+		}
 		flipped = false;
 
 		updateCardProgress(card, gotIt, struggled);
 
-		if (i >= cards.length - 1) {
+		if (queue.isLast) {
 			const params = new URLSearchParams({
 				correct: String(correct),
-				total: String(cards.length),
+				total: String(queue.originalTotal),
 				mode: 'flashcards'
 			});
 			if (cardEl) {
 				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
 			}
 			goto(`/deck/${data.deck.id}/summary?${params}`);
-			saveSession(correct, cards.length);
+			saveSession(correct, queue.originalTotal);
 		} else {
 			// Slide out current, slide in next
 			if (cardEl) {
@@ -93,7 +99,7 @@
 					{ opacity: [1, 0], x: [0, dir * 40] },
 					{ duration: 0.2, ease: 'easeIn' }
 				).finished;
-				i++;
+				queue.advance();
 				flipped = false;
 				struggled = false;
 				await animate(
@@ -102,7 +108,7 @@
 					{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }
 				);
 			} else {
-				i++;
+				queue.advance();
 				flipped = false;
 				struggled = false;
 			}
