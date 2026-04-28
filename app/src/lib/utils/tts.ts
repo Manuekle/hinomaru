@@ -64,7 +64,7 @@ function speakBrowser(text: string): void {
  * Speaks Japanese text using the VOICEVOX microservice.
  * Falls back to browser TTS if the service is unavailable.
  */
-export function speakJapanese(text: string): void {
+export async function speakJapanese(text: string): Promise<void> {
 	const cleaned = cleanForTTS(text);
 	if (!cleaned) return;
 
@@ -72,7 +72,7 @@ export function speakJapanese(text: string): void {
 	const preset = voiceMode === 'kaito' ? 'cool' : 'kawaii';
 
 	// Attempt high-quality VOICEVOX first
-	speakVoicevox(cleaned, preset).catch((err) => {
+	await speakVoicevox(cleaned, preset).catch((err) => {
 		console.warn('VOICEVOX offline, falling back to browser TTS:', err);
 		speakBrowser(cleaned);
 	});

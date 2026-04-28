@@ -96,17 +96,16 @@
 	let fontSize = $state<'sm' | 'md' | 'lg'>('md');
 	let isSpeaking = $state(false);
 
-	function toggleAudio() {
+	async function toggleAudio() {
 		if (isSpeaking) {
-			// Stopping audio is tricky with the Audio API, 
-			// for now we just stop the speaking state
 			isSpeaking = false;
 		} else {
 			isSpeaking = true;
-			speakJapanese(bodyJp);
-			// For simplicity in stories, we'll reset the state after a reasonable time 
-			// or you can implement a more complex audio state tracker
-			setTimeout(() => isSpeaking = false, 5000);
+			try {
+				await speakJapanese(bodyJp);
+			} finally {
+				isSpeaking = false;
+			}
 		}
 	}
 
