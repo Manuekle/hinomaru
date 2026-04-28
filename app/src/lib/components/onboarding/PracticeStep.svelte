@@ -6,6 +6,7 @@
 	import DotLoader from '$lib/components/DotLoader.svelte';
 
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { speakJapanese } from '$lib/utils/tts';
 
 	let { onNext, onBack } = $props();
 
@@ -119,6 +120,7 @@
 				onComplete: () => {
 					box.style.borderColor = 'var(--success)';
 					completed = true;
+					speakJapanese(char);
 				}
 			});
 		} else {
@@ -144,6 +146,7 @@
 			onComplete: () => {
 				if (box) box.style.borderColor = 'var(--success)';
 				completed = true;
+				speakJapanese(char);
 			}
 		});
 	}
@@ -160,7 +163,6 @@
 	<div class="canvas-area">
 		<!-- Character hint above the box -->
 		<div class="char-hint">
-			<span class="char-label">{t('session.writeThis', $locale)}</span>
 			<span class="char-name">{t('onboarding.practice.one', $locale)}</span>
 			<span class="char-romaji">ichi • いち</span>
 		</div>

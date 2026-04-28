@@ -126,12 +126,14 @@
 		position: fixed;
 		inset: 0;
 		background: var(--bg-page);
+		background-image: 
+			radial-gradient(at 0% 0%, rgba(188, 0, 45, 0.03) 0px, transparent 50%),
+			radial-gradient(at 100% 100%, rgba(0, 122, 255, 0.03) 0px, transparent 50%);
 		z-index: 1000;
 		display: flex;
 		flex-direction: column;
 		padding-top: env(safe-area-inset-top);
 		/* safe-area-inset-bottom handled by StickyFooter */
-		touch-action: none;
 		overscroll-behavior: none;
 		--step-title: clamp(24px, 7vw, 32px);
 		--step-subtitle: clamp(15px, 4vw, 20px);
@@ -150,11 +152,13 @@
 	}
 
 	.progress-wrapper {
-		height: 4px;
-		background: var(--ink-100);
-		width: 100%;
+		height: 6px;
+		background: var(--ink-50);
+		margin: 16px 24px 8px;
+		border-radius: 99px;
 		overflow: hidden;
 		flex-shrink: 0;
+		border: 1px solid var(--ink-200);
 	}
 
 	.progress-bar-fill {
@@ -174,7 +178,9 @@
 		inset: 0;
 		display: flex;
 		flex-direction: column;
-		overflow: hidden;
+		overflow-x: hidden;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
 		max-width: 600px;
 		margin-left: auto;
 		margin-right: auto;
@@ -189,29 +195,27 @@
 	 * As a relative/in-flow item it becomes part of the step-content
 	 * flex column and justify-content:center works on the whole block.
 	 */
+	.step-inner :global(.step-content) {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		min-height: 100%;
+		padding-bottom: 0 !important;
+	}
+
 	.step-inner :global(.sticky-footer) {
 		position: relative !important;
+		margin-top: auto !important;
 		bottom: auto;
 		left: auto;
 		right: auto;
 		z-index: auto;
-		pointer-events: auto;
-		border-top: none;
-		background: transparent;
+		pointer-events: auto !important;
+		border-top: none !important;
+		background: transparent !important;
 		padding: 16px 24px max(16px, env(safe-area-inset-bottom, 0px));
 		transition: none;
-	}
-
-	/*
-	 * box-sizing:border-box — height:100% includes padding, no overflow.
-	 * justify-content:center — centers the whole content+button block.
-	 * padding-bottom:0 — the 100px footer clearance was for position:fixed;
-	 *   now footer is in flow it sits naturally at bottom of centered block.
-	 */
-	.step-inner :global(.step-content) {
-		box-sizing: border-box;
-		justify-content: center;
-		padding-bottom: 0 !important;
 	}
 
 	@media (max-height: 600px) and (orientation: landscape) {

@@ -246,8 +246,8 @@
 	}
 
 	function toggleReadingMode() {
-		if (typeof window !== 'undefined' && window.speechSynthesis) {
-			window.speechSynthesis.cancel();
+		if (isSpeaking) {
+			stopJapanese();
 			isSpeaking = false;
 		}
 
@@ -836,38 +836,6 @@
 
 	.story-viewer-layout:not(.reading-mode) .story-display-title {
 		font-size: 24px;
-	}
-
-	.story-audio-btn {
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		border: none;
-		background: var(--ink-100);
-		font-size: 20px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition: all 0.2s;
-		flex-shrink: 0;
-	}
-
-	.story-viewer-layout:not(.reading-mode) .story-audio-btn {
-		width: 40px;
-		height: 40px;
-		font-size: 16px;
-	}
-
-	@media (hover: hover) {
-		.story-audio-btn:hover {
-			background: var(--ink-200);
-			transform: scale(1.05);
-		}
-	}
-
-	.story-audio-btn:active {
-		transform: scale(0.95);
 	}
 
 	.story-body-card {
@@ -1574,15 +1542,6 @@
 		border-radius: 0;
 	}
 
-	.reading-mode-overlay .body-text-jp {
-		font-size: var(--story-fs);
-		text-align: left;
-		line-height: 2.2;
-		margin-bottom: 40px;
-		letter-spacing: 0.02em;
-		color: var(--fg-primary);
-	}
-
 	/* Force InteractiveText to pick up reading mode colors and font size */
 	.reading-mode-overlay :global(.interactive-text) {
 		font-family: var(--font-jp);
@@ -1653,11 +1612,6 @@
 		border-bottom-color: rgba(91, 70, 54, 0.4);
 	}
 
-	.reading-mode-overlay .back-link-beautiful,
-	.reading-mode-overlay .story-meta-tags {
-		opacity: 0 !important;
-		pointer-events: none;
-	}
 
 	.glass-reading {
 		transition: all 0.4s ease;
@@ -1829,7 +1783,7 @@
 	/* Now Playing toast */
 	:global(.now-playing-toast) {
 		position: fixed;
-		top: calc(16px + env(safe-area-inset-top));
+		top: calc(8px + env(safe-area-inset-top));
 		left: 50%;
 		transform: translateX(-50%);
 		display: flex;

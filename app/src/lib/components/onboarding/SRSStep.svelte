@@ -30,12 +30,12 @@
 	}
 
 	const intervals = [
-		{ label: '2 hrs', icon: Clock01Icon },
-		{ label: '1 day', icon: Calendar01Icon },
-		{ label: '6 days', icon: Calendar02Icon },
-		{ label: '25 days', icon: Calendar03Icon },
-		{ label: '5 mo', icon: BrainIcon },
-		{ label: '11 mo', icon: Idea01Icon }
+		{ label: '2 hrs', icon: Clock01Icon, color: '#ff3b30' },
+		{ label: '1 day', icon: Calendar01Icon, color: '#ff9500' },
+		{ label: '6 days', icon: Calendar02Icon, color: '#ffcc00' },
+		{ label: '25 days', icon: Calendar03Icon, color: '#34c759' },
+		{ label: '5 mo', icon: BrainIcon, color: '#007aff' },
+		{ label: '11 mo', icon: Idea01Icon, color: '#af52de' }
 	];
 </script>
 
@@ -49,17 +49,18 @@
 			{t('onboarding.srs.desc', $locale)}
 		</p>
 
-		<div class="timeline" use:fadeUp={{ delay: 0.2, y: 15 }}>
-			{#each intervals as interval, i (interval.label)}
-				<div class="interval-item">
-					<div class="icon-box">
-						<Icon icon={interval.icon} size={20} color="var(--washi)" strokeWidth={1.5} />
+		<div class="timeline-v" use:fadeUp={{ delay: 0.2, y: 15 }}>
+			<div class="track-v"></div>
+			{#each intervals as node, i (node.id)}
+				<div class="node-v" class:active={i === 0} use:fadeUp={{ delay: 0.1 + i * 0.1, y: 15 }}>
+					<div class="node-icon-wrap">
+						<Icon icon={node.icon} size={24} color="currentColor" strokeWidth={2} />
 					</div>
-					<span class="label">{interval.label}</span>
+					<div class="node-text">
+						<span class="node-time">{node.time}</span>
+						<span class="node-title">{node.label}</span>
+					</div>
 				</div>
-				{#if i < intervals.length - 1}
-					<div class="arrow">›</div>
-				{/if}
 			{/each}
 		</div>
 	</div>
@@ -84,72 +85,120 @@
 
 	.header {
 		text-align: center;
-		margin-bottom: clamp(24px, 8vw, 60px);
+		margin-bottom: 32px;
 	}
 
 	.title {
-		font-size: var(--step-title, clamp(24px, 7vw, 32px));
-		font-weight: 600;
-		letter-spacing: -0.04em;
+		font-size: var(--step-title, clamp(28px, 8vw, 38px));
+		font-weight: 800;
+		letter-spacing: -0.05em;
 		line-height: 1.1;
 		margin: 0;
+		color: var(--fg-primary);
 	}
 
 	.main-body {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 		align-items: center;
-		text-align: center;
+		width: 100%;
+		max-width: 400px;
+		margin: 0 auto;
 	}
 
 	.description {
 		font-size: 17px;
-		color: var(--fg-tertiary);
-		line-height: 1.5;
-		max-width: 320px;
-		margin: 0 0 60px;
+		color: var(--fg-secondary);
+		line-height: 1.6;
+		text-align: center;
+		margin: 0 0 40px;
+		font-weight: 500;
 	}
 
-	.timeline {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		overflow-x: auto;
-		width: 100%;
-		padding: 20px 0;
-		justify-content: center;
-	}
-
-	.interval-item {
+	.timeline-v {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 8px;
+		gap: 32px;
+		position: relative;
+		padding: 20px 0;
+		max-width: 320px;
+		margin: 0 auto 40px;
 	}
 
-	.icon-box {
-		width: 44px;
-		height: 44px;
-		background: var(--sumi);
-		border-radius: 12px;
+	.track-v {
+		position: absolute;
+		left: 27px;
+		top: 0;
+		bottom: 0;
+		width: 3px;
+		background: linear-gradient(to bottom, var(--hinomaru-red), var(--ink-200) 80%);
+		border-radius: 99px;
+		z-index: 0;
+	}
+
+	.node-v {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		position: relative;
+		z-index: 1;
+	}
+
+	.node-icon-wrap {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: var(--bg-surface);
+		border: 2px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--washi);
+		color: var(--fg-secondary);
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+		transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		flex-shrink: 0;
 	}
 
-	.label {
-		font-size: 11px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		white-space: nowrap;
+	.node-v.active .node-icon-wrap {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red);
+		color: #fff;
+		transform: scale(1.1);
+		box-shadow: 0 10px 25px rgba(188, 0, 45, 0.2);
 	}
 
-	.arrow {
-		color: var(--ink-300);
+	.node-text {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.node-time {
+		font-size: 14px;
+		font-weight: 900;
+		color: var(--hinomaru-red);
+		letter-spacing: 0.02em;
+	}
+
+	.node-title {
 		font-size: 18px;
-		margin-bottom: 20px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+
+	.node-v:not(.active) .node-time {
+		color: var(--fg-tertiary);
+	}
+
+	@media (max-width: 400px) {
+		.node-icon-wrap {
+			width: 48px;
+			height: 48px;
+		}
+		.node-title {
+			font-size: 16px;
+		}
 	}
 </style>

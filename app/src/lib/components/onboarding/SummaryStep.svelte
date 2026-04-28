@@ -22,7 +22,8 @@
 			value: selections.motivation
 				? t(`onboarding.motivation.${selections.motivation}`, $locale)
 				: '...',
-			icon: FavouriteIcon
+			icon: FavouriteIcon,
+			color: '#34c759'
 		},
 		{
 			id: 'level',
@@ -30,7 +31,8 @@
 			value: selections.experience
 				? t(`onboarding.experience.${selections.experience}`, $locale)
 				: '...',
-			icon: GraduationScrollIcon
+			icon: GraduationScrollIcon,
+			color: '#007aff'
 		},
 		{
 			id: 'voice',
@@ -39,13 +41,15 @@
 				selections.voice === 'cool'
 					? t('onboarding.voice.cool.name', $locale)
 					: t('onboarding.voice.kawaii.name', $locale),
-			icon: VolumeHighIcon
+			icon: VolumeHighIcon,
+			color: '#af52de'
 		},
 		{
 			id: 'goal',
 			label: t('onboarding.summary.goal', $locale),
 			value: t('onboarding.goal.wordsDay', $locale, { n: selections.goal || 5 }),
-			icon: FireIcon
+			icon: FireIcon,
+			color: '#ff3b30'
 		},
 		{
 			id: 'srs',
@@ -53,7 +57,8 @@
 			value: selections.srsEnabled
 				? t('onboarding.summary.enabled', $locale)
 				: t('onboarding.summary.disabled', $locale) || 'Disabled',
-			icon: BrainIcon
+			icon: BrainIcon,
+			color: '#5856d6'
 		}
 	]);
 </script>
@@ -65,16 +70,16 @@
 
 	<div class="summary-list">
 		{#each items as item, i (item.id)}
-			<div class="summary-item" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
-				<div class="icon-box">
-					<Icon icon={item.icon} size={22} color="var(--washi)" strokeWidth={1.5} />
+			<div class="summary-row" use:fadeUp={{ delay: 0.1 + i * 0.1, y: 12 }}>
+				<div class="icon-box" style="background: {item.color}14; color: {item.color};">
+					<Icon icon={item.icon} size={18} color="currentColor" strokeWidth={2} />
 				</div>
-				<div class="text">
-					<div class="label">{item.label}</div>
-					<div class="value">{item.value}</div>
+				<div class="text-group">
+					<span class="label">{item.label}</span>
+					<span class="value">{item.value}</span>
 				</div>
-				<div class="checkmark">
-					<span class="check-icon">✓</span>
+				<div class="verified-badge">
+					<span class="check">✓</span>
 				</div>
 			</div>
 		{/each}
@@ -119,58 +124,67 @@
 	.summary-list {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 12px;
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
 	}
 
-	.summary-item {
+	.summary-row {
 		display: flex;
 		align-items: center;
 		gap: 16px;
+		padding: 16px 20px;
+		background: var(--bg-surface);
+		border-radius: 20px;
+		border: 1.5px solid transparent;
 	}
 
 	.icon-box {
-		width: 48px;
-		height: 48px;
-		background: var(--ink-700);
-		border-radius: 14px;
+		width: 40px;
+		height: 40px;
+		border-radius: 10px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--washi);
+		flex-shrink: 0;
 	}
 
-	.text {
-		flex: 1;
+	.text-group {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 1px;
+		flex: 1;
 	}
 
 	.label {
-		font-size: 13px;
+		font-size: 11px;
 		color: var(--fg-tertiary);
-		font-weight: 600;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.value {
-		font-size: 17px;
+		font-size: 16px;
 		font-weight: 700;
 		color: var(--fg-primary);
 	}
 
-	.checkmark {
-		width: 24px;
-		height: 24px;
-		background: var(--success-wash);
+	.verified-badge {
+		width: 22px;
+		height: 22px;
+		background: var(--success);
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex-shrink: 0;
 	}
 
-	.check-icon {
-		color: var(--success);
-		font-weight: 400;
-		font-size: 14px;
+	.check {
+		color: #fff;
+		font-size: 12px;
+		font-weight: 900;
 	}
 </style>

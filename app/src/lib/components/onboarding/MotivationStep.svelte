@@ -8,7 +8,7 @@
 		Briefcase01Icon,
 		Airplane01Icon,
 		Message01Icon,
-		SparklesIcon
+		Tick01Icon
 	} from '@hugeicons/core-free-icons';
 
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -16,18 +16,17 @@
 	let { onSelect, onBack } = $props();
 
 	const options = $derived([
-		{ id: 'education', label: t('onboarding.motivation.education', $locale), icon: BookOpen01Icon },
-		{ id: 'career', label: t('onboarding.motivation.career', $locale), icon: Briefcase01Icon },
-		{ id: 'travel', label: t('onboarding.motivation.travel', $locale), icon: Airplane01Icon },
-		{ id: 'partner', label: t('onboarding.motivation.partner', $locale), icon: Message01Icon },
-		{ id: 'fun', label: t('onboarding.motivation.fun', $locale), icon: SparklesIcon }
+		{ id: 'education', label: t('onboarding.motivation.education', $locale), icon: BookOpen01Icon, color: '#ff2d55' },
+		{ id: 'career', label: t('onboarding.motivation.career', $locale), icon: Briefcase01Icon, color: '#007aff' },
+		{ id: 'travel', label: t('onboarding.motivation.travel', $locale), icon: Airplane01Icon, color: '#34c759' },
+		{ id: 'fun', label: t('onboarding.motivation.fun', $locale), icon: Message01Icon, color: '#af52de' }
 	]);
 
-	let selected = $state<string | null>(null);
+	let selected = $state('');
 
 	function handleSelect(id: string) {
 		selected = id;
-		setTimeout(() => onSelect(id), 250);
+		onSelect(id);
 	}
 </script>
 
@@ -40,13 +39,17 @@
 	<div class="options-list">
 		{#each options as option, i (option.id)}
 			<button
-				class="option-btn"
+				class="option-row"
 				class:selected={selected === option.id}
-				use:fadeUp={{ delay: 0.1 + i * 0.08, y: 12 }}
+				use:fadeUp={{ delay: 0.1 + i * 0.05, y: 12 }}
 				onclick={() => handleSelect(option.id)}
 			>
-				<span class="icon"><Icon icon={option.icon} size={20} color="currentColor" /></span>
-				<span class="label">{option.label}</span>
+				<div class="icon-box" style="background: {option.color}14; color: {option.color};">
+					<Icon icon={option.icon} size={20} color="currentColor" strokeWidth={2} />
+				</div>
+				<div class="label-group">
+					<span class="label">{option.label}</span>
+				</div>
 			</button>
 		{/each}
 	</div>
@@ -64,22 +67,22 @@
 
 	.header {
 		text-align: center;
-		margin-bottom: clamp(24px, 8vw, 60px);
+		margin-bottom: 32px;
 	}
 
 	.title {
-		font-size: var(--step-title, clamp(24px, 7vw, 32px));
-		font-weight: 600;
+		font-size: var(--step-title);
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		line-height: 1.1;
-		margin: 0 0 40px;
+		margin: 0 0 12px;
+		color: var(--fg-primary);
 	}
 
 	.subtitle {
-		font-size: var(--step-subtitle, clamp(15px, 4vw, 20px));
+		font-size: var(--step-subtitle);
 		color: var(--fg-tertiary);
-		font-weight: 600;
-		margin: 0;
+		font-weight: 500;
 		line-height: 1.3;
 	}
 
@@ -87,46 +90,64 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
 	}
 
-	.option-btn {
-		width: 100%;
+	.option-row {
 		display: flex;
 		align-items: center;
 		gap: 16px;
-		padding: 20px;
+		padding: 16px 20px;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
 		border-radius: 20px;
-		cursor: pointer;
-		transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+		transition: all 0.2s ease;
+		position: relative;
+		outline: none;
+		border: 1.5px solid transparent;
+		color: inherit;
 		text-align: left;
+		cursor: pointer;
 	}
 
-	@media (hover: hover) {
-		.option-btn:hover {
-			border-color: var(--ink-300);
-			background: var(--ink-50);
-		}
-	}
-
-	.option-btn.selected {
-		border-color: var(--sumi);
+	.option-row.selected {
 		background: var(--ink-100);
-		transform: scale(0.98);
 	}
 
-	.icon {
+	.icon-box {
+		width: 44px;
+		height: 44px;
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 24px;
 		flex-shrink: 0;
+		transition: transform 0.2s ease;
+	}
+
+	.selected .icon-box {
+		transform: scale(1.05);
+	}
+
+	.label-group {
+		flex: 1;
 	}
 
 	.label {
-		font-size: var(--step-body, clamp(13px, 3.5vw, 17px));
+		font-size: 16px;
 		font-weight: 600;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+
+	@media (max-width: 400px) {
+		.option-row {
+			padding: 12px 16px;
+		}
+		.icon-box {
+			width: 40px;
+			height: 40px;
+		}
 	}
 </style>

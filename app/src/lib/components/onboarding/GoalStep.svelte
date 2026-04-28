@@ -42,7 +42,7 @@
 					onclick={() => handleSelect(option.value)}
 				>
 					{#if option.popular}
-						<span class="popular-badge">{t('onboarding.goal.popular', $locale)}</span>
+						<div class="popular-tag">{t('onboarding.goal.popular', $locale)}</div>
 					{/if}
 					<span class="value">{option.value}</span>
 					<span class="label">{t('onboarding.goal.words', $locale)}</span>
@@ -117,60 +117,62 @@
 	.goal-card {
 		aspect-ratio: 1;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 24px;
+		border: 1.5px solid transparent;
+		border-radius: 28px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+		transition: all 0.2s ease;
 		position: relative;
-	}
-
-	@media (hover: hover) {
-		.goal-card:hover {
-			border-color: var(--ink-300);
-			transform: translateY(-2px);
-		}
+		outline: none;
 	}
 
 	.goal-card.selected {
-		border-color: var(--sumi);
 		background: var(--ink-100);
-		box-shadow: var(--shadow-md);
 	}
 
-	.popular-badge {
+	.popular-tag {
 		position: absolute;
-		top: -10px;
-		background: var(--sumi);
-		color: var(--bg-surface);
-		font-size: 10px;
-		font-weight: 600;
-		padding: 2px 10px;
+		top: -12px;
+		background: var(--hinomaru-red);
+		color: #fff;
+		font-size: 11px;
+		font-weight: 800;
+		padding: 4px 12px;
 		border-radius: 99px;
 		text-transform: uppercase;
-		letter-spacing: 0.02em;
+		letter-spacing: 0.04em;
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
 	}
 
 	.value {
-		font-size: 44px;
-		font-weight: 600;
+		font-size: 48px;
+		font-weight: 900;
 		line-height: 1;
-		color: var(--sumi);
+		color: var(--fg-primary);
+		transition: color 0.2s ease;
+	}
+
+	.selected .value {
+		color: var(--hinomaru-red);
 	}
 
 	.label {
 		font-size: 13px;
 		color: var(--fg-tertiary);
-		font-weight: 600;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
 	}
 
 	.goal-info {
 		font-size: 14px;
 		color: var(--fg-tertiary);
-		font-weight: 500;
+		font-weight: 600;
+		text-align: center;
+		margin-bottom: 40px;
 	}
 
 	.tip-section {
@@ -179,17 +181,18 @@
 		justify-content: center;
 		gap: 8px;
 		margin-bottom: 40px;
-		padding: 12px;
-		background: var(--ink-50);
+		padding: 12px 16px;
+		background: var(--ink-100);
 		border-radius: 12px;
 		color: var(--fg-secondary);
+		max-width: 320px;
 	}
 
 	.tip-text {
 		font-size: 13px;
 		color: var(--fg-secondary);
 		margin: 0;
-		font-weight: 500;
+		font-weight: 600;
 	}
 
 	.footer {

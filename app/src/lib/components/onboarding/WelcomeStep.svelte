@@ -42,10 +42,12 @@
 	}
 
 	.title {
-		font-size: var(--step-title, clamp(24px, 7vw, 36px));
-		font-weight: 600;
-		letter-spacing: -0.04em;
+		font-size: var(--step-title, clamp(28px, 8vw, 38px));
+		font-weight: 800;
+		letter-spacing: -0.05em;
 		margin: 0;
+		color: var(--fg-primary);
+		line-height: 1;
 	}
 
 	.main-visual {
@@ -69,16 +71,17 @@
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
-		border-radius: 40px;
-		box-shadow: 0 20px 40px rgba(188, 0, 45, 0.2);
+		border-radius: 44px;
+		box-shadow: 0 24px 64px rgba(188, 0, 45, 0.25), 0 8px 24px rgba(0, 0, 0, 0.05);
 	}
 
 	.subtitle {
-		font-size: var(--step-body, clamp(13px, 3.5vw, 17px));
+		font-size: var(--step-body, clamp(14px, 3.8vw, 18px));
 		color: var(--fg-secondary);
 		line-height: 1.5;
-		max-width: 300px;
+		max-width: 320px;
 		margin: 0;
+		font-weight: 500;
 	}
 
 	.footer-section {
