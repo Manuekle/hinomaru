@@ -9,8 +9,6 @@
 	import VoiceStep from './VoiceStep.svelte';
 	import GoalStep from './GoalStep.svelte';
 	import SummaryStep from './SummaryStep.svelte';
-	import { fly, fade } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 	import { preferredVoice, dailyGoal, srsEnabled as srsStore } from '$lib/stores/settings';
 
 	let { onFinish } = $props<{ onFinish: (selections: any) => void }>();
@@ -87,35 +85,29 @@
 	</div>
 
 	<div class="step-wrapper">
-		{#key step}
-			<div
-				class="step-inner"
-				in:fly={{ y: 12, duration: 300, easing: cubicOut }}
-				out:fade={{ duration: 150 }}
-			>
-				{#if step === 1}
-					<WelcomeStep onNext={nextStep} />
-				{:else if step === 2}
-					<FeaturesStep onNext={nextStep} onBack={prevStep} />
-				{:else if step === 3}
-					<MotivationStep onSelect={handleMotivation} onBack={prevStep} />
-				{:else if step === 4}
-					<ExperienceStep onSelect={handleExperience} onBack={prevStep} />
-				{:else if step === 5}
-					<PracticeStep onNext={nextStep} onBack={prevStep} />
-				{:else if step === 6}
-					<StoriesStep onNext={nextStep} onBack={prevStep} />
-				{:else if step === 7}
-					<VoiceStep onSelect={handleVoice} onBack={prevStep} />
-				{:else if step === 8}
-					<GoalStep onSelect={handleGoal} onBack={prevStep} />
-				{:else if step === 9}
-					<SRSStep onNext={handleSRS} />
-				{:else if step === 10}
-					<SummaryStep {selections} onComplete={handleComplete} onBack={prevStep} loading={finishing} />
-				{/if}
-			</div>
-		{/key}
+		<div class="step-inner">
+			{#if step === 1}
+				<WelcomeStep onNext={nextStep} />
+			{:else if step === 2}
+				<FeaturesStep onNext={nextStep} onBack={prevStep} />
+			{:else if step === 3}
+				<MotivationStep onSelect={handleMotivation} onBack={prevStep} />
+			{:else if step === 4}
+				<ExperienceStep onSelect={handleExperience} onBack={prevStep} />
+			{:else if step === 5}
+				<PracticeStep onNext={nextStep} onBack={prevStep} />
+			{:else if step === 6}
+				<StoriesStep onNext={nextStep} onBack={prevStep} />
+			{:else if step === 7}
+				<VoiceStep onSelect={handleVoice} onBack={prevStep} />
+			{:else if step === 8}
+				<GoalStep onSelect={handleGoal} onBack={prevStep} />
+			{:else if step === 9}
+				<SRSStep onNext={handleSRS} />
+			{:else if step === 10}
+				<SummaryStep {selections} onComplete={handleComplete} onBack={prevStep} loading={finishing} />
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -184,8 +176,8 @@
 		flex-direction: column;
 		justify-content: flex-start;
 		flex: 1;
-		/* Clear fixed footer (~64px btn + 8/16px padding + safe-area) */
-		padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+		/* Clear fixed footer (~64px btn + padding incl. safe-area) */
+		padding-bottom: 96px !important;
 	}
 
 

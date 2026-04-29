@@ -36,7 +36,7 @@
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		padding: 8px 16px max(16px, env(safe-area-inset-bottom, 0px));
+		padding: 8px 16px max(12px, calc(env(safe-area-inset-bottom, 0px) - 14px));
 		pointer-events: none;
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
