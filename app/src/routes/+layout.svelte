@@ -159,7 +159,7 @@
 		}}
 	/>
 	{@render children()}
-	{#if data.session && $page.url.pathname === '/'}
+	{#if data.session && new Set(['/', '/alphabet', '/vocabulary', '/deck/stories', '/deck/songs', '/conversation']).has($page.url.pathname)}
 		<DockBar />
 	{/if}
 	{#if !data.session && $page.url.pathname === '/'}
