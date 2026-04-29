@@ -544,7 +544,7 @@ body {
   --svileo-state-warning: #a8741a;
   --svileo-state-info:    #1a1a1a;
   --svileo-duration: 480ms;
-  --svileo-width:    380px;
+  --svileo-width:    min(380px, calc(100vw - 40px));
   --svileo-height:   48px;
 }
 
@@ -587,6 +587,10 @@ body {
 }
 
 /* Animation refinement */
+:global([data-svileo-viewport]) {
+  padding: 8px !important;
+}
+
 :global([data-svileo-viewport][data-position^='top'] [data-svileo-toast]:not([data-ready='true'])) {
   transform: translateY(-40px) scale(0.95) !important;
   opacity: 0 !important;

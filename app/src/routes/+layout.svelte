@@ -153,9 +153,9 @@
 <div class="app-container" use:swipeBack>
 	<Toaster
 		position="top-center"
-		offset={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+		offset={{ top: 'calc(env(safe-area-inset-top, 0px) + 6px)' }}
 		options={{
-			roundness: 18,
+			roundness: 20,
 		}}
 	/>
 	{@render children()}
