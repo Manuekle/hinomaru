@@ -398,7 +398,7 @@
 	</div>
 {:else}
 	<div
-		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+		style="max-width:720px;margin:0 auto;min-height:100vh;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;"
 	>
 		<!-- Back link -->
 		<div use:fadeIn={{ delay: 0 }}>
