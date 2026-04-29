@@ -26,14 +26,21 @@
 </div>
 
 <style>
-	/* Default (Android + Desktop): inline at end of content */
+	/* Fixed footer across all platforms. GPU layer (translateZ) prevents iOS
+	   scroll jitter on position:fixed (same trick as DockBar). */
 	.sticky-footer {
-		position: relative;
-		margin-top: auto;
-		width: 100%;
-		padding: 16px 24px max(16px, env(safe-area-inset-bottom, 0px));
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 50;
 		display: flex;
 		justify-content: center;
+		padding: 8px 16px max(16px, env(safe-area-inset-bottom, 0px));
+		pointer-events: none;
+		transform: translateZ(0);
+		-webkit-transform: translateZ(0);
+		will-change: transform;
 	}
 
 	.footer-content {
@@ -41,9 +48,9 @@
 		max-width: 520px;
 		display: flex;
 		gap: 12px;
+		pointer-events: auto;
 	}
 
-	/* When back button is alone (no sibling), let it span the row */
 	.footer-content > .back-btn:only-child {
 		flex: 1;
 	}
@@ -55,10 +62,9 @@
 		display: inline;
 	}
 
-	/* Desktop: more generous padding */
 	@media (min-width: 768px) {
 		.sticky-footer {
-			padding: 16px 32px 24px;
+			padding: 12px 16px 24px;
 		}
 	}
 
@@ -69,19 +75,5 @@
 		.footer-content {
 			gap: 8px;
 		}
-	}
-
-	/* iOS: sticky pinned to bottom of scroll container — avoids fixed-positioning
-	   rubber-band drift during momentum scroll. */
-	:global(html.is-ios) .sticky-footer {
-		position: sticky;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		z-index: 100;
-		background: var(--bg-page);
-		border-top: 1px solid var(--ink-100);
-		margin-top: auto;
-		padding: 8px 24px max(16px, env(safe-area-inset-bottom, 0px));
 	}
 </style>

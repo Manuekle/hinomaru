@@ -184,7 +184,8 @@
 		flex-direction: column;
 		justify-content: flex-start;
 		flex: 1;
-		padding-bottom: 0 !important;
+		/* Clear fixed footer (~64px btn + 8/16px padding + safe-area) */
+		padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
 	}
 
 
