@@ -71,21 +71,17 @@
 		}
 	}
 
-	/* iOS: fixed floating footer with safe-area clearance */
+	/* iOS: sticky pinned to bottom of scroll container — avoids fixed-positioning
+	   rubber-band drift during momentum scroll. */
 	:global(html.is-ios) .sticky-footer {
-		position: fixed;
+		position: sticky;
 		bottom: 0;
 		left: 0;
 		right: 0;
 		z-index: 100;
 		background: var(--bg-page);
 		border-top: 1px solid var(--ink-100);
-		margin-top: 0;
+		margin-top: auto;
 		padding: 8px 24px max(16px, env(safe-area-inset-bottom, 0px));
-		pointer-events: none;
-	}
-
-	:global(html.is-ios) .footer-content {
-		pointer-events: auto;
 	}
 </style>

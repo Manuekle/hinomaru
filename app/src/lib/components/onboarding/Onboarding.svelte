@@ -194,10 +194,6 @@
 		padding-bottom: 0 !important;
 	}
 
-	/* iOS: footer is fixed-floating, so reserve scroll space at the end of each step */
-	:global(html.is-ios) .step-inner :global(.step-content) {
-		padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
-	}
 
 	@media (max-height: 600px) and (orientation: landscape) {
 		.progress-wrapper {
