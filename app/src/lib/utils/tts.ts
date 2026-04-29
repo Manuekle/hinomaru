@@ -72,21 +72,21 @@ async function speakBrowser(text: string): Promise<void> {
  * the moment audio begins playing, not when it finishes.
  * Falls back to browser TTS if the service is unavailable.
  */
-export async function speakJapanese(text: string): Promise<void> {
+export async function speakJapanese(text: string, onStart?: () => void): Promise<void> {
 	const cleaned = cleanForTTS(text);
 	if (!cleaned) return;
 
 	const voiceMode = get(preferredVoice);
 	const preset = voiceMode === 'cool' ? 'cool' : 'kawaii';
 
-	// Only show loading toast if audio hasn't started within 2 seconds.
+	// Show loading toast if audio hasn't started within 500ms.
 	let markStarted!: () => void;
 	let markFailed!: (e: unknown) => void;
 	const audioStarted = new Promise<void>((res, rej) => {
 		markStarted = res;
 		markFailed = rej;
 	});
-	// Prevent unhandled rejection if error occurs before the 2s toast timer fires
+	// Prevent unhandled rejection if error occurs before the timer fires
 	audioStarted.catch(() => { });
 
 	const toastTimer = setTimeout(() => {
@@ -96,14 +96,13 @@ export async function speakJapanese(text: string): Promise<void> {
 			success: { title: t('stories.audio.ready', l) },
 			error: { title: t('stories.audio.error', l) }
 		});
-	}, 2000);
+	}, 500);
 
-	// markStarted resolves audioStarted → clears toast (if shown)
-	// If audio starts before 2s, clearTimeout prevents toast from appearing
 	const origMarkStarted = markStarted;
 	markStarted = () => {
 		clearTimeout(toastTimer);
 		origMarkStarted();
+		onStart?.();
 	};
 	const origMarkFailed = markFailed;
 	markFailed = (e: unknown) => {
@@ -114,6 +113,7 @@ export async function speakJapanese(text: string): Promise<void> {
 	await speakVoicevox(cleaned, preset, 1.0, 0.0, 1.0, markStarted).catch(async (err) => {
 		markFailed(err);
 		console.warn('VOICEVOX offline, falling back to browser TTS:', err);
+		onStart?.(); // Browser TTS starts almost immediately
 		await speakBrowser(cleaned);
 	});
 }

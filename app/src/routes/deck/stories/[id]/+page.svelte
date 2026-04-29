@@ -105,9 +105,10 @@
 			stopJapanese();
 			isSpeaking = false;
 		} else {
-			isSpeaking = true;
 			try {
-				await speakJapanese(bodyJp);
+				await speakJapanese(bodyJp, () => {
+					isSpeaking = true;
+				});
 			} finally {
 				isSpeaking = false;
 			}

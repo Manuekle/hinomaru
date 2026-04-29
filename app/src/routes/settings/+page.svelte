@@ -171,11 +171,35 @@
 	let otpCode = $state('');
 	let isDeleting = $state(false);
 	let modalRef = $state<HTMLDivElement | null>(null);
+	let overlayPaddingBottom = $state(0);
 
 	$effect(() => {
 		if (showDeleteConfirm && modalRef) {
 			modalRef.focus();
 		}
+	});
+
+	$effect(() => {
+		if (!showDeleteConfirm) return;
+
+		function onViewportResize() {
+			const vv = window.visualViewport;
+			if (!vv) return;
+			// Keyboard height = layout viewport height minus visual viewport height + offset
+			const keyboardHeight = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+			overlayPaddingBottom = keyboardHeight;
+		}
+
+		const vv = window.visualViewport;
+		vv?.addEventListener('resize', onViewportResize);
+		vv?.addEventListener('scroll', onViewportResize);
+		onViewportResize();
+
+		return () => {
+			vv?.removeEventListener('resize', onViewportResize);
+			vv?.removeEventListener('scroll', onViewportResize);
+			overlayPaddingBottom = 0;
+		};
 	});
 
 	function handleModalKeydown(e: KeyboardEvent) {
@@ -591,6 +615,7 @@
 		onclick={handleOverlayClick}
 		onkeydown={handleModalKeydown}
 		aria-hidden="true"
+		style="padding-bottom: {overlayPaddingBottom}px"
 	>
 		<div
 			class="modal-content"
@@ -1153,21 +1178,24 @@
 		backdrop-filter: blur(8px);
 		-webkit-backdrop-filter: blur(8px);
 		display: flex;
-		align-items: center;
+		align-items: flex-end;
 		justify-content: center;
-		padding: 24px;
+		/* padding-bottom set inline via visualViewport to sit above keyboard */
+		padding: 24px 24px max(24px, env(safe-area-inset-bottom, 0px));
 		z-index: 1000;
+		transition: padding-bottom 0.2s ease;
 	}
 
 	.modal-content {
 		background: var(--bg-surface);
-		border-radius: 28px;
+		border-radius: 28px 28px 20px 20px;
 		width: 100%;
-		max-width: 400px;
-		padding: 32px;
+		max-width: 420px;
+		padding: 28px 28px 24px;
 		box-shadow: var(--shadow-xl);
 		border: 1px solid var(--ink-200);
 		text-align: center;
+		outline: none;
 	}
 
 	.modal-header {
