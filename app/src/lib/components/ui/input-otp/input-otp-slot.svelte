@@ -21,9 +21,9 @@
 	{...restProps}
 >
 	{#if cell.char}
-		{cell.char}
+		<span aria-hidden="true">{cell.char}</span>
 	{:else}
-		<span class="opacity-20">−</span>
+		<span class="opacity-20" aria-hidden="true">−</span>
 	{/if}
 
 	{#if cell.hasFakeCaret}

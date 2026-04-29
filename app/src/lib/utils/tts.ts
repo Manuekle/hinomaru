@@ -28,6 +28,8 @@ export function cleanForTTS(text: string): string {
 import { get } from 'svelte/store';
 import { preferredVoice } from '$lib/stores/settings';
 import { speakVoicevox, stopVoicevox } from '$lib/services/voicevox';
+import { locale } from '$lib/stores/locale';
+import { t } from '$lib/i18n';
 import { svileo } from '$lib/stores/toast';
 
 /**
@@ -85,13 +87,14 @@ export async function speakJapanese(text: string): Promise<void> {
 		markFailed = rej;
 	});
 	// Prevent unhandled rejection if error occurs before the 2s toast timer fires
-	audioStarted.catch(() => {});
+	audioStarted.catch(() => { });
 
 	const toastTimer = setTimeout(() => {
+		const l = get(locale);
 		svileo.promise(audioStarted, {
-			loading: { title: '🔊 Cargando voz...' },
-			success: { title: '✓ Voz lista' },
-			error: { title: '✗ Voz no disponible' }
+			loading: { title: t('stories.audio.loading', l) },
+			success: { title: t('stories.audio.ready', l) },
+			error: { title: t('stories.audio.error', l) }
 		});
 	}, 2000);
 

@@ -121,7 +121,7 @@
 					savedVocab = new Set([...savedVocab, word.jp]);
 				} else {
 					console.error('save vocab:', error);
-					svileo.error({ title: 'Error' });
+					svileo.error({ title: t('common.error', $locale) });
 				}
 			} else {
 				savedVocab = new Set([...savedVocab, word.jp]);
@@ -260,7 +260,7 @@
 		} else {
 			svileo.success({
 				title: t('songs.doneBravo', $locale),
-				description: 'Canción ya completada anteriormente'
+				description: t('songs.alreadyCompleted', $locale)
 			});
 		}
 

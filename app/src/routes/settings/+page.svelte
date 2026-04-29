@@ -170,6 +170,29 @@
 	let deleteStep = $state<'confirm' | 'otp'>('confirm');
 	let otpCode = $state('');
 	let isDeleting = $state(false);
+	let modalRef = $state<HTMLDivElement | null>(null);
+
+	$effect(() => {
+		if (showDeleteConfirm && modalRef) {
+			modalRef.focus();
+		}
+	});
+
+	function handleModalKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			showDeleteConfirm = false;
+			deleteStep = 'confirm';
+			otpCode = '';
+		}
+	}
+
+	function handleOverlayClick(e: MouseEvent) {
+		if (e.target === e.currentTarget) {
+			showDeleteConfirm = false;
+			deleteStep = 'confirm';
+			otpCode = '';
+		}
+	}
 
 	async function initiateDeletion() {
 		if (!user?.email) return;
@@ -561,13 +584,28 @@
 </div>
 
 {#if showDeleteConfirm}
-	<div class="modal-overlay" transition:fly={{ duration: 200, opacity: 0 }}>
-		<div class="modal-content" use:fadeUp={{ delay: 0.05, y: 20 }}>
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<div
+		class="modal-overlay"
+		transition:fly={{ duration: 200, opacity: 0 }}
+		onclick={handleOverlayClick}
+		onkeydown={handleModalKeydown}
+		aria-hidden="true"
+	>
+		<div
+			class="modal-content"
+			use:fadeUp={{ delay: 0.05, y: 20 }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="delete-modal-title"
+			tabindex="-1"
+			bind:this={modalRef}
+		>
 			<div class="modal-header">
-				<div class="warning-icon" style="background: var(--ink-100); color: var(--fg-secondary);">
+				<div class="warning-icon">
 					<Icon icon={BubbleChatIcon} size={24} color="currentColor" />
 				</div>
-				<h2 class="modal-title" style="text-align: left; margin-left: 4px;">
+				<h2 id="delete-modal-title" class="modal-title" style="text-align: left; margin-left: 4px;">
 					{deleteStep === 'confirm'
 						? t('settings.deleteAccount.confirm', $locale)
 						: t('settings.deleteAccount.verify', $locale)}
@@ -582,9 +620,14 @@
 					<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
 						{t('deck.back', $locale)}
 					</button>
-					<button class="modal-btn-danger" onclick={initiateDeletion} disabled={isDeleting}>
+					<button
+						class="modal-btn-danger"
+						onclick={initiateDeletion}
+						disabled={isDeleting}
+						aria-busy={isDeleting}
+					>
 						{#if isDeleting}
-							<div class="spinner"></div>
+							<div class="spinner" aria-hidden="true"></div>
 						{:else}
 							{t('settings.deleteAccount.confirmBtn', $locale)}
 						{/if}
@@ -595,9 +638,15 @@
 					{t('settings.deleteAccount.otpSent', $locale, { email: user?.email || '' })}
 				</p>
 				<div class="otp-wrapper">
-					<InputOTP.Root maxlength={6} bind:value={otpCode} aria-label={t('settings.deleteAccount.verify', $locale)}>
+					<InputOTP.Root
+						maxlength={6}
+						bind:value={otpCode}
+						aria-label={t('settings.deleteAccount.verify', $locale)}
+						autocomplete="one-time-code"
+						inputmode="numeric"
+					>
 						{#snippet children({ cells })}
-							<div class="otp-slots-container">
+							<div class="otp-slots-container" aria-hidden="true">
 								{#each cells as cell (cell)}
 									<InputOTP.Slot {cell} />
 								{/each}
@@ -619,9 +668,10 @@
 						class="modal-btn-danger"
 						onclick={confirmDeletion}
 						disabled={isDeleting || otpCode.length < 6}
+						aria-busy={isDeleting}
 					>
 						{#if isDeleting}
-							<div class="spinner"></div>
+							<div class="spinner" aria-hidden="true"></div>
 						{:else}
 							{t('settings.deleteAccount.btn', $locale)}
 						{/if}
@@ -1134,6 +1184,7 @@
 		align-items: center;
 		justify-content: center;
 		margin: 0 auto 16px;
+		flex-shrink: 0;
 	}
 
 	.modal-title {

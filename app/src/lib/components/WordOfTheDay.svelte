@@ -59,7 +59,7 @@
 					saved = true;
 				} else {
 					console.error('save vocab:', error);
-					svileo.error({ title: 'Error' });
+					svileo.error({ title: t('common.error', $locale) });
 				}
 			} else {
 				saved = true;

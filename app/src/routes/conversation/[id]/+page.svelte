@@ -3,6 +3,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { showRomaji } from '$lib/stores/settings';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
@@ -97,7 +98,7 @@
 				await invalidateAll();
 			}
 		} catch { /* non-critical */ }
-		svileo.success({ title: $locale === 'es' ? '¡Conversación completada!' : 'Conversation complete!' });
+		svileo.success({ title: t('conversation.complete', $locale) });
 	}
 
 	function restart() {

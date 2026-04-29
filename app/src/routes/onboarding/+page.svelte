@@ -3,6 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { createClient } from '$lib/supabase';
 	import { toast } from '$lib/stores/toast';
+	import { t } from '$lib/i18n';
+	import { locale } from '$lib/stores/locale';
 	const supabase = createClient();
 
 	async function handleFinish(selections: any) {
@@ -25,8 +27,8 @@
 			localStorage.setItem('hinomaru_onboarding_completed', 'true');
 			
 			toast.success({
-				title: '¡Bienvenido a Hinomaru! 🇯🇵',
-				description: 'Todo listo. Tu viaje para dominar el japonés comienza hoy.'
+				title: t('onboarding.success.title', $locale),
+				description: t('onboarding.success.desc', $locale)
 			});
 		} catch (e) {
 			console.error('Failed to save onboarding profile:', e);
