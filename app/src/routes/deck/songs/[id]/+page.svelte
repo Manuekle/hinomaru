@@ -397,7 +397,9 @@
 		Song not found. <a href="/deck/songs" style="color:var(--hinomaru-red);">← Back</a>
 	</div>
 {:else}
-	<div class="page">
+	<div
+		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+	>
 		<!-- Back link -->
 		<div use:fadeIn={{ delay: 0 }}>
 			<a href="/deck/songs" class="back">← {t('deck.back', $locale)}</a>
@@ -607,12 +609,6 @@
 {/if}
 
 <style>
-	.page {
-		max-width: 680px;
-		margin: 0 auto;
-		padding: calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
-	}
-
 	.back {
 		font-size: 13px;
 		color: var(--fg-secondary);

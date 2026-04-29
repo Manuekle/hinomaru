@@ -33,23 +33,39 @@
 	<title>{t('songs.title', $locale)} — Hinomaru</title>
 </svelte:head>
 
-<div class="page">
-	<div class="hero" use:fadeUp={{ delay: 0.05, y: 16 }}>
-		<h1>{t('songs.title', $locale)}</h1>
-		<p>{t('songs.subtitle', $locale)}</p>
-	</div>
+<div
+	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+>
+	<h1
+		use:fadeUp={{ delay: 0.06, y: 16 }}
+		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
+	>
+		{t('songs.title', $locale)}
+	</h1>
 
-	<!-- Level chips -->
-	<div class="chips hide-scrollbar" use:fadeIn={{ delay: 0.14 }}>
+	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">
+		{t('songs.subtitle', $locale)}
+	</p>
+
+	<!-- Level Chips matching Stories/Dashboard -->
+	<div
+		use:fadeIn={{ delay: 0.18 }}
+		class="hide-scrollbar"
+		style="display:flex;gap:8px;margin-top:32px;margin-bottom:20px;overflow-x:auto;"
+	>
 		{#each levels as lvl (lvl)}
-			<button class="chip" class:on={activeLevel === lvl} onclick={() => (activeLevel = lvl)}>
+			<button
+				class="filter-chip"
+				class:active={activeLevel === lvl}
+				onclick={() => (activeLevel = lvl)}
+			>
 				{lvl}
 			</button>
 		{/each}
 	</div>
 
 	<!-- Song rows -->
-	<div class="list" use:staggerChildren={{ delay: 0.2, stagger: 0.07, y: 10 }}>
+	<div class="list" use:staggerChildren={{ delay: 0.25, stagger: 0.07, y: 10 }}>
 		{#each filtered as song (song.idx)}
 			{@const done = completedIds.includes(song.idx)}
 			{@const ready = hasContent(song.idx)}
@@ -79,73 +95,26 @@
 </div>
 
 <style>
-	.page {
-		max-width: 680px;
-		margin: 0 auto;
-		padding: calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
-	}
-
-	.back {
-		font-size: 13px;
-		color: var(--fg-secondary);
-		text-decoration: none;
-		display: inline-block;
-		margin-bottom: 20px;
-		transition: color 150ms;
-	}
-	.back:hover {
-		color: var(--fg-primary);
-	}
-
-	/* Hero */
-	.hero {
-		margin-bottom: 28px;
-	}
-
-	.hero h1 {
-		font-size: 38px;
-		font-weight: 700;
-		letter-spacing: -0.03em;
-		color: var(--fg-primary);
-		margin: 0 0 6px;
-		line-height: 1.1;
-	}
-
-	.hero p {
-		font-size: 15px;
-		color: var(--fg-secondary);
-		margin: 0;
-		line-height: 1.5;
-	}
-
-	/* Chips */
-	.chips {
-		display: flex;
-		gap: 6px;
-		margin-bottom: 24px;
-		overflow-x: auto;
-	}
-
-	.chip {
-		height: 34px;
-		padding: 0 14px;
+	.filter-chip {
+		height: 42px;
+		padding: 0 16px;
 		border-radius: 999px;
-		border: 1.5px solid var(--ink-200);
-		background: transparent;
-		color: var(--fg-secondary);
-		font-size: 12px;
-		font-weight: 700;
-		font-family: var(--font-ui);
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
+		color: var(--sumi);
+		font-weight: 600;
+		font-size: 13px;
 		cursor: pointer;
+		font-family: var(--font-ui);
 		white-space: nowrap;
 		flex-shrink: 0;
 		transition: all 180ms ease;
-		letter-spacing: 0.04em;
 	}
-	.chip.on {
-		background: var(--fg-primary);
-		border-color: var(--fg-primary);
-		color: var(--bg-page);
+
+	.filter-chip.active {
+		background: var(--sumi);
+		color: var(--bg-surface);
+		border-color: var(--sumi);
 	}
 
 	/* List */
@@ -217,11 +186,6 @@
 		border-radius: 99px;
 		letter-spacing: 0.03em;
 	}
-	.tag-done {
-		background: var(--success-wash);
-		color: var(--success);
-		border: 1px solid var(--success);
-	}
 	.tag-soon {
 		background: var(--ink-100);
 		color: var(--fg-tertiary);
@@ -265,3 +229,4 @@
 			transform 150ms;
 	}
 </style>
+
