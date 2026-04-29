@@ -150,9 +150,6 @@
 	<div class="container">
 		<!-- Top Nav -->
 		<div use:fadeUp={{ delay: 0, y: 10 }} class="top-nav">
-			<a href="/" class="back-link-beautiful">
-				← {t('deck.back', $locale)}
-			</a>
 			<div class="top-actions">
 				<button
 					class="romaji-toggle"

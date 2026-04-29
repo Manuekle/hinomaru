@@ -19,11 +19,7 @@
 <div
 	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 >
-	<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:8px;">
-		<a href="/" class="back-link-beautiful">
-			← {t('deck.back', $locale)}
-		</a>
-	</div>
+
 
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}

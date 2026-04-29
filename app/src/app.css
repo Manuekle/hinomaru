@@ -544,7 +544,8 @@ body {
   --svileo-state-warning: #a8741a;
   --svileo-state-info:    #1a1a1a;
   --svileo-duration: 480ms;
-  --svileo-width:    min(380px, calc(100vw - 40px));
+  /* Match SVG WIDTH constant (350) — wider breaks pill centering */
+  --svileo-width:    min(350px, calc(100vw - 40px));
   --svileo-height:   48px;
 }
 
@@ -586,19 +587,30 @@ body {
   background-color: var(--ink-100) !important;
 }
 
-/* Animation refinement: Entry (Drop from top) */
 :global([data-svileo-viewport]) {
   padding: 8px !important;
 }
 
+/* Entry: slide down from above, Y-axis only — no X drift */
 :global([data-svileo-viewport][data-position^='top'] [data-svileo-toast]:not([data-ready='true'])) {
-  transform: translateY(-80px) scale(0.9) !important;
+  transform: translateY(-48px) !important;
   opacity: 0 !important;
 }
 
-/* Animation refinement: Exit (Slide back up) */
+/* Entry transition: explicit to avoid spring fighting */
+:global([data-svileo-viewport][data-position^='top'] [data-svileo-toast][data-ready='true']) {
+  transform: translateY(0) !important;
+  transition:
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease,
+    margin-bottom var(--svileo-duration) var(--svileo-spring-easing),
+    margin-top var(--svileo-duration) var(--svileo-spring-easing),
+    height var(--svileo-duration) var(--svileo-spring-easing) !important;
+}
+
+/* Exit: slide back up */
 :global([data-svileo-viewport][data-position^='top'] [data-svileo-toast][data-ready='true'][data-exiting='true']) {
-  transform: translateY(-80px) scale(0.9) !important;
+  transform: translateY(-48px) !important;
   opacity: 0 !important;
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1), opacity 0.25s ease !important;
 }

@@ -34,10 +34,6 @@
 </svelte:head>
 
 <div class="page">
-	<div use:fadeIn={{ delay: 0 }}>
-		<a href="/" class="back">← {t('deck.back', $locale)}</a>
-	</div>
-
 	<div class="hero" use:fadeUp={{ delay: 0.05, y: 16 }}>
 		<h1>{t('songs.title', $locale)}</h1>
 		<p>{t('songs.subtitle', $locale)}</p>
