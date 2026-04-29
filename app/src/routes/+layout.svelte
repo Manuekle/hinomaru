@@ -156,6 +156,7 @@
 		offset={{ top: 'calc(env(safe-area-inset-top, 0px) + 6px)' }}
 		options={{
 			roundness: 20,
+			autopilot: true,
 		}}
 	/>
 	{@render children()}
