@@ -6,11 +6,8 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import {
 		Clock01Icon,
-		Calendar01Icon,
 		Calendar02Icon,
-		Calendar03Icon,
-		BrainIcon,
-		Idea01Icon
+		BrainIcon
 	} from '@hugeicons/core-free-icons';
 
 	import { page } from '$app/stores';
@@ -31,11 +28,8 @@
 
 	const intervals = [
 		{ id: 1, label: '2 hrs', icon: Clock01Icon, color: '#ff3b30', time: '› 2 hrs' },
-		{ id: 2, label: '1 day', icon: Calendar01Icon, color: '#ff9500', time: '› 1 day' },
-		{ id: 3, label: '6 days', icon: Calendar02Icon, color: '#ffcc00', time: '› 6 days' },
-		{ id: 4, label: '25 days', icon: Calendar03Icon, color: '#34c759', time: '› 25 days' },
-		{ id: 5, label: '5 mo', icon: BrainIcon, color: '#007aff', time: '› 5 mo' },
-		{ id: 6, label: '11 mo', icon: Idea01Icon, color: '#af52de', time: '› 11 mo' }
+		{ id: 2, label: '6 days', icon: Calendar02Icon, color: '#ffcc00', time: '› 6 days' },
+		{ id: 3, label: '5 mo', icon: BrainIcon, color: '#007aff', time: '› 5 mo' }
 	];
 </script>
 
@@ -66,11 +60,11 @@
 	</div>
 
 	<StickyFooter>
+		<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex: 1" onclick={() => handleNext(false)}>
+			{t('onboarding.srs.later', $locale)}
+		</button>
 		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={() => handleNext(true)}>
 			{t('onboarding.srs.enable', $locale)}
-		</button>
-		<button class="hm-btn hm-btn-ghost hm-btn-lg" style="flex: 1" onclick={() => handleNext(false)}>
-			{t('onboarding.srs.later', $locale)}
 		</button>
 	</StickyFooter>
 </div>

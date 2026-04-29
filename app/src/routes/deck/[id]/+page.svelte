@@ -24,18 +24,44 @@
 			id: 'flashcards',
 			titleKey: 'mode.flashcards.title',
 			descKey: 'mode.flashcards.desc',
-			icon: Cards02Icon
+			icon: Cards02Icon,
+			color: '#ff2d55'
 		},
-		{ id: 'quiz', titleKey: 'mode.quiz.title', descKey: 'mode.quiz.desc', icon: Target01Icon },
-		{ id: 'type', titleKey: 'mode.type.title', descKey: 'mode.type.desc', icon: KeyboardIcon },
+		{
+			id: 'quiz',
+			titleKey: 'mode.quiz.title',
+			descKey: 'mode.quiz.desc',
+			icon: Target01Icon,
+			color: '#007aff'
+		},
+		{
+			id: 'type',
+			titleKey: 'mode.type.title',
+			descKey: 'mode.type.desc',
+			icon: KeyboardIcon,
+			color: '#ff9500'
+		},
 		{
 			id: 'write',
 			titleKey: 'mode.write.title',
 			descKey: 'mode.write.desc',
-			icon: PencilEdit01Icon
+			icon: PencilEdit01Icon,
+			color: '#af52de'
 		},
-		{ id: 'match', titleKey: 'mode.match.title', descKey: 'mode.match.desc', icon: PuzzleIcon },
-		{ id: 'exam', titleKey: 'mode.exam.title', descKey: 'mode.exam.desc', icon: Certificate01Icon }
+		{
+			id: 'match',
+			titleKey: 'mode.match.title',
+			descKey: 'mode.match.desc',
+			icon: PuzzleIcon,
+			color: '#34c759'
+		},
+		{
+			id: 'exam',
+			titleKey: 'mode.exam.title',
+			descKey: 'mode.exam.desc',
+			icon: Certificate01Icon,
+			color: '#ff3b30'
+		}
 	];
 </script>
 
@@ -98,8 +124,8 @@
 				href={mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`}
 				class="mode-card"
 			>
-				<div class="mode-icon-box">
-					<Icon icon={mode.icon} size={20} strokeWidth={1.5} color="currentColor" />
+				<div class="mode-icon-box" style="background: {mode.color}14; color: {mode.color};">
+					<Icon icon={mode.icon} size={20} strokeWidth={1.8} color="currentColor" />
 				</div>
 				<div style="flex:1;">
 					<div style="font-size:16px;font-weight:600;">{t(mode.titleKey, $locale)}</div>
@@ -156,11 +182,10 @@
 	.mode-icon-box {
 		width: 40px;
 		height: 40px;
-		background: var(--ink-100);
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--sumi);
+		flex-shrink: 0;
 	}
 </style>

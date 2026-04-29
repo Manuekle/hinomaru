@@ -79,14 +79,14 @@
 
 	.header {
 		text-align: center;
-		margin-bottom: clamp(24px, 8vw, 80px);
+		margin-bottom: clamp(16px, 3dvh, 32px);
 	}
 
 	.title {
 		font-size: var(--step-title, clamp(24px, 7vw, 32px));
 		font-weight: 600;
 		letter-spacing: -0.04em;
-		margin: 0 0 clamp(16px, 5vw, 40px);
+		margin: 0 0 clamp(8px, 1.5dvh, 16px);
 	}
 
 	.subtitle {
@@ -148,7 +148,7 @@
 	}
 
 	.value {
-		font-size: 48px;
+		font-size: clamp(32px, 9vw, 48px);
 		font-weight: 900;
 		line-height: 1;
 		color: var(--fg-primary);
@@ -172,7 +172,7 @@
 		color: var(--fg-tertiary);
 		font-weight: 600;
 		text-align: center;
-		margin-bottom: 40px;
+		margin-bottom: 16px;
 	}
 
 	.tip-section {
@@ -180,8 +180,8 @@
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		margin-bottom: 40px;
-		padding: 12px 16px;
+		margin: 0 auto;
+		padding: 10px 14px;
 		background: var(--ink-100);
 		border-radius: 12px;
 		color: var(--fg-secondary);

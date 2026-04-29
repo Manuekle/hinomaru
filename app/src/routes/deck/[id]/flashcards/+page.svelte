@@ -134,6 +134,15 @@
 			.insert({ user_id: user.id, deck_id: data.deck.id, mode: 'flashcards', correct: c, total });
 		await updateStreak(supabase, user.id);
 	}
+
+	function getFontSize(text: string) {
+		const len = text?.length || 0;
+		if (len <= 3) return '96px';
+		if (len <= 5) return '72px';
+		if (len <= 8) return '56px';
+		if (len <= 11) return '42px';
+		return '32px';
+	}
 </script>
 
 <div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
@@ -177,7 +186,12 @@
 						<div style="position:absolute;top:24px;left:24px;" class="label-meta">
 							{$locale === 'es' ? (data.deck.kind_es ?? data.deck.kind) : data.deck.kind}
 						</div>
-						<div class="jp" style="font-size:96px;line-height:1;">{card.jp}</div>
+						<div 
+							class="jp" 
+							style="font-size: {getFontSize(card.jp)}; line-height: 1.1; text-align: center; padding: 0 16px; width: 100%; box-sizing: border-box; word-break: break-word;"
+						>
+							{card.jp}
+						</div>
 						<button
 							onclick={(e) => {
 								e.stopPropagation();

@@ -169,6 +169,15 @@
 		await updateStreak(supabase, user.id);
 		await addXP(supabase, user.id, 15);
 	}
+
+	function getFontSize(text: string) {
+		const len = text?.length || 0;
+		if (len <= 3) return '96px';
+		if (len <= 5) return '72px';
+		if (len <= 8) return '56px';
+		if (len <= 11) return '42px';
+		return '32px';
+	}
 </script>
 
 <svelte:head>
@@ -217,7 +226,12 @@
 						<div style="position:absolute;top:24px;left:24px;" class="label-meta">
 							{($locale === 'es' ? word.category_es : word.category) || t('nav.vocabulary', $locale)}
 						</div>
-						<div class="jp" style="font-size:96px;line-height:1;">{word.jp}</div>
+						<div 
+							class="jp" 
+							style="font-size: {getFontSize(word.jp)}; line-height: 1.1; text-align: center; padding: 0 16px; width: 100%; box-sizing: border-box; word-break: break-word;"
+						>
+							{word.jp}
+						</div>
 						<button
 							onclick={(e) => {
 								e.stopPropagation();
