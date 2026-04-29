@@ -51,22 +51,21 @@
 <style>
 	.dock-wrap {
 		position: fixed;
-		bottom: 0;
+		bottom: env(safe-area-inset-bottom, 0px);
 		left: 0;
 		right: 0;
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		/*
-		 * env(safe-area-inset-bottom) = ~34px iOS, = 0 Android/desktop.
-		 * max() ensures at least 16px clearance on Android/web.
+		/* 
+		 * Fixed 16px padding above the safe area (or bottom of screen).
+		 * This is more stable on iOS than complex calc() inside padding.
 		 */
-		padding: 0 16px max(16px, calc(env(safe-area-inset-bottom, 0px) - 14px));
+		padding: 0 16px 16px;
 		pointer-events: none;
 		/* GPU layer — prevents iOS scroll jitter on position:fixed */
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
-		will-change: transform;
 	}
 
 	.dock-bar {
