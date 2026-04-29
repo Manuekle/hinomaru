@@ -7,7 +7,7 @@
 		BookOpen01Icon,
 		CheckmarkCircle02Icon,
 		ZapIcon,
-		Headphones02Icon,
+		HeadphonesIcon,
 		SparklesIcon
 	} from '@hugeicons/core-free-icons';
 
@@ -29,20 +29,20 @@
 
 	const points = $derived([
 		{
-			title: t('onboarding.stories.point1.title', $locale),
-			desc: t('onboarding.stories.point1.desc', $locale),
+			title: t('onboarding.stories.p1.title', $locale),
+			desc: t('onboarding.stories.p1.desc', $locale),
 			icon: ZapIcon,
 			color: '#ff9500'
 		},
 		{
-			title: t('onboarding.stories.point2.title', $locale),
-			desc: t('onboarding.stories.point2.desc', $locale),
-			icon: Headphones02Icon,
+			title: t('onboarding.stories.p2.title', $locale),
+			desc: t('onboarding.stories.p2.desc', $locale),
+			icon: HeadphonesIcon,
 			color: '#007aff'
 		},
 		{
-			title: t('onboarding.stories.point3.title', $locale),
-			desc: t('onboarding.stories.point3.desc', $locale),
+			title: t('onboarding.stories.p3.title', $locale),
+			desc: t('onboarding.stories.p3.desc', $locale),
 			icon: SparklesIcon,
 			color: '#af52de'
 		}

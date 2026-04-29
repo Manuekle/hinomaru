@@ -19,8 +19,8 @@
 	let completed = $state(false);
 	let loadingWriters = $state(true);
 
-	// 一 = "ichi" (one) — simplest kanji, 1 stroke
-	const char = '一';
+	// 日 = "hi" (sun)
+	const char = '日';
 
 	$effect(() => {
 		if (hanziContainer) {
@@ -163,8 +163,8 @@
 	<div class="canvas-area">
 		<!-- Character hint above the box -->
 		<div class="char-hint">
-			<span class="char-name">{t('onboarding.practice.one', $locale)}</span>
-			<span class="char-romaji">ichi • いち</span>
+			<span class="char-name">{t('onboarding.practice.sun', $locale)}</span>
+			<span class="char-romaji">hi • ひ</span>
 		</div>
 
 		<!-- The writing card — matches write page visual -->

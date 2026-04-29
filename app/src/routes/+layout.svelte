@@ -4,7 +4,7 @@
 	import { invalidate, goto } from '$app/navigation';
 	import { page, navigating } from '$app/stores';
 	import { locale } from '$lib/stores/locale';
-	import { theme } from '$lib/stores/theme';
+	import { theme, resolvedTheme } from '$lib/stores/theme';
 	import { t } from '$lib/i18n';
 	import { untrack } from 'svelte';
 	// @ts-ignore - Virtual module from vite-plugin-pwa
@@ -148,7 +148,7 @@
 	<Toaster
 		position="top-center"
 		offset={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
-		theme={$theme}
+		theme={$resolvedTheme}
 		options={{
 			roundness: 18,
 		}}

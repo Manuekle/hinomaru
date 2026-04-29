@@ -32,8 +32,6 @@
 		if (step > 1) step -= 1;
 	}
 
-
-
 	function handleMotivation(val: string) {
 		selections.motivation = val;
 		nextStep();
@@ -108,11 +106,11 @@
 				{:else if step === 6}
 					<StoriesStep onNext={nextStep} onBack={prevStep} />
 				{:else if step === 7}
-					<SRSStep onNext={handleSRS} />
-				{:else if step === 8}
 					<VoiceStep onSelect={handleVoice} onBack={prevStep} />
-				{:else if step === 9}
+				{:else if step === 8}
 					<GoalStep onSelect={handleGoal} onBack={prevStep} />
+				{:else if step === 9}
+					<SRSStep onNext={handleSRS} />
 				{:else if step === 10}
 					<SummaryStep {selections} onComplete={handleComplete} onBack={prevStep} loading={finishing} />
 				{/if}
@@ -133,7 +131,6 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: env(safe-area-inset-top);
-		/* safe-area-inset-bottom handled by StickyFooter */
 		overscroll-behavior: none;
 		--step-title: clamp(24px, 7vw, 32px);
 		--step-subtitle: clamp(15px, 4vw, 20px);
@@ -188,13 +185,6 @@
 		padding-bottom: 0;
 	}
 
-	/*
-	 * Pull StickyFooter out of fixed positioning into the flex flow.
-	 * With position:fixed it is always viewport-relative, creating a
-	 * ~167px dead zone between content and the button on tall iPhones.
-	 * As a relative/in-flow item it becomes part of the step-content
-	 * flex column and justify-content:center works on the whole block.
-	 */
 	.step-inner :global(.step-content) {
 		box-sizing: border-box;
 		display: flex;
