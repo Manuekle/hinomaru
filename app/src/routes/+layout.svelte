@@ -38,6 +38,12 @@
 		inject({ mode: dev ? 'development' : 'production' });
 		theme.init();
 
+		const ua = navigator.userAgent;
+		const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+		const isAndroid = /Android/.test(ua);
+		document.documentElement.classList.toggle('is-ios', isIOS);
+		document.documentElement.classList.toggle('is-android', isAndroid);
+
 		// Detect PWA mode first, set booting state before revealing body
 		const nav = window.navigator as Navigator & { standalone?: boolean };
 		const clientPWA = window.matchMedia('(display-mode: standalone)').matches || !!nav.standalone;

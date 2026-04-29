@@ -3,24 +3,16 @@
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
 	import { ArrowLeft02Icon } from '@hugeicons/core-free-icons';
-	import { onMount } from 'svelte';
 
 	let { children, onBack } = $props<{ children?: any; onBack?: () => void }>();
-
-	let isIOS = $state(false);
-
-	onMount(() => {
-		isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-	});
 </script>
 
-<div class="sticky-footer" class:ios={isIOS}>
+<div class="sticky-footer">
 	<div class="footer-content">
 		{#if onBack}
-			<button 
-				class="hm-btn hm-btn-secondary hm-btn-lg" 
-				style={!children ? 'width: 100%' : 'flex: 0 0 auto'} 
-				onclick={onBack} 
+			<button
+				class="hm-btn hm-btn-secondary hm-btn-lg back-btn"
+				onclick={onBack}
 				aria-label="Back"
 			>
 				<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
@@ -34,27 +26,14 @@
 </div>
 
 <style>
+	/* Default (Android + Desktop): inline at end of content */
 	.sticky-footer {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		z-index: 100;
-		background: var(--bg-page);
-		border-top: 1px solid var(--ink-100);
-		/*
-		 * env(safe-area-inset-bottom) = ~34px on iOS (home bar), = 0 on Android/desktop.
-		 */
-		padding: 8px 24px max(16px, env(safe-area-inset-bottom, 0px));
+		position: relative;
+		margin-top: auto;
+		width: 100%;
+		padding: 16px 24px max(16px, env(safe-area-inset-bottom, 0px));
 		display: flex;
 		justify-content: center;
-		pointer-events: none;
-		transition: all 0.3s ease;
-	}
-
-	/* iOS: same layout, just adjust bottom padding for home bar */
-	.sticky-footer.ios {
-		padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
 	}
 
 	.footer-content {
@@ -62,17 +41,24 @@
 		max-width: 520px;
 		display: flex;
 		gap: 12px;
-		pointer-events: auto;
+	}
+
+	/* When back button is alone (no sibling), let it span the row */
+	.footer-content > .back-btn:only-child {
+		flex: 1;
+	}
+	.footer-content > .back-btn:not(:only-child) {
+		flex: 0 0 auto;
 	}
 
 	.back-text {
 		display: inline;
 	}
 
-	/* Desktop: more generous padding, centered feel */
+	/* Desktop: more generous padding */
 	@media (min-width: 768px) {
 		.sticky-footer {
-			padding: 12px 32px 24px;
+			padding: 16px 32px 24px;
 		}
 	}
 
@@ -83,5 +69,23 @@
 		.footer-content {
 			gap: 8px;
 		}
+	}
+
+	/* iOS: fixed floating footer with safe-area clearance */
+	:global(html.is-ios) .sticky-footer {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 100;
+		background: var(--bg-page);
+		border-top: 1px solid var(--ink-100);
+		margin-top: 0;
+		padding: 8px 24px max(16px, env(safe-area-inset-bottom, 0px));
+		pointer-events: none;
+	}
+
+	:global(html.is-ios) .footer-content {
+		pointer-events: auto;
 	}
 </style>

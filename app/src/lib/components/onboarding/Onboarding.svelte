@@ -194,18 +194,9 @@
 		padding-bottom: 0 !important;
 	}
 
-	.step-inner :global(.sticky-footer) {
-		position: relative !important;
-		margin-top: auto !important;
-		bottom: auto;
-		left: auto;
-		right: auto;
-		z-index: auto;
-		pointer-events: auto !important;
-		border-top: none !important;
-		background: transparent !important;
-		padding: 16px 24px max(16px, env(safe-area-inset-bottom, 0px));
-		transition: none;
+	/* iOS: footer is fixed-floating, so reserve scroll space at the end of each step */
+	:global(html.is-ios) .step-inner :global(.step-content) {
+		padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
 	}
 
 	@media (max-height: 600px) and (orientation: landscape) {
