@@ -121,17 +121,14 @@
 
 <style>
 	.onboarding-container {
-		position: fixed;
-		inset: 0;
+		min-height: 100dvh;
 		background: var(--bg-page);
-		background-image: 
+		background-image:
 			radial-gradient(at 0% 0%, rgba(188, 0, 45, 0.03) 0px, transparent 50%),
 			radial-gradient(at 100% 100%, rgba(0, 122, 255, 0.03) 0px, transparent 50%);
-		z-index: 1000;
 		display: flex;
 		flex-direction: column;
 		padding-top: env(safe-area-inset-top);
-		overscroll-behavior: none;
 		--step-title: clamp(24px, 7vw, 32px);
 		--step-subtitle: clamp(15px, 4vw, 20px);
 		--step-body: clamp(13px, 3.5vw, 17px);
@@ -166,23 +163,19 @@
 
 	.step-wrapper {
 		flex: 1;
-		position: relative;
-		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
 	}
 
 	.step-inner {
-		position: absolute;
-		inset: 0;
+		flex: 1;
 		display: flex;
 		flex-direction: column;
-		overflow-x: hidden;
-		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
 		max-width: 600px;
 		margin-left: auto;
 		margin-right: auto;
 		width: 100%;
-		padding-bottom: 0;
 	}
 
 	.step-inner :global(.step-content) {
@@ -190,7 +183,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
-		min-height: 100%;
+		flex: 1;
 		padding-bottom: 0 !important;
 	}
 

@@ -548,30 +548,46 @@ body {
   --svileo-height:   48px;
 }
 
-/* Subtle border for the bubble shapes */
-[data-svileo-toast] [data-svileo-svg] path {
+/* 
+   BRUTE FORCE THEME SYNC 
+   We target the paths directly with :global to ensure they are overridden
+*/
+:global([data-svileo-toast] [data-svileo-svg] path) {
+  fill: #ffffff !important;
   stroke: rgba(0, 0, 0, 0.08) !important;
   stroke-width: 0.5px !important;
 }
 
-[data-theme='dark'] [data-svileo-toast] [data-svileo-svg] path {
+:global([data-theme='dark'] [data-svileo-toast] [data-svileo-svg] path) {
+  fill: #1c1c1c !important;
   stroke: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* General refinement */
-[data-svileo-title] {
+:global([data-svileo-title]) {
+  color: #1a1a1a !important;
   font-family: var(--font-ui) !important;
   font-weight: 600 !important;
 }
-[data-svileo-description] {
+
+:global([data-theme='dark'] [data-svileo-title]) {
+  color: #f2f2f1 !important;
+}
+
+:global([data-svileo-description]) {
+  color: rgba(26, 26, 26, 0.7) !important;
   font-family: var(--font-ui) !important;
 }
-[data-svileo-badge] {
+
+:global([data-theme='dark'] [data-svileo-description]) {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+:global([data-svileo-badge]) {
   background-color: var(--ink-100) !important;
 }
 
 /* Animation refinement */
-[data-svileo-viewport][data-position^='top'] [data-svileo-toast]:not([data-ready='true']) {
+:global([data-svileo-viewport][data-position^='top'] [data-svileo-toast]:not([data-ready='true'])) {
   transform: translateY(-40px) scale(0.95) !important;
   opacity: 0 !important;
 }

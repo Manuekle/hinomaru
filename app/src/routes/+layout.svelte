@@ -154,7 +154,6 @@
 	<Toaster
 		position="top-center"
 		offset={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
-		theme={$resolvedTheme}
 		options={{
 			roundness: 18,
 		}}
