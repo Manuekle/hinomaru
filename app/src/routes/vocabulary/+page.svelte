@@ -148,11 +148,14 @@
 
 <div class="vocab-layout">
 	<div class="container">
-		<div class="header-row" use:fadeUp={{ delay: 0.05, y: 15 }}>
-			<h1 class="page-title">
+		<div class="header-row">
+			<h1
+				use:fadeUp={{ delay: 0.06, y: 16 }}
+				style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;color:var(--sumi);"
+			>
 				{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}
 			</h1>
-			<div class="top-actions">
+			<div class="top-actions" use:fadeIn={{ delay: 0.12 }}>
 				<button
 					class="romaji-toggle"
 					class:active={$showRomaji}
@@ -169,7 +172,10 @@
 				{/if}
 			</div>
 		</div>
-		<p class="page-subtitle" use:fadeUp={{ delay: 0.08, y: 10 }}>
+		<p
+			use:fadeUp={{ delay: 0.12, y: 12 }}
+			style="font-size:16px;color:var(--fg-secondary);margin:0 0 48px;text-align:left;"
+		>
 			{t('home.cards', $locale, { n: data.savedWords.length })} guardadas para estudiar.
 		</p>
 
@@ -295,9 +301,9 @@
 	}
 
 	.container {
-		max-width: 720px;
+		max-width: 720px !important;
 		margin: 0 auto;
-		padding: calc(32px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
+		padding: calc(40px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
 	}
 
 	.top-nav {
@@ -401,27 +407,10 @@
 
 	.header-row {
 		display: flex;
-		align-items: center;
+		align-items: baseline;
 		justify-content: space-between;
 		gap: 16px;
-		margin-bottom: 8px;
 		width: 100%;
-	}
-
-	.page-title {
-		font-size: 40px;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		margin: 0;
-		color: var(--sumi);
-		line-height: 1;
-	}
-
-	.page-subtitle {
-		font-size: 16px;
-		color: var(--fg-secondary);
-		margin: 0 0 32px;
-		text-align: left;
 	}
 
 	.search-container {
