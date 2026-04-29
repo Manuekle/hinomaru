@@ -34,7 +34,7 @@
 </svelte:head>
 
 <div
-	style="max-width:720px;margin:0 auto;min-height:100vh;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;"
+	style="max-width:720px;margin:0 auto;min-height:100vh;padding:calc(32px + env(safe-area-inset-top)) 24px 140px;"
 >
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}

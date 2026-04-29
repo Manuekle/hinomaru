@@ -41,17 +41,7 @@
 				{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }
 			);
 		}
-		// Initial speak
-		if (word) speak(word.jp);
 	});
-
-	// Auto-speak when word changes
-	$effect(() => {
-		if (word && i >= 0) {
-			untrack(() => speak(word.jp));
-		}
-	});
-
 	function speak(text: string) {
 		speakJapanese(text);
 	}

@@ -107,19 +107,31 @@
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
 		gap: 12px;
+		max-width: 480px;
+		margin: 0 auto;
 	}
 
 	.kana-cell {
 		aspect-ratio: 1;
-		background: none;
-		border: none;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-100);
+		border-radius: 16px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		padding: 0;
 		cursor: pointer;
-		transition: transform 0.1s;
+		transition: all 0.2s var(--ease-brand);
+	}
+
+	@media (hover: hover) {
+		.kana-cell:hover:not(.empty) {
+			border-color: var(--ink-300);
+			background: var(--ink-50);
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-sm);
+		}
 	}
 
 	.kana-cell:active {
@@ -143,6 +155,8 @@
 
 	.kana-cell.empty {
 		cursor: default;
+		background: transparent;
+		border-color: transparent;
 	}
 
 	@media (max-width: 400px) {

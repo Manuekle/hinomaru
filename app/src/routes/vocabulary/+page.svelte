@@ -148,8 +148,10 @@
 
 <div class="vocab-layout">
 	<div class="container">
-		<!-- Top Nav -->
-		<div use:fadeUp={{ delay: 0, y: 10 }} class="top-nav">
+		<div class="header-row" use:fadeUp={{ delay: 0.05, y: 15 }}>
+			<h1 class="page-title">
+				{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}
+			</h1>
 			<div class="top-actions">
 				<button
 					class="romaji-toggle"
@@ -160,23 +162,16 @@
 					<Icon icon={TranslateIcon} size={16} strokeWidth={2} />
 				</button>
 				{#if data.dueCount > 0}
-					<a href="/vocabulary/review" class="review-pill">
+					<a href="/vocabulary/review" class="review-pill" title={t('nav.review', $locale)}>
 						<Icon icon={ZapIcon} size={14} variant="solid" />
-						<span>{t('nav.review', $locale)} ({data.dueCount})</span>
+						<span class="btn-label">{t('nav.review', $locale)} ({data.dueCount})</span>
 					</a>
 				{/if}
 			</div>
 		</div>
-
-		<!-- Header -->
-		<div class="header" use:fadeUp={{ delay: 0.05, y: 15 }}>
-			<h1 class="page-title">
-				{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}
-			</h1>
-			<p class="page-subtitle">
-				{t('home.cards', $locale, { n: data.savedWords.length })} guardadas para estudiar.
-			</p>
-		</div>
+		<p class="page-subtitle" use:fadeUp={{ delay: 0.08, y: 10 }}>
+			{t('home.cards', $locale, { n: data.savedWords.length })} guardadas para estudiar.
+		</p>
 
 		<!-- Search Bar -->
 		<div class="search-container" use:fadeUp={{ delay: 0.1, y: 12 }}>
@@ -225,29 +220,21 @@
 							<div class="card-top">
 								<div class="word-info">
 									<div class="jp-group">
-										<span class="jp-text jp">{word.jp}</span>
+										<div style="display:flex; align-items:center; gap:12px;">
+											<span class="jp-text jp">{word.jp}</span>
+											<button
+												class="action-btn-inline"
+												onclick={(e) => { e.stopPropagation(); speakJapanese(word.jp); }}
+												title={t('vocab.listen', $locale)}
+											>
+												<Icon icon={VolumeHighIcon} size={16} />
+											</button>
+										</div>
 										<span class="kana-text jp">{word.kana}</span>
 									</div>
 									{#if $showRomaji}
 										<span class="romaji-text">{word.romaji || kanaToRomaji(word.kana)}</span>
 									{/if}
-								</div>
-
-								<div class="card-actions">
-									<button
-										class="action-btn"
-										onclick={() => speakJapanese(word.jp)}
-										title={t('vocab.listen', $locale)}
-									>
-										<Icon icon={VolumeHighIcon} size={16} />
-									</button>
-									<button
-										class="action-btn del-btn"
-										onclick={() => removeWord(word.id)}
-										title={t('vocab.delete', $locale)}
-									>
-										<Icon icon={Cancel01Icon} size={16} />
-									</button>
 								</div>
 							</div>
 
@@ -275,14 +262,23 @@
 									<div class="status-dot" style="background: {stage.color}"></div>
 									<span class="status-label">{stage.label}</span>
 								</div>
-								{#if review}
-									<span class="review-info" class:urgent={review.urgent}>
-										{#if review.urgent}
-											<Icon icon={ZapIcon} size={12} variant="solid" />
-										{/if}
-										{review.text}
-									</span>
-								{/if}
+								<div style="display:flex; align-items:center; gap:12px;">
+									{#if review}
+										<span class="review-info" class:urgent={review.urgent}>
+											{#if review.urgent}
+												<Icon icon={ZapIcon} size={12} variant="solid" />
+											{/if}
+											{review.text}
+										</span>
+									{/if}
+									<button
+										class="action-btn-subtle del-btn"
+										onclick={(e) => { e.stopPropagation(); removeWord(word.id); }}
+										title={t('vocab.delete', $locale)}
+									>
+										<Icon icon={Cancel01Icon} size={14} />
+									</button>
+								</div>
 							</div>
 						</div>
 					{/each}
@@ -301,14 +297,11 @@
 	.container {
 		max-width: 720px;
 		margin: 0 auto;
-		padding: calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
+		padding: calc(32px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));
 	}
 
 	.top-nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 32px;
+		display: none;
 	}
 
 	.top-actions {
@@ -390,23 +383,45 @@
 		transform: scale(0.96);
 	}
 
-	.header {
-		margin-bottom: 24px;
+	.review-pill .btn-label {
+		display: inline;
+	}
+
+	@media (max-width: 600px) {
+		.review-pill .btn-label {
+			display: none;
+		}
+		.review-pill {
+			padding: 0;
+			width: 32px;
+			height: 32px;
+			justify-content: center;
+		}
+	}
+
+	.header-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 8px;
+		width: 100%;
 	}
 
 	.page-title {
-		font-size: 36px;
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		margin: 0 0 4px;
+		font-size: 40px;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		margin: 0;
 		color: var(--sumi);
-		line-height: 1.1;
+		line-height: 1;
 	}
 
 	.page-subtitle {
 		font-size: 16px;
 		color: var(--fg-secondary);
-		margin: 0;
+		margin: 0 0 32px;
+		text-align: left;
 	}
 
 	.search-container {
@@ -546,13 +561,28 @@
 		gap: 6px;
 	}
 
-	.action-btn {
+	.action-btn-inline {
 		width: 32px;
 		height: 32px;
 		border-radius: 50%;
-		border: none;
-		background: var(--ink-50);
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
 		color: var(--fg-secondary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 200ms ease;
+		flex-shrink: 0;
+	}
+
+	.action-btn-subtle {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		border: none;
+		background: transparent;
+		color: var(--fg-tertiary);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -561,17 +591,19 @@
 	}
 
 	@media (hover: hover) {
-		.action-btn:hover {
+		.action-btn-inline:hover {
 			background: var(--ink-100);
 			color: var(--sumi);
+			border-color: var(--ink-300);
 		}
-		.action-btn.del-btn:hover {
+		.action-btn-subtle:hover {
 			background: var(--error-wash);
 			color: var(--error);
 		}
 	}
 
-	.action-btn:active {
+	.action-btn-inline:active,
+	.action-btn-subtle:active {
 		transform: scale(0.9);
 	}
 

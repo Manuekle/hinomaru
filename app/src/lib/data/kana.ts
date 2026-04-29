@@ -95,7 +95,7 @@ export const KATAKANA = [
 	{ jp: 'ヨ', romaji: 'yo' },
 	{ jp: 'ラ', romaji: 'ra' },
 	{ jp: 'リ', romaji: 'ri' },
-	{ jp: 'る', romaji: 'ru' },
+	{ jp: 'ル', romaji: 'ru' },
 	{ jp: 'レ', romaji: 're' },
 	{ jp: 'ロ', romaji: 'ro' },
 	{ jp: 'ワ', romaji: 'wa' },

@@ -556,7 +556,7 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-tertiary);
-		border-radius: 10px;
+		border-radius: 99px;
 		transition: all 0.15s;
 		background: var(--ink-50);
 		border: 1px solid var(--ink-100);
