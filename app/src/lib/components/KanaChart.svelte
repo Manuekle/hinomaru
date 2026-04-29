@@ -113,8 +113,8 @@
 
 	.kana-cell {
 		aspect-ratio: 1;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-100);
+		background: transparent;
+		border: none;
 		border-radius: 16px;
 		display: flex;
 		flex-direction: column;
@@ -127,15 +127,16 @@
 
 	@media (hover: hover) {
 		.kana-cell:hover:not(.empty) {
-			border-color: var(--ink-300);
-			background: var(--ink-50);
 			transform: translateY(-2px);
-			box-shadow: var(--shadow-sm);
 		}
 	}
 
 	.kana-cell:active {
-		transform: scale(0.9);
+		transform: scale(0.95);
+	}
+
+	.kana-cell:active .kana-char {
+		color: var(--hinomaru-red);
 	}
 
 	.kana-char {
@@ -144,6 +145,7 @@
 		font-weight: 500;
 		color: var(--fg-primary);
 		line-height: 1;
+		transition: color 0.1s;
 	}
 
 	.kana-romaji {
