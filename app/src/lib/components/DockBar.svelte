@@ -7,7 +7,8 @@
 		LibraryIcon,
 		News01Icon,
 		HeadphonesIcon,
-		BubbleChatIcon
+		BubbleChatIcon,
+		Mortarboard01Icon
 	} from '@hugeicons/core-free-icons';
 
 	const items = [
@@ -16,7 +17,8 @@
 		{ href: '/vocabulary', label: 'Vocab', icon: LibraryIcon, exact: false },
 		{ href: '/deck/stories', label: 'Historias', icon: News01Icon, exact: false },
 		{ href: '/deck/songs', label: 'Canciones', icon: HeadphonesIcon, exact: false },
-		{ href: '/conversation', label: 'Hablar', icon: BubbleChatIcon, exact: false }
+		{ href: '/conversation', label: 'Hablar', icon: BubbleChatIcon, exact: false },
+		{ href: '/jlpt', label: 'JLPT', icon: Mortarboard01Icon, exact: false }
 	];
 
 	const pathname = $derived($page.url.pathname);

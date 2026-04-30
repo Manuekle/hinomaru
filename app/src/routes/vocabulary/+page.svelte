@@ -13,8 +13,7 @@
 		Cancel01Icon,
 		VolumeHighIcon,
 		Search01Icon,
-		ZapIcon,
-		TranslateIcon
+		ZapIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
@@ -155,22 +154,14 @@
 			>
 				{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}
 			</h1>
-			<div class="top-actions" use:fadeIn={{ delay: 0.12 }}>
-				<button
-					class="romaji-toggle"
-					class:active={$showRomaji}
-					onclick={() => showRomaji.toggle()}
-					title="Romaji"
-				>
-					<Icon icon={TranslateIcon} size={16} strokeWidth={2} />
-				</button>
-				{#if data.dueCount > 0}
+			{#if data.dueCount > 0}
+				<div class="top-actions" use:fadeIn={{ delay: 0.12 }}>
 					<a href="/vocabulary/review" class="review-pill" title={t('nav.review', $locale)}>
 						<Icon icon={ZapIcon} size={14} variant="solid" />
 						<span class="btn-label">{t('nav.review', $locale)} ({data.dueCount})</span>
 					</a>
-				{/if}
-			</div>
+				</div>
+			{/if}
 		</div>
 		<p
 			use:fadeUp={{ delay: 0.12, y: 12 }}
@@ -301,9 +292,9 @@
 	}
 
 	.container {
-		max-width: 720px !important;
+		max-width: 720px;
 		margin: 0 auto;
-		padding: calc(40px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
+		padding: calc(32px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
 	}
 
 	.top-nav {
@@ -314,37 +305,6 @@
 		display: flex;
 		align-items: center;
 		gap: 12px;
-	}
-
-	.romaji-toggle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		border: 1px solid var(--ink-200);
-		background: var(--bg-surface);
-		color: var(--fg-secondary);
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	@media (hover: hover) {
-		.romaji-toggle:hover {
-			background: var(--ink-50);
-			color: var(--sumi);
-		}
-	}
-
-	.romaji-toggle:active {
-		transform: scale(0.9);
-	}
-
-	.romaji-toggle.active {
-		background: var(--hinomaru-red);
-		color: white;
-		border-color: var(--hinomaru-red);
 	}
 
 	.back-link-beautiful {
