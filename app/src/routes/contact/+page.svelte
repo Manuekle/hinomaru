@@ -652,23 +652,7 @@
 		border-top: 1px solid var(--ink-100);
 		display: flex;
 	}
-	.back-cta {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 20px;
-		border-radius: 999px;
-		font-weight: 700;
-		font-size: 14px;
-		text-decoration: none;
-		background: transparent;
-		color: var(--fg-secondary);
-		border: 1px solid var(--ink-100);
-		transition: all 220ms var(--ease-brand);
-	}
 	.back-cta:hover {
-		color: var(--fg-primary);
-		border-color: var(--fg-primary);
 		transform: translateX(-3px);
 	}
 
