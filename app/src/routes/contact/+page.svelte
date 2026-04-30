@@ -14,7 +14,7 @@
 		Coffee02Icon,
 		FlashIcon
 	} from '@hugeicons/core-free-icons';
-	import kofiImg from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
+	import kofiImg from '$lib/assets/kofi_brandasset/support_me_on_kofi_red.png';
 	import type { ActionData } from './$types';
 
 	let { form } = $props<{ form: ActionData }>();
@@ -32,7 +32,7 @@
 				<span class="brand-dot"></span>
 				<span class="brand-name">Hinomaru</span>
 			</a>
-			<a href="/" class="header-back">
+			<a href="/" class="hm-btn hm-btn-sm hm-btn-secondary header-back">
 				<Icon icon={ArrowLeft01Icon} size={14} color="currentColor" />
 				<span>{t('deck.back', $locale)}</span>
 			</a>
@@ -136,7 +136,7 @@
 							<button
 								type="button"
 								onclick={() => location.reload()}
-								class="another-btn"
+								class="hm-btn hm-btn-secondary"
 							>
 								{t('contact.success.another', $locale)}
 							</button>
@@ -205,7 +205,7 @@
 								></textarea>
 							</div>
 
-							<button type="submit" disabled={loading} class="submit-btn">
+							<button type="submit" disabled={loading} class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg submit-btn">
 								{#if loading}
 									<DotLoader color="white" />
 								{:else}
@@ -226,7 +226,7 @@
 		</div>
 
 		<div class="legal-footer" use:fadeUp={{ delay: 0.1 }}>
-			<a href="/" class="back-cta">
+			<a href="/" class="hm-btn hm-btn-secondary back-cta">
 				<Icon icon={ArrowLeft01Icon} size={16} color="currentColor" />
 				<span>{t('deck.back', $locale)}</span>
 			</a>
@@ -283,21 +283,9 @@
 		letter-spacing: -0.02em;
 	}
 	.header-back {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-		text-decoration: none;
-		padding: 8px 14px;
-		border-radius: 999px;
-		border: 1px solid var(--ink-100);
-		transition: all 200ms var(--ease-brand);
+		transition: transform 200ms var(--ease-brand);
 	}
 	.header-back:hover {
-		color: var(--brand-primary);
-		border-color: var(--brand-primary);
 		transform: translateX(-2px);
 	}
 
@@ -489,25 +477,28 @@
 	.kofi-card {
 		display: flex;
 		flex-direction: column;
+		align-items: flex-start;
 		gap: 12px;
 		text-decoration: none;
 		padding: 20px;
-		background: #0a0a0a;
+		background: rgba(255, 94, 29, 0.08);
+		border: 1px solid rgba(255, 94, 29, 0.2);
 		border-radius: 24px;
-		transition: transform 240ms var(--ease-brand);
+		transition: transform 240ms var(--ease-brand), background 200ms;
 	}
 	.kofi-card:hover {
 		transform: translateY(-2px);
+		background: rgba(255, 94, 29, 0.13);
 	}
 	.kofi-card img {
-		height: 40px;
+		height: 38px;
 		width: auto;
 		display: block;
 		border-radius: 8px;
 	}
 	.kofi-sub {
 		font-size: 12.5px;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--fg-secondary);
 		line-height: 1.5;
 		margin: 0;
 	}
@@ -597,28 +588,7 @@
 	}
 
 	.submit-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 10px;
-		width: 100%;
-		height: 56px;
-		border: none;
-		border-radius: 16px;
-		background: var(--brand-primary);
-		color: #fff;
-		font-family: inherit;
-		font-size: 15px;
-		font-weight: 700;
-		letter-spacing: 0.01em;
-		cursor: pointer;
-		transition: all 220ms var(--ease-brand);
 		margin-top: 8px;
-	}
-	.submit-btn:hover:not(:disabled) {
-		background: var(--brand-primary-hover, #9a0025);
-		transform: translateY(-2px);
-		box-shadow: 0 12px 28px rgba(188, 0, 45, 0.32);
 	}
 	.submit-btn:disabled {
 		opacity: 0.6;
@@ -673,23 +643,6 @@
 		margin: 0;
 		font-size: 15.5px;
 		max-width: 340px;
-	}
-	.another-btn {
-		margin-top: 12px;
-		padding: 12px 22px;
-		border: 1px solid var(--ink-100);
-		background: transparent;
-		color: var(--fg-primary);
-		font-family: inherit;
-		font-weight: 700;
-		font-size: 14px;
-		border-radius: 999px;
-		cursor: pointer;
-		transition: all 200ms var(--ease-brand);
-	}
-	.another-btn:hover {
-		border-color: var(--brand-primary);
-		color: var(--brand-primary);
 	}
 
 	/* ── Footer ── */

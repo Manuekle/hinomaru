@@ -34,7 +34,7 @@
 				<span class="brand-dot"></span>
 				<span class="brand-name">Hinomaru</span>
 			</a>
-			<a href="/" class="header-back">
+			<a href="/" class="hm-btn hm-btn-sm hm-btn-secondary header-back">
 				<Icon icon={ArrowLeft01Icon} size={14} color="currentColor" />
 				<span>{t('deck.back', $locale)}</span>
 			</a>
@@ -95,11 +95,11 @@
 		</div>
 
 		<div class="legal-footer" use:fadeUp={{ delay: 0.1 }}>
-			<a href="/" class="back-cta">
+			<a href="/" class="hm-btn hm-btn-secondary">
 				<Icon icon={ArrowLeft01Icon} size={16} color="currentColor" />
 				<span>{t('deck.back', $locale)}</span>
 			</a>
-			<a href="/contact" class="contact-cta">
+			<a href="/contact" class="hm-btn hm-btn-primary">
 				<Icon icon={Mail01Icon} size={16} color="currentColor" />
 				<span>{t('contact.title', $locale)}</span>
 			</a>
@@ -155,21 +155,9 @@
 		letter-spacing: -0.02em;
 	}
 	.header-back {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-		text-decoration: none;
-		padding: 8px 14px;
-		border-radius: 999px;
-		border: 1px solid var(--ink-100);
-		transition: all 200ms var(--ease-brand);
+		transition: transform 200ms var(--ease-brand);
 	}
 	.header-back:hover {
-		color: var(--brand-primary);
-		border-color: var(--brand-primary);
 		transform: translateX(-2px);
 	}
 
@@ -380,37 +368,6 @@
 		gap: 12px;
 		flex-wrap: wrap;
 		justify-content: space-between;
-	}
-	.back-cta,
-	.contact-cta {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 20px;
-		border-radius: 999px;
-		font-weight: 700;
-		font-size: 14px;
-		text-decoration: none;
-		transition: all 220ms var(--ease-brand);
-	}
-	.back-cta {
-		background: transparent;
-		color: var(--fg-secondary);
-		border: 1px solid var(--ink-100);
-	}
-	.back-cta:hover {
-		color: var(--fg-primary);
-		border-color: var(--fg-primary);
-		transform: translateX(-3px);
-	}
-	.contact-cta {
-		background: var(--brand-primary);
-		color: #fff;
-	}
-	.contact-cta:hover {
-		background: var(--brand-primary-hover, #9a0025);
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.3);
 	}
 
 	@media (max-width: 900px) {
