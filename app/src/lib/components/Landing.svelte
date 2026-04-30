@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 	import { fadeUp, fadeIn, animateNumber, inView, inViewStagger, floatLoop } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import { theme, resolvedTheme } from '$lib/stores/theme';
 	import Icon from '$lib/Icon.svelte';
-	import supportImg from '$lib/assets/support.png';
+	import kofiImg from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
 	import {
 		BrainIcon,
 		Target01Icon,
@@ -21,12 +22,29 @@
 		FlashIcon,
 		FavouriteIcon,
 		ZapIcon,
-		GlobeIcon
+		GlobeIcon,
+		Moon01Icon,
+		Sun01Icon,
+		LanguageCircleIcon
 	} from '@hugeicons/core-free-icons';
 	import AppDownloadDrawer from '$lib/components/AppDownloadDrawer.svelte';
 	import { deferredPrompt, isInstalled } from '$lib/stores/pwa';
 
 	let { decks = [] } = $props();
+
+	function toggleTheme() {
+		const current = get(resolvedTheme);
+		const next = current === 'dark' ? 'light' : 'dark';
+		console.log('[footer] toggleTheme', { current, next });
+		theme.set(next);
+	}
+
+	function toggleLocale() {
+		const current = get(locale);
+		const next = current === 'es' ? 'en' : 'es';
+		console.log('[footer] toggleLocale', { current, next });
+		locale.set(next);
+	}
 
 	let showDownload = $state(false);
 	let isIOS = $state(false);
@@ -380,15 +398,38 @@
 					rel="noopener noreferrer"
 					class="kofi-link-badge"
 				>
-					<img src={supportImg} alt="Ko-fi" />
+					<img src={kofiImg} alt="Support me on Ko-fi" />
 				</a>
 			</div>
 		</div>
 		<div class="footer-bottom">
-			<p>
+			<p class="footer-copy">
 				{t('landing.copyright', $locale).replace('{year}', String(new Date().getFullYear()))}
 				{t('landing.footer.crafted', $locale)}
 			</p>
+			<div class="footer-controls">
+				<button
+					type="button"
+					class="footer-ctrl-btn"
+					onclick={toggleTheme}
+					aria-label="Toggle theme"
+				>
+					{#if $resolvedTheme === 'dark'}
+						<Icon icon={Sun01Icon} size={16} color="currentColor" />
+					{:else}
+						<Icon icon={Moon01Icon} size={16} color="currentColor" />
+					{/if}
+				</button>
+				<button
+					type="button"
+					class="footer-ctrl-btn lang-toggle"
+					onclick={toggleLocale}
+					aria-label="Switch language"
+				>
+					<Icon icon={LanguageCircleIcon} size={16} color="currentColor" />
+					<span>{$locale === 'es' ? 'ES' : 'EN'}</span>
+				</button>
+			</div>
 		</div>
 	</footer>
 </div>
@@ -1111,7 +1152,7 @@
 	.landing-footer {
 		background: #0a0a0a;
 		color: #fff;
-		padding: 100px 24px 60px;
+		padding: 64px 24px 40px;
 		position: relative;
 		overflow: hidden;
 	}
@@ -1134,8 +1175,8 @@
 		margin: 0 auto;
 		display: grid;
 		grid-template-columns: 1.5fr 1fr 1fr;
-		gap: 80px;
-		margin-bottom: 80px;
+		gap: 48px;
+		margin-bottom: 48px;
 		position: relative;
 		z-index: 2;
 	}
@@ -1192,26 +1233,63 @@
 	}
 
 	.kofi-link-badge {
-		opacity: 1 !important;
 		display: inline-block;
-		transition: transform 300ms var(--ease-brand);
+		transition: transform 280ms var(--ease-brand), opacity 200ms;
+		opacity: 0.9;
 	}
 	.kofi-link-badge img {
-		height: 44px;
+		height: 40px;
 		display: block;
+		border-radius: 8px;
 	}
 	.kofi-link-badge:hover {
-		transform: scale(1.08) !important;
+		transform: translateX(4px);
+		opacity: 1;
 	}
 
 	.footer-bottom {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding-top: 40px;
+		padding-top: 24px;
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
-		text-align: center;
-		font-size: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
+		font-size: 13px;
 		color: rgba(255, 255, 255, 0.4);
+		position: relative;
+		z-index: 2;
+	}
+	.footer-copy {
+		margin: 0;
+	}
+	.footer-controls {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+	.footer-ctrl-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 8px;
+		color: rgba(255, 255, 255, 0.7);
+		cursor: pointer;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		padding: 6px 10px;
+		transition: background 200ms, color 200ms;
+		line-height: 1;
+	}
+	.footer-ctrl-btn:hover {
+		background: rgba(255, 255, 255, 0.16);
+		color: #fff;
 	}
 
 	/* ── RESPONSIVE ── */
@@ -1481,15 +1559,22 @@
 			font-size: 80px;
 		}
 		.landing-footer {
-			padding: 48px 20px 32px;
+			padding: 32px 16px 24px;
 		}
 		.footer-grid {
 			grid-template-columns: 1fr;
 			text-align: center;
-			gap: 48px;
+			gap: 28px;
+			margin-bottom: 28px;
 		}
 		.footer-links-col {
 			align-items: center;
+		}
+		.footer-links-col h4 {
+			margin-bottom: 12px;
+		}
+		.footer-links-col a {
+			margin-bottom: 10px;
 		}
 		.brand-wrap {
 			justify-content: center;
@@ -1497,6 +1582,14 @@
 		.brand-tagline {
 			margin-left: auto;
 			margin-right: auto;
+			margin-bottom: 0;
+		}
+		.footer-bottom {
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+			gap: 12px;
+			padding-top: 16px;
 		}
 		.iphone-16-mockup {
 			max-width: 280px;

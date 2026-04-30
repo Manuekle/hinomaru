@@ -33,5 +33,5 @@ export const load: LayoutLoad = async ({ data, depends, fetch, url }) => {
 
 	const isPWA = url.searchParams.get('pwa') === '1';
 
-	return { supabase, session, user, profile, isPWA };
+	return { supabase, session, user, profile, isPWA, initialLocale: data.initialLocale };
 };
