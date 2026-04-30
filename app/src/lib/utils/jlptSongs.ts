@@ -1934,20 +1934,20 @@ export const jlptSongs: SongLesson[] = [
 		title: 'ピースサイン (Peace Sign)',
 		artist: '米津玄師',
 		start: '00:00',
-		end: '01:25',
+		end: '01:29',
 		focus: { es: 'Destino y valentía', en: 'Destiny and bravery' },
 		difficulty: 3,
-		youtubeId: '9aJVr5tTTWk',
+		youtubeId: 'Q7w5IMyJ3pM',
 		lyrics: [
 			{
-				time: 14.5,
+				time: 18.0,
 				text: 'いつか僕らの上をスレスレに 通り過ぎていったあの飛行機を',
 				romaji: 'itsuka bokura no ue wo suresure ni toorisugite itta ano hikouki wo',
 				translation_es: 'Aquel avión que una vez pasó rozando por encima de nosotros.',
 				translation_en: 'That airplane that once passed right over our heads.'
 			},
 			{
-				time: 21.0,
+				time: 23.0,
 				text: '不思議なくらいに覚えてる 意味もないのに何故か',
 				romaji: 'fushigi na kurai ni oboeteru imi mo nai noni nazeka',
 				translation_es: 'Lo recuerdo de una manera extraña, aunque no tenga sentido.',
@@ -1963,14 +1963,14 @@ export const jlptSongs: SongLesson[] = [
 					'On the night of the day I cried from worthlessness, I just wished to be strong.'
 			},
 			{
-				time: 35.0,
+				time: 33.0,
 				text: 'そのために必要な勇気を 探し求めていた',
 				romaji: 'sono tame ni hitsuyou na yuuki wo sagashimotomete ita',
 				translation_es: 'Estaba buscando el valor necesario para ello.',
 				translation_en: 'I was searching for the courage needed for that.'
 			},
 			{
-				time: 42.0,
+				time: 38.0,
 				text: '残酷な運命が定まってるとして それがいつの日か僕の前に現れるとして',
 				romaji:
 					'zankoku na unmei ga sadamatteru to shite sore ga itsu no hi ka boku no mae ni arawareru to shite',
@@ -1979,11 +1979,60 @@ export const jlptSongs: SongLesson[] = [
 				translation_en: 'Even if a cruel fate is decided, and even if it appears before me someday.'
 			},
 			{
-				time: 49.0,
+				time: 47.0,
 				text: 'ただ一瞬 この一瞬 息ができるなら',
 				romaji: 'tada isshun kono isshun iki ga dekiru nara',
 				translation_es: 'Si tan solo puedo respirar por un instante, por este instante.',
 				translation_en: 'If I can just breathe for an instant, for this instant.'
+			},
+			{
+				time: 52.0,
+				text: 'どうでもいいと思えた その心を',
+				romaji: 'dou demo ii to omoeta sono kokoro wo',
+				translation_es: 'Ese corazón que pensaba que no importaba nada.',
+				translation_en: 'That heart that felt like anything was okay.'
+			},
+			{
+				time: 58.5,
+				text: 'もう一度',
+				romaji: 'mou ichido',
+				translation_es: 'Una vez más.',
+				translation_en: 'Once more.'
+			},
+			{
+				time: 60.0,
+				text: '遠くへ行け 遠くへ行けと 僕の中で誰かが歌う',
+				romaji: 'tooku e ike tooku e ike to boku no naka de dareka ga utau',
+				translation_es: 'Vete lejos, vete lejos, alguien canta dentro de mí.',
+				translation_en: 'Go far away, go far away, someone sings inside of me.'
+			},
+			{
+				time: 64.5,
+				text: 'どうしようもないほど熱烈に',
+				romaji: 'Dou shiyou mo nai hodo netsuretsu ni',
+				translation_es: 'Con una pasión incontrolable',
+				translation_en: 'With an uncontrollable passion'
+			},
+			{
+				time: 68.5,
+				text: 'いつだって目を腫らした君が 二度と悲しまないように笑える',
+				romaji: 'itsudatte me wo harashita kimi ga nido to kanashimanai you ni waraeru',
+				translation_es: 'Para que tú, que siempre tenías los ojos hinchados, puedas reír sin volver a estar triste.',
+				translation_en: 'So that you, who always had swollen eyes, can laugh and never be sad again.'
+			},
+			{
+				time: 74.0,
+				text: 'そんなヒーローになるための歌',
+				romaji: 'sonna hiiroo ni naru tame no uta',
+				translation_es: 'Una canción para convertirse en ese tipo de héroe.',
+				translation_en: 'A song to become that kind of hero.'
+			},
+			{
+				time: 78.5,
+				text: 'さらば掲げろピースサイン 転がっていくストーリーを',
+				romaji: 'saraba kakagero piisu sain korogatte iku sutoorii wo',
+				translation_es: 'Así que levanta el signo de la paz, ante esta historia que sigue rodando.',
+				translation_en: 'So raise the peace sign, for the story that keeps on rolling.'
 			}
 		],
 		vocab: [
@@ -1996,7 +2045,8 @@ export const jlptSongs: SongLesson[] = [
 				en: 'instant / moment',
 				es: 'instante'
 			},
-			{ jp: '願う', kana: 'ねがう', romaji: 'negau', en: 'to wish / desire', es: 'desear' }
+			{ jp: '願う', kana: 'ねがう', romaji: 'negau', en: 'to wish / desire', es: 'desear' },
+			{ jp: '心', kana: 'こころ', romaji: 'kokoro', en: 'heart / mind', es: 'corazón / mente' }
 		]
 	},
 	{
