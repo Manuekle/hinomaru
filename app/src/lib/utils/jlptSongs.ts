@@ -1811,86 +1811,6 @@ export const jlptSongs: SongLesson[] = [
 		]
 	},
 	{
-		id: 'doraemon-no-uta',
-		level: 'N5',
-		title: 'ドラえもんのうた',
-		artist: '山野さと子',
-		start: '00:00',
-		end: '01:00',
-		focus: { es: 'Deseos y objetos cotidianos', en: 'Wishes and everyday objects' },
-		difficulty: 1,
-		youtubeId: '966M7mZ4uBw',
-		lyrics: [
-			{
-				time: 0.0,
-				text: 'こんなこといいな できたらいいな',
-				romaji: 'konna koto ii na dekitara ii na',
-				translation_es: 'Estaría bien si pudiera hacer estas cosas.',
-				translation_en: 'It would be nice if I could do these things.'
-			},
-			{
-				time: 5.0,
-				text: 'あんなゆめ こんなゆめ いっぱいあるけど',
-				romaji: 'anna yume konna yume ippai aru kedo',
-				translation_es: 'Tengo muchos sueños, este y aquel.',
-				translation_en: 'I have many dreams, this one and that one.'
-			},
-			{
-				time: 11.0,
-				text: 'みんなみんなみんな かなえてくれる',
-				romaji: 'minna minna minna kanaete kureru',
-				translation_es: 'Todos, todos, todos, él los hará realidad.',
-				translation_en: 'All of them, he will make them all come true.'
-			},
-			{
-				time: 16.5,
-				text: 'ふしぎなポッケで かなえてくれる',
-				romaji: 'fushigi na pokke de kanaete kureru',
-				translation_es: 'Con su bolsillo mágico, los hará realidad.',
-				translation_en: 'With his magic pocket, he will make them come true.'
-			},
-			{
-				time: 22.0,
-				text: 'そらをじゆうに とびたいな',
-				romaji: 'sora wo jiyuu ni tobitai na',
-				translation_es: 'Quisiera volar libremente por el cielo.',
-				translation_en: 'I want to fly freely in the sky.'
-			},
-			{
-				time: 27.0,
-				text: '「ハイ! タケコプター」',
-				romaji: 'hai! takekoputaa!',
-				translation_es: '¡Toma! ¡El gorrocóptero!',
-				translation_en: 'Here! The Bamboo-copter!'
-			},
-			{
-				time: 30.0,
-				text: 'アンアンアン とってもだいすきドラえもん',
-				romaji: 'an an an tottemo daisuki doraemon',
-				translation_es: 'An an an, te quiero mucho, Doraemon.',
-				translation_en: 'An an an, I love you so much, Doraemon.'
-			}
-		],
-		vocab: [
-			{ jp: '夢', kana: 'ゆめ', romaji: 'yume', en: 'dream', es: 'sueño' },
-			{
-				jp: '不思議',
-				kana: 'ふしぎ',
-				romaji: 'fushigi',
-				en: 'mysterious / wonderful',
-				es: 'misterioso / maravilloso'
-			},
-			{ jp: '自由', kana: 'じゆう', romaji: 'jiyuu', en: 'freedom', es: 'libertad' },
-			{
-				jp: '叶える',
-				kana: 'かなえる',
-				romaji: 'kanaeru',
-				en: 'to grant / realize (a dream)',
-				es: 'hacer realidad / cumplir'
-			}
-		]
-	},
-	{
 		id: 'gurenge',
 		level: 'N4',
 		title: '紅蓮華 (Gurenge)',
@@ -1899,7 +1819,7 @@ export const jlptSongs: SongLesson[] = [
 		end: '01:30',
 		focus: { es: 'Determinación y superación', en: 'Determination and overcoming' },
 		difficulty: 3,
-		youtubeId: 'MPV2METPeJU',
+		youtubeId: 'pmanD_s7G3U',
 		lyrics: [
 			{
 				time: 1.0,
@@ -1924,25 +1844,67 @@ export const jlptSongs: SongLesson[] = [
 				translation_en: 'My trembling hands have something they want to grasp, that’s all.'
 			},
 			{
-				time: 31.0,
+				time: 32.0,
 				text: '夜の匂いに空睨んでも',
 				romaji: 'yoru no nioi ni sora nirandemo',
 				translation_es: 'Aunque mire fijamente al cielo con el aroma de la noche.',
 				translation_en: 'Even if I glare at the sky in the scent of the night.'
 			},
 			{
-				time: 36.0,
+				time: 39.0,
 				text: '変わっていけるのは自分自身だけ それだけさ',
 				romaji: 'kawatte ikeru no wa jibun jishin dake sore dake sa',
 				translation_es: 'El único que puede cambiar soy yo mismo, eso es todo.',
 				translation_en: 'The only one who can change is myself, that’s all.'
 			},
 			{
-				time: 43.0,
+				time: 46.0,
 				text: '強くなれる理由を知った 僕を連れて進め',
 				romaji: 'tsuyoku nareru riyuu wo shitta boku wo tsurete susume',
 				translation_es: 'He descubierto la razón para ser fuerte, llévame contigo y avancemos.',
 				translation_en: 'I found the reason to become strong, take me with you and move forward.'
+			},
+			{
+				time: 60.0,
+				text: 'どうしたって！',
+				romaji: 'Dou shitatte!',
+				translation_es: '¡No importa lo que pase!',
+				translation_en: 'No matter what!'
+			},
+			{
+				time: 61.0,
+				text: '消せない夢も 止まれない今も',
+				romaji: 'Kesenai yume mo tomarenai ima mo',
+				translation_es: 'Tanto los sueños que no puedo borrar como el presente que no se detiene.',
+				translation_en: "Even the dreams I can't erase, even the present I can't stop."
+			},
+			{
+				time: 64.0,
+				text: '誰かのために強くなれるなら',
+				romaji: 'Dareka no tame ni tsuyoku nareru nara',
+				translation_es: 'Si puedo hacerme más fuerte por el bien de alguien.',
+				translation_en: 'If I can become stronger for the sake of someone else.'
+			},
+			{
+				time: 68.5,
+				text: '何度でも 立ち上がれ',
+				romaji: 'Nando demo tachiagare',
+				translation_es: 'Levántate una y otra vez.',
+				translation_en: 'Stand up again and again.'
+			},
+			{
+				time: 73.0,
+				text: '世界に打ちのめされて 負ける意味を知った',
+				romaji: 'Sekai ni uchinomesarete makeru imi wo shitta',
+				translation_es: 'Siendo derrotado por el mundo, aprendí el significado de la derrota.',
+				translation_en: 'Beaten down by the world, I learned the meaning of defeat.'
+			},
+			{
+				time: 78.5,
+				text: '紅蓮の華よ 咲き誇れ！ 運命を照らして',
+				romaji: 'Guren no hana yo sakihokore! Unmei wo terashite',
+				translation_es: '¡Flor de loto carmesí, florece en todo tu esplendor! Ilumina el destino.',
+				translation_en: 'Crimson lotus flower, bloom in full glory! Light up our fate.'
 			}
 		],
 		vocab: [
@@ -1961,7 +1923,9 @@ export const jlptSongs: SongLesson[] = [
 				en: 'oneself',
 				es: 'uno mismo'
 			},
-			{ jp: '震える', kana: 'ふるえる', romaji: 'furueru', en: 'to tremble', es: 'temblar' }
+			{ jp: '震える', kana: 'ふるえる', romaji: 'furueru', en: 'to tremble', es: 'temblar' },
+			{ jp: '運命', kana: 'うんめい', romaji: 'unmei', en: 'fate', es: 'destino' },
+			{ jp: '世界', kana: 'せかい', romaji: 'sekai', en: 'world', es: 'mundo' }
 		]
 	},
 	{
