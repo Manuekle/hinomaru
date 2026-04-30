@@ -1809,5 +1809,497 @@ export const jlptSongs: SongLesson[] = [
 			},
 			{ jp: '裏切る', kana: 'うらぎる', romaji: 'uragiru', en: 'to betray', es: 'traicionar' }
 		]
+	},
+	{
+		id: 'doraemon-no-uta',
+		level: 'N5',
+		title: 'ドラえもんのうた',
+		artist: '山野さと子',
+		start: '00:00',
+		end: '01:00',
+		focus: { es: 'Deseos y objetos cotidianos', en: 'Wishes and everyday objects' },
+		difficulty: 1,
+		youtubeId: '966M7mZ4uBw',
+		lyrics: [
+			{
+				time: 0.0,
+				text: 'こんなこといいな できたらいいな',
+				romaji: 'konna koto ii na dekitara ii na',
+				translation_es: 'Estaría bien si pudiera hacer estas cosas.',
+				translation_en: 'It would be nice if I could do these things.'
+			},
+			{
+				time: 5.0,
+				text: 'あんなゆめ こんなゆめ いっぱいあるけど',
+				romaji: 'anna yume konna yume ippai aru kedo',
+				translation_es: 'Tengo muchos sueños, este y aquel.',
+				translation_en: 'I have many dreams, this one and that one.'
+			},
+			{
+				time: 11.0,
+				text: 'みんなみんなみんな かなえてくれる',
+				romaji: 'minna minna minna kanaete kureru',
+				translation_es: 'Todos, todos, todos, él los hará realidad.',
+				translation_en: 'All of them, he will make them all come true.'
+			},
+			{
+				time: 16.5,
+				text: 'ふしぎなポッケで かなえてくれる',
+				romaji: 'fushigi na pokke de kanaete kureru',
+				translation_es: 'Con su bolsillo mágico, los hará realidad.',
+				translation_en: 'With his magic pocket, he will make them come true.'
+			},
+			{
+				time: 22.0,
+				text: 'そらをじゆうに とびたいな',
+				romaji: 'sora wo jiyuu ni tobitai na',
+				translation_es: 'Quisiera volar libremente por el cielo.',
+				translation_en: 'I want to fly freely in the sky.'
+			},
+			{
+				time: 27.0,
+				text: '「ハイ! タケコプター」',
+				romaji: 'hai! takekoputaa!',
+				translation_es: '¡Toma! ¡El gorrocóptero!',
+				translation_en: 'Here! The Bamboo-copter!'
+			},
+			{
+				time: 30.0,
+				text: 'アンアンアン とってもだいすきドラえもん',
+				romaji: 'an an an tottemo daisuki doraemon',
+				translation_es: 'An an an, te quiero mucho, Doraemon.',
+				translation_en: 'An an an, I love you so much, Doraemon.'
+			}
+		],
+		vocab: [
+			{ jp: '夢', kana: 'ゆめ', romaji: 'yume', en: 'dream', es: 'sueño' },
+			{
+				jp: '不思議',
+				kana: 'ふしぎ',
+				romaji: 'fushigi',
+				en: 'mysterious / wonderful',
+				es: 'misterioso / maravilloso'
+			},
+			{ jp: '自由', kana: 'じゆう', romaji: 'jiyuu', en: 'freedom', es: 'libertad' },
+			{
+				jp: '叶える',
+				kana: 'かなえる',
+				romaji: 'kanaeru',
+				en: 'to grant / realize (a dream)',
+				es: 'hacer realidad / cumplir'
+			}
+		]
+	},
+	{
+		id: 'gurenge',
+		level: 'N4',
+		title: '紅蓮華 (Gurenge)',
+		artist: 'LiSA',
+		start: '00:00',
+		end: '01:30',
+		focus: { es: 'Determinación y superación', en: 'Determination and overcoming' },
+		difficulty: 3,
+		youtubeId: 'MPV2METPeJU',
+		lyrics: [
+			{
+				time: 1.0,
+				text: '強くなれる理由を知った 僕を連れて進め',
+				romaji: 'tsuyoku nareru riyuu wo shitta boku wo tsurete susume',
+				translation_es: 'He descubierto la razón para ser fuerte, llévame contigo y avancemos.',
+				translation_en: 'I found the reason to become strong, take me with you and move forward.'
+			},
+			{
+				time: 18.0,
+				text: '泥だらけの走馬灯に酔う こわばる心',
+				romaji: 'dorodarake no soumatou ni you kowabaru kokoro',
+				translation_es:
+					'Embriagado por un caleidoscopio de recuerdos llenos de lodo, mi corazón se tensa.',
+				translation_en: 'Drunk on a mud-covered revolving lantern, my heart stiffens.'
+			},
+			{
+				time: 25.0,
+				text: '震える手は掴みたいものがある それだけさ',
+				romaji: 'furueru te wa tsukamitai mono ga aru sore dake sa',
+				translation_es: 'Mis manos temblorosas tienen algo que quieren alcanzar, eso es todo.',
+				translation_en: 'My trembling hands have something they want to grasp, that’s all.'
+			},
+			{
+				time: 31.0,
+				text: '夜の匂いに空睨んでも',
+				romaji: 'yoru no nioi ni sora nirandemo',
+				translation_es: 'Aunque mire fijamente al cielo con el aroma de la noche.',
+				translation_en: 'Even if I glare at the sky in the scent of the night.'
+			},
+			{
+				time: 36.0,
+				text: '変わっていけるのは自分自身だけ それだけさ',
+				romaji: 'kawatte ikeru no wa jibun jishin dake sore dake sa',
+				translation_es: 'El único que puede cambiar soy yo mismo, eso es todo.',
+				translation_en: 'The only one who can change is myself, that’s all.'
+			},
+			{
+				time: 43.0,
+				text: '強くなれる理由を知った 僕を連れて進め',
+				romaji: 'tsuyoku nareru riyuu wo shitta boku wo tsurete susume',
+				translation_es: 'He descubierto la razón para ser fuerte, llévame contigo y avancemos.',
+				translation_en: 'I found the reason to become strong, take me with you and move forward.'
+			}
+		],
+		vocab: [
+			{ jp: '理由', kana: 'りゆう', romaji: 'riyuu', en: 'reason', es: 'razón' },
+			{
+				jp: '強くなる',
+				kana: 'つよくなる',
+				romaji: 'tsuyoku naru',
+				en: 'to become strong',
+				es: 'hacerse fuerte'
+			},
+			{
+				jp: '自分自身',
+				kana: 'じぶんじしん',
+				romaji: 'jibun jishin',
+				en: 'oneself',
+				es: 'uno mismo'
+			},
+			{ jp: '震える', kana: 'ふるえる', romaji: 'furueru', en: 'to tremble', es: 'temblar' }
+		]
+	},
+	{
+		id: 'peace-sign',
+		level: 'N3',
+		title: 'ピースサイン (Peace Sign)',
+		artist: '米津玄師',
+		start: '00:00',
+		end: '01:25',
+		focus: { es: 'Destino y valentía', en: 'Destiny and bravery' },
+		difficulty: 3,
+		youtubeId: '9aJVr5tTTWk',
+		lyrics: [
+			{
+				time: 14.5,
+				text: 'いつか僕らの上をスレスレに 通り過ぎていったあの飛行機を',
+				romaji: 'itsuka bokura no ue wo suresure ni toorisugite itta ano hikouki wo',
+				translation_es: 'Aquel avión que una vez pasó rozando por encima de nosotros.',
+				translation_en: 'That airplane that once passed right over our heads.'
+			},
+			{
+				time: 21.0,
+				text: '不思議なくらいに覚えてる 意味もないのに何故か',
+				romaji: 'fushigi na kurai ni oboeteru imi mo nai noni nazeka',
+				translation_es: 'Lo recuerdo de una manera extraña, aunque no tenga sentido.',
+				translation_en: "I remember it strangely, even though there's no meaning to it."
+			},
+			{
+				time: 28.0,
+				text: '不甲斐なくて泣いた日の夜に ただ強くなりたいと願った',
+				romaji: 'fugainakute naita hi no yoru ni tada tsuyoku naritai to negatta',
+				translation_es:
+					'En la noche del día que lloré por mi inutilidad, solo deseé ser más fuerte.',
+				translation_en:
+					'On the night of the day I cried from worthlessness, I just wished to be strong.'
+			},
+			{
+				time: 35.0,
+				text: 'そのために必要な勇気を 探し求めていた',
+				romaji: 'sono tame ni hitsuyou na yuuki wo sagashimotomete ita',
+				translation_es: 'Estaba buscando el valor necesario para ello.',
+				translation_en: 'I was searching for the courage needed for that.'
+			},
+			{
+				time: 42.0,
+				text: '残酷な運命が定まってるとして それがいつの日か僕の前に現れるとして',
+				romaji:
+					'zankoku na unmei ga sadamatteru to shite sore ga itsu no hi ka boku no mae ni arawareru to shite',
+				translation_es:
+					'Incluso si un destino cruel está decidido, e incluso si aparece ante mí algún día.',
+				translation_en: 'Even if a cruel fate is decided, and even if it appears before me someday.'
+			},
+			{
+				time: 49.0,
+				text: 'ただ一瞬 この一瞬 息ができるなら',
+				romaji: 'tada isshun kono isshun iki ga dekiru nara',
+				translation_es: 'Si tan solo puedo respirar por un instante, por este instante.',
+				translation_en: 'If I can just breathe for an instant, for this instant.'
+			}
+		],
+		vocab: [
+			{ jp: '勇気', kana: 'ゆうき', romaji: 'yuuki', en: 'courage', es: 'valor' },
+			{ jp: '運命', kana: 'うんめい', romaji: 'unmei', en: 'fate', es: 'destino' },
+			{
+				jp: '一瞬',
+				kana: 'いっしゅん',
+				romaji: 'isshun',
+				en: 'instant / moment',
+				es: 'instante'
+			},
+			{ jp: '願う', kana: 'ねがう', romaji: 'negau', en: 'to wish / desire', es: 'desear' }
+		]
+	},
+	{
+		id: 'cry-baby',
+		level: 'N2',
+		title: 'Cry Baby',
+		artist: 'Official髭男dism',
+		start: '00:00',
+		end: '01:30',
+		focus: { es: 'Lealtad y superación urbana', en: 'Loyalty and urban overcoming' },
+		difficulty: 4,
+		youtubeId: 'O1CU9tgwxRM',
+		lyrics: [
+			{
+				time: 12.0,
+				text: '胸ぐらを掴まれて 強烈なパンチを食らってよろけて',
+				romaji: 'munagura wo tsukamarete kyouretsu na panchi wo kuratte yorokete',
+				translation_es: 'Me agarraron por el cuello, recibí un puñetazo fuerte y me tambaleé.',
+				translation_en: 'Grabbed by the collar, I took a strong punch and stumbled.'
+			},
+			{
+				time: 19.0,
+				text: '肩を並べうずくまった 予報通りの雨に お前はにやけて',
+				romaji: 'kata wo narabe uzukumatta yohoudoori no ame ni omae wa niyakete',
+				translation_es:
+					'Nos agachamos hombro con hombro bajo la lluvia prevista, y tú sonreíste con ironía.',
+				translation_en: 'We crouched side by side in the predicted rain, and you smirked.'
+			},
+			{
+				time: 26.0,
+				text: '「今に見てろよ」と呟いた',
+				romaji: '"ima ni mitero yo" to tsubuyaita',
+				translation_es: 'Murmuraste: "Ya verás lo que pasa".',
+				translation_en: 'You muttered, "Just you wait and see."'
+			},
+			{
+				time: 32.0,
+				text: '正解のない日々に 堪えてる',
+				romaji: 'seikai no nai hibi ni kotaeteru',
+				translation_es: 'Soportando estos días sin respuestas correctas.',
+				translation_en: 'Enduring these days with no right answers.'
+			},
+			{
+				time: 38.0,
+				text: '傘はいらないから',
+				romaji: 'kasa wa iranai kara',
+				translation_es: 'Porque no necesito un paraguas.',
+				translation_en: "Because I don't need an umbrella."
+			}
+		],
+		vocab: [
+			{
+				jp: '胸ぐら',
+				kana: 'むなぐら',
+				romaji: 'munagura',
+				en: 'collar / chest area',
+				es: 'pecho / solapas'
+			},
+			{
+				jp: '強烈',
+				kana: 'きょうれつ',
+				romaji: 'kyouretsu',
+				en: 'intense / strong',
+				es: 'intenso / fuerte'
+			},
+			{ jp: '予報', kana: 'よほう', romaji: 'yohou', en: 'forecast', es: 'pronóstico' },
+			{
+				jp: '呟く',
+				kana: 'つぶやく',
+				romaji: 'tsubuyaku',
+				en: 'to mutter / murmur',
+				es: 'murmurar'
+			}
+		]
+	},
+	{
+		id: 'kick-back',
+		level: 'N1',
+		title: 'KICK BACK',
+		artist: '米津玄師',
+		start: '00:00',
+		end: '01:30',
+		focus: { es: 'Deseos caóticos y ambición', en: 'Chaotic desires and ambition' },
+		difficulty: 5,
+		youtubeId: 'dFlDRhvM4L0',
+		lyrics: [
+			{
+				time: 9.8,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 11.8,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 14.5,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 16.5,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 19.0,
+				text: 'ランドリー今日はガラ空きでラッキーデイ',
+				romaji: 'randorii kyou wa garaaki de rakkii dei',
+				translation_es: 'La lavandería está vacía hoy, es un día de suerte.',
+				translation_en: "The laundromat's empty today, it's a lucky day."
+			},
+			{
+				time: 24.0,
+				text: 'かったりい油汚れもこれでバイバイ',
+				romaji: 'kattarii abura yogore mo kore de baibai',
+				translation_es: 'Digo adiós a estas molestas manchas de grasa.',
+				translation_en: 'Say bye-bye to these tiresome grease stains.'
+			},
+			{
+				time: 28.0,
+				text: '誰だ誰だ頭の中 呼びかける声は',
+				romaji: 'dare da dare da atama no naka yobikakeru koe wa',
+				translation_es: '¿Quién es? ¿Quién es esa voz que llama dentro de mi cabeza?',
+				translation_en: 'Who is it, who is it, the voice calling in my head?'
+			},
+			{
+				time: 32.8,
+				text: 'あれが欲しいこれが欲しいと歌っている',
+				romaji: 'are ga hoshii kore ga hoshii to utatteiru',
+				translation_es: 'Canta diciendo que quiere esto y aquello.',
+				translation_en: 'Singing that it wants this, it wants that.'
+			},
+			{
+				time: 37.0,
+				text: '幸せになりたい 楽して生きていたい',
+				romaji: 'shiawase ni naritai rakushite ikite itai',
+				translation_es: 'Quiero ser feliz, quiero vivir con tranquilidad.',
+				translation_en: 'I want to be happy, I want to live comfortably.'
+			},
+			{
+				time: 41.0,
+				text: 'この手に掴みたい あなたのその胸の中',
+				romaji: 'kono te ni tsukamitai anata no sono mune no naka',
+				translation_es: 'Quiero atrapar con estas manos lo que hay en tu corazón.',
+				translation_en: 'I want to grasp with these hands what is inside your heart.'
+			},
+			{
+				time: 51.0,
+				text: 'ハッピーで埋め尽くして レストインピースまで行こうぜ',
+				romaji: 'happii de umetsukushite resuto in piisu made ikou ze',
+				translation_es: 'Llenémoslo todo de felicidad, vayamos hasta el "descansa en paz".',
+				translation_en: "Let's fill it with happiness, let's go until rest in peace."
+			},
+			{
+				time: 56.0,
+				text: 'いつかみた地獄もいいところ 愛をばら撒いて',
+				romaji: 'itsuka mita jigoku mo ii tokoro ai wo baramaite',
+				translation_es: 'El infierno que vi una vez también es un buen lugar, esparciendo amor.',
+				translation_en: 'The hell I saw once is a good place too, scattering love.'
+			},
+			{
+				time: 61.0,
+				text: 'アイラブユー貶してくれ 全部奪って笑ってくれマイハニー',
+				romaji: 'ai rabu yuu kenashite kure zenbu ubatte waratte kure mai hanii',
+				translation_es: 'Te amo, habla mal de mí, quítamelo todo y ríete de mí, cariño.',
+				translation_en: 'I love you, speak ill of me, take everything and laugh at me, my honey.'
+			},
+			{
+				time: 66.0,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 68.0,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 71.0,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 73.0,
+				text: 'なんか忘れちゃってんだ',
+				romaji: 'nanka wasurechatten da',
+				translation_es: 'Parece que he olvidado algo.',
+				translation_en: "I've forgotten something somehow."
+			},
+			{
+				time: 75.8,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 78.2,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 80.0,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			},
+			{
+				time: 82.8,
+				text: '努力 未来 A BEAUTIFUL STAR',
+				romaji: 'doryoku mirai A BEAUTIFUL STAR',
+				translation_es: 'Esfuerzo, futuro, una estrella hermosa.',
+				translation_en: 'Effort, future, a beautiful star.'
+			}
+		],
+		vocab: [
+			{ jp: '努力', kana: 'どりょく', romaji: 'doryoku', en: 'effort', es: 'esfuerzo' },
+			{ jp: '期待', kana: 'きたい', romaji: 'kitai', en: 'expectation', es: 'expectativa' },
+			{ jp: '幸せ', kana: 'しあわせ', romaji: 'shiawase', en: 'happiness', es: 'felicidad' },
+			{
+				jp: '埋め尽くす',
+				kana: 'うめつくす',
+				romaji: 'umetsukusu',
+				en: 'to fill up / crowd',
+				es: 'llenar por completo'
+			},
+			{
+				jp: '炭酸水',
+				kana: 'たんさんすい',
+				romaji: 'tansansui',
+				en: 'carbonated water',
+				es: 'agua carbonatada'
+			},
+			{
+				jp: '拗らせる',
+				kana: 'こじらせる',
+				romaji: 'kojirasete',
+				en: 'to complicate / aggravate',
+				es: 'complicar / agravar'
+			},
+			{ jp: '虚しい', kana: 'むなしい', romaji: 'munashii', en: 'empty / vain', es: 'vacío / vano' },
+			{
+				jp: '滅茶苦茶',
+				kana: 'めちゃくちゃ',
+				romaji: 'mechakucha',
+				en: 'messy / chaotic',
+				es: 'caótico / desastroso'
+			}
+		]
 	}
 ];
