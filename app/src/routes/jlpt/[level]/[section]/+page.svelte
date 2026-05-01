@@ -5,6 +5,7 @@
 	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import Icon from '$lib/Icon.svelte';
@@ -72,6 +73,7 @@
 		answer: number;
 		mondaiTitle: string;
 		mondaiId: string;
+		audioFile?: string;
 	}
 	let allQuestions = $state<FlatQuestion[]>([]);
 
@@ -119,7 +121,7 @@
 		`${Math.floor(timeUsed / 60)}:${String(timeUsed % 60).padStart(2, '0')}`
 	);
 	const totalQuestionsCount = $derived.by(() => {
-		if (section === 'listening') return audioFiles.length;
+		if (section === 'listening' && !test) return audioFiles.length;
 		if (!test) return 0;
 		return test.mondai.reduce((acc, m) => acc + m.questions.length, 0);
 	});
@@ -144,7 +146,7 @@
 
 	// ── Exam flow ─────────────────────────────────────────────────────────────
 	function startExam() {
-		if (section === 'listening') { 
+		if (section === 'listening' && !test) { 
 			phase = 'listening'; 
 			return; 
 		}
@@ -152,16 +154,23 @@
 		// Prepare and Shuffle Questions & Options
 		if (test) {
 			const flat = test.mondai.flatMap((m: JLPTMondai) =>
-				m.questions.map((q) => {
+				m.questions.map((q, qIdx) => {
 					const originalCorrectChoice = q.choices[q.answer - 1];
 					const shuffledChoices = shuffleArray(q.choices);
 					const newAnswer = shuffledChoices.indexOf(originalCorrectChoice) + 1;
+
+					// Match audio file if this is a listening test
+					const audioFile = (section === 'listening' && test.audioFiles) 
+						? test.audioFiles[qIdx] 
+						: undefined;
+
 					return { 
 						...q, 
 						choices: shuffledChoices,
 						answer: newAnswer,
 						mondaiTitle: m.title, 
-						mondaiId: m.id 
+						mondaiId: m.id,
+						audioFile
 					};
 				})
 			);
@@ -296,6 +305,29 @@
 			</div>
 
 			<div class="question-wrap" use:fadeUp={{ delay: 0.04, y: 12 }}>
+				{#if currentQ.audioFile}
+					<AudioPlayerProvider>
+						<div class="audio-question-player" use:fadeUp={{ delay: 0.05, y: 10 }}>
+							<AudioPlayerButton
+								item={{ 
+									id: currentQ.id.toString(), 
+									name: currentQ.sentence, 
+									src: `/jlpt/audio/${currentQ.audioFile}` 
+								}}
+								variant="default"
+								size="icon"
+								className="player-main-btn"
+							/>
+							<div class="player-info-side">
+								<span class="player-instruction">{t('exam.listening_instruction', $locale)}</span>
+								<div class="player-progress-wrap">
+									<AudioPlayerProgress className="custom-player-progress" />
+								</div>
+							</div>
+						</div>
+					</AudioPlayerProvider>
+				{/if}
+
 				<div class="question-card">
 					<p class="question-text jp">{currentQ.sentence}</p>
 					{#if $showRomaji}
@@ -537,27 +569,25 @@
 	</div>
 </div>
 
-<!-- Exit Confirmation Modal -->
-{#if showExitModal}
-	<div class="modal-overlay" transition:fade={{ duration: 200 }}>
-		<div class="modal-content" use:fadeUp={{ delay: 0, y: 20 }}>
-			<div class="modal-icon">
-				<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />
-			</div>
-			<h3 class="modal-title">{t('exam.exit_title', $locale)}</h3>
-			<p class="modal-text">{t('exam.exit_text', $locale)}</p>
-			
-			<div class="modal-actions">
-				<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>
-					{t('exam.exit_cancel', $locale)}
-				</button>
-				<button class="modal-btn confirm" onclick={handleConfirmExit}>
-					{t('exam.exit_confirm', $locale)}
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
+{#snippet exitIcon()}
+	<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />
+{/snippet}
+
+<ResponsiveModal
+	bind:open={showExitModal}
+	title={t('exam.exit_title', $locale)}
+	description={t('exam.exit_text', $locale)}
+	icon={exitIcon}
+>
+	{#snippet actions()}
+		<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>
+			{t('exam.exit_cancel', $locale)}
+		</button>
+		<button class="modal-btn confirm" onclick={handleConfirmExit}>
+			{t('exam.exit_confirm', $locale)}
+		</button>
+	{/snippet}
+</ResponsiveModal>
 
 <style>
 	.session-layout {
@@ -642,6 +672,45 @@
 		border-radius: 6px;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
+	}
+
+	/* ── AUDIO QUESTION PLAYER ── */
+	.audio-question-player {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 24px;
+		padding: 20px;
+		margin-bottom: 24px;
+		box-shadow: var(--shadow-sm);
+	}
+	@media (max-width: 480px) {
+		.audio-question-player {
+			gap: 12px;
+			padding: 16px;
+			border-radius: 20px;
+		}
+	}
+	.player-info-side {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+	.player-instruction {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+	.player-progress-wrap {
+		width: 100%;
+	}
+	:global(.custom-player-progress) {
+		height: 6px !important;
 	}
 
 	.exam-step-indicator {
@@ -798,9 +867,6 @@
 	.listening-screen {
 		display: flex;
 		flex-direction: column;
-		max-width: 640px;
-		margin: 0 auto;
-		padding: 0 20px 80px;
 	}
 	.back {
 		font-size: 13px;
@@ -1093,43 +1159,7 @@
 
 	.jp { font-family: var(--font-jp); }
 
-	/* ── Modal ── */
-	.modal-overlay {
-		position: fixed;
-		top: 0; left: 0; right: 0; bottom: 0;
-		background: rgba(0, 0, 0, 0.4);
-		backdrop-filter: blur(8px);
-		z-index: 1000;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 24px;
-	}
-	.modal-content {
-		background: var(--paper);
-		border-radius: 24px;
-		width: 100%;
-		max-width: 400px;
-		padding: 32px;
-		text-align: center;
-		box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
-		border: 1px solid var(--ink-100);
-	}
-	.modal-icon {
-		width: 64px; height: 64px;
-		background: var(--hinomaru-red-wash);
-		border-radius: 20px;
-		display: flex; align-items: center; justify-content: center;
-		margin: 0 auto 20px;
-	}
-	.modal-title {
-		font-size: 20px; font-weight: 800;
-		color: var(--sumi); margin: 0 0 12px;
-	}
-	.modal-text {
-		font-size: 15px; color: var(--fg-secondary);
-		line-height: 1.6; margin: 0 0 32px;
-	}
+	/* Modal handled by ResponsiveModal */
 	.modal-actions {
 		display: flex; flex-direction: column; gap: 12px;
 	}

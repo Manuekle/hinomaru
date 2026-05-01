@@ -10,6 +10,7 @@ export { n2v } from './n2v';
 export { n2g } from './n2g';
 export { n1v } from './n1v';
 export { n1g } from './n1g';
+export { n5l } from './n5l';
 
 import type { JLPTLevel, JLPTSectionType, JLPTTest } from './types';
 import { n5v } from './n5v';
@@ -22,6 +23,7 @@ import { n2v } from './n2v';
 import { n2g } from './n2g';
 import { n1v } from './n1v';
 import { n1g } from './n1g';
+import { n5l } from './n5l';
 
 export const jlptTests: Record<string, JLPTTest> = {
 	N5_vocabulary: n5v,
@@ -33,7 +35,8 @@ export const jlptTests: Record<string, JLPTTest> = {
 	N2_vocabulary: n2v,
 	N2_grammar: n2g,
 	N1_vocabulary: n1v,
-	N1_grammar: n1g
+	N1_grammar: n1g,
+	N5_listening: n5l
 };
 
 export function getTest(level: JLPTLevel, type: JLPTSectionType): JLPTTest | null {

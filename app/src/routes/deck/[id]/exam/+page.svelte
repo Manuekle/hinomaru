@@ -22,6 +22,7 @@
 	} from '@hugeicons/core-free-icons';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import type { PageData } from './$types';
+	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -413,19 +414,21 @@
 	</div>
 </div>
 
-{#if showExitModal}
-	<div class="modal-overlay" transition:fade={{ duration: 200 }}>
-		<div class="modal-content" use:fadeUp={{ delay: 0, y: 20 }}>
-			<div class="modal-icon"><Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" /></div>
-			<h3 class="modal-title">{t('exam.exit_title', $locale)}</h3>
-			<p class="modal-text">{t('exam.exit_text', $locale)}</p>
-			<div class="modal-actions">
-				<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>{t('exam.exit_cancel', $locale)}</button>
-				<button class="modal-btn confirm" onclick={handleConfirmExit}>{t('exam.exit_confirm', $locale)}</button>
-			</div>
-		</div>
-	</div>
-{/if}
+{#snippet exitIcon()}
+	<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />
+{/snippet}
+
+<ResponsiveModal
+	bind:open={showExitModal}
+	title={t('exam.exit_title', $locale)}
+	description={t('exam.exit_text', $locale)}
+	icon={exitIcon}
+>
+	{#snippet actions()}
+		<button class="modal-btn confirm" onclick={handleConfirmExit}>{t('exam.exit_confirm', $locale)}</button>
+		<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>{t('exam.exit_cancel', $locale)}</button>
+	{/snippet}
+</ResponsiveModal>
 
 <style>
 	.session-layout { display: flex; flex-direction: column; min-height: 100vh; background: var(--paper); }
@@ -532,11 +535,7 @@
 	.stat-v { font-size: 16px; font-weight: 800; color: var(--sumi); }
 	.stat-l { font-size: 12px; font-weight: 700; color: var(--fg-secondary); text-transform: lowercase; }
 
-	.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
-	.modal-content { background: var(--paper); border-radius: 32px; padding: 32px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid var(--ink-100); }
-	.modal-icon { width: 64px; height: 64px; background: var(--hinomaru-red-wash); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-	.modal-title { font-size: 20px; font-weight: 800; color: var(--sumi); margin-bottom: 12px; }
-	.modal-text { font-size: 15px; color: var(--fg-secondary); line-height: 1.5; margin-bottom: 28px; }
+	/* Modal handled by ResponsiveModal */
 	.modal-actions { display: flex; flex-direction: column; gap: 10px; }
 	.modal-btn { padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; transition: all 0.2s; cursor: pointer; border: none; }
 	.modal-btn.confirm { background: var(--hinomaru-red); color: white; }

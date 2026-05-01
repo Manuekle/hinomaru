@@ -239,7 +239,7 @@
 						</div>
 
 						<!-- Options (same as story quiz) -->
-						<div use:fadeUp={{ delay: 0.18, y: 10 }} class="question-box" style="margin-top:20px;">
+						<div use:fadeUp={{ delay: 0.18, y: 10 }} style="margin-top:32px;">
 							<p class="question-text">
 								{$locale === 'es' ? 'Elige la respuesta más natural:' : 'Choose the most natural response:'}
 							</p>
@@ -511,14 +511,7 @@
 		margin: 0;
 	}
 
-	/* Quiz area — same as stories quiz */
-	.question-box {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 28px;
-		padding: 24px;
-		box-shadow: var(--shadow-sm);
-	}
+
 
 	.question-text {
 		font-size: 16px;

@@ -36,6 +36,7 @@
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
+	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
 
 	let { data } = $props<{ data: PageData }>();
 	let { supabase, user } = $derived(data);
@@ -570,104 +571,86 @@
 	</div>
 </div>
 
-{#if showDeleteConfirm}
-	<div
-		class="modal-overlay"
-		transition:fly={{ duration: 200, opacity: 0 }}
-		onclick={handleOverlayClick}
-		onkeydown={handleModalKeydown}
-		aria-hidden="true"
-		style="padding-bottom: {overlayPaddingBottom}px"
-	>
-		<div
-			class="modal-content"
-			use:fadeUp={{ delay: 0.05, y: 20 }}
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="delete-modal-title"
-			tabindex="-1"
-			bind:this={modalRef}
-		>
-			<div class="modal-header">
-				<div class="warning-icon">
-					<Icon icon={BubbleChatIcon} size={24} color="currentColor" />
-				</div>
-				<h2 id="delete-modal-title" class="modal-title" style="text-align: left; margin-left: 4px;">
-					{deleteStep === 'confirm'
-						? t('settings.deleteAccount.confirm', $locale)
-						: t('settings.deleteAccount.verify', $locale)}
-				</h2>
-			</div>
+{#snippet deleteIcon()}
+	<Icon icon={BubbleChatIcon} size={24} color="currentColor" />
+{/snippet}
 
-			{#if deleteStep === 'confirm'}
-				<p class="modal-desc" style="text-align: left; margin-left: 4px;">
-					{t('settings.deleteAccount.desc', $locale)}
-				</p>
-				<div class="modal-actions">
-					<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
-						{t('deck.back', $locale)}
-					</button>
-					<button
-						class="modal-btn-danger"
-						onclick={initiateDeletion}
-						disabled={isDeleting}
-						aria-busy={isDeleting}
-					>
-						{#if isDeleting}
-							<div class="spinner" aria-hidden="true"></div>
-						{:else}
-							{t('settings.deleteAccount.confirmBtn', $locale)}
-						{/if}
-					</button>
-				</div>
-			{:else}
-				<p class="modal-desc" style="text-align: left; margin-left: 4px;">
-					{t('settings.deleteAccount.otpSent', $locale, { email: user?.email || '' })}
-				</p>
-				<div class="otp-wrapper">
-					<InputOTP.Root
-						maxlength={6}
-						bind:value={otpCode}
-						aria-label={t('settings.deleteAccount.verify', $locale)}
-						autocomplete="one-time-code"
-						inputmode="numeric"
-					>
-						{#snippet children({ cells })}
-							<div class="otp-slots-container" aria-hidden="true">
-								{#each cells as cell (cell)}
-									<InputOTP.Slot {cell} />
-								{/each}
-							</div>
-						{/snippet}
-					</InputOTP.Root>
-				</div>
-				<div class="modal-actions">
-					<button
-						class="modal-btn-secondary"
-						onclick={() => {
-							deleteStep = 'confirm';
-							otpCode = '';
-						}}
-					>
-						{t('deck.back', $locale)}
-					</button>
-					<button
-						class="modal-btn-danger"
-						onclick={confirmDeletion}
-						disabled={isDeleting || otpCode.length < 6}
-						aria-busy={isDeleting}
-					>
-						{#if isDeleting}
-							<div class="spinner" aria-hidden="true"></div>
-						{:else}
-							{t('settings.deleteAccount.btn', $locale)}
-						{/if}
-					</button>
-				</div>
-			{/if}
+<ResponsiveModal
+	bind:open={showDeleteConfirm}
+	title={deleteStep === 'confirm'
+		? t('settings.deleteAccount.confirm', $locale)
+		: t('settings.deleteAccount.verify', $locale)}
+	icon={deleteIcon}
+>
+	{#if deleteStep === 'confirm'}
+		<p class="modal-desc" style="text-align: left; margin-left: 4px;">
+			{t('settings.deleteAccount.desc', $locale)}
+		</p>
+	{:else}
+		<p class="modal-desc" style="text-align: left; margin-left: 4px;">
+			{t('settings.deleteAccount.otpSent', $locale, { email: user?.email || '' })}
+		</p>
+		<div class="otp-wrapper">
+			<InputOTP.Root
+				maxlength={6}
+				bind:value={otpCode}
+				aria-label={t('settings.deleteAccount.verify', $locale)}
+				autocomplete="one-time-code"
+				inputmode="numeric"
+			>
+				{#snippet children({ cells })}
+					<div class="otp-slots-container" aria-hidden="true">
+						{#each cells as cell (cell)}
+							<InputOTP.Slot {cell} />
+						{/each}
+					</div>
+				{/snippet}
+			</InputOTP.Root>
 		</div>
-	</div>
-{/if}
+	{/if}
+
+	{#snippet actions()}
+		{#if deleteStep === 'confirm'}
+			<button
+				class="modal-btn-danger"
+				onclick={initiateDeletion}
+				disabled={isDeleting}
+				aria-busy={isDeleting}
+			>
+				{#if isDeleting}
+					<div class="spinner" aria-hidden="true"></div>
+				{:else}
+					{t('settings.deleteAccount.confirmBtn', $locale)}
+				{/if}
+			</button>
+			<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
+				{t('deck.back', $locale)}
+			</button>
+		{:else}
+			<button
+				class="modal-btn-danger"
+				onclick={confirmDeletion}
+				disabled={isDeleting || otpCode.length < 6}
+				aria-busy={isDeleting}
+			>
+				{#if isDeleting}
+					<div class="spinner" aria-hidden="true"></div>
+				{:else}
+					{t('settings.deleteAccount.btn', $locale)}
+				{/if}
+			</button>
+			<button
+				class="modal-btn-secondary"
+				onclick={() => {
+					deleteStep = 'confirm';
+					otpCode = '';
+				}}
+			>
+				{t('deck.back', $locale)}
+			</button>
+		{/if}
+	{/snippet}
+</ResponsiveModal>
 
 <style>
 	.settings-page {
@@ -1122,67 +1105,7 @@
 		opacity: 1 !important;
 	}
 
-	/* ── Modal ── */
-	.modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.4);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		display: flex;
-		align-items: flex-end;
-		justify-content: center;
-		/* padding-bottom set inline via visualViewport to sit above keyboard */
-		padding: 24px 24px max(24px, env(safe-area-inset-bottom, 0px));
-		z-index: 1000;
-		transition: padding-bottom 0.2s ease;
-	}
-
-	.modal-content {
-		background: var(--bg-surface);
-		border-radius: 28px 28px 20px 20px;
-		width: 100%;
-		max-width: 420px;
-		padding: 28px 28px 24px;
-		box-shadow: var(--shadow-xl);
-		border: 1px solid var(--ink-200);
-		text-align: center;
-		outline: none;
-	}
-
-	.modal-header {
-		margin-bottom: 20px;
-	}
-
-	.warning-icon {
-		width: 56px;
-		height: 56px;
-		background: #ff3b3014;
-		color: #ff3b30;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin: 0 auto 16px;
-		flex-shrink: 0;
-	}
-
-	.modal-title {
-		font-size: 20px;
-		font-weight: 700;
-		color: var(--fg-primary);
-		letter-spacing: -0.01em;
-	}
-
-	.modal-desc {
-		font-size: 15px;
-		color: var(--fg-secondary);
-		line-height: 1.5;
-		margin-bottom: 24px;
-	}
+	/* ── Modal (handled by ResponsiveModal) ── */
 
 	.otp-wrapper {
 		display: flex;
