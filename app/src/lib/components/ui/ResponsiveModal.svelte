@@ -167,16 +167,34 @@
 	}
 
 	.modal-content {
-		background: var(--bg-surface);
-		border-radius: 40px;
-		padding: 48px;
+		background: linear-gradient(to bottom, var(--bg-surface), var(--paper));
+		border-radius: 48px;
+		padding: 64px 48px;
 		width: 100%;
-		max-width: 460px;
+		max-width: 480px;
 		text-align: center;
-		box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
 		border: 1.5px solid var(--ink-100);
 		font-family: var(--font-ui);
 		position: relative;
+		overflow: hidden;
+	}
+
+	.modal-content::before {
+		content: '';
+		position: absolute;
+		top: -60px;
+		right: -60px;
+		width: 220px;
+		height: 220px;
+		background: radial-gradient(circle, rgba(188, 0, 45, 0.05) 0%, transparent 70%);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	.modal-body, .modal-title, .modal-text, .modal-icon-box {
+		position: relative;
+		z-index: 10;
 	}
 
 	:global([data-theme='dark']) .modal-content {
@@ -215,8 +233,49 @@
 		font-weight: 500;
 	}
 
-	.modal-body {
-		font-family: var(--font-ui);
-		margin-bottom: 32px;
+	/* ── PREMIUM BUTTON STYLES ── */
+	:global(.modal-btn-confirm), :global(.modal-btn-cancel) {
+		padding: 18px !important;
+		border-radius: 22px !important;
+		font-size: 16px !important;
+		font-weight: 800 !important;
+		cursor: pointer;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: none !important;
+		font-family: var(--font-ui) !important;
+		letter-spacing: -0.01em;
+	}
+
+	:global(.modal-btn-confirm) {
+		background: var(--hinomaru-red) !important;
+		color: white !important;
+		box-shadow: 0 10px 25px rgba(188, 0, 45, 0.2) !important;
+	}
+
+	:global(.modal-btn-confirm:hover) {
+		transform: translateY(-2px);
+		box-shadow: 0 15px 30px rgba(188, 0, 45, 0.3) !important;
+		background: #a30027 !important;
+	}
+
+	:global(.modal-btn-confirm:active) {
+		transform: translateY(0);
+	}
+
+	:global(.modal-btn-cancel) {
+		background: var(--ink-100) !important;
+		color: var(--sumi) !important;
+	}
+
+	:global(.modal-btn-cancel:hover) {
+		background: var(--ink-200) !important;
+		transform: translateY(-2px);
+	}
+
+	:global(.modal-btn-cancel:active) {
+		transform: translateY(0);
 	}
 </style>

@@ -171,8 +171,8 @@
 	icon={confirmIcon}
 >
 	{#snippet actions()}
-		<button class="modal-btn cancel" onclick={() => (showConfirmModal = false)}>{t('common.cancel', $locale)}</button>
-		<button class="modal-btn confirm" onclick={handleConfirm}>{t('exam.start_now', $locale)}</button>
+		<button class="modal-btn-cancel" onclick={() => (showConfirmModal = false)}>{t('common.cancel', $locale)}</button>
+		<button class="modal-btn-confirm" onclick={handleConfirm}>{t('exam.start_now', $locale)}</button>
 	{/snippet}
 </ResponsiveModal>
 
@@ -245,10 +245,4 @@
 	}
 
 	/* Modal handled by ResponsiveModal */
-	.modal-actions { display: flex; flex-direction: column; gap: 10px; }
-	.modal-btn { padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; transition: all 0.2s; cursor: pointer; border: none; }
-	.modal-btn.confirm { background: var(--hinomaru-red); color: white; }
-	.modal-btn.confirm:hover { background: #a30027; }
-	.modal-btn.cancel { background: var(--ink-100); color: var(--sumi); }
-	.modal-btn.cancel:hover { background: var(--ink-200); }
 </style>

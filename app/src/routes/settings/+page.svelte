@@ -611,11 +611,11 @@
 
 	{#snippet actions()}
 		{#if deleteStep === 'confirm'}
-			<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
+			<button class="modal-btn-cancel" onclick={() => (showDeleteConfirm = false)}>
 				{t('common.cancel', $locale)}
 			</button>
 			<button
-				class="modal-btn-danger"
+				class="modal-btn-confirm"
 				onclick={initiateDeletion}
 				disabled={isDeleting}
 				aria-busy={isDeleting}
@@ -628,16 +628,13 @@
 			</button>
 		{:else}
 			<button
-				class="modal-btn-secondary"
-				onclick={() => {
-					deleteStep = 'confirm';
-					otpCode = '';
-				}}
+				class="modal-btn-cancel"
+				onclick={() => (showDeleteConfirm = false)}
 			>
-				{t('deck.back', $locale)}
+				{t('common.cancel', $locale)}
 			</button>
 			<button
-				class="modal-btn-danger"
+				class="modal-btn-confirm"
 				onclick={confirmDeletion}
 				disabled={isDeleting || otpCode.length < 6}
 				aria-busy={isDeleting}
@@ -1134,50 +1131,7 @@
 		gap: 12px;
 	}
 
-	.modal-btn-secondary {
-		background: var(--ink-100);
-		border: none;
-		padding: 18px;
-		border-radius: 20px;
-		font-size: 16px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-	.modal-btn-secondary:hover {
-		background: var(--ink-200);
-		color: var(--fg-primary);
-	}
-
-	.modal-btn-danger {
-		background: var(--hinomaru-red);
-		border: none;
-		padding: 18px;
-		border-radius: 20px;
-		font-size: 16px;
-		font-weight: 700;
-		color: white;
-		cursor: pointer;
-		transition: all 0.2s;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
-	}
-	.modal-btn-danger:hover:not(:disabled) {
-		transform: translateY(-1px);
-		box-shadow: 0 6px 16px rgba(188, 0, 45, 0.3);
-	}
-	.modal-btn-danger:active:not(:disabled) {
-		transform: translateY(0);
-	}
-	.modal-btn-danger:disabled {
-		background: var(--ink-200);
-		color: var(--fg-tertiary);
-		box-shadow: none;
-		cursor: not-allowed;
-	}
+	/* Global premium buttons from ResponsiveModal used instead */
 
 	.spinner {
 		width: 20px;
