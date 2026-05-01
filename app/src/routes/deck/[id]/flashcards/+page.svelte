@@ -238,9 +238,10 @@
 
 							{#if $showRomaji}
 								<div
+									class="romaji-example"
 									style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;font-weight:600;letter-spacing:0.02em;"
 								>
-									{card.example_romaji || card.extra?.example_romaji || (card.example ? kanaToRomaji(card.example_kana || card.example) : '')}
+									{card.example_romaji || card.extra?.example_romaji || (card.example_kana ? kanaToRomaji(card.example_kana) : '')}
 								</div>
 							{/if}
 

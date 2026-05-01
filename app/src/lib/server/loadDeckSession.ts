@@ -56,8 +56,9 @@ export async function loadDeckSession(
 		learnedToday = progressCount + savedCount;
 	}
 
-	const newSlots = Math.max(0, dailyGoal - learnedToday);
-
+	// We use a standard session size of 10 new cards so users aren't 
+	// restricted to tiny sessions (e.g. 2 cards) when near their daily goal.
+	const newSlots = 10;
 	// --- 2. Fetch all cards for the deck with their SRS progress ---
 	const { data: allCards } = await supabase
 		.from('cards')
@@ -73,12 +74,10 @@ export async function loadDeckSession(
 		return p?.learned && p.next_review && p.next_review <= now;
 	});
 
-	const newCards = cards
-		.filter((c: any) => {
-			const p = c.progress?.[0];
-			return !p || !p.learned;
-		})
-		.slice(0, newSlots);
+	const newCards = cards.filter((c: any) => {
+		const p = c.progress?.[0];
+		return !p || !p.learned;
+	});
 
 	// --- 4. Build session: reviews first, then new words ---
 	const session = [...reviewCards, ...newCards];

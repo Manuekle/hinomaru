@@ -17,7 +17,7 @@
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
-	import confetti from 'canvas-confetti';
+	import Confetti from '$lib/components/Confetti.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -28,6 +28,7 @@
 	let flipped = $state(false);
 	let struggled = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
+	let confettiRef = $state<{ fire: () => void } | null>(null);
 
 	const word = $derived(words[i]);
 	const meta = $derived(word ? getWordMetadata(word.jp) : null);
@@ -82,32 +83,7 @@
 			if (cardEl) {
 				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
 			}
-			confetti({
-				particleCount: 60,
-				angle: 60,
-				spread: 65,
-				startVelocity: 55,
-				decay: 0.88,
-				gravity: 1.1,
-				origin: { x: 0, y: 1 },
-				colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
-				scalar: 0.9
-			});
-			setTimeout(
-				() =>
-					confetti({
-						particleCount: 60,
-						angle: 120,
-						spread: 65,
-						startVelocity: 55,
-						decay: 0.88,
-						gravity: 1.1,
-						origin: { x: 1, y: 1 },
-						colors: ['#BC002D', '#1A1A1A', '#F9F8F6', '#D4A574', '#E8C547'],
-						scalar: 0.9
-					}),
-				80
-			);
+			confettiRef?.fire();
 			saveSession();
 			setTimeout(() => goto('/vocabulary'), 1500);
 		} else {
@@ -173,6 +149,8 @@
 <svelte:head>
 	<title>{t('nav.review', $locale)} — Hinomaru</title>
 </svelte:head>
+
+<Confetti bind:this={confettiRef} />
 
 <div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
 	<SessionNav

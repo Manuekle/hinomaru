@@ -36,9 +36,20 @@ const updates = [
   { jp: '〜よりも', example_romaji: 'Neko wa inu yori mo suki desu.' },
   { jp: '〜の方が', example_romaji: 'Kore no hou ga ii desu.' },
   { jp: '〜ことができます', example_romaji: 'Nihongo wo hanasu koto ga dekimasu.' },
-  { jp: '〜たことがあります', example_romaji: 'Nihon ni itta koto ga arimasu.' },
+  { jp: '〜たことがある', example_romaji: 'Nihon ni itta koto ga arimasu.' },
   { jp: '〜つもりです', example_romaji: 'Nihon ni iku tsumori desu.' },
   { jp: '〜かもしれません', example_romaji: 'Kare wa konai kamoshiremasen.' },
+  // Survival - Hotel
+  { jp: 'チェックインをお願いします。', example_romaji: 'Sumimasen, chekkuin o onegaishimasu.' },
+  { jp: '予約しています。', example_romaji: 'Sumisu de yoyaku shite imasu.' },
+  { jp: '朝食は何時ですか？', example_romaji: 'Sumimasen, choushoku wa nanji desu ka?' },
+  { jp: 'Wi-Fiのパスワードは何ですか？', example_romaji: 'Waifai no pasuwaado wa nan desu ka?' },
+  { jp: '荷物を預かってもらえますか？', example_romaji: 'Chekkuauto go, nimotsu o azukatte moraemasu ka?' },
+  { jp: '部屋を掃除してください。', example_romaji: 'Kyou, heya o souji shite kudasai.' },
+  { jp: 'タオルを追加でください。', example_romaji: 'Sumimasen, taoru o tsuika de kudasai.' },
+  { jp: 'お湯が出ません。', example_romaji: 'Sumimasen, oyu ga demasen.' },
+  { jp: 'チェックアウトは何時ですか？', example_romaji: 'Ashita no chekkuauto wa nanji desu ka?' },
+  { jp: 'タクシーを呼んでください。', example_romaji: 'Kuukou made takushii o yonde kudasai.' },
 ];
 
 async function update() {

@@ -7,6 +7,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'Check-in, please.',
 		es: 'Quiero hacer el check-in, por favor.',
 		example: 'すみません、チェックインをお願いします。',
+		example_romaji: 'Sumimasen, chekkuin o onegaishimasu.',
 		example_en: 'Excuse me, check-in please.',
 		example_es: 'Disculpe, check-in por favor.',
 		kana: 'ちぇっくいんをおねがいします'
@@ -17,6 +18,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'I have a reservation.',
 		es: 'Tengo una reserva.',
 		example: 'スミスで予約しています。',
+		example_romaji: 'Sumisu de yoyaku shite imasu.',
 		example_en: 'I have a reservation under Smith.',
 		example_es: 'Tengo una reserva a nombre de Smith.',
 		kana: 'よやくしています'
@@ -27,6 +29,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'What time is breakfast?',
 		es: '¿A qué hora es el desayuno?',
 		example: 'すみません、朝食は何時ですか？',
+		example_romaji: 'Sumimasen, choushoku wa nanji desu ka?',
 		example_en: 'Excuse me, what time is breakfast?',
 		example_es: 'Disculpe, ¿a qué hora es el desayuno?',
 		kana: 'ちょうしょくはなんじですか'
@@ -37,6 +40,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'What is the Wi-Fi password?',
 		es: '¿Cuál es la contraseña del Wi-Fi?',
 		example: 'Wi-Fiのパスワードは何ですか？',
+		example_romaji: 'Waifai no pasuwaado wa nan desu ka?',
 		example_en: 'What is the Wi-Fi password?',
 		example_es: '¿Cuál es la contraseña del Wi-Fi?',
 		kana: 'わいふぁいのぱすわーどはなんですか'
@@ -47,6 +51,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'Can you keep my luggage?',
 		es: '¿Pueden guardarme el equipaje?',
 		example: 'チェックアウト後、荷物を預かってもらえますか？',
+		example_romaji: 'Chekkuauto go, nimotsu o azukatte moraemasu ka?',
 		example_en: 'Can you keep my luggage after check-out?',
 		example_es: '¿Pueden guardarme el equipaje después del check-out?',
 		kana: 'にもつをあずかってもらえますか'
@@ -57,6 +62,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'Please clean my room.',
 		es: 'Por favor limpie mi habitación.',
 		example: '今日、部屋を掃除してください。',
+		example_romaji: 'Kyou, heya o souji shite kudasai.',
 		example_en: 'Please clean my room today.',
 		example_es: 'Por favor limpie mi habitación hoy.',
 		kana: 'へやをそうじしてください'
@@ -67,6 +73,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'Can I have an extra towel?',
 		es: '¿Puedo pedir una toalla extra?',
 		example: 'すみません、タオルを追加でください。',
+		example_romaji: 'Sumimasen, taoru o tsuika de kudasai.',
 		example_en: 'Excuse me, can I have an extra towel?',
 		example_es: 'Disculpe, ¿puede darme una toalla extra?',
 		kana: 'たおるをついかでください'
@@ -77,6 +84,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'There is no hot water.',
 		es: 'No sale agua caliente.',
 		example: 'すみません、お湯が出ません。',
+		example_romaji: 'Sumimasen, oyu ga demasen.',
 		example_en: 'Excuse me, there is no hot water.',
 		example_es: 'Disculpe, no sale agua caliente.',
 		kana: 'おゆがでません'
@@ -87,6 +95,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'What time is check-out?',
 		es: '¿A qué hora es el check-out?',
 		example: '明日のチェックアウトは何時ですか？',
+		example_romaji: 'Ashita no chekkuauto wa nanji desu ka?',
 		example_en: 'What time is check-out tomorrow?',
 		example_es: '¿A qué hora es el check-out mañana?',
 		kana: 'ちぇっくあうとはなんじですか'
@@ -97,6 +106,7 @@ export const hotelPhrases: CardData[] = [
 		en: 'Please call a taxi.',
 		es: 'Por favor llame un taxi.',
 		example: '空港までタクシーを呼んでください。',
+		example_romaji: 'Kuukou made takushii o yonde kudasai.',
 		example_en: 'Please call a taxi to the airport.',
 		example_es: 'Por favor llame un taxi para el aeropuerto.',
 		kana: 'たくしーをよんでください'
