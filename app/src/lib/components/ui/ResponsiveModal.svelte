@@ -1,12 +1,5 @@
 <script lang="ts">
-	import { 
-		Drawer, 
-		DrawerContent, 
-		DrawerFooter, 
-		DrawerHeader, 
-		DrawerTitle, 
-		DrawerDescription 
-	} from "$lib/components/ui/drawer";
+	import * as Drawer from "$lib/components/ui/drawer";
 	import { fade } from "svelte/transition";
 	import { onMount, type Snippet } from "svelte";
 	import { cn } from "$lib/utils";
@@ -20,6 +13,7 @@
 		children?: Snippet;
 		actions?: Snippet;
 		contentClass?: string;
+		actionsClass?: string;
 	}
 
 	let { 
@@ -29,12 +23,15 @@
 		icon,
 		children, 
 		actions, 
-		contentClass = ""
+		contentClass = "",
+		actionsClass = ""
 	}: Props = $props();
 
 	let isMobile = $state(false);
+	let mounted = $state(false);
 
 	onMount(() => {
+		mounted = true;
 		const mql = window.matchMedia("(max-width: 640px)");
 		isMobile = mql.matches;
 		const handler = (e: MediaQueryListEvent) => (isMobile = e.matches);
@@ -50,35 +47,30 @@
 </script>
 
 {#if isMobile}
-	<Drawer bind:open>
-		<DrawerContent class={cn("px-6 pb-10", contentClass)}>
-			<DrawerHeader class="px-0 pt-4 text-left">
-				{#if icon}
-					<div class="drawer-icon-wrapper">
-						{@render icon()}
-					</div>
-				{/if}
-				<DrawerTitle class="text-2xl font-extrabold text-[var(--sumi)]">
+	<Drawer.Root bind:open>
+		<Drawer.Content class={cn("drawer-premium px-6 pb-12 rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)]", contentClass)}>
+			<Drawer.Header class="px-0 pt-8 text-left">
+				<Drawer.Title class="drawer-title-premium">
 					{title}
-				</DrawerTitle>
+				</Drawer.Title>
 				{#if description}
-					<DrawerDescription class="text-[var(--fg-secondary)] text-[16px] leading-relaxed mt-2">
+					<Drawer.Description class="drawer-desc-premium">
 						{description}
-					</DrawerDescription>
+					</Drawer.Description>
 				{/if}
-			</DrawerHeader>
+			</Drawer.Header>
 			
-			<div class="py-4">
+			<div class="py-6 font-ui relative z-10">
 				{@render children?.()}
 			</div>
 
-			<DrawerFooter class="px-0 pt-2">
-				<div class="flex flex-col gap-3 w-full">
+			<Drawer.Footer class="px-0 pt-4 relative z-10">
+				<div class={cn("flex flex-row gap-4 w-full font-ui [&>*]:flex-1", actionsClass)}>
 					{@render actions?.()}
 				</div>
-			</DrawerFooter>
-		</DrawerContent>
-	</Drawer>
+			</Drawer.Footer>
+		</Drawer.Content>
+	</Drawer.Root>
 {:else if open}
 	<div 
 		class="modal-overlay" 
@@ -107,7 +99,7 @@
 				{@render children?.()}
 			</div>
 
-			<div class="modal-actions-box">
+			<div class={cn("flex flex-row gap-3 w-full font-ui [&>*]:flex-1", actionsClass)}>
 				{@render actions?.()}
 			</div>
 		</div>
@@ -115,18 +107,49 @@
 {/if}
 
 <style>
-	.drawer-icon-wrapper {
-		width: 56px;
-		height: 56px;
-		background: var(--hinomaru-red-wash);
-		border-radius: 18px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 16px;
-		color: var(--hinomaru-red);
+	:global(.font-ui) {
+		font-family: var(--font-ui) !important;
 	}
 
+	/* ── PREMIUM DRAWER STYLES ── */
+	:global(.drawer-premium) {
+		background: linear-gradient(to bottom, var(--bg-surface), var(--paper)) !important;
+		box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1) !important;
+		overflow: hidden;
+	}
+
+	:global(.drawer-premium)::before {
+		content: '';
+		position: absolute;
+		top: -40px;
+		right: -40px;
+		width: 180px;
+		height: 180px;
+		background: radial-gradient(circle, rgba(188, 0, 45, 0.06) 0%, transparent 70%);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	:global(.drawer-title-premium) {
+		font-family: var(--font-ui) !important;
+		font-size: 28px !important;
+		font-weight: 900 !important;
+		color: var(--sumi) !important;
+		line-height: 1.1 !important;
+		letter-spacing: -0.03em !important;
+		margin-bottom: 4px;
+	}
+
+	:global(.drawer-desc-premium) {
+		font-family: var(--font-ui) !important;
+		font-size: 17px !important;
+		color: var(--fg-secondary) !important;
+		line-height: 1.5 !important;
+		margin-top: 10px !important;
+		font-weight: 500 !important;
+	}
+
+	/* ── MODAL STYLES ── */
 	.modal-overlay {
 		position: fixed;
 		top: 0;
@@ -134,8 +157,8 @@
 		right: 0;
 		bottom: 0;
 		background: rgba(0, 0, 0, 0.4);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
 		z-index: 1000;
 		display: flex;
 		align-items: center;
@@ -144,14 +167,16 @@
 	}
 
 	.modal-content {
-		background: var(--paper);
-		border-radius: 32px;
-		padding: 36px;
+		background: var(--bg-surface);
+		border-radius: 40px;
+		padding: 48px;
 		width: 100%;
-		max-width: 420px;
+		max-width: 460px;
 		text-align: center;
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-		border: 1px solid var(--ink-100);
+		box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+		border: 1.5px solid var(--ink-100);
+		font-family: var(--font-ui);
+		position: relative;
 	}
 
 	:global([data-theme='dark']) .modal-content {
@@ -163,36 +188,35 @@
 		width: 64px;
 		height: 64px;
 		background: var(--hinomaru-red-wash);
-		border-radius: 20px;
+		border-radius: 22px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 0 auto 20px;
+		margin: 0 auto 28px;
 		color: var(--hinomaru-red);
 	}
 
 	.modal-title {
-		font-size: 22px;
-		font-weight: 800;
+		font-family: var(--font-ui);
+		font-size: 28px;
+		font-weight: 900;
 		color: var(--sumi);
-		margin-bottom: 12px;
-		letter-spacing: -0.01em;
+		margin-bottom: 14px;
+		letter-spacing: -0.03em;
+		line-height: 1.1;
 	}
 
 	.modal-text {
-		font-size: 16px;
+		font-family: var(--font-ui);
+		font-size: 17px;
 		color: var(--fg-secondary);
-		line-height: 1.5;
-		margin-bottom: 32px;
+		line-height: 1.6;
+		margin-bottom: 36px;
+		font-weight: 500;
 	}
 
 	.modal-body {
-		margin-bottom: 24px;
-	}
-
-	.modal-actions-box {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
+		font-family: var(--font-ui);
+		margin-bottom: 32px;
 	}
 </style>

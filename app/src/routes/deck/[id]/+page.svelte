@@ -171,8 +171,8 @@
 	icon={confirmIcon}
 >
 	{#snippet actions()}
-		<button class="modal-btn confirm" onclick={handleConfirm}>{t('exam.start', $locale)}</button>
-		<button class="modal-btn cancel" onclick={() => (showConfirmModal = false)}>{t('exam.exit_cancel', $locale)}</button>
+		<button class="modal-btn cancel" onclick={() => (showConfirmModal = false)}>{t('common.cancel', $locale)}</button>
+		<button class="modal-btn confirm" onclick={handleConfirm}>{t('exam.start_now', $locale)}</button>
 	{/snippet}
 </ResponsiveModal>
 

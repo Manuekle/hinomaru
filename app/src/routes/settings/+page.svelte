@@ -611,6 +611,9 @@
 
 	{#snippet actions()}
 		{#if deleteStep === 'confirm'}
+			<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
+				{t('common.cancel', $locale)}
+			</button>
 			<button
 				class="modal-btn-danger"
 				onclick={initiateDeletion}
@@ -623,10 +626,16 @@
 					{t('settings.deleteAccount.confirmBtn', $locale)}
 				{/if}
 			</button>
-			<button class="modal-btn-secondary" onclick={() => (showDeleteConfirm = false)}>
+		{:else}
+			<button
+				class="modal-btn-secondary"
+				onclick={() => {
+					deleteStep = 'confirm';
+					otpCode = '';
+				}}
+			>
 				{t('deck.back', $locale)}
 			</button>
-		{:else}
 			<button
 				class="modal-btn-danger"
 				onclick={confirmDeletion}
@@ -638,15 +647,6 @@
 				{:else}
 					{t('settings.deleteAccount.btn', $locale)}
 				{/if}
-			</button>
-			<button
-				class="modal-btn-secondary"
-				onclick={() => {
-					deleteStep = 'confirm';
-					otpCode = '';
-				}}
-			>
-				{t('deck.back', $locale)}
 			</button>
 		{/if}
 	{/snippet}
