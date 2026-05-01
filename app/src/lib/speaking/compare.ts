@@ -53,8 +53,8 @@ function bestWindowSimilarity(text: string, target: string): number {
 export type ScoreLevel = 'correct' | 'close' | 'wrong';
 
 export function classify(score: number): ScoreLevel {
-	if (score >= 0.9) return 'correct';
-	if (score >= 0.7) return 'close';
+	if (score >= 0.8) return 'correct';
+	if (score >= 0.55) return 'close';
 	return 'wrong';
 }
 

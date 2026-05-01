@@ -206,7 +206,7 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 20px;
-		padding: 20px 0;
+		padding: 24px 0;
 		border-bottom: 1px solid var(--ink-100);
 		background: none;
 		border-left: none;
@@ -274,16 +274,19 @@
 	}
 
 	.row-title {
-		font-size: 18px;
+		font-size: 17px;
 		font-weight: 600;
 		color: var(--fg-primary);
 		line-height: 1.2;
 		transition: color 150ms;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.row-sub {
 		font-size: 13px;
-		color: var(--fg-secondary);
+		color: var(--fg-tertiary);
 		line-height: 1.4;
 	}
 

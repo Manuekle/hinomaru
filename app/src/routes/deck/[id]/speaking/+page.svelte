@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
@@ -40,8 +40,9 @@
 
 	// ── Speech ────────────────────────────────────────────────────────────────
 	const recognizer    = new JapaneseSpeechRecognizer();
-	let liveTranscript  = $state('');
-	let finalTranscript = $state('');
+	let liveTranscript   = $state('');
+	let finalTranscript  = $state('');
+	let allFinalParts    = $state<string[]>([]); // accumulate multi-result finals
 	let speechError     = $state<string | null>(null);
 	let speechStatus = $state<SpeechStatus>({ ok: false, reason: 'no-window' });
 	let speechHost = $state('');
@@ -52,8 +53,8 @@
 	const speechOk = $derived(speechStatus.ok);
 	const speechWarn = $derived.by(() => {
 		if (speechStatus.ok) return '';
-		if (speechStatus.reason === 'insecure') return `Pronunciación requiere HTTPS o localhost. Estás en: ${speechHost}`;
-		if (speechStatus.reason === 'unsupported') return 'Tu navegador no soporta reconocimiento de voz. Usa Chrome, Edge o Safari.';
+		if (speechStatus.reason === 'insecure') return `${t('speaking.insecure', $locale)} (${speechHost})`;
+		if (speechStatus.reason === 'unsupported') return t('speaking.unsupported', $locale);
 		return '';
 	});
 
@@ -70,29 +71,40 @@
 
 	async function startRecording() {
 		if (!phrase || !speechOk) return;
-		speechError    = null;
-		liveTranscript = '';
+		speechError     = null;
+		liveTranscript  = '';
 		finalTranscript = '';
-		result         = null;
+		allFinalParts   = [];
+		result          = null;
 		phase          = 'recording';
 
 		await recognizer.start(
 			(r) => {
 				liveTranscript = r.transcript;
-				if (r.isFinal) finalTranscript = r.transcript;
+				if (r.isFinal) {
+					allFinalParts = [...allFinalParts, r.transcript];
+					finalTranscript = allFinalParts.join('');
+				}
 			},
 			(err) => { speechError = err; phase = 'idle'; },
 			() => {
+				// Use accumulated final; fall back to last interim (often hiragana — useful for kanji targets)
 				const spoken = finalTranscript || liveTranscript;
 				if (!spoken && !speechError) {
-					speechError = 'No se detectó voz. Habla más cerca del micrófono e intenta otra vez.';
+					speechError = t('speaking.noSpeech', $locale);
 					phase = 'idle';
 					return;
 				}
 				if (spoken && phrase) {
-					const res = comparePhrase(phrase.text, spoken, phrase.segments);
-					result = res;
-					if (res.overallLevel === 'correct') playCorrect();
+					// Compare against final AND last interim separately, take best
+					const candidates = [finalTranscript, liveTranscript].filter(Boolean);
+					let best = comparePhrase(phrase.text, candidates[0], phrase.segments);
+					for (let i = 1; i < candidates.length; i++) {
+						const c = comparePhrase(phrase.text, candidates[i], phrase.segments);
+						if (c.overallScore > best.overallScore) best = c;
+					}
+					result = best;
+					if (best.overallLevel === 'correct') playCorrect();
 					else playWrong();
 					phase = 'result';
 				} else {
@@ -122,6 +134,7 @@
 		retry();
 	}
 
+	beforeNavigate(() => recognizer.stop());
 	onDestroy(() => recognizer.stop());
 
 	// ── Font size (same as flashcards) ────────────────────────────────────────
@@ -158,7 +171,7 @@
 	{#if phrases.length === 0}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;">
 			<div style="font-size:48px;">📭</div>
-			<p style="color:var(--fg-secondary);">No hay palabras en este deck.</p>
+			<p style="color:var(--fg-secondary);">{t('speaking.noWords', $locale)}</p>
 			<a href="/deck/{deck?.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
 		</div>
 
@@ -254,7 +267,7 @@
 						<!-- Heard -->
 						{#if finalTranscript || liveTranscript}
 							<div class="heard-row">
-								<span class="heard-label">Escuché</span>
+								<span class="heard-label">{t('speaking.heard', $locale)}</span>
 								<span class="heard-text jp">{finalTranscript || liveTranscript}</span>
 							</div>
 						{/if}
@@ -294,7 +307,7 @@
 					disabled={!speechOk || phase === 'playing'}
 				>
 					<Icon icon={Mic01Icon} size={18} color="currentColor" />
-					{speechOk ? 'Hablar' : 'Pronunciación no disponible'}
+					{speechOk ? t('speaking.speak', $locale) : t('speaking.unavailable', $locale)}
 				</button>
 
 			{:else if phase === 'recording'}
@@ -303,7 +316,7 @@
 					onclick={stopRecording}
 				>
 					<span class="rec-dot"></span>
-					Detener grabación
+					{t('speaking.stop', $locale)}
 				</button>
 
 			{:else if phase === 'result' && result}
@@ -312,7 +325,7 @@
 					style="flex:1;"
 					onclick={retry}
 				>
-					Otra vez
+					{t('session.again', $locale)}
 				</button>
 				<button
 					class="hm-btn hm-btn-primary touch-action-manip"
