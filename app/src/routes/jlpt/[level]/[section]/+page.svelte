@@ -265,6 +265,9 @@
 
 		<!-- ── EXAM ── -->
 		{#if phase === 'exam' && currentQ}
+			<div use:fadeIn={{ delay: 0 }}>
+				<a href="/jlpt" class="back">← {t('deck.back', $locale)}</a>
+			</div>
 			<!-- Progress + timer bar -->
 
 
@@ -367,11 +370,8 @@
 		<!-- ── LISTENING ── -->
 		{:else if phase === 'listening'}
 			<div class="listening-screen">
-				<div class="listening-header" use:fadeIn={{ delay: 0 }}>
-					<button class="back-link" onclick={() => goto('/jlpt')}>
-						<Icon icon={ArrowLeft01Icon} size={16} color="currentColor" />
-						<span>{t('deck.back', $locale)}</span>
-					</button>
+				<div use:fadeIn={{ delay: 0 }}>
+					<a href="/jlpt" class="back">← {t('deck.back', $locale)}</a>
 				</div>
 
 				<AudioPlayerProvider>
@@ -802,16 +802,19 @@
 		margin: 0 auto;
 		padding: 0 20px 80px;
 	}
-	.listening-header {
-		margin-bottom: 24px;
+	.back {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		text-decoration: none;
+		display: inline-block;
+		margin-bottom: 20px;
+		transition: color 150ms;
 	}
-	.back-link {
-		display: flex; align-items: center; gap: 8px;
-		background: none; border: none; color: var(--fg-secondary);
-		font-size: 14px; font-weight: 600; cursor: pointer; padding: 0;
-		transition: color 0.2s;
+	@media (hover: hover) {
+		.back:hover {
+			color: var(--fg-primary);
+		}
 	}
-	.back-link:hover { color: var(--fg-primary); }
 
 	.compact-playlist {
 		display: flex;

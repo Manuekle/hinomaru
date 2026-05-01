@@ -9,8 +9,11 @@
 		KeyboardIcon,
 		PencilEdit01Icon,
 		PuzzleIcon,
-		DocumentValidationIcon
+		DocumentValidationIcon,
+		AlertCircleIcon
 	} from '@hugeicons/core-free-icons';
+	import { fade } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -63,6 +66,19 @@
 			color: '#ff3b30'
 		}
 	];
+
+	let showConfirmModal = $state(false);
+	let pendingUrl = $state<string | null>(null);
+
+	function openConfirm(url: string) {
+		pendingUrl = url;
+		showConfirmModal = true;
+	}
+
+	function handleConfirm() {
+		if (pendingUrl) goto(pendingUrl);
+		showConfirmModal = false;
+	}
 </script>
 
 <div
@@ -123,6 +139,12 @@
 			<a
 				href={mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`}
 				class="mode-card"
+				onclick={(e) => {
+					if (mode.id === 'exam') {
+						e.preventDefault();
+						openConfirm(`/deck/${deck.id}/exam`);
+					}
+				}}
 			>
 				<div class="mode-icon-box" style="background: {mode.color}14; color: {mode.color};">
 					<Icon icon={mode.icon} size={20} strokeWidth={1.8} color="currentColor" />
@@ -136,6 +158,20 @@
 		{/each}
 	</div>
 </div>
+
+{#if showConfirmModal}
+	<div class="modal-overlay" transition:fade={{ duration: 200 }}>
+		<div class="modal-content" use:fadeUp={{ delay: 0, y: 20 }}>
+			<div class="modal-icon"><Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" /></div>
+			<h3 class="modal-title">{t('exam.start_confirm_title', $locale) || 'Ready to start?'}</h3>
+			<p class="modal-text">{t('exam.start_confirm', $locale)}</p>
+			<div class="modal-actions">
+				<button class="modal-btn confirm" onclick={handleConfirm}>{t('exam.start', $locale)}</button>
+				<button class="modal-btn cancel" onclick={() => (showConfirmModal = false)}>{t('exam.exit_cancel', $locale)}</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.back-link {
@@ -204,4 +240,17 @@
 		justify-content: center;
 		flex-shrink: 0;
 	}
+
+	/* Modal Premium */
+	.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+	.modal-content { background: var(--paper); border-radius: 32px; padding: 32px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid var(--ink-100); }
+	.modal-icon { width: 64px; height: 64px; background: var(--hinomaru-red-wash); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+	.modal-title { font-size: 20px; font-weight: 800; color: var(--sumi); margin-bottom: 12px; }
+	.modal-text { font-size: 15px; color: var(--fg-secondary); line-height: 1.5; margin-bottom: 28px; }
+	.modal-actions { display: flex; flex-direction: column; gap: 10px; }
+	.modal-btn { padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; transition: all 0.2s; cursor: pointer; border: none; }
+	.modal-btn.confirm { background: var(--hinomaru-red); color: white; }
+	.modal-btn.confirm:hover { background: #a30027; }
+	.modal-btn.cancel { background: var(--ink-100); color: var(--sumi); }
+	.modal-btn.cancel:hover { background: var(--ink-200); }
 </style>

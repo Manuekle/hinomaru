@@ -8,7 +8,8 @@
 	import type { JLPTLevel, JLPTSectionType } from '$lib/data/jlpt/index';
 	import { showRomaji } from '$lib/stores/settings';
 	import Icon from '$lib/Icon.svelte';
-	import { DocumentValidationIcon } from '@hugeicons/core-free-icons';
+	import { DocumentValidationIcon, AlertCircleIcon } from '@hugeicons/core-free-icons';
+	import { fade } from 'svelte/transition';
 
 	const levels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state<JLPTLevel>('N5');
@@ -64,6 +65,19 @@
 		grammar: '文',
 		listening: '聴'
 	};
+
+	let showConfirmModal = $state(false);
+	let pendingUrl = $state<string | null>(null);
+
+	function openConfirm(url: string) {
+		pendingUrl = url;
+		showConfirmModal = true;
+	}
+
+	function handleConfirm() {
+		if (pendingUrl) goto(pendingUrl);
+		showConfirmModal = false;
+	}
 </script>
 
 <svelte:head>
@@ -127,7 +141,10 @@
 				class="row"
 				class:unavailable={!available}
 				disabled={!available}
-				onclick={() => available && goto(`/jlpt/${activeLevel}/${section}`)}
+				onclick={() => {
+					if (!available) return;
+					openConfirm(`/jlpt/${activeLevel}/${section}`);
+				}}
 			>
 				<div class="row-icon-jp jp">{SECTION_ICONS[section]}</div>
 
@@ -169,6 +186,20 @@
 		{t('jlpt.materials', $locale)}
 	</p>
 </div>
+
+{#if showConfirmModal}
+	<div class="modal-overlay" transition:fade={{ duration: 200 }}>
+		<div class="modal-content" use:fadeUp={{ delay: 0, y: 20 }}>
+			<div class="modal-icon"><Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" /></div>
+			<h3 class="modal-title">{t('exam.start_confirm_title', $locale) || 'Ready to start?'}</h3>
+			<p class="modal-text">{t('exam.start_confirm', $locale)}</p>
+			<div class="modal-actions">
+				<button class="modal-btn confirm" onclick={handleConfirm}>{t('exam.start', $locale)}</button>
+				<button class="modal-btn cancel" onclick={() => (showConfirmModal = false)}>{t('exam.exit_cancel', $locale)}</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.filter-chip {
@@ -360,4 +391,17 @@
 	.jp {
 		font-family: var(--font-jp);
 	}
+
+	/* Modal Premium */
+	.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+	.modal-content { background: var(--paper); border-radius: 32px; padding: 32px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 1px solid var(--ink-100); }
+	.modal-icon { width: 64px; height: 64px; background: var(--hinomaru-red-wash); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+	.modal-title { font-size: 20px; font-weight: 800; color: var(--sumi); margin-bottom: 12px; }
+	.modal-text { font-size: 15px; color: var(--fg-secondary); line-height: 1.5; margin-bottom: 28px; }
+	.modal-actions { display: flex; flex-direction: column; gap: 10px; }
+	.modal-btn { padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; transition: all 0.2s; cursor: pointer; border: none; }
+	.modal-btn.confirm { background: var(--hinomaru-red); color: white; }
+	.modal-btn.confirm:hover { background: #a30027; }
+	.modal-btn.cancel { background: var(--ink-100); color: var(--sumi); }
+	.modal-btn.cancel:hover { background: var(--ink-200); }
 </style>

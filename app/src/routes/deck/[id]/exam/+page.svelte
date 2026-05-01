@@ -232,6 +232,7 @@
 	}
 
 	onMount(() => {
+		startExam();
 		return () => {
 			if (timerInterval) clearInterval(timerInterval);
 			if (advanceTimeout) clearTimeout(advanceTimeout);
@@ -261,44 +262,10 @@
 
 <div class="session-layout">
 	<div class="session-container">
-		{#if phase === 'intro'}
-			<div use:fadeUp={{ delay: 0, y: 16 }} class="intro-screen">
-				<div class="intro-icon">
-					<Icon icon={DocumentValidationIcon} size={44} color="var(--washi)" strokeWidth={1.5} />
-				</div>
-				<h1 class="intro-title">{t('mode.exam.title', $locale)}</h1>
-				<p class="intro-deck">{$locale === 'es' ? deck?.title_es : deck?.title_en}</p>
-
-				<div class="rules-box">
-					<div class="rule-item">
-						<span class="rule-num">10</span>
-						<span class="rule-text">{t('exam.questions', $locale)}</span>
-					</div>
-					<div class="rule-item">
-						<span class="rule-num">5:00</span>
-						<span class="rule-text">{t('exam.minutes', $locale)}</span>
-					</div>
-					<div class="rule-item">
-						<span class="rule-num">1×</span>
-						<span class="rule-text">{t('exam.attempt', $locale)}</span>
-					</div>
-				</div>
-
-				{#if cards.length < 4}
-					<p class="warning-text">{t('exam.warning_min_cards', $locale)}</p>
-				{/if}
+		{#if phase === 'exam' && currentQuestion}
+			<div use:fadeUp={{ delay: 0, y: 10 }}>
+				<a href="/deck/{deck?.id}" class="back">← {t('deck.back', $locale)}</a>
 			</div>
-
-			<StickyFooter>
-				<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto(`/deck/${deck?.id}`)}>
-					← {t('deck.back', $locale)}
-				</button>
-				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:2;" onclick={startExam} disabled={cards.length < 4}>
-					{t('exam.start', $locale)}
-				</button>
-			</StickyFooter>
-
-		{:else if phase === 'exam' && currentQuestion}
 
 
 			<div class="exam-premium-header">
@@ -471,15 +438,20 @@
 
 
 
-	/* ── Intro ── */
-	.intro-screen { text-align: center; padding: 40px 0 20px; }
-	.intro-icon { width: 80px; height: 80px; background: var(--sumi); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-	.intro-title { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 4px; color: var(--sumi); }
-	.intro-deck { font-size: 15px; font-weight: 600; color: var(--fg-secondary); margin: 0 0 32px; }
-	.rules-box { display: flex; justify-content: center; gap: 24px; margin-bottom: 32px; background: var(--bg-surface); padding: 24px; border-radius: 24px; border: 1px solid var(--ink-200); }
-	.rule-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-	.rule-num { font-size: 24px; font-weight: 800; color: var(--sumi); }
-	.rule-text { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; }
+	/* ── Back Button ── */
+	.back {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		text-decoration: none;
+		display: inline-block;
+		margin-bottom: 20px;
+		transition: color 150ms;
+	}
+	@media (hover: hover) {
+		.back:hover {
+			color: var(--fg-primary);
+		}
+	}
 
 	/* ── Premium Exam Header ── */
 	.exam-premium-header { margin-bottom: 24px; }
