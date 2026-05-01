@@ -7,6 +7,9 @@
 	import { ArrowLeft02Icon, PrinterIcon, Share01Icon } from '@hugeicons/core-free-icons';
 	import type { JLPTLevel, JLPTSectionType } from '$lib/data/jlpt/index';
 	import { LEVEL_META } from '$lib/data/jlpt/index';
+	import { createClient } from '$lib/supabase';
+
+	const supabase = createClient();
 
 	const level = $derived($page.params.level as JLPTLevel);
 	const meta = $derived(LEVEL_META[level]);
@@ -94,29 +97,45 @@
 		}
 	}
 
-	onMount(() => {
+	function updateIssueDate(r: Record<string, SectionResult>) {
+		const dates = sections.map((s) => r[`${level}_${s}`]?.date).filter(Boolean) as string[];
+		issueDate = formatDate(dates.length ? dates.sort().reverse()[0] : new Date().toISOString());
+	}
+
+	onMount(async () => {
+		// Load localStorage first for instant display
 		const r: Record<string, SectionResult> = {};
 		for (const lv of ['N5', 'N4', 'N3', 'N2', 'N1'] as JLPTLevel[]) {
 			for (const sec of ['vocabulary', 'grammar', 'listening'] as JLPTSectionType[]) {
 				const raw = localStorage.getItem(`jlpt_result_${lv}_${sec}`);
 				if (raw) {
-					try {
-						r[`${lv}_${sec}`] = JSON.parse(raw);
-					} catch {
-						// Ignore parse errors
-					}
+					try { r[`${lv}_${sec}`] = JSON.parse(raw); } catch { /* ignore */ }
 				}
 			}
 		}
 		results = r;
+		updateIssueDate(r);
 
-		// Issue date: most recent exam date
-		const dates = sections.map((s) => results[`${level}_${s}`]?.date).filter(Boolean) as string[];
-		if (dates.length) {
-			issueDate = formatDate(dates.sort().reverse()[0]);
-		} else {
-			issueDate = formatDate(new Date().toISOString());
-		}
+		// Sync from Supabase
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				const { data: rows } = await supabase
+					.from('jlpt_results')
+					.select('level, section, score, total, pct, completed_at')
+					.eq('user_id', user.id);
+				if (rows?.length) {
+					const synced = { ...r };
+					for (const row of rows) {
+						synced[`${row.level}_${row.section}`] = {
+							score: row.score, total: row.total, pct: row.pct, date: row.completed_at
+						};
+					}
+					results = synced;
+					updateIssueDate(synced);
+				}
+			}
+		} catch { /* offline */ }
 	});
 </script>
 

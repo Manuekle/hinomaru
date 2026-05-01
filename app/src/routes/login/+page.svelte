@@ -823,22 +823,31 @@
 	}
 
 	.social-btn {
-		height: 52px;
+		height: 54px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: 10px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
-		border-radius: 16px;
+		border-radius: 18px;
 		cursor: pointer;
-		transition: all 150ms ease;
-		padding: 0 16px;
+		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+		padding: 0 20px;
+	}
+
+	@media (hover: hover) {
+		.social-btn:hover:not(:disabled) {
+			background: var(--ink-50);
+			border-color: var(--ink-300);
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-md);
+		}
 	}
 
 	.social-btn:active {
-		transform: scale(0.96);
-		background: var(--ink-50);
+		transform: scale(0.97) translateY(0);
+		background: var(--ink-100);
 	}
 
 	.social-icon {

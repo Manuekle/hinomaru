@@ -2,20 +2,19 @@
 	import { goto, beforeNavigate } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
-	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { createClient } from '$lib/supabase';
+	import { addXP } from '$lib/utils/gamification';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import ScrollingWaveform from '$lib/components/ScrollingWaveform.svelte';
+	import Confetti from '$lib/components/Confetti.svelte';
 	import {
-		DocumentValidationIcon,
 		CheckmarkCircle01Icon,
 		Cancel01Icon,
-		HeadphonesIcon,
 		Clock01Icon,
 		Target01Icon,
 		CheckmarkCircle02Icon,
@@ -34,26 +33,26 @@
 	} from '$lib/data/jlpt/index';
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
-	import { Play as PlayIcon, Pause as PauseIcon } from '@lucide/svelte';
 	import {
 		AudioPlayerProvider,
 		AudioPlayerButton,
 		AudioPlayerProgress,
 		AudioPlayerTime,
 		AudioPlayerDuration,
-		AudioPlayerSpeed,
 		getAudioPlayerContext
 	} from '$lib/components/ui/audio-player';
 	import { ArrowReloadHorizontalIcon } from '@hugeicons/core-free-icons';
 
 	let { data } = $props<{ data: { level: string; section: string } }>();
 
+	const supabase = createClient();
+
 	const level = $derived(data.level as JLPTLevel);
 	const section = $derived(data.section as JLPTSectionType);
 	const sectionLabel = $derived(SECTION_LABELS[section] ?? { es: section, en: section, jp: '' });
 
 	// ── Test data ──────────────────────────────────────────────────────────────
-	const test = $derived(section !== 'listening' ? getTest(level, section) : null);
+	const test = $derived(getTest(level, section));
 	const audioFiles = $derived(
 		section === 'listening' ? (AUDIO_FILES[level] ?? []) : []
 	);
@@ -104,7 +103,9 @@
 
 	// Audio state
 	let currentAudioIdx = $state(0);
-	let showTranscript = $state(false);
+
+	// Confetti
+	let confettiRef = $state<{ fire: () => void } | null>(null);
 
 	// ── Derived ──────────────────────────────────────────────────────────────
 	const currentQ = $derived(allQuestions[currentIdx]);
@@ -112,7 +113,6 @@
 	const score = $derived(correctness.filter(Boolean).length);
 	const wrong = $derived(correctness.filter((b) => !b).length);
 	const pct = $derived(allQuestions.length > 0 ? Math.round((score / allQuestions.length) * 100) : 0);
-	const timerPct = $derived(DURATION > 0 ? (timeLeft / DURATION) * 100 : 0);
 	const timerCritical = $derived(timeLeft <= 60);
 	const timerLabel = $derived(
 		`${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
@@ -120,11 +120,6 @@
 	const timeUsedLabel = $derived(
 		`${Math.floor(timeUsed / 60)}:${String(timeUsed % 60).padStart(2, '0')}`
 	);
-	const totalQuestionsCount = $derived.by(() => {
-		if (section === 'listening' && !test) return audioFiles.length;
-		if (!test) return 0;
-		return test.mondai.reduce((acc, m) => acc + m.questions.length, 0);
-	});
 
 
 
@@ -153,14 +148,16 @@
 
 		// Prepare and Shuffle Questions & Options
 		if (test) {
+			let globalQIdx = 0;
 			const flat = test.mondai.flatMap((m: JLPTMondai) =>
-				m.questions.map((q, qIdx) => {
+				m.questions.map((q) => {
+					const qIdx = globalQIdx++;
 					const originalCorrectChoice = q.choices[q.answer - 1];
 					const shuffledChoices = shuffleArray(q.choices);
 					const newAnswer = shuffledChoices.indexOf(originalCorrectChoice) + 1;
 
 					// Match audio file if this is a listening test
-					const audioFile = (section === 'listening' && test.audioFiles) 
+					const audioFile = (section === 'listening' && test?.audioFiles) 
 						? test.audioFiles[qIdx] 
 						: undefined;
 
@@ -211,19 +208,38 @@
 		checked = false;
 	}
 
+	async function saveResult(sec: string, s: number, tot: number, p: number) {
+		const date = new Date().toISOString();
+		try {
+			localStorage.setItem(
+				`jlpt_result_${level}_${sec}`,
+				JSON.stringify({ score: s, total: tot, pct: p, date })
+			);
+		} catch { /* ignore */ }
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				await supabase.from('jlpt_results').upsert(
+					{ user_id: user.id, level, section: sec, score: s, total: tot, pct: p, completed_at: date },
+					{ onConflict: 'user_id,level,section' }
+				);
+				if (sec !== 'listening') await addXP(supabase, user.id, p);
+			}
+		} catch { /* ignore — offline or unauthenticated */ }
+	}
+
 	function endExam() {
 		stopTimer();
 		phase = 'result';
 		playFinish();
-		// Persist result
-		try {
-			localStorage.setItem(
-				`jlpt_result_${level}_${section}`,
-				JSON.stringify({ score, total: allQuestions.length, pct, date: new Date().toISOString() })
-			);
-		} catch {
-			// Ignore localStorage errors
-		}
+		saveResult(section, score, allQuestions.length, pct);
+		setTimeout(() => confettiRef?.fire(), 300);
+	}
+
+	function finishListening() {
+		playFinish();
+		saveResult('listening', 1, 1, 100);
+		goto('/jlpt');
 	}
 
 	const isCorrect = $derived(
@@ -251,7 +267,7 @@
 	}
 
 	onMount(() => {
-		if (section === 'listening') {
+		if (section === 'listening' && !test) {
 			phase = 'listening';
 		} else {
 			startExam();
@@ -295,7 +311,7 @@
 
 					<div class="header-right">
 						{#if timeLeft !== null}
-							<div class="exam-timer-pill" class:is-critical={timeLeft < 60}>
+							<div class="exam-timer-pill" class:is-critical={timerCritical}>
 								<Icon icon={Clock01Icon} size={16} color="currentColor" />
 								<span class="timer-val">{timerLabel}</span>
 							</div>
@@ -340,13 +356,13 @@
 						<button
 							class="option-item"
 							class:is-selected={selected === idx}
-							class:is-correct={checked && idx + 1 === currentQ.answer && selected + 1 === currentQ.answer}
+							class:is-correct={checked && selected === idx && idx + 1 === currentQ.answer}
 							class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
 							disabled={checked}
 							onclick={() => { if (!checked) selected = idx; }}
 						>
 							<div class="opt-marker">
-								{#if checked && idx + 1 === currentQ.answer}
+								{#if checked && selected === idx && idx + 1 === currentQ.answer}
 									<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
 								{:else if checked && selected === idx && idx + 1 !== currentQ.answer}
 									<Icon icon={Cancel01Icon} size={16} color="white" />
@@ -403,9 +419,12 @@
 					<a href="/jlpt" class="back">← {t('deck.back', $locale)}</a>
 				</div>
 
-				<AudioPlayerProvider>
+				<AudioPlayerProvider
+					items={tracks}
+					bind:currentIndex={currentAudioIdx}
+				>
 					{@const player = getAudioPlayerContext()}
-					
+
 					<!-- Compact Playlist -->
 					<div class="compact-playlist" use:fadeUp={{ delay: 0.05, y: 5 }}>
 						{#each tracks as track, idx (track.id)}
@@ -414,12 +433,11 @@
 								class="playlist-pill" 
 								class:is-active={isActive}
 								onclick={() => {
-									currentAudioIdx = idx;
-									if (player.activeItem?.id !== track.id) {
-										player.activeItem = track;
-										player.isPlaying = true;
-									} else {
+									if (currentAudioIdx === idx) {
 										player.isPlaying = !player.isPlaying;
+									} else {
+										currentAudioIdx = idx;
+										player.isPlaying = true;
 									}
 								}}
 							>
@@ -488,16 +506,28 @@
 							{/if}
 						</div>
 					{/if}
+
+					<!-- Finalizar escucha -->
+					<div use:fadeUp={{ delay: 0.25, y: 8 }} style="margin-top:32px;">
+						<button
+							class="hm-btn hm-btn-dark hm-btn-lg"
+							style="width:100%;"
+							onclick={finishListening}
+						>
+							<Icon icon={CheckmarkCircle02Icon} size={20} color="currentColor" />
+							Finalizar escucha
+						</button>
+					</div>
 				</AudioPlayerProvider>
 			</div>
 
 		<!-- ── RESULT ── -->
 		{:else if phase === 'result'}
+			<Confetti bind:this={confettiRef} />
 			<div use:fadeUp={{ delay: 0, y: 20 }} class="result-screen">
-				
+
 				<!-- Premium Hero Header -->
 				<div class="result-premium-hero" class:is-pass={pct >= 60}>
-					<div class="hero-glow"></div>
 					<div class="hero-content-wrapper">
 						<div class="score-display-ring" use:fadeUp={{ delay: 0.2, y: 20 }}>
 							<svg class="progress-svg" viewBox="0 0 100 100">
@@ -550,17 +580,44 @@
 						<span class="stat-l">{t('exam.duration', $locale)}</span>
 					</div>
 				</div>
-			</div>
 
-			<StickyFooter>
-				<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto('/jlpt')}>
-					<Icon icon={ArrowLeft01Icon} size={20} color="currentColor" />
-					<span>JLPT</span>
-				</button>
-				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:2;" onclick={startExam}>
-					{t('exam.retry', $locale)}
-				</button>
-			</StickyFooter>
+				<!-- Answer Review — only correct answers -->
+				{#if correctness.some(Boolean)}
+					<div use:fadeUp={{ delay: 0.55, y: 16 }}>
+						<p class="review-section-label">Respuestas correctas</p>
+						<div class="review-list">
+							{#each allQuestions as q, i (i)}
+								{@const ok = correctness[i]}
+								{@const userIdx = selectedHistory[i]}
+								{@const userText = userIdx !== undefined ? q.choices[userIdx] : null}
+								{#if ok && userText}
+								<div class="review-item-premium is-review-correct">
+									<div class="review-num">{i + 1}</div>
+									<div class="review-body">
+										<p class="review-q jp">{q.sentence}</p>
+										<p class="review-correct-ans">
+											<span class="review-check">✓</span>
+											<span class="review-correct-text jp">{userText}</span>
+										</p>
+									</div>
+								</div>
+								{/if}
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				<!-- Result actions — inline, not sticky -->
+				<div class="result-actions" use:fadeUp={{ delay: 0.6, y: 12 }}>
+					<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto('/jlpt')}>
+						<Icon icon={ArrowLeft01Icon} size={20} color="currentColor" />
+						<span>JLPT</span>
+					</button>
+					<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:2;" onclick={startExam}>
+						{t('exam.retry', $locale)}
+					</button>
+				</div>
+			</div>
 		{/if}
 
 	</div>
@@ -577,10 +634,10 @@
 	icon={exitIcon}
 >
 	{#snippet actions()}
-		<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>
-			{t('exam.exit_cancel', $locale)}
+		<button class="modal-btn-cancel" onclick={() => (showExitModal = false)}>
+			{t('common.cancel', $locale)}
 		</button>
-		<button class="modal-btn confirm" onclick={handleConfirmExit}>
+		<button class="modal-btn-confirm" onclick={handleConfirmExit}>
 			{t('exam.exit_confirm', $locale)}
 		</button>
 	{/snippet}
@@ -1044,6 +1101,52 @@
 		padding-bottom: 40px;
 	}
 
+	/* ── Answer Review ── */
+	.review-section-label {
+		font-size: 11px; font-weight: 700;
+		text-transform: uppercase; letter-spacing: 0.08em;
+		color: var(--fg-tertiary);
+		margin: 0 0 10px;
+	}
+	.review-list {
+		display: flex; flex-direction: column; gap: 8px;
+	}
+	.review-item-premium {
+		display: flex; align-items: center; gap: 12px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		border-radius: 14px;
+		padding: 12px 14px;
+	}
+	.review-item-premium.is-review-correct { border-color: var(--success-wash); }
+	.review-item-premium.is-review-wrong { border-color: var(--hinomaru-red-wash); }
+
+	.review-num {
+		width: 22px; height: 22px;
+		border-radius: 50%;
+		background: var(--ink-100);
+		color: var(--fg-tertiary);
+		font-size: 11px; font-weight: 700;
+		display: flex; align-items: center; justify-content: center;
+		flex-shrink: 0;
+	}
+	.is-review-correct .review-num { background: var(--success-wash); color: var(--success); }
+	.is-review-wrong .review-num { background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+
+	.review-body { flex: 1; min-width: 0; }
+	.review-q {
+		font-size: 13px; color: var(--fg-secondary);
+		margin: 0 0 6px; line-height: 1.5;
+	}
+	.review-user-ans, .review-correct-ans {
+		display: flex; align-items: baseline; gap: 6px;
+		margin: 0 0 3px;
+	}
+	.review-x { font-size: 12px; font-weight: 700; color: var(--hinomaru-red); flex-shrink: 0; }
+	.review-check { font-size: 12px; font-weight: 700; color: var(--success); flex-shrink: 0; }
+	.review-wrong-text { font-size: 13px; color: var(--hinomaru-red); text-decoration: line-through; }
+	.review-correct-text { font-size: 14px; font-weight: 700; color: var(--success); }
+
 	.result-premium-hero {
 		position: relative;
 		border-radius: 32px;
@@ -1061,19 +1164,6 @@
 
 	.result-premium-hero:not(.is-pass) {
 		background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%);
-	}
-
-	.hero-glow {
-		position: absolute;
-		top: -50%; left: -50%; width: 200%; height: 200%;
-		background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 50%);
-		animation: glow-rotate 10s linear infinite;
-		pointer-events: none;
-	}
-
-	@keyframes glow-rotate {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
 	}
 
 	.hero-content-wrapper { position: relative; z-index: 2; }
@@ -1133,6 +1223,13 @@
 		text-transform: uppercase; letter-spacing: 0.1em;
 	}
 
+	/* Result actions */
+	.result-actions {
+		display: flex;
+		gap: 12px;
+		margin-top: 8px;
+	}
+
 	/* Stats Row */
 	.stats-premium-row {
 		display: flex;
@@ -1157,23 +1254,6 @@
 	.jp { font-family: var(--font-jp); }
 
 	/* Modal handled by ResponsiveModal */
-	.modal-actions {
-		display: flex; flex-direction: column; gap: 12px;
-	}
-	.modal-btn {
-		width: 100%; padding: 14px;
-		border-radius: 12px; font-size: 14px; font-weight: 700;
-		cursor: pointer; transition: all 0.2s;
-		border: none;
-	}
-	.modal-btn.confirm {
-		background: var(--hinomaru-red); color: white;
-	}
-	.modal-btn.confirm:hover { background: #a30027; transform: translateY(-2px); }
-	.modal-btn.cancel {
-		background: var(--ink-100); color: var(--sumi);
-	}
-	.modal-btn.cancel:hover { background: var(--ink-200); }
 
 	.jp { font-family: var(--font-jp); }
 
@@ -1194,16 +1274,8 @@
 		background: var(--ink-100);
 		border-color: var(--ink-200);
 	}
-	:global([data-theme='dark']) .progress-bar-fill {
-		background: var(--sumi);
-		opacity: 0.6;
-	}
-	:global([data-theme='dark']) .timer-label {
-		background: var(--ink-100);
-		border-color: var(--ink-300);
-	}
 
-	.player-main-btn {
+	:global(.player-main-btn) {
 		width: 64px !important;
 		height: 64px !important;
 		border-radius: 50% !important;
@@ -1212,7 +1284,7 @@
 		box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
 		display: flex; align-items: center; justify-content: center;
 	}
-	:global([data-theme='dark']) .player-main-btn {
+	:global([data-theme='dark'] .player-main-btn) {
 		background: var(--washi) !important;
 		color: var(--sumi) !important;
 	}

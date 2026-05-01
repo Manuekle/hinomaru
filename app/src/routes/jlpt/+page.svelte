@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
+	import { createClient } from '$lib/supabase';
 	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
 	import { getTest, LEVEL_META, SECTION_LABELS, AUDIO_FILES } from '$lib/data/jlpt/index';
 	import type { JLPTLevel, JLPTSectionType } from '$lib/data/jlpt/index';
@@ -11,6 +12,8 @@
 	import { DocumentValidationIcon, AlertCircleIcon } from '@hugeicons/core-free-icons';
 	import { fade } from 'svelte/transition';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
+
+	const supabase = createClient();
 
 	const levels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state<JLPTLevel>('N5');
@@ -23,21 +26,41 @@
 	}
 	let results = $state<Partial<Record<string, SectionResult>>>({});
 
-	onMount(() => {
+	onMount(async () => {
+		// Load localStorage first for instant display
 		const r: Partial<Record<string, SectionResult>> = {};
 		for (const lv of levels) {
 			for (const sec of ['vocabulary', 'grammar', 'listening'] as JLPTSectionType[]) {
 				const raw = localStorage.getItem(`jlpt_result_${lv}_${sec}`);
 				if (raw) {
-					try {
-						r[`${lv}_${sec}`] = JSON.parse(raw);
-					} catch {
-						// Ignore parse errors
-					}
+					try { r[`${lv}_${sec}`] = JSON.parse(raw); } catch { /* ignore */ }
 				}
 			}
 		}
 		results = r;
+
+		// Sync from Supabase (source of truth)
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				const { data: rows } = await supabase
+					.from('jlpt_results')
+					.select('level, section, score, total, pct, completed_at')
+					.eq('user_id', user.id);
+				if (rows?.length) {
+					const synced = { ...r };
+					for (const row of rows) {
+						const key = `${row.level}_${row.section}`;
+						synced[key] = { score: row.score, total: row.total, pct: row.pct, date: row.completed_at };
+						// Keep localStorage in sync
+						try {
+							localStorage.setItem(`jlpt_result_${row.level}_${row.section}`, JSON.stringify(synced[key]));
+						} catch { /* ignore */ }
+					}
+					results = synced;
+				}
+			}
+		} catch { /* offline — localStorage data is fine */ }
 	});
 
 	function getResult(level: JLPTLevel, section: JLPTSectionType): SectionResult | null {
@@ -56,9 +79,19 @@
 	}
 
 	function levelComplete(level: JLPTLevel): boolean {
-		return (['vocabulary', 'grammar'] as JLPTSectionType[]).every(
-			(sec) => getResult(level, sec) !== null
+		return (LEVEL_META[level]?.sections ?? []).every(
+			(sec) => !hasContent(level, sec) || getResult(level, sec) !== null
 		);
+	}
+
+	function completedCount(level: JLPTLevel): number {
+		return (LEVEL_META[level]?.sections ?? []).filter(
+			(sec) => hasContent(level, sec) && getResult(level, sec) !== null
+		).length;
+	}
+
+	function totalAvailable(level: JLPTLevel): number {
+		return (LEVEL_META[level]?.sections ?? []).filter((sec) => hasContent(level, sec)).length;
 	}
 
 	const SECTION_ICONS: Record<JLPTSectionType, string> = {
@@ -116,6 +149,13 @@
 		{/each}
 	</div>
 
+	<!-- Progress indicator -->
+	{#if completedCount(activeLevel) > 0}
+		<p use:fadeIn={{ delay: 0.2 }} style="font-size:12px;color:var(--fg-tertiary);margin:0 0 14px;font-weight:600;">
+			{completedCount(activeLevel)}/{totalAvailable(activeLevel)} secciones completadas
+		</p>
+	{/if}
+
 	<!-- Certificate banner if level complete -->
 	{#if levelComplete(activeLevel)}
 		<button
@@ -171,9 +211,13 @@
 
 				<div class="row-right">
 					{#if res !== null}
-						<span class="score-badge" class:pass={res.pct >= 70} class:fail={res.pct < 70}>
-							{res.pct}%
-						</span>
+						{#if section === 'listening'}
+							<span class="score-badge pass">✓</span>
+						{:else}
+							<span class="score-badge" class:pass={res.pct >= 70} class:fail={res.pct < 70}>
+								{res.pct}%
+							</span>
+						{/if}
 					{/if}
 					{#if available}
 						<span class="row-arrow">→</span>

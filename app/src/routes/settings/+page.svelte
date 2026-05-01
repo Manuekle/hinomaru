@@ -698,7 +698,7 @@
 	.card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 20px;
+		border-radius: 24px;
 		overflow: hidden;
 		box-shadow:
 			0 1px 3px rgba(0, 0, 0, 0.05),
@@ -735,26 +735,29 @@
 	}
 
 	.avatar {
-		width: 64px;
-		height: 64px;
-		border-radius: 50%;
-		background: var(--ink-100);
+		width: 72px;
+		height: 72px;
+		border-radius: 20px;
+		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 32px;
+		font-size: 36px;
 		cursor: pointer;
 		padding: 0;
-		transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+		transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+		box-shadow: var(--shadow-sm);
 	}
 	@media (hover: hover) {
 		.avatar:hover {
-			transform: scale(1.06);
+			transform: scale(1.05) translateY(-2px);
+			box-shadow: var(--shadow-md);
+			border-color: var(--ink-300);
 		}
 	}
 	.avatar:active {
-		transform: scale(0.93);
+		transform: scale(0.94) translateY(0);
 	}
 
 	.avatar-emoji {
@@ -819,7 +822,7 @@
 		aspect-ratio: 1;
 		padding: 0;
 		cursor: pointer;
-		border-radius: 14px;
+		border-radius: 16px;
 		transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 		display: flex;
 		align-items: center;
@@ -828,15 +831,16 @@
 	}
 	@media (hover: hover) {
 		.emoji-btn:hover {
-			background: var(--ink-100);
-			transform: scale(1.18) translateY(-2px);
+			background: var(--bg-surface);
+			transform: scale(1.18) translateY(-4px);
 			z-index: 2;
-			box-shadow: var(--shadow-sm);
+			box-shadow: var(--shadow-md);
+			border-color: var(--ink-200);
 		}
 	}
 	.emoji-btn:active {
-		transform: scale(0.9);
-		background: var(--ink-200);
+		transform: scale(0.9) translateY(0);
+		background: var(--ink-100);
 	}
 
 	.profile-info {
@@ -861,11 +865,11 @@
 	/* ── Segmented control ── */
 	.segmented {
 		background: var(--ink-100);
-		border-radius: 999px;
+		border-radius: 18px;
 		display: flex;
 		padding: 4px;
 		position: relative;
-		height: 42px;
+		height: 44px;
 	}
 
 	.seg-glider {
@@ -874,7 +878,7 @@
 		left: 4px;
 		height: calc(100% - 8px);
 		background: var(--bg-surface);
-		border-radius: 999px;
+		border-radius: 14px;
 		box-shadow:
 			0 1px 4px rgba(0, 0, 0, 0.12),
 			0 0 0 0.5px rgba(0, 0, 0, 0.06);
@@ -1055,28 +1059,28 @@
 	/* ── Sign out ── */
 	.signout-btn {
 		width: 100%;
-		height: 50px;
+		height: 52px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
-		border-radius: 16px;
+		border-radius: 20px;
 		color: var(--hinomaru-red);
-		font-weight: 700;
+		font-weight: 800;
 		font-size: 15px;
 		cursor: pointer;
 		letter-spacing: -0.01em;
-		transition:
-			background 0.15s,
-			border-color 0.15s,
-			transform 0.12s;
+		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+		box-shadow: var(--shadow-sm);
 	}
 	@media (hover: hover) {
 		.signout-btn:hover {
 			background: var(--hinomaru-red-wash);
 			border-color: var(--hinomaru-red);
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-md);
 		}
 	}
 	.signout-btn:active {
-		transform: scale(0.98);
+		transform: scale(0.97) translateY(0);
 	}
 
 

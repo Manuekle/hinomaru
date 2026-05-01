@@ -461,39 +461,43 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		height: 56px;
-		padding: 0 32px;
-		font-size: 16px;
-		font-weight: 600;
-		border-radius: 16px;
+		height: 60px;
+		padding: 0 40px;
+		font-size: 17px;
+		font-weight: 800;
+		border-radius: 20px;
 		text-decoration: none;
 		cursor: pointer;
-		transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+		transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 		border: none;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		gap: 10px;
+		gap: 12px;
+		letter-spacing: -0.01em;
 	}
 	.cta-white {
 		background: #ffffff;
 		color: var(--brand-primary);
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 	}
 	.cta-white:hover {
-		transform: translateY(-3px) scale(1.02);
-		box-shadow: 0 15px 35px rgba(255, 255, 255, 0.25);
+		transform: translateY(-4px);
+		box-shadow: 0 20px 45px rgba(255, 255, 255, 0.3);
 		background: #fdfdfd;
 	}
 	.cta-ghost {
-		background: rgba(255, 255, 255, 0.05);
+		background: rgba(255, 255, 255, 0.1);
 		color: #fff;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(12px);
-		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
 	}
 	.cta-ghost:hover {
-		background: rgba(255, 255, 255, 0.15);
-		transform: translateY(-3px) scale(1.02);
-		border-color: rgba(255, 255, 255, 0.4);
+		background: rgba(255, 255, 255, 0.2);
+		transform: translateY(-4px);
+		border-color: rgba(255, 255, 255, 0.5);
+		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+	}
+	.cta-btn:active {
+		transform: scale(0.96) translateY(0);
 	}
 
 	/* ── HERO ── */

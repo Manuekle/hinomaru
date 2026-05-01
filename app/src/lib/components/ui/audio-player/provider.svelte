@@ -4,9 +4,14 @@
 
 	interface Props {
 		children?: Snippet;
+		/** Playlist for auto-advance. When current track ends, moves to next. */
+		items?: AudioPlayerItem[];
+		/** Bindable index into items[] — updated when auto-advancing. */
+		currentIndex?: number;
+		onCurrentIndexChange?: (idx: number) => void;
 	}
 
-	let { children }: Props = $props();
+	let { children, items = [], currentIndex = $bindable(0), onCurrentIndexChange }: Props = $props();
 
 	// State
 	let activeItem = $state<AudioPlayerItem | null>(null);
@@ -38,6 +43,14 @@
 
 	setAudioPlayerContext(playerState);
 
+	// When currentIndex changes (externally or via auto-advance), load that track
+	$effect(() => {
+		const track = items[currentIndex];
+		if (track && activeItem?.id !== track.id) {
+			activeItem = track;
+		}
+	});
+
 	function handleTimeUpdate() {
 		if (audioEl) currentTime = audioEl.currentTime;
 	}
@@ -46,21 +59,10 @@
 		if (audioEl) duration = audioEl.duration;
 	}
 
-	function handlePlay() {
-		isPlaying = true;
-	}
-
-	function handlePause() {
-		isPlaying = false;
-	}
-
-	function handleWaiting() {
-		isBuffering = true;
-	}
-
-	function handlePlaying() {
-		isBuffering = false;
-	}
+	function handlePlay() { isPlaying = true; }
+	function handlePause() { isPlaying = false; }
+	function handleWaiting() { isBuffering = true; }
+	function handlePlaying() { isBuffering = false; }
 
 	function handleError() {
 		error = audioEl?.error?.message || 'Unknown error';
@@ -69,7 +71,6 @@
 
 	$effect(() => {
 		if (audioEl && activeItem) {
-			// Extract relative path from audioEl.src if it's a full URL
 			const currentSrc = audioEl.getAttribute('src');
 			if (currentSrc !== activeItem.src) {
 				audioEl.src = activeItem.src;
@@ -95,13 +96,20 @@
 	});
 
 	onMount(() => {
-		if (audioEl) {
-			playbackRate = audioEl.playbackRate;
-		}
+		if (audioEl) playbackRate = audioEl.playbackRate;
 	});
+
 	function handleEnded() {
 		isPlaying = false;
 		currentTime = 0;
+		// Auto-advance to next track in playlist
+		if (items.length > 0 && currentIndex < items.length - 1) {
+			const next = currentIndex + 1;
+			currentIndex = next;
+			onCurrentIndexChange?.(next);
+			// Small delay so UI updates before playback starts
+			setTimeout(() => { isPlaying = true; }, 100);
+		}
 	}
 </script>
 

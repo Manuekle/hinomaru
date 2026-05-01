@@ -3,6 +3,7 @@ import { setContext, getContext } from 'svelte';
 export interface AudioPlayerItem<TData = any> {
 	id: string | number;
 	src: string;
+	name?: string;
 	data?: TData;
 }
 

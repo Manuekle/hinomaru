@@ -10,7 +10,8 @@
 		PencilEdit01Icon,
 		PuzzleIcon,
 		DocumentValidationIcon,
-		AlertCircleIcon
+		AlertCircleIcon,
+		Mic01Icon
 	} from '@hugeicons/core-free-icons';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
@@ -65,6 +66,13 @@
 			descKey: 'mode.exam.desc',
 			icon: DocumentValidationIcon,
 			color: '#ff3b30'
+		},
+		{
+			id: 'speaking',
+			titleKey: 'mode.speaking.title',
+			descKey: 'mode.speaking.desc',
+			icon: Mic01Icon,
+			color: '#bc002d'
 		}
 	];
 
@@ -128,34 +136,34 @@
 	</div>
 
 	<!-- Mode list with stagger -->
-	<div class="label-meta" use:fadeIn={{ delay: 0.25 }} style="margin-top:48px;margin-bottom:12px;">
-		{t('deck.chooseMode', $locale)}
-	</div>
-
-	<div
-		use:staggerChildren={{ delay: 0.3, stagger: 0.06, y: 8 }}
-		style="display:flex;flex-direction:column;gap:10px;"
-	>
+	<div class="list" style="margin-top:48px;" use:staggerChildren={{ delay: 0.3, stagger: 0.06, y: 8 }}>
 		{#each modes as mode (mode.id)}
-			<a
-				href={mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`}
-				class="mode-card"
-				onclick={(e) => {
+			<button
+				class="row"
+				onclick={() => {
+					const url = mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`;
 					if (mode.id === 'exam') {
-						e.preventDefault();
-						openConfirm(`/deck/${deck.id}/exam`);
+						openConfirm(url);
+					} else {
+						goto(url);
 					}
 				}}
 			>
-				<div class="mode-icon-box" style="background: {mode.color}14; color: {mode.color};">
-					<Icon icon={mode.icon} size={20} strokeWidth={1.8} color="currentColor" />
+				<div class="row-icon-box">
+					<Icon icon={mode.icon} size={15} strokeWidth={2.5} color="currentColor" />
 				</div>
-				<div style="flex:1;">
-					<div style="font-size:16px;font-weight:600;">{t(mode.titleKey, $locale)}</div>
-					<div style="font-size:13px;color:var(--fg-secondary);">{t(mode.descKey, $locale)}</div>
+
+				<div class="row-body">
+					<div class="row-top">
+						<span class="row-title">{t(mode.titleKey, $locale)}</span>
+					</div>
+					<div class="row-sub">{t(mode.descKey, $locale)}</div>
 				</div>
-				<span style="color:var(--fg-tertiary);">→</span>
-			</a>
+
+				<div class="row-right">
+					<span class="row-arrow">→</span>
+				</div>
+			</button>
 		{/each}
 	</div>
 </div>
@@ -189,60 +197,108 @@
 		touch-action: manipulation;
 	}
 
-	.mode-card {
-		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
-		border-radius: 20px;
-		padding: 20px;
+	.list {
 		display: flex;
-		align-items: center;
-		gap: 16px;
-		text-decoration: none;
-		color: inherit;
-		transition:
-			box-shadow 0.2s ease,
-			transform 0.2s ease,
-			background 0.2s ease,
-			border-color 0.2s ease;
-		touch-action: manipulation;
-		-webkit-tap-highlight-color: transparent;
-		box-shadow: var(--shadow-sm);
+		flex-direction: column;
 	}
 
-	.mode-card:active {
-		transform: scale(0.98);
-		background: var(--ink-50);
+	.row {
+		display: flex;
+		align-items: flex-start;
+		gap: 16px;
+		padding: 16px 0;
+		border-bottom: 1px solid var(--ink-100);
+		background: none;
+		border-left: none;
+		border-right: none;
+		border-top: none;
+		border-radius: 4px;
+		color: inherit;
+		font-family: inherit;
+		text-align: left;
+		width: 100%;
+		cursor: pointer;
+		transition: background 150ms ease;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.row:first-child {
+		border-top: 1px solid var(--ink-100);
 	}
 
 	@media (hover: hover) {
-		.back-link:hover { color: var(--sumi); }
-		.mode-card:hover {
-			box-shadow: var(--shadow-md);
-			transform: translateY(-2px);
-			border-color: var(--ink-300);
-			background: var(--bg-surface);
+		.back-link:hover {
+			color: var(--sumi);
+		}
+		.row:hover .row-title {
+			color: var(--hinomaru-red);
+		}
+		.row:hover .row-arrow {
+			color: var(--hinomaru-red);
+			transform: translateX(3px);
 		}
 	}
 
-	:global([data-theme='dark']) .mode-card {
-		background: var(--ink-100);
-		border-color: var(--ink-200);
+	.row:active .row-title {
+		color: var(--hinomaru-red);
 	}
 
-	:global([data-theme='dark']) .mode-card:hover {
-		background: var(--ink-200);
-		border-color: var(--ink-300);
+	.row:active .row-arrow {
+		color: var(--hinomaru-red);
+		transform: scale(0.9) translateX(2px);
 	}
 
-	.mode-icon-box {
-		width: 40px;
-		height: 40px;
-		border-radius: 12px;
+	.row-icon-box {
+		width: 28px;
+		height: 28px;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
+		margin-top: 2px;
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
 	}
 
-	/* Modal handled by ResponsiveModal */
+	.row-body {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.row-top {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 3px;
+	}
+
+	.row-title {
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		line-height: 1.2;
+		transition: color 150ms;
+	}
+
+	.row-sub {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		line-height: 1.4;
+	}
+
+	.row-right {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+		padding-top: 4px;
+	}
+
+	.row-arrow {
+		font-size: 16px;
+		color: var(--fg-tertiary);
+		transition:
+			color 150ms,
+			transform 150ms;
+	}
 </style>

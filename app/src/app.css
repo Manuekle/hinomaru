@@ -264,36 +264,37 @@ body {
 	align-items: center;
 	justify-content: center;
 	gap: var(--space-2);
-	height: 48px;
-	padding: 0 var(--space-6);
+	height: 52px;
+	padding: 0 var(--space-8);
 	font-family: var(--font-ui);
 	font-size: var(--fs-base);
-	font-weight: 600;
-	border-radius: var(--radius-md);
-	border: 1px solid transparent;
+	font-weight: 800;
+	border-radius: 20px;
+	border: none;
 	cursor: pointer;
-	transition:
-		background var(--dur-micro) var(--ease-brand),
-		transform 80ms var(--ease-brand);
+	transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
 	text-decoration: none;
 	touch-action: manipulation;
 	-webkit-tap-highlight-color: transparent;
+	letter-spacing: -0.01em;
 }
 
 .hm-btn:active {
-	transform: scale(0.98);
+	transform: scale(0.96) translateY(0) !important;
 }
 
 .hm-btn-sm {
-	height: 40px;
-	padding: 0 16px;
+	height: 42px;
+	padding: 0 20px;
 	font-size: var(--fs-sm);
+	border-radius: 16px;
 }
 
 .hm-btn-lg {
-	height: 56px;
-	padding: 0 32px;
+	height: 60px;
+	padding: 0 36px;
 	font-size: var(--fs-md);
+	border-radius: 24px;
 }
 
 .hm-btn-full {
@@ -303,12 +304,13 @@ body {
 .hm-btn-primary {
 	background: var(--hinomaru-red);
 	color: var(--fg-inverse);
+	box-shadow: 0 8px 20px rgba(188, 0, 45, 0.2);
 }
 
 .hm-btn-secondary {
-	background: var(--washi);
+	background: var(--bg-surface);
 	color: var(--fg-primary);
-	border-color: var(--ink-200);
+	border: 1.5px solid var(--ink-200);
 }
 
 .hm-btn-ghost {
@@ -319,14 +321,30 @@ body {
 .hm-btn-dark {
 	background: var(--sumi);
 	color: var(--washi);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Hover only on pointer devices — prevents stuck hover state on mobile/touch */
+/* Hover only on pointer devices */
 @media (hover: hover) {
-	.hm-btn-primary:hover { background: var(--hinomaru-red-ink); }
-	.hm-btn-secondary:hover { background: var(--ink-50); }
-	.hm-btn-ghost:hover { background: var(--ink-100); }
-	.hm-btn-dark:hover { background: var(--ink-700); }
+	.hm-btn:hover {
+		transform: translateY(-3px);
+	}
+	.hm-btn-primary:hover { 
+		background: var(--hinomaru-red-ink); 
+		box-shadow: 0 12px 28px rgba(188, 0, 45, 0.3);
+	}
+	.hm-btn-secondary:hover { 
+		background: var(--ink-50); 
+		border-color: var(--ink-300);
+		box-shadow: var(--shadow-md);
+	}
+	.hm-btn-ghost:hover { 
+		background: var(--ink-100); 
+	}
+	.hm-btn-dark:hover { 
+		background: var(--ink-700); 
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+	}
 }
 
 .hm-pill {

@@ -194,18 +194,27 @@
 	.audio-btn {
 		background: var(--ink-100);
 		border: none;
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
+		width: 44px;
+		height: 44px;
+		border-radius: 14px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
 		font-size: 18px;
-		transition: transform 0.2s;
+		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+		color: var(--sumi);
 	}
+
+	@media (hover: hover) {
+		.audio-btn:hover {
+			background: var(--ink-200);
+			transform: scale(1.05) translateY(-1px);
+		}
+	}
+
 	.audio-btn:active {
-		transform: scale(0.9);
+		transform: scale(0.95);
 	}
 
 	.wotd-meaning {
@@ -217,21 +226,27 @@
 
 	.save-btn {
 		width: 100%;
-		height: 44px;
+		height: 48px;
 		background: var(--ink-100);
 		border: none;
-		border-radius: 14px;
+		border-radius: 16px;
 		font-size: 14px;
-		font-weight: 700;
+		font-weight: 800;
 		color: var(--sumi);
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
 		font-family: var(--font-ui);
+		letter-spacing: -0.01em;
 	}
 
 	@media (hover: hover) {
 		.save-btn:hover:not(:disabled) {
 			background: var(--ink-200);
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-md);
 		}
+	}
+	.save-btn:active {
+		transform: scale(0.97) translateY(0);
 	}
 </style>

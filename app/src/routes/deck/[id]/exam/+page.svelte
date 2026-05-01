@@ -21,6 +21,7 @@
 		Target01Icon
 	} from '@hugeicons/core-free-icons';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
+	import Confetti from '$lib/components/Confetti.svelte';
 	import type { PageData } from './$types';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
 
@@ -41,6 +42,8 @@
 	const supabase = createClient();
 	const cards = $derived(data.cards as any[]);
 	const deck = $derived(data.deck);
+
+	let confettiRef = $state<{ fire: () => void } | null>(null);
 
 	// ── Exam state ──────────────────────────────────────────────────────────────
 	type Phase = 'intro' | 'exam' | 'result';
@@ -184,6 +187,7 @@
 		stopTimer();
 		phase = 'result';
 		playFinish();
+		setTimeout(() => confettiRef?.fire(), 300);
 		await saveSession();
 	}
 
@@ -375,9 +379,9 @@
 			</StickyFooter>
 
 		{:else if phase === 'result'}
+			<Confetti bind:this={confettiRef} />
 			<div use:fadeUp={{ delay: 0, y: 20 }} class="result-screen">
 				<div class="result-premium-hero" class:is-pass={pct >= 70}>
-					<div class="hero-glow"></div>
 					<div class="hero-content-wrapper">
 						<div class="score-display-ring" use:fadeUp={{ delay: 0.2, y: 20 }}>
 							<svg class="progress-svg" viewBox="0 0 100 100">
@@ -397,16 +401,16 @@
 					<div class="stat-pill-sm wrong"><Icon icon={Cancel01Icon} size={14} color="var(--hinomaru-red)" /><span class="stat-v">{wrongCount}</span><span class="stat-l">{t('exam.incorrect_count', $locale)}</span></div>
 					<div class="stat-pill-sm duration"><Icon icon={Clock01Icon} size={14} color="var(--sumi)" /><span class="stat-v">{timeUsedLabel}</span><span class="stat-l">{t('exam.duration', $locale)}</span></div>
 				</div>
-			</div>
 
-			<StickyFooter>
-				<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto(`/deck/${deck?.id}`)}>
-					← {t('deck.back', $locale)}
-				</button>
-				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={startExam}>
-					{t('exam.retry', $locale)}
-				</button>
-			</StickyFooter>
+				<div class="result-actions" use:fadeUp={{ delay: 0.5, y: 12 }}>
+					<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto(`/deck/${deck?.id}`)}>
+						← {t('deck.back', $locale)}
+					</button>
+					<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={startExam}>
+						{t('exam.retry', $locale)}
+					</button>
+				</div>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -422,8 +426,8 @@
 	icon={exitIcon}
 >
 	{#snippet actions()}
-		<button class="modal-btn confirm" onclick={handleConfirmExit}>{t('exam.exit_confirm', $locale)}</button>
-		<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>{t('exam.exit_cancel', $locale)}</button>
+		<button class="modal-btn-cancel" onclick={() => (showExitModal = false)}>{t('common.cancel', $locale)}</button>
+		<button class="modal-btn-confirm" onclick={handleConfirmExit}>{t('exam.exit_confirm', $locale)}</button>
 	{/snippet}
 </ResponsiveModal>
 
@@ -514,8 +518,8 @@
 	.result-screen { display: flex; flex-direction: column; gap: 24px; }
 	.result-premium-hero { position: relative; border-radius: 32px; padding: 48px 24px; text-align: center; overflow: hidden; background: #1a1a1a; color: white; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
 	.result-premium-hero.is-pass { background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%); }
-	.hero-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none; }
 	.hero-content-wrapper { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+	.result-actions { display: flex; gap: 12px; margin-top: 8px; }
 	.score-display-ring { position: relative; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; }
 	.progress-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 	.progress-track { stroke: rgba(255,255,255,0.15); }
@@ -533,12 +537,6 @@
 	.stat-l { font-size: 12px; font-weight: 700; color: var(--fg-secondary); text-transform: lowercase; }
 
 	/* Modal handled by ResponsiveModal */
-	.modal-actions { display: flex; flex-direction: column; gap: 10px; }
-	.modal-btn { padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; transition: all 0.2s; cursor: pointer; border: none; }
-	.modal-btn.confirm { background: var(--hinomaru-red); color: white; }
-	.modal-btn.confirm:hover { background: #a30027; }
-	.modal-btn.cancel { background: var(--ink-100); color: var(--sumi); }
-	.modal-btn.cancel:hover { background: var(--ink-200); }
 
 	.jp { font-family: var(--font-jp); }
 
