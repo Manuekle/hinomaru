@@ -314,21 +314,24 @@
 			<!-- Premium Exam Header -->
 			<div class="exam-premium-header">
 				<div class="exam-header-main">
-					<div class="exam-meta-group">
+					<div class="header-left">
 						<span class="exam-label-pill">もんだい {currentQ?.mondaiId?.split('-').pop() || 1}</span>
-						<div class="exam-step-indicator">
-							<span class="step-curr">{currentIdx + 1}</span>
-							<span class="step-divider">/</span>
-							<span class="step-total">{allQuestions.length}</span>
-						</div>
 					</div>
 
-					{#if timeLeft !== null}
-						<div class="exam-timer-pill" class:is-critical={timeLeft < 60}>
-							<Icon icon={Clock01Icon} size={16} color="currentColor" />
-							<span class="timer-val">{timerLabel}</span>
-						</div>
-					{/if}
+					<div class="exam-step-indicator">
+						<span class="step-curr">{currentIdx + 1}</span>
+						<span class="step-divider">/</span>
+						<span class="step-total">{allQuestions.length}</span>
+					</div>
+
+					<div class="header-right">
+						{#if timeLeft !== null}
+							<div class="exam-timer-pill" class:is-critical={timeLeft < 60}>
+								<Icon icon={Clock01Icon} size={16} color="currentColor" />
+								<span class="timer-val">{timerLabel}</span>
+							</div>
+						{/if}
+					</div>
 				</div>
 			</div>
 
@@ -615,7 +618,7 @@
 	.session-container {
 		max-width: 720px;
 		margin: 0 auto;
-		padding: calc(16px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
+		padding: calc(12px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));
 	}
 
 	/* ── Romaji toggle ── */
@@ -669,19 +672,17 @@
 
 	/* ── PREMIUM EXAM HEADER ── */
 	.exam-premium-header {
-		margin: 20px 0 24px;
+		margin: 0 0 24px;
 	}
 	.exam-header-main {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.exam-meta-group {
-		display: flex;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
 		gap: 12px;
 	}
+
+	.header-left { display: flex; align-items: center; }
+	.header-right { display: flex; justify-content: flex-end; align-items: center; }
 
 	.exam-label-pill {
 		font-size: 12px;

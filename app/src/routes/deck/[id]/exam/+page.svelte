@@ -303,17 +303,21 @@
 
 			<div class="exam-premium-header">
 				<div class="exam-header-main">
-					<div class="exam-meta-group">
+					<div class="header-left">
 						<span class="exam-label-pill">{typeLabel(currentQuestion.type)}</span>
-						<div class="exam-step-indicator">
-							<span class="step-curr">{currentIdx + 1}</span>
-							<span class="step-divider">/</span>
-							<span class="step-total">{questions.length}</span>
-						</div>
 					</div>
-					<div class="exam-timer-pill" class:is-critical={timerCritical}>
-						<Icon icon={Clock01Icon} size={16} color="currentColor" />
-						<span class="timer-val">{timerLabel}</span>
+					
+					<div class="exam-step-indicator">
+						<span class="step-curr">{currentIdx + 1}</span>
+						<span class="step-divider">/</span>
+						<span class="step-total">{questions.length}</span>
+					</div>
+
+					<div class="header-right">
+						<div class="exam-timer-pill" class:is-critical={timerCritical}>
+							<Icon icon={Clock01Icon} size={16} color="currentColor" />
+							<span class="timer-val">{timerLabel}</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -458,7 +462,12 @@
 
 <style>
 	.session-layout { display: flex; flex-direction: column; min-height: 100vh; background: var(--paper); }
-	.session-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom)); }
+	.session-container { 
+		width: 100%; 
+		max-width: 720px; 
+		margin: 0 auto; 
+		padding: calc(12px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom)); 
+	}
 
 
 
@@ -474,8 +483,14 @@
 
 	/* ── Premium Exam Header ── */
 	.exam-premium-header { margin-bottom: 24px; }
-	.exam-header-main { display: flex; justify-content: space-between; align-items: center; }
-	.exam-meta-group { display: flex; align-items: center; gap: 12px; }
+	.exam-header-main { 
+		display: grid; 
+		grid-template-columns: 1fr auto 1fr; 
+		align-items: center; 
+		gap: 12px;
+	}
+	.header-left { display: flex; align-items: center; }
+	.header-right { display: flex; justify-content: flex-end; align-items: center; }
 	.exam-label-pill { font-size: 11px; font-weight: 800; color: var(--washi); background: var(--sumi); padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
 	:global([data-theme='dark']) .exam-label-pill { background: var(--ink-200); color: var(--sumi); }
 	.exam-step-indicator { display: flex; align-items: baseline; gap: 3px; font-weight: 700; }
