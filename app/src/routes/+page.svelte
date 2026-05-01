@@ -13,8 +13,9 @@
 
 	let { data } = $props<{ data: PageData }>();
 
-	const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
-	let activeLevel = $state('N5');
+	const levels = ['Survival', 'N5', 'N4', 'N3', 'N2', 'N1'];
+	let activeLevel = $state(data.motivation === 'travel' ? 'Survival' : 'N5');
+
 
 	const filtered = $derived(data.decks.filter((d: any) => d.level === activeLevel));
 	const totalLearned = $derived(data.decks.reduce((s: number, d: any) => s + (d.learned ?? 0), 0));
@@ -29,6 +30,8 @@
 			Math.max(0, ((currentXP - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100)
 		)
 	);
+	const learnedToday = $derived(data.learnedToday ?? 0);
+	const dailyGoal = $derived(data.dailyGoal ?? 5);
 </script>
 
 {#if !data.user}
@@ -123,8 +126,13 @@
 			</a>
 		{/if}
 
-		<!-- Word of the Day -->
-		<WordOfTheDay word={data.todayWord} initiallySaved={data.wordSaved} />
+		<!-- Word of the Day & Progress -->
+		<WordOfTheDay 
+			word={data.todayWord} 
+			initiallySaved={data.wordSaved} 
+			learnedToday={learnedToday}
+			dailyGoal={dailyGoal}
+		/>
 
 		<!-- Level tabs -->
 
@@ -240,6 +248,9 @@
 {/if}
 
 <style>
+	/* ── Daily Goal (Dashboard) ── */
+
+	/* ── General ── */
 	.settings-group {
 		display: flex;
 		flex-direction: column;

@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 					.eq('learned', true)
 			: Promise.resolve({ data: [] }),
 		user
-			? locals.supabase.from('profiles').select('current_streak, xp, level, avatar, total_lessons, srs_enabled').eq('id', user.id).maybeSingle()
+			? locals.supabase.from('profiles').select('current_streak, xp, level, avatar, total_lessons, srs_enabled, daily_goal, motivation').eq('id', user.id).maybeSingle()
 			: Promise.resolve({ data: null }),
 		user
 			? locals.supabase
@@ -55,8 +55,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// Dependent queries (these need results from the first batch)
 	let storyRead = false;
 	let wordSaved = false;
+	let learnedToday = 0;
+	const dailyGoal = (profile as any)?.daily_goal ?? 5;
 
 	if (user) {
+		const todayStart = new Date();
+		todayStart.setUTCHours(0, 0, 0, 0);
+
 		const queries = [];
 		if (todayStory) {
 			queries.push(
@@ -84,14 +89,39 @@ export const load: PageServerLoad = async ({ locals }) => {
 			queries.push(Promise.resolve({ data: null }));
 		}
 
-		const [readRes, savedRes] = await Promise.all(queries);
+		// Count new cards learned today (cross-deck)
+		queries.push(
+			locals.supabase
+				.from('progress')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', user.id)
+				.eq('learned', true)
+				.gte('last_seen', todayStart.toISOString())
+		);
+
+		// Count words saved today
+		queries.push(
+			locals.supabase
+				.from('user_saved_words')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', user.id)
+				.gte('created_at', todayStart.toISOString())
+		);
+
+		const [readRes, savedRes, todayRes, savedTodayRes] = await Promise.all(queries);
 		storyRead = !!readRes.data;
 		wordSaved = !!savedRes.data;
+		
+		const learnedCardsCount = (todayRes as any)?.count ?? 0;
+		const savedWordsCount = (savedTodayRes as any)?.count ?? 0;
+		learnedToday = learnedCardsCount + savedWordsCount;
 	}
+
 
 	return {
 		user,
 		profile,
+		motivation: (profile as any)?.motivation,
 		decks: decks.map((d: any) => ({
 			...d,
 			learned: learnedByDeck[d.id] ?? 0,
@@ -101,6 +131,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		todayStory,
 		storyRead,
 		todayWord,
-		wordSaved
+		wordSaved,
+		learnedToday,
+		dailyGoal
 	};
 };

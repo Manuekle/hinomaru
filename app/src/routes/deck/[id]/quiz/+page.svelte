@@ -34,23 +34,27 @@
 
 	const options = $derived.by(() => {
 		if (!card) return [];
-		// Filter out the correct answer and duplicates by meaning
+		const correctMeaning = $locale === 'es' ? card.es : card.en;
+
+		// Pool of unique distractors (different meaning from current card)
 		const pool = Array.from(
 			new Set(
 				cards
 					.filter((c) => c.en !== card.en && c.es !== card.es)
 					.map((c) => ($locale === 'es' ? c.es : c.en))
+					.filter(Boolean)
 			)
 		);
 
-		// Fisher-Yates partial shuffle to pick 2 random distractors
-		for (let k = pool.length - 1; k > pool.length - 3 && k > 0; k--) {
+		// Fisher-Yates partial shuffle to pick up to 2 distractors
+		const need = Math.min(2, pool.length);
+		for (let k = pool.length - 1; k > pool.length - 1 - need && k > 0; k--) {
 			const r = Math.floor(Math.random() * (k + 1));
 			[pool[k], pool[r]] = [pool[r], pool[k]];
 		}
 
-		const distractors = pool.slice(-2);
-		const result = [...distractors, $locale === 'es' ? card.es : card.en];
+		const distractors = pool.slice(-need);
+		const result = [...distractors, correctMeaning];
 
 		// Fisher-Yates shuffle final options
 		for (let k = result.length - 1; k > 0; k--) {

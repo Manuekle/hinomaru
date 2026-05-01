@@ -19,6 +19,10 @@
 	import { conversations, type DialogueChoice } from '$lib/data/conversations';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
+	import { comparePhrase } from '$lib/speaking/compare';
+	import { Mic01Icon } from '@hugeicons/core-free-icons';
+
 
 	const supabase = createClient();
 
@@ -35,6 +39,16 @@
 	let selectedIdx = $state<number | null>(null);
 	let showTranslation = $state(false);
 	let fireConfetti = $state(false);
+
+	// Roleplay Mode
+	let roleplayMode = $state(true);
+	const recognizer = new JapaneseSpeechRecognizer();
+	let liveTranscript = $state('');
+	let isRecording = $state(false);
+	let speechError = $state<string | null>(null);
+	let speechStatus = $state<SpeechStatus>({ ok: false, reason: 'no-window' });
+	let speechHost = $state('');
+
 
 	const currentTurn = $derived(scenario?.turns[turnIndex] ?? null);
 	const progressPct = $derived(scenario ? Math.round((turnIndex / scenario.turns.length) * 100) : 0);
@@ -113,8 +127,60 @@
 		selectedIdx = null;
 		showTranslation = false;
 		fireConfetti = false;
+		liveTranscript = '';
+		speechError = null;
 		const first = scenario?.turns[0];
 		phase = first?.type === 'choice' ? 'choice' : 'npc';
+	}
+
+	async function startRecording() {
+		if (phase !== 'choice' || !speechOk) return;
+		speechError = null;
+		liveTranscript = '';
+		isRecording = true;
+
+		await recognizer.start(
+			(r) => { liveTranscript = r.transcript; },
+			(err) => { speechError = err; isRecording = false; },
+			() => {
+				isRecording = false;
+				if (!liveTranscript && !speechError) {
+					speechError = t('speaking.noSpeech', $locale);
+					return;
+				}
+				if (liveTranscript && currentTurn?.type === 'choice') {
+					checkSpokenAnswer(liveTranscript);
+				}
+			}
+		);
+	}
+
+	function stopRecording() {
+		if (isRecording) recognizer.stop();
+	}
+
+	function checkSpokenAnswer(spoken: string) {
+		if (currentTurn?.type !== 'choice') return;
+		let bestScore = 0;
+		let bestIdx = -1;
+
+		currentTurn.choices.forEach((choice, idx) => {
+			const c = comparePhrase(choice.jp, spoken, [choice.jp]);
+			if (c.overallScore > bestScore) {
+				bestScore = c.overallScore;
+				bestIdx = idx;
+			}
+		});
+
+		// If score is decent enough (> 0.4), accept it as their choice
+		if (bestScore > 0.4 && bestIdx !== -1) {
+			const matchedChoice = currentTurn.choices[bestIdx];
+			// Find its original index in shuffledChoices to select the right one visually
+			const visualIdx = shuffledChoices.findIndex(sc => sc.originalIdx === bestIdx);
+			pickChoice(matchedChoice, visualIdx !== -1 ? visualIdx : bestIdx);
+		} else {
+			speechError = $locale === 'es' ? 'No reconocí ninguna de las opciones. Intenta de nuevo.' : "Didn't recognize any of the options. Try again.";
+		}
 	}
 
 	// Auto-speak NPC lines
@@ -126,9 +192,25 @@
 
 	onMount(() => {
 		if (!scenario) { goto('/conversation'); return; }
+		speechStatus = getSpeechStatus();
+		speechHost = typeof location !== 'undefined' ? location.host : '';
 		const first = scenario.turns[0];
 		phase = first.type === 'choice' ? 'choice' : 'npc';
 	});
+
+	import { onDestroy } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
+	beforeNavigate(() => recognizer.stop());
+	onDestroy(() => recognizer.stop());
+
+	const speechOk = $derived(speechStatus.ok);
+	const speechWarn = $derived.by(() => {
+		if (speechStatus.ok) return '';
+		if (speechStatus.reason === 'insecure') return `${t('speaking.insecure', $locale)} (${speechHost})`;
+		if (speechStatus.reason === 'unsupported') return t('speaking.unsupported', $locale);
+		return '';
+	});
+
 </script>
 
 <svelte:head>
@@ -148,12 +230,28 @@
 		<div
 			style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 		>
-			<!-- Back link -->
-			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;">
+			<!-- Header actions -->
+			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
 				<a href="/conversation" class="back-link-beautiful">
 					← {t('deck.back', $locale)}
 				</a>
+				
+				{#if speechOk}
+					<button 
+						class="roleplay-toggle" 
+						class:active={roleplayMode}
+						onclick={() => (roleplayMode = !roleplayMode)}
+					>
+						<Icon icon={Mic01Icon} size={14} color="currentColor" />
+						{roleplayMode ? ($locale === 'es' ? 'Roleplay: ON' : 'Roleplay: ON') : ($locale === 'es' ? 'Roleplay: OFF' : 'Roleplay: OFF')}
+					</button>
+				{/if}
 			</div>
+
+			{#if speechWarn && roleplayMode}
+				<div class="speech-warn" style="margin-bottom:16px;">{speechWarn}</div>
+			{/if}
+
 
 			{#if phase !== 'result'}
 				<!-- Header row -->
@@ -242,13 +340,43 @@
 							</div>
 						</div>
 
-						<!-- Options (same as story quiz) -->
+						<!-- Options or Recording Mode -->
 						<div use:fadeUp={{ delay: 0.18, y: 10 }} style="margin-top:32px;">
 							<p class="question-text">
 								{$locale === 'es' ? 'Elige la respuesta más natural:' : 'Choose the most natural response:'}
 							</p>
 
-							<div class="options-grid">
+							{#if roleplayMode && phase === 'choice'}
+								<!-- ROLEPLAY MODE -->
+								<div class="roleplay-box">
+									<p style="font-size:14px;color:var(--fg-secondary);margin:0 0 16px;text-align:center;">
+										{$locale === 'es' ? 'Mantén presionado para hablar tu respuesta' : 'Hold to speak your response'}
+									</p>
+									
+									<button
+										class="hm-btn hm-btn-lg roleplay-mic-btn"
+										class:is-recording={isRecording}
+										onmousedown={startRecording}
+										onmouseup={stopRecording}
+										ontouchstart={startRecording}
+										ontouchend={stopRecording}
+									>
+										{#if isRecording}
+											<span class="rec-dot"></span>
+											{liveTranscript || '...'}
+										{:else}
+											<Icon icon={Mic01Icon} size={24} color="currentColor" />
+											{$locale === 'es' ? 'Hablar' : 'Speak'}
+										{/if}
+									</button>
+
+									{#if speechError}
+										<p class="error-text" style="margin-top:12px;">{speechError}</p>
+									{/if}
+								</div>
+							{:else}
+								<!-- STANDARD MULTIPLE CHOICE -->
+								<div class="options-grid">
 								{#each shuffledChoices as choice, loopIdx (choice.originalIdx)}
 									{@const isPicked = selectedIdx === loopIdx}
 									{@const isRevealed = phase === 'feedback'}
@@ -272,6 +400,7 @@
 									</button>
 								{/each}
 							</div>
+							{/if}
 						</div>
 
 						<!-- Feedback (shown after picking) -->
@@ -383,6 +512,90 @@
 		transition: color 150ms ease;
 	}
 	@media (hover: hover) { .back-link-beautiful:hover { color: var(--sumi); } }
+
+	.roleplay-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		padding: 6px 12px;
+		border-radius: 99px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.roleplay-toggle.active {
+		color: var(--hinomaru-red);
+		border-color: rgba(188,0,45,0.4);
+		background: var(--hinomaru-red-wash);
+	}
+	
+	.roleplay-box {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 24px;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	
+	.roleplay-mic-btn {
+		background: var(--bg-surface);
+		color: var(--sumi);
+		border: 2px solid var(--ink-200);
+		width: 100%;
+		max-width: 280px;
+		height: 64px;
+		border-radius: 32px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 12px;
+		font-size: 18px;
+		font-weight: 700;
+		transition: all 0.2s;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	
+	.roleplay-mic-btn:active {
+		transform: scale(0.96);
+		background: var(--ink-100);
+	}
+	
+	.roleplay-mic-btn.is-recording {
+		background: var(--sumi);
+		color: var(--paper);
+		border-color: var(--sumi);
+	}
+
+	.rec-dot {
+		width: 10px; height: 10px;
+		border-radius: 50%; background: var(--hinomaru-red);
+		flex-shrink: 0;
+		animation: pulse-btn 0.7s infinite alternate;
+	}
+	@keyframes pulse-btn { from { opacity: 1; } to { opacity: 0.5; } }
+
+	.error-text { font-size: 13px; color: var(--hinomaru-red); font-weight: 600; text-align: center; margin:0;}
+
+	.speech-warn {
+		width: 100%;
+		padding: 10px 14px;
+		border-radius: 12px;
+		background: rgba(245, 158, 11, 0.12);
+		border: 1px solid rgba(245, 158, 11, 0.4);
+		color: var(--warning, #b45309);
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.4;
+		text-align: center;
+	}
 
 	/* Scenario header */
 	.scenario-header {

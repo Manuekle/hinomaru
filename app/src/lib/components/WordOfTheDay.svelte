@@ -24,9 +24,25 @@
 		example_es?: string;
 	}
 
-	let { word, initiallySaved = false } = $props<{ word: Word | null; initiallySaved?: boolean }>();
+	let {
+		word,
+		initiallySaved = false,
+		learnedToday = 0,
+		dailyGoal = 0
+	} = $props<{
+		word: Word | null;
+		initiallySaved?: boolean;
+		learnedToday?: number;
+		dailyGoal?: number;
+	}>();
+
 	let saved = $state(false);
 	let saving = $state(false);
+
+	const dailyPct = $derived(
+		dailyGoal > 0 ? Math.min(100, Math.round((learnedToday / dailyGoal) * 100)) : 0
+	);
+	const goalMet = $derived(dailyGoal > 0 && learnedToday >= dailyGoal);
 
 	$effect(() => {
 		if (initiallySaved) saved = true;
@@ -107,6 +123,27 @@
 				</button>
 			</div>
 		{/if}
+
+		{#if dailyGoal > 0}
+			<div class="wotd-progress" use:fadeUp={{ delay: 0.2, y: 8 }}>
+				<div class="wp-divider"></div>
+				<div class="wp-content">
+					<div class="wp-text">
+						<span class="wp-label">
+							{#if goalMet}
+								✓ {t('deck.dailyGoalMet', $locale)}
+							{:else}
+								{t('deck.dailyGoalProgress', $locale, { done: learnedToday, total: dailyGoal })}
+							{/if}
+						</span>
+						<span class="wp-count" class:goal-met={goalMet}>{learnedToday}/{dailyGoal}</span>
+					</div>
+					<div class="wp-track">
+						<div class="wp-fill" class:goal-met={goalMet} style="width:{dailyPct}%"></div>
+					</div>
+				</div>
+			</div>
+		{/if}
 	</div>
 {/if}
 
@@ -115,8 +152,8 @@
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 24px;
-		padding: 20px;
-		margin-top: 16px;
+		padding: 24px;
+		margin-top: 24px;
 		margin-bottom: 0;
 		box-shadow: var(--shadow-sm);
 		position: relative;
@@ -163,7 +200,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-end;
-		margin-bottom: 8px;
+		margin-bottom: 12px;
 	}
 
 	.wotd-jp {
@@ -196,7 +233,7 @@
 		border: none;
 		width: 44px;
 		height: 44px;
-		border-radius: 14px;
+		border-radius: 999px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -221,7 +258,11 @@
 		font-size: 18px;
 		font-weight: 500;
 		color: var(--fg-primary);
-		margin: 0 0 16px;
+		margin: 0 0 20px;
+	}
+
+	.wotd-actions {
+		margin-bottom: 0;
 	}
 
 	.save-btn {
@@ -248,5 +289,67 @@
 	}
 	.save-btn:active {
 		transform: scale(0.97) translateY(0);
+	}
+
+	/* Integrated Progress */
+	.wotd-progress {
+		margin-top: 24px;
+	}
+
+	.wp-divider {
+		height: 1px;
+		background: var(--ink-200);
+		opacity: 0.5;
+		margin: 0 -24px 20px;
+	}
+
+	.wp-content {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.wp-text {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.wp-label {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+	}
+
+	.wp-count {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+	}
+
+	.wp-count.goal-met {
+		color: var(--success);
+	}
+
+	.wp-track {
+		height: 6px;
+		background: var(--ink-100);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+
+	:global([data-theme='dark']) .wp-track {
+		background: var(--ink-200);
+	}
+
+	.wp-fill {
+		height: 100%;
+		background: var(--hinomaru-red);
+		border-radius: 999px;
+		transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	.wp-fill.goal-met {
+		background: var(--success);
 	}
 </style>

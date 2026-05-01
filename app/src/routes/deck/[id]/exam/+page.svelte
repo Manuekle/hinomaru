@@ -6,6 +6,7 @@
 	import { createClient } from '$lib/supabase';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
+	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { fadeUp } from '$lib/motion';
 	import { fade } from 'svelte/transition';
 	import Icon from '$lib/Icon.svelte';
@@ -207,6 +208,22 @@
 				total: questions.length,
 				duration_s: timeUsed
 			});
+			// Update per-card SRS progress based on actual exam correctness
+			await Promise.all(
+				questions.map((q, idx) => {
+					const gotIt = correctness[idx] ?? false;
+					const currentProgress = q.card.progress?.[0];
+					const quality = mapPerformanceToQuality(gotIt, false);
+					const nextState = calculateNextReview(quality, currentProgress);
+					return supabase.from('progress').upsert({
+						user_id: user.id,
+						card_id: q.card.id,
+						learned: gotIt,
+						...nextState,
+						last_seen: new Date().toISOString()
+					});
+				})
+			);
 			await updateStreak(supabase, user.id);
 			const xpEarned = score * 5;
 			if (xpEarned > 0) await addXP(supabase, user.id, xpEarned);

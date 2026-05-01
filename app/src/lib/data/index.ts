@@ -12,8 +12,82 @@ import { vocabulary as n2Vocab } from './n2/vocabulary';
 import { grammar as n2Grammar } from './n2/grammar';
 import { vocabulary as n1Vocab } from './n1/vocabulary';
 import { grammar as n1Grammar } from './n1/grammar';
+import { phrases as survivalPhrases } from './survival/phrases';
+import { restaurantPhrases } from './survival/restaurant';
+import { shoppingPhrases } from './survival/shopping';
+import { directionsPhrases } from './survival/directions';
+import { hotelPhrases } from './survival/hotel';
+import { healthPhrases } from './survival/health';
 
 export const DECKS: DeckDef[] = [
+	// ── Survival ──────────────────────────────────────────────────────────────
+	{
+		id: 'survival-travel',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'Travel Phrases',
+		title_es: 'Frases de Viaje',
+		desc_en: 'Essential phrases for your trip to Japan. Speak instantly.',
+		desc_es: 'Frases esenciales para tu viaje a Japón. Habla al instante.',
+		cards: survivalPhrases
+	},
+	{
+		id: 'survival-restaurant',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'At the Restaurant',
+		title_es: 'En el Restaurante',
+		desc_en: 'Order food, ask for water, and pay the bill.',
+		desc_es: 'Pide comida, pide agua y paga la cuenta sin problemas.',
+		cards: restaurantPhrases
+	},
+	{
+		id: 'survival-shopping',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'Shopping',
+		title_es: 'De Compras',
+		desc_en: 'Try clothes, ask for prices, and refuse bags.',
+		desc_es: 'Pruébate ropa, pregunta precios y rechaza bolsas.',
+		cards: shoppingPhrases
+	},
+	{
+		id: 'survival-directions',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'Directions & Trains',
+		title_es: 'Direcciones y Trenes',
+		desc_en: 'Find the station, buy tickets, and avoid getting lost.',
+		desc_es: 'Encuentra la estación, compra boletos y evita perderte.',
+		cards: directionsPhrases
+	},
+	{
+		id: 'survival-hotel',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'Hotel & Accommodation',
+		title_es: 'Hotel y Alojamiento',
+		desc_en: 'Check-in, request towels, and ask for the Wi-Fi.',
+		desc_es: 'Haz check-in, pide toallas y pregunta por el Wi-Fi.',
+		cards: hotelPhrases
+	},
+	{
+		id: 'survival-health',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'Emergencies & Health',
+		title_es: 'Emergencias y Salud',
+		desc_en: 'Ask for help, find a hospital, or explain your symptoms.',
+		desc_es: 'Pide ayuda, encuentra un hospital o explica tus síntomas.',
+		cards: healthPhrases
+	},
+
 	// ── N5 ────────────────────────────────────────────────────────────────────
 	{
 		id: 'n5-hiragana',

@@ -31,6 +31,7 @@
 	let selectedKey = $state<string | null>(null);
 	let matchedIds = new SvelteSet<string>();
 	let wrongKeys = new SvelteSet<string>(); // flash red on wrong pick
+	let wrongCounts = new Map<string, number>(); // card.id -> wrong match attempts
 
 	// Timer
 	let elapsed = $state(0);
@@ -120,7 +121,10 @@
 				}, 500);
 			}
 		} else {
-			// ❌ Wrong match — flash red briefly
+			// ❌ Wrong match — flash red briefly, track per card
+			const prevCardId = prevId;
+			wrongCounts.set(prevCardId, (wrongCounts.get(prevCardId) ?? 0) + 1);
+			wrongCounts.set(item.id, (wrongCounts.get(item.id) ?? 0) + 1);
 			wrongKeys.add(selectedKey);
 			wrongKeys.add(key);
 			selectedKey = null;
@@ -151,8 +155,9 @@
 			});
 			await Promise.all(
 				allCards.map((card) => {
+					const hadWrong = (wrongCounts.get(card.id) ?? 0) > 0;
 					const currentProgress = card.progress?.[0];
-					const quality = mapPerformanceToQuality(true, false);
+					const quality = mapPerformanceToQuality(true, hadWrong);
 					const nextState = calculateNextReview(quality, currentProgress);
 					return supabase.from('progress').upsert({
 						user_id: user.id,
@@ -275,6 +280,7 @@
 							finished = false;
 							currentIndex = 0;
 							elapsed = 0;
+							wrongCounts.clear();
 							sessionCards = [...allCards].sort(() => Math.random() - 0.5);
 							loadNextSet();
 							timerInterval = setInterval(() => elapsed++, 1000);

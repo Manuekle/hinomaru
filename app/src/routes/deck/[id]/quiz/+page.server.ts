@@ -1,19 +1,19 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { loadDeckSession } from '$lib/server/loadDeckSession';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	const [deckRes, cardsRes] = await Promise.all([
-		locals.supabase.from('decks').select('*').eq('id', params.id).single(),
-		locals.supabase
-			.from('cards')
-			.select('*, progress(easiness, interval_days, repetitions, next_review)')
-			.eq('deck_id', params.id)
-			.order('sort_order', { ascending: true })
-			.limit(50)
-	]);
+	const { user } = await locals.safeGetSession();
 
-	const deck = deckRes.data;
+	const { data: deck } = await locals.supabase
+		.from('decks')
+		.select('*')
+		.eq('id', params.id)
+		.single();
+
 	if (!deck) throw error(404);
 
-	return { deck, cards: cardsRes.data ?? [] };
+	const session = await loadDeckSession(locals.supabase, params.id, user?.id ?? null);
+
+	return { deck, ...session };
 };
