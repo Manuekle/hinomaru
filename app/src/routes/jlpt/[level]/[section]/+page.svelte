@@ -114,6 +114,12 @@
 	const timeUsedLabel = $derived(
 		`${Math.floor(timeUsed / 60)}:${String(timeUsed % 60).padStart(2, '0')}`
 	);
+	const totalQuestionsCount = $derived.by(() => {
+		if (section === 'listening') return audioFiles.length;
+		if (!test) return 0;
+		return test.mondai.reduce((acc, m) => acc + m.questions.length, 0);
+	});
+
 	const progressPct = $derived(
 		allQuestions.length > 0 ? (currentIdx / allQuestions.length) * 100 : 0
 	);
@@ -268,7 +274,7 @@
 				<div class="intro-stats">
 					<div class="stat-card">
 						<span class="stat-val">
-							{section === 'listening' ? audioFiles.length : allQuestions.length}
+							{totalQuestionsCount}
 						</span>
 						<span class="stat-label">
 							{section === 'listening' ? 'archivos' : 'preguntas'}
@@ -283,7 +289,7 @@
 					{/if}
 				</div>
 
-				{#if section !== 'listening' && allQuestions.length === 0}
+				{#if totalQuestionsCount === 0}
 					<p class="unavail">Contenido próximamente disponible.</p>
 				{/if}
 			</div>
@@ -296,7 +302,7 @@
 					class="hm-btn hm-btn-dark hm-btn-lg"
 					style="flex:2;"
 					onclick={startExam}
-					disabled={section !== 'listening' && allQuestions.length === 0}
+					disabled={totalQuestionsCount === 0}
 				>
 					Comenzar
 				</button>

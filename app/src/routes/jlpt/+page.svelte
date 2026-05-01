@@ -1,18 +1,24 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { fadeUp, fadeIn, staggerChildren } from '$lib/motion';
 	import { getTest, LEVEL_META, SECTION_LABELS, AUDIO_FILES } from '$lib/data/jlpt/index';
 	import type { JLPTLevel, JLPTSectionType } from '$lib/data/jlpt/index';
 	import { showRomaji } from '$lib/stores/settings';
 	import Icon from '$lib/Icon.svelte';
 	import { DocumentValidationIcon } from '@hugeicons/core-free-icons';
-	// showRomaji used for section label display
 
 	const levels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state<JLPTLevel>('N5');
 
-	interface SectionResult { score: number; total: number; pct: number; date: string }
+	interface SectionResult {
+		score: number;
+		total: number;
+		pct: number;
+		date: string;
+	}
 	let results = $state<Partial<Record<string, SectionResult>>>({});
 
 	onMount(() => {
@@ -38,8 +44,8 @@
 
 	function questionCount(level: JLPTLevel, section: JLPTSectionType): number {
 		if (section === 'listening') return 0;
-		const t = getTest(level, section);
-		return t ? t.mondai.reduce((acc, m) => acc + m.questions.length, 0) : 0;
+		const test = getTest(level, section);
+		return test ? test.mondai.reduce((acc, m) => acc + m.questions.length, 0) : 0;
 	}
 
 	function hasContent(level: JLPTLevel, section: JLPTSectionType): boolean {
@@ -58,42 +64,38 @@
 		grammar: '文',
 		listening: '聴'
 	};
-
-	const SECTION_DESC: Record<JLPTSectionType, string> = {
-		vocabulary: 'Vocabulario y lectura de kanji',
-		grammar: 'Gramática y comprensión de textos',
-		listening: 'Comprensión auditiva'
-	};
 </script>
 
 <svelte:head>
-	<title>JLPT — Hinomaru</title>
+	<title>{t('jlpt.title', $locale)} — Hinomaru</title>
 </svelte:head>
 
-<div style="max-width:720px;margin:0 auto;padding:calc(32px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));">
-
+<div
+	style="max-width:720px;margin:0 auto;min-height:100vh;padding:calc(32px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));"
+>
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}
 		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
 	>
-		JLPT
+		{t('jlpt.title', $locale)}
 	</h1>
 
-	<p
-		use:fadeUp={{ delay: 0.12, y: 12 }}
-		style="font-size:16px;color:var(--fg-secondary);margin:0 0 32px;"
-	>
-		Práctica oficial · N1〜N5
+	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">
+		{t('jlpt.subtitle', $locale)}
 	</p>
 
 	<!-- Level chips -->
 	<div
 		use:fadeIn={{ delay: 0.18 }}
 		class="hide-scrollbar"
-		style="display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;"
+		style="display:flex;gap:8px;margin-top:32px;margin-bottom:20px;overflow-x:auto;"
 	>
 		{#each levels as lv (lv)}
-			<button class="filter-chip" class:active={activeLevel === lv} onclick={() => (activeLevel = lv)}>
+			<button
+				class="filter-chip"
+				class:active={activeLevel === lv}
+				onclick={() => (activeLevel = lv)}
+			>
 				{lv}
 			</button>
 		{/each}
@@ -107,14 +109,14 @@
 			onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}
 		>
 			<Icon icon={DocumentValidationIcon} size={18} strokeWidth={2} color="currentColor" />
-			<span>Ver certificado de práctica {activeLevel}</span>
+			<span>{t('jlpt.certBanner', $locale, { level: activeLevel })}</span>
 			<span class="cert-arrow">→</span>
 		</button>
 	{/if}
 
 	<!-- Section rows -->
-	<div class="list" use:staggerChildren={{ delay: 0.22, stagger: 0.06, y: 10 }}>
-		{#each (LEVEL_META[activeLevel]?.sections ?? []) as section (section)}
+	<div class="list" use:staggerChildren={{ delay: 0.25, stagger: 0.07, y: 10 }}>
+		{#each LEVEL_META[activeLevel]?.sections ?? [] as section (section)}
 			{@const lbl = SECTION_LABELS[section]}
 			{@const available = hasContent(activeLevel, section)}
 			{@const res = getResult(activeLevel, section)}
@@ -136,15 +138,15 @@
 							<span class="row-romaji">{lbl.romaji}</span>
 						{/if}
 						{#if !available}
-							<span class="tag-soon">pronto</span>
+							<span class="tag-soon">{t('jlpt.tagSoon', $locale)}</span>
 						{/if}
 					</div>
-					<div class="row-sub">{SECTION_DESC[section]}</div>
+					<div class="row-sub">{t(`jlpt.${section}.desc`, $locale)}</div>
 					<div class="row-meta-inline">
 						{#if section === 'listening'}
-							{audioCount} archivos de audio
+							{t('jlpt.audioCount', $locale, { n: audioCount })}
 						{:else}
-							{qCount} preguntas · {lbl.es}
+							{t('jlpt.questionCount', $locale, { n: qCount })} · {lbl.es}
 						{/if}
 					</div>
 				</div>
@@ -163,8 +165,8 @@
 		{/each}
 	</div>
 
-	<p style="font-size:11px;color:var(--fg-tertiary);text-align:center;margin-top:32px;">
-		Materiales: JLPT Official Practice Workbook Vol.2 (2018) — Japan Foundation / JEES
+	<p style="font-size:11px;color:var(--fg-tertiary);text-align:center;margin-top:48px;">
+		{t('jlpt.materials', $locale)}
 	</p>
 </div>
 
@@ -192,47 +194,83 @@
 
 	/* Certificate banner */
 	.cert-banner {
-		display: flex; align-items: center; gap: 10px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
 		width: 100%;
 		padding: 12px 16px;
 		margin-bottom: 12px;
 		background: var(--sumi);
 		color: var(--washi);
-		border: none; border-radius: 14px;
-		font-family: inherit; font-size: 14px; font-weight: 600;
+		border: none;
+		border-radius: 14px;
+		font-family: inherit;
+		font-size: 14px;
+		font-weight: 600;
 		cursor: pointer;
 		transition: opacity 0.15s;
 		text-align: left;
 	}
-	.cert-banner:hover { opacity: 0.88; }
-	.cert-arrow { margin-left: auto; font-size: 16px; }
+	.cert-banner:hover {
+		opacity: 0.88;
+	}
+	.cert-arrow {
+		margin-left: auto;
+		font-size: 16px;
+	}
 
 	/* List */
-	.list { display: flex; flex-direction: column; }
+	.list {
+		display: flex;
+		flex-direction: column;
+	}
 
 	.row {
 		display: flex;
 		align-items: flex-start;
 		gap: 16px;
-		padding: 16px 0;
+		padding: 16px 8px;
+		margin: 0 -8px;
 		border-bottom: 1px solid var(--ink-100);
 		background: none;
-		border-left: none; border-right: none; border-top: none;
-		border-radius: 0;
+		border-left: none;
+		border-right: none;
+		border-top: none;
+		border-radius: 12px;
 		color: inherit;
 		font-family: inherit;
 		text-align: left;
-		width: 100%;
+		width: calc(100% + 16px);
 		cursor: pointer;
-		transition: none;
+		transition:
+			background 150ms ease,
+			transform 150ms ease;
 		-webkit-tap-highlight-color: transparent;
 	}
-	.row:first-child { border-top: 1px solid var(--ink-100); }
-	.row.unavailable { opacity: 0.45; cursor: default; }
+	.row:first-child {
+		border-top: 1px solid var(--ink-100);
+	}
+	.row.unavailable {
+		opacity: 0.45;
+		cursor: default;
+	}
+
+	.row:active:not(.unavailable) {
+		background: var(--ink-100);
+		transform: scale(0.99);
+	}
 
 	@media (hover: hover) {
-		.row:not(.unavailable):hover .row-title { color: var(--hinomaru-red); }
-		.row:not(.unavailable):hover .row-arrow { color: var(--hinomaru-red); transform: translateX(3px); }
+		.row:not(.unavailable):hover {
+			background: var(--ink-50);
+		}
+		.row:not(.unavailable):hover .row-title {
+			color: var(--hinomaru-red);
+		}
+		.row:not(.unavailable):hover .row-arrow {
+			color: var(--hinomaru-red);
+			transform: translateX(3px);
+		}
 	}
 
 	.row-icon-jp {
@@ -244,10 +282,15 @@
 		line-height: 1;
 	}
 
-	.row-body { flex: 1; min-width: 0; }
+	.row-body {
+		flex: 1;
+		min-width: 0;
+	}
 
 	.row-top {
-		display: flex; align-items: center; gap: 8px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
 		margin-bottom: 3px;
 	}
 	.row-title {
@@ -263,11 +306,14 @@
 		font-style: italic;
 	}
 	.tag-soon {
-		font-size: 10px; font-weight: 700;
-		text-transform: uppercase; letter-spacing: 0.06em;
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
 		color: var(--fg-tertiary);
 		background: var(--ink-100);
-		padding: 2px 7px; border-radius: 99px;
+		padding: 2px 7px;
+		border-radius: 99px;
 	}
 	.row-sub {
 		font-size: 13px;
@@ -280,22 +326,36 @@
 	}
 
 	.row-right {
-		display: flex; align-items: center; gap: 8px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
 		padding-top: 4px;
 		flex-shrink: 0;
 	}
 	.score-badge {
-		font-size: 12px; font-weight: 700;
-		padding: 2px 8px; border-radius: 99px;
+		font-size: 12px;
+		font-weight: 700;
+		padding: 2px 8px;
+		border-radius: 99px;
 	}
-	.score-badge.pass { background: var(--success-wash); color: var(--success); }
-	.score-badge.fail { background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+	.score-badge.pass {
+		background: var(--success-wash);
+		color: var(--success);
+	}
+	.score-badge.fail {
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+	}
 
 	.row-arrow {
 		font-size: 16px;
 		color: var(--fg-tertiary);
-		transition: color 150ms, transform 150ms;
+		transition:
+			color 150ms,
+			transform 150ms;
 	}
 
-	.jp { font-family: var(--font-jp); }
+	.jp {
+		font-family: var(--font-jp);
+	}
 </style>

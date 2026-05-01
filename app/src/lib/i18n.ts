@@ -81,7 +81,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'mode.match.title': 'Match game',
 		'mode.match.desc': 'Pair Japanese with translations.',
 		'mode.exam.title': 'Exam',
-		'mode.exam.desc': 'Test everything you\'ve learned.',
+		'mode.exam.desc': "Test everything you've learned.",
 		'session.progress': '{a} / {b}',
 		'session.flip': 'Tap to flip',
 		'session.again': 'Again',
@@ -150,11 +150,14 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.hero.dailyGoal': 'Daily Goal',
 		'landing.cta.subtitle': 'Free forever for beginners. Pro tools for masters.',
 		'landing.immersion.title': 'Deep Cultural Immersion',
-		'landing.immersion.desc': 'Read daily stories and learn with your favorite J-pop songs. Language learning is better with context.',
+		'landing.immersion.desc':
+			'Read daily stories and learn with your favorite J-pop songs. Language learning is better with context.',
 		'landing.gamification.title': 'Stay Motivated',
-		'landing.gamification.desc': 'Earn XP, level up, and maintain your streak. Turn your study habit into a rewarding game.',
+		'landing.gamification.desc':
+			'Earn XP, level up, and maintain your streak. Turn your study habit into a rewarding game.',
 		'landing.srs.title': 'Science of Memory',
-		'landing.srs.desc': 'Our Spaced Repetition System (SRS) ensures you never forget what you\'ve learned.',
+		'landing.srs.desc':
+			"Our Spaced Repetition System (SRS) ensures you never forget what you've learned.",
 		'landing.testimonial':
 			"The most beautiful Japanese study tool I've ever used. It makes Kanji practice feel like a meditation.",
 		'landing.testimonial.author': 'SATO-SAN, TOKYO',
@@ -164,7 +167,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.hero.tagline.highlight': 'real world',
 		'landing.brand.tagline': 'The minimalist method to master Japanese.',
 		'landing.copyright': '© {year} Hinomaru 日の丸.',
-		'landing.hero.sub': 'The minimalist and effective method to master the JLPT and speak with confidence.',
+		'landing.hero.sub':
+			'The minimalist and effective method to master the JLPT and speak with confidence.',
 		'landing.hero.path': 'Your path to Japanese mastery:',
 		'landing.why.label': 'WHY HINOMARU?',
 		'landing.features.label': 'DESIGNED FOR YOUR SUCCESS',
@@ -175,17 +179,22 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.cta.secondary': 'Or download app →',
 		'landing.cta.download': 'Download App',
 		'landing.songs.title': 'Learn with Music',
-		'landing.songs.desc': 'Immerse yourself in Japanese culture with your favorite songs. Interactive lyrics, vocabulary, and grammar in every verse.',
+		'landing.songs.desc':
+			'Immerse yourself in Japanese culture with your favorite songs. Interactive lyrics, vocabulary, and grammar in every verse.',
 		'landing.stories.title': 'Immersive Stories',
-		'landing.stories.desc': 'Readings designed for every level with real audio and integrated dictionary. From theory to natural comprehension.',
+		'landing.stories.desc':
+			'Readings designed for every level with real audio and integrated dictionary. From theory to natural comprehension.',
 		'landing.kanji.title': 'Kanji Writing',
-		'landing.kanji.desc': 'Master the 2,136 Joyo Kanji with our smart tracing system. Learn the correct order and memorize forever.',
+		'landing.kanji.desc':
+			'Master the 2,136 Joyo Kanji with our smart tracing system. Learn the correct order and memorize forever.',
 		'footer.community': 'Support Me',
 		'footer.support': 'Donate on Ko-fi',
-		'landing.testimonials.1.quote': 'I finally found an app that feels professional and minimalist. The daily stories are amazing for improving my reading.',
+		'landing.testimonials.1.quote':
+			'I finally found an app that feels professional and minimalist. The daily stories are amazing for improving my reading.',
 		'landing.testimonials.1.author': 'Akari T.',
 		'landing.testimonials.1.sub': 'N3 Student',
-		'landing.testimonials.2.quote': 'The writing system is the best I\'ve tried. It really helps to memorize the kanji stroke order.',
+		'landing.testimonials.2.quote':
+			"The writing system is the best I've tried. It really helps to memorize the kanji stroke order.",
 		'landing.testimonials.2.author': 'Kenji S.',
 		'landing.testimonials.2.sub': 'N2 Student',
 		'footer.product': 'Product',
@@ -412,7 +421,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.reset.show': 'Show password',
 		'auth.reset.hide': 'Hide password',
 		'settings.deleteAccount': 'Delete Account',
-		'settings.deleteAccount.desc': 'This will permanently remove your account and all your progress.',
+		'settings.deleteAccount.desc':
+			'This will permanently remove your account and all your progress.',
 		'settings.deleteAccount.confirm': 'Are you sure you want to delete your account?',
 		'settings.deleteAccount.verify': 'Enter Code',
 		'settings.deleteAccount.otpSent': 'We sent a verification code to your email {email}.',
@@ -421,7 +431,18 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.deleteAccount.error': 'Verification failed. Please try again.',
 		'settings.deleteAccount.confirmBtn': 'Confirm',
 		'common.error': 'Something went wrong',
-		'conversation.complete': 'Conversation complete!'
+		'conversation.complete': 'Conversation complete!',
+		'jlpt.title': 'JLPT',
+		'jlpt.subtitle': 'Official Practice · N1〜N5',
+		'jlpt.materials':
+			'Materials: JLPT Official Practice Workbook Vol.2 (2018) — Japan Foundation / JEES',
+		'jlpt.tagSoon': 'soon',
+		'jlpt.audioCount': '{n} audio files',
+		'jlpt.questionCount': '{n} questions',
+		'jlpt.certBanner': 'View practice certificate {level}',
+		'jlpt.vocabulary.desc': 'Vocabulary and kanji reading',
+		'jlpt.grammar.desc': 'Grammar and reading comprehension',
+		'jlpt.listening.desc': 'Listening comprehension'
 	},
 	es: {
 		'auth.signin.subtitle': 'Inicia sesión para guardar tu progreso.',
@@ -573,11 +594,14 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.cta.subtitle':
 			'Gratis para siempre para principiantes. Herramientas pro para maestros.',
 		'landing.immersion.title': 'Inmersión Cultural Profunda',
-		'landing.immersion.desc': 'Lee historias diarias y aprende con tus canciones favoritas de J-pop. El idioma se aprende mejor con contexto.',
+		'landing.immersion.desc':
+			'Lee historias diarias y aprende con tus canciones favoritas de J-pop. El idioma se aprende mejor con contexto.',
 		'landing.gamification.title': 'Mantén la Motivación',
-		'landing.gamification.desc': 'Gana XP, sube de nivel y mantén tu racha. Convierte tu hábito de estudio en un juego gratificante.',
+		'landing.gamification.desc':
+			'Gana XP, sube de nivel y mantén tu racha. Convierte tu hábito de estudio en un juego gratificante.',
 		'landing.srs.title': 'Ciencia de la Memoria',
-		'landing.srs.desc': 'Nuestro Sistema de Repetición Espaciada (SRS) asegura que nunca olvides lo que has aprendido.',
+		'landing.srs.desc':
+			'Nuestro Sistema de Repetición Espaciada (SRS) asegura que nunca olvides lo que has aprendido.',
 		'landing.testimonial':
 			'La herramienta de estudio de japonés más bonita que he usado. El kanji se siente como una meditación.',
 		'landing.testimonial.author': 'SATO-SAN, TOKIO',
@@ -803,20 +827,33 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.deleteAccount.desc': 'Esto eliminará permanentemente tu cuenta y todo tu progreso.',
 		'settings.deleteAccount.confirm': '¿Estás seguro de que quieres eliminar tu cuenta?',
 		'settings.deleteAccount.verify': 'Introduce el código',
-		'settings.deleteAccount.otpSent': 'Hemos enviado un código de verificación a tu correo {email}.',
+		'settings.deleteAccount.otpSent':
+			'Hemos enviado un código de verificación a tu correo {email}.',
 		'settings.deleteAccount.otpPlaceholder': 'Introduce el código',
 		'settings.deleteAccount.btn': 'Verificar',
 		'settings.deleteAccount.error': 'La verificación falló. Inténtalo de nuevo.',
 		'settings.deleteAccount.confirmBtn': 'Confirmar',
 		'common.error': 'Algo salió mal',
 		'conversation.complete': '¡Conversación completada!',
+		'jlpt.title': 'JLPT',
+		'jlpt.subtitle': 'Práctica oficial · N1〜N5',
+		'jlpt.materials':
+			'Materiales: JLPT Official Practice Workbook Vol.2 (2018) — Japan Foundation / JEES',
+		'jlpt.tagSoon': 'pronto',
+		'jlpt.audioCount': '{n} archivos de audio',
+		'jlpt.questionCount': '{n} preguntas',
+		'jlpt.certBanner': 'Ver certificado de práctica {level}',
+		'jlpt.vocabulary.desc': 'Vocabulario y lectura de kanji',
+		'jlpt.grammar.desc': 'Gramática y comprensión de textos',
+		'jlpt.listening.desc': 'Comprensión auditiva',
 		'landing.hero.badge': 'DOMINIO DEL JAPONÉS',
 		'landing.hero.tagline': 'Aprende japonés para el mundo real',
 		'landing.hero.tagline.pre': 'Aprende japonés para el',
 		'landing.hero.tagline.highlight': 'mundo real',
 		'landing.brand.tagline': 'El método minimalista para dominar el japonés.',
 		'landing.copyright': '© {year} Hinomaru 日の丸.',
-		'landing.hero.sub': 'El método minimalista y efectivo para dominar el JLPT y hablar con confianza.',
+		'landing.hero.sub':
+			'El método minimalista y efectivo para dominar el JLPT y hablar con confianza.',
 		'landing.hero.path': 'Tu camino al dominio del japonés:',
 		'landing.why.label': '¿POR QUÉ HINOMARU?',
 		'landing.features.label': 'DISEÑADO PARA TU ÉXITO',
@@ -827,22 +864,27 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'landing.cta.secondary': 'O descargar app →',
 		'landing.cta.download': 'Descargar App',
 		'landing.songs.title': 'Aprende con Música',
-		'landing.songs.desc': 'Sumérgete en la cultura japonesa con tus canciones favoritas. Letras interactivas, vocabulario y gramática en cada verso.',
+		'landing.songs.desc':
+			'Sumérgete en la cultura japonesa con tus canciones favoritas. Letras interactivas, vocabulario y gramática en cada verso.',
 		'landing.stories.title': 'Historias Inmersivas',
-		'landing.stories.desc': 'Lecturas diseñadas para cada nivel con audio real y diccionario integrado. De la teoría a la comprensión natural.',
+		'landing.stories.desc':
+			'Lecturas diseñadas para cada nivel con audio real y diccionario integrado. De la teoría a la comprensión natural.',
 		'landing.kanji.title': 'Escritura de Kanji',
-		'landing.kanji.desc': 'Domina los 2,136 Joyo Kanji con nuestro sistema de trazado inteligente. Aprende el orden correcto y memoriza para siempre.',
+		'landing.kanji.desc':
+			'Domina los 2,136 Joyo Kanji con nuestro sistema de trazado inteligente. Aprende el orden correcto y memoriza para siempre.',
 		'footer.community': 'Apóyame',
 		'footer.support': 'Donar en Ko-fi',
-		'landing.testimonials.1.quote': 'Por fin encontré una app que se siente profesional y minimalista. Las historias diarias son increíbles para mejorar mi lectura.',
+		'landing.testimonials.1.quote':
+			'Por fin encontré una app que se siente profesional y minimalista. Las historias diarias son increíbles para mejorar mi lectura.',
 		'landing.testimonials.1.author': 'Akari T.',
 		'landing.testimonials.1.sub': 'Estudiante N3',
-		'landing.testimonials.2.quote': 'El sistema de escritura es el mejor que he probado. Realmente ayuda a memorizar el orden de los trazos de los kanji.',
+		'landing.testimonials.2.quote':
+			'El sistema de escritura es el mejor que he probado. Realmente ayuda a memorizar el orden de los trazos de los kanji.',
 		'landing.testimonials.2.author': 'Kenji S.',
 		'landing.testimonials.2.sub': 'Estudiante N2',
 		'footer.product': 'Producto',
 		'footer.legal': 'Legal',
-		'footer.login': 'Acceder',
+		'footer.login': 'Acceder'
 	}
 };
 
