@@ -5,10 +5,11 @@
 	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { fadeUp } from '$lib/motion';
+	import { fadeUp, fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import ScrollingWaveform from '$lib/components/ScrollingWaveform.svelte';
 	import {
 		DocumentValidationIcon,
 		CheckmarkCircle01Icon,
@@ -42,6 +43,7 @@
 		AudioPlayerSpeed,
 		getAudioPlayerContext
 	} from '$lib/components/ui/audio-player';
+	import { ArrowReloadHorizontalIcon } from '@hugeicons/core-free-icons';
 
 	let { data } = $props<{ data: { level: string; section: string } }>();
 
@@ -142,10 +144,8 @@
 
 	// ── Exam flow ─────────────────────────────────────────────────────────────
 	function startExam() {
-		console.log('Starting exam for section:', section);
-		if (section.toLowerCase() === 'listening') { 
+		if (section === 'listening') { 
 			phase = 'listening'; 
-			console.log('Phase changed to listening');
 			return; 
 		}
 
@@ -226,7 +226,7 @@
 	let nextRoute = $state<string | null>(null);
 
 	beforeNavigate(({ cancel, to }) => {
-		if ((phase === 'exam' || phase === 'listening') && !showExitModal) {
+		if (phase === 'exam' && !showExitModal) {
 			cancel();
 			if (to) nextRoute = to.url.pathname;
 			showExitModal = true;
@@ -242,6 +242,11 @@
 	}
 
 	onMount(() => {
+		if (section === 'listening') {
+			phase = 'listening';
+		} else {
+			startExam();
+		}
 		return () => {
 			if (timerInterval) clearInterval(timerInterval);
 			if (advanceTimeout) clearTimeout(advanceTimeout);
@@ -256,60 +261,10 @@
 <div class="session-layout">
 	<div class="session-container">
 
-		<!-- ── INTRO ── -->
-		{#if phase === 'intro'}
-			<div use:fadeUp={{ delay: 0, y: 16 }} class="intro-screen">
-				<div class="intro-icon">
-					{#if section === 'listening'}
-						<Icon icon={HeadphonesIcon} size={44} color="var(--washi)" strokeWidth={1.5} />
-					{:else}
-						<Icon icon={DocumentValidationIcon} size={44} color="var(--washi)" strokeWidth={1.5} />
-					{/if}
-				</div>
-
-				<div class="intro-badge">{level}</div>
-				<h1 class="intro-title">{sectionLabel.jp}</h1>
-				<p class="intro-sub">{sectionLabel[$locale]}</p>
-
-				<div class="intro-stats">
-					<div class="stat-card">
-						<span class="stat-val">
-							{totalQuestionsCount}
-						</span>
-						<span class="stat-label">
-							{section === 'listening' ? t('exam.intro_stats_files', $locale) : t('exam.intro_stats_questions', $locale)}
-						</span>
-					</div>
-					{#if section !== 'listening'}
-						<div class="stat-divider"></div>
-						<div class="stat-card">
-							<span class="stat-val">{test?.duration ?? 25}</span>
-							<span class="stat-label">{t('exam.intro_stats_minutes', $locale)}</span>
-						</div>
-					{/if}
-				</div>
-
-				{#if totalQuestionsCount === 0}
-					<p class="unavail">{t('exam.intro_unavail', $locale)}</p>
-				{/if}
-			</div>
-
-			<StickyFooter>
-				<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto('/jlpt')}>
-					← {t('deck.back', $locale)}
-				</button>
-				<button
-					class="hm-btn hm-btn-dark hm-btn-lg"
-					style="flex:2;"
-					onclick={startExam}
-					disabled={totalQuestionsCount === 0}
-				>
-					{t('exam.start', $locale)}
-				</button>
-			</StickyFooter>
+		<!-- ── NO INTRO (Removed) ── -->
 
 		<!-- ── EXAM ── -->
-		{:else if phase === 'exam' && currentQ}
+		{#if phase === 'exam' && currentQ}
 			<!-- Progress + timer bar -->
 
 
@@ -366,7 +321,7 @@
 							</div>
 							<div class="opt-content">
 								<span class="opt-text jp">{choice}</span>
-								{#if $showRomaji}
+								{#if $showRomaji && kanaToRomaji(choice)}
 									<span class="opt-romaji">{kanaToRomaji(choice)}</span>
 								{/if}
 							</div>
@@ -411,109 +366,101 @@
 
 		<!-- ── LISTENING ── -->
 		{:else if phase === 'listening'}
-			<div use:fadeUp={{ delay: 0, y: 12 }} class="listening-screen">
+			<div class="listening-screen">
+				<div class="listening-header" use:fadeIn={{ delay: 0 }}>
+					<button class="back-link" onclick={() => goto('/jlpt')}>
+						<Icon icon={ArrowLeft01Icon} size={16} color="currentColor" />
+						<span>{t('deck.back', $locale)}</span>
+					</button>
+				</div>
+
 				<AudioPlayerProvider>
-					<div class="audio-player-card">
-						<div class="audio-player-layout">
-							<!-- Left Side: Playlist -->
-							<div class="audio-player-sidebar">
-								<div class="audio-player-scroll">
-									<div class="audio-player-list">
-										{#each tracks as track, idx (track.id)}
-											{@const player = getAudioPlayerContext()}
-											{@const isActive = player.activeItem?.id === track.id}
-											{@const isPlaying = isActive && player.isPlaying}
-
-											<button
-												class={cn(
-													'group/track relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors',
-													isActive ? 'bg-secondary text-secondary-foreground' : 'hover:bg-secondary/50'
-												)}
-												onclick={() => {
-													currentAudioIdx = idx;
-													if (isActive) {
-														player.isPlaying = !player.isPlaying;
-													} else {
-														player.activeItem = track;
-														player.isPlaying = true;
-													}
-												}}
-											>
-												<div class="flex w-6 shrink-0 items-center justify-center">
-													{#if isPlaying}
-														<PauseIcon size={14} class="text-primary" />
-													{:else}
-														<span class="text-xs font-medium text-muted-foreground/60 group-hover/track:hidden">
-															{idx + 1}
-														</span>
-														<PlayIcon size={14} class="hidden fill-current text-primary group-hover/track:block" />
-													{/if}
-												</div>
-												<span class="truncate text-sm font-medium">{track.name}</span>
-											</button>
-										{/each}
+					{@const player = getAudioPlayerContext()}
+					
+					<!-- Compact Playlist -->
+					<div class="compact-playlist" use:fadeUp={{ delay: 0.05, y: 5 }}>
+						{#each tracks as track, idx (track.id)}
+							{@const isActive = currentAudioIdx === idx}
+							<button 
+								class="playlist-pill" 
+								class:is-active={isActive}
+								onclick={() => {
+									currentAudioIdx = idx;
+									if (player.activeItem?.id !== track.id) {
+										player.activeItem = track;
+										player.isPlaying = true;
+									} else {
+										player.isPlaying = !player.isPlaying;
+									}
+								}}
+							>
+								{#if isActive && player.isPlaying}
+									<div class="p-wave-tiny">
+										<span></span><span></span><span></span>
 									</div>
-								</div>
+								{/if}
+								<span class="p-name-tiny">{track.name}</span>
+							</button>
+						{/each}
+					</div>
+
+					<!-- Compact Hero -->
+					<div class="hero-compact" use:fadeUp={{ delay: 0.1, y: 8 }}>
+						<div class="hero-top-meta">
+							<span class="level-pill-tiny">{level}</span>
+							<span class="section-label-tiny">{sectionLabel[$locale]}</span>
+						</div>
+						<h1 class="title-compact jp">{tracks[currentAudioIdx]?.name ?? '...'}</h1>
+					</div>
+
+					<!-- Minimal Controls & Waveform -->
+					<div class="player-minimal" use:fadeUp={{ delay: 0.15, y: 8 }}>
+						<div class="wave-row-minimal">
+							<ScrollingWaveform
+								height={32}
+								barWidth={2}
+								barGap={2}
+								speed={4}
+								fadeEdges={true}
+								barColor="var(--hinomaru-red)"
+								playing={player.isPlaying}
+							/>
+						</div>
+
+						<div class="ctrl-row-compact">
+							<div class="time-compact"><AudioPlayerTime /></div>
+							
+							<div class="actions-compact">
+								<AudioPlayerButton
+									item={tracks[currentAudioIdx]}
+									variant="default"
+									size="icon"
+									className="play-btn-compact"
+								/>
+								<button class="replay-btn-compact" onclick={() => { player.currentTime = 0; player.isPlaying = true; }}>
+									<Icon icon={ArrowReloadHorizontalIcon} size={14} />
+								</button>
 							</div>
 
-							<!-- Right Side: Player Controls -->
-							<div class="audio-player-main">
-								<div class="audio-player-content">
-									<div class="audio-player-header">
-										<div class="audio-player-info">
-											<h3 class="audio-player-title">
-												{tracks[currentAudioIdx]?.name ?? 'No track selected'}
-											</h3>
-											<p class="audio-player-subtitle">{level} {sectionLabel[$locale]}</p>
-										</div>
-										<AudioPlayerSpeed variant="ghost" size="icon" className="audio-speed-top" />
-									</div>
-
-									<div class="audio-player-controls-row">
-										<AudioPlayerButton
-											item={tracks[currentAudioIdx]}
-											variant="default"
-											size="icon"
-											className="h-14 w-14 shrink-0 rounded-full shadow-lg"
-										/>
-										<div class="audio-player-progress-area">
-											<div class="audio-player-time-row">
-												<AudioPlayerTime className="text-xs font-bold tabular-nums text-primary" />
-												<div class="flex-1"></div>
-												<AudioPlayerDuration className="text-xs font-medium tabular-nums text-muted-foreground" />
-											</div>
-											<AudioPlayerProgress className="flex-1" />
-										</div>
-									</div>
-								</div>
-							</div>
+							<div class="time-compact"><AudioPlayerDuration /></div>
+						</div>
+						
+						<div class="progress-bar-minimal">
+							<AudioPlayerProgress className="custom-player-progress" />
 						</div>
 					</div>
+
+					<!-- Integrated Transcript -->
+					{#if activeTranscript}
+						<div class="transcript-minimal" use:fadeUp={{ delay: 0.2, y: 5 }}>
+							<div class="jp text-minimal">{activeTranscript}</div>
+							{#if $showRomaji && kanaToRomaji(activeTranscript)}
+								<div class="romaji-minimal">{kanaToRomaji(activeTranscript)}</div>
+							{/if}
+						</div>
+					{/if}
 				</AudioPlayerProvider>
-
-				{#if activeTranscript}
-					<div class="transcript-wrap">
-						<button class="transcript-toggle" onclick={() => (showTranscript = !showTranscript)}>
-							<span>{t('exam.transcript', $locale)}</span>
-							<span class="toggle-arrow">{showTranscript ? '▲' : '▼'}</span>
-						</button>
-						{#if showTranscript}
-							<div class="transcript-body">
-								<div class="jp">{activeTranscript}</div>
-								{#if $showRomaji}
-									<div class="transcript-romaji">{kanaToRomaji(activeTranscript)}</div>
-								{/if}
-							</div>
-						{/if}
-					</div>
-				{/if}
 			</div>
-
-			<StickyFooter>
-				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => goto('/jlpt')}>
-					← {t('exam.back_to_levels', $locale)}
-				</button>
-			</StickyFooter>
 
 		<!-- ── RESULT ── -->
 		{:else if phase === 'result'}
@@ -687,19 +634,14 @@
 	.header-right { display: flex; justify-content: flex-end; align-items: center; }
 
 	.exam-label-pill {
-		font-size: 12px;
+		font-size: 11px;
 		font-weight: 800;
-		font-family: var(--font-jp);
-		color: var(--washi);
-		background: var(--sumi);
-		padding: 4px 12px;
-		border-radius: 8px;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 10px;
+		border-radius: 6px;
 		text-transform: uppercase;
-		letter-spacing: 0.02em;
-	}
-	:global([data-theme='dark']) .exam-label-pill {
-		background: var(--ink-200);
-		color: var(--sumi);
+		letter-spacing: 0.05em;
 	}
 
 	.exam-step-indicator {
@@ -709,9 +651,9 @@
 		font-family: var(--font-ui);
 		font-weight: 700;
 	}
-	.step-curr { font-size: 18px; color: var(--sumi); }
-	.step-divider { font-size: 14px; color: var(--fg-tertiary); opacity: 0.5; }
-	.step-total { font-size: 14px; color: var(--fg-tertiary); }
+	.step-curr { font-size: 18px; font-weight: 800; color: var(--sumi); }
+	.step-divider { font-size: 14px; color: var(--fg-tertiary); opacity: 0.4; }
+	.step-total { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); }
 
 	.exam-timer-pill {
 		display: flex;
@@ -852,165 +794,180 @@
 	.opt-text { font-size: 17px; font-weight: 600; color: var(--fg-primary); line-height: 1.4; }
 	.opt-romaji { font-size: 12px; color: var(--fg-tertiary); font-style: italic; opacity: 0.7; }
 
-	/* ── Listening ── */
-	.listening-screen { padding: 20px 0; }
-	.audio-player-card {
+	/* ── MINIMALIST LISTENING ── */
+	.listening-screen {
+		display: flex;
+		flex-direction: column;
+		max-width: 640px;
+		margin: 0 auto;
+		padding: 0 20px 80px;
+	}
+	.listening-header {
+		margin-bottom: 24px;
+	}
+	.back-link {
+		display: flex; align-items: center; gap: 8px;
+		background: none; border: none; color: var(--fg-secondary);
+		font-size: 14px; font-weight: 600; cursor: pointer; padding: 0;
+		transition: color 0.2s;
+	}
+	.back-link:hover { color: var(--fg-primary); }
+
+	.compact-playlist {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 32px;
+	}
+	.playlist-pill {
+		display: flex; align-items: center; gap: 8px;
+		padding: 6px 14px;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 999px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.playlist-pill.is-active {
+		background: var(--hinomaru-red);
+		border-color: var(--hinomaru-red);
+	}
+	.p-idx-tiny { font-size: 10px; font-weight: 800; color: var(--fg-tertiary); }
+	.p-name-tiny { font-size: 13px; font-weight: 700; color: var(--fg-secondary); }
+	.is-active .p-idx-tiny, .is-active .p-name-tiny { color: white; }
+
+	.p-wave-tiny { display: flex; align-items: flex-end; gap: 1.5px; height: 8px; }
+	.p-wave-tiny span { width: 1.5px; background: white; border-radius: 1px; animation: p-wave-tiny 0.6s infinite alternate; }
+	.p-wave-tiny span:nth-child(2) { animation-delay: 0.2s; height: 60%; }
+	.p-wave-tiny span:nth-child(1) { height: 40%; }
+	.p-wave-tiny span:nth-child(3) { height: 80%; }
+	@keyframes p-wave-tiny { from { height: 20%; } to { height: 100%; } }
+
+	.hero-compact { margin-bottom: 24px; text-align: center; }
+	.hero-top-meta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
+	.level-pill-tiny { font-size: 9px; font-weight: 800; color: var(--hinomaru-red); background: var(--hinomaru-red-wash); padding: 1px 6px; border-radius: 4px; }
+	.section-label-tiny { font-size: 9px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+	.title-compact { font-size: 28px; font-weight: 800; color: var(--sumi); margin: 0; letter-spacing: -0.02em; }
+
+	.player-minimal { 
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-100);
+		border-radius: 20px;
+		padding: 24px;
+		margin-bottom: 40px;
+		box-shadow: var(--shadow-sm);
+	}
+	.wave-row-minimal { margin-bottom: 20px; opacity: 0.6; }
+	.ctrl-row-compact { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+	.time-compact { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); font-family: var(--font-mono); width: 40px; text-align: center; }
+	.actions-compact { display: flex; align-items: center; gap: 12px; }
+
+	:global(.play-btn-compact) {
+		width: 44px !important; height: 44px !important;
+		border-radius: 50% !important;
+		background: var(--sumi) !important;
+		color: var(--washi) !important;
+		border: none !important;
+	}
+	.replay-btn-compact {
+		width: 32px; height: 32px;
+		border-radius: 50%;
+		border: 1px solid var(--ink-200);
+		background: none;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		display: flex; align-items: center; justify-content: center;
+	}
+
+	:global(.custom-player-progress) {
+		height: 8px !important;
+	}
+	:global(.custom-player-progress [role="slider"]) {
+		--primary: var(--hinomaru-red);
+		--secondary: var(--ink-100);
+	}
+	:global(.custom-player-progress .SliderRange) {
+		background-color: var(--hinomaru-red) !important;
+	}
+	:global(.custom-player-progress span[role="slider"]) {
+		display: none !important;
+	}
+
+	.transcript-minimal { border-top: 1px solid var(--ink-100); padding-top: 32px; }
+	.minimal-label { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+	.text-minimal { font-size: 17px; line-height: 2; color: var(--fg-primary); white-space: pre-wrap; font-weight: 500; }
+	.romaji-minimal { margin-top: 16px; font-size: 14px; color: var(--fg-tertiary); font-style: italic; opacity: 0.8; line-height: 1.6; }
+
+	/* ── Transcript PREMIUM ── */
+	.transcript-section {
+		margin-top: 24px;
+	}
+	.transcript-toggle-card {
+		display: flex; align-items: center; justify-content: space-between;
+		width: 100%; padding: 16px 20px;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 20px;
-		overflow: hidden;
+		cursor: pointer;
+		font-family: inherit;
+		transition: all 0.2s;
 		box-shadow: var(--shadow-sm);
 	}
-	.audio-player-layout {
-		display: flex;
-		flex-direction: column;
+	.transcript-toggle-card:hover {
+		border-color: var(--ink-300);
+		transform: translateY(-1px);
 	}
-	@media (min-width: 1024px) {
-		.audio-player-layout {
-			flex-direction: row;
-			height: 240px;
-		}
-	}
-
-	.audio-player-sidebar {
+	.transcript-toggle-card.is-open {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
 		background: var(--paper);
-		border-bottom: 1px solid var(--ink-100);
-		width: 100%;
-	}
-	@media (min-width: 1024px) {
-		.audio-player-sidebar {
-			width: 260px;
-			border-bottom: none;
-			border-right: 1px solid var(--ink-100);
-			height: 100%;
-		}
 	}
 
-	.audio-player-scroll {
-		height: 180px;
-		overflow-y: auto;
+	.toggle-left { display: flex; align-items: center; gap: 14px; }
+	.toggle-icon-box {
+		width: 36px; height: 36px;
+		background: var(--hinomaru-red-wash);
+		border-radius: 10px;
+		display: flex; align-items: center; justify-content: center;
 	}
-	@media (min-width: 1024px) {
-		.audio-player-scroll {
-			height: 100%;
-		}
-	}
+	.toggle-text-stack { display: flex; flex-direction: column; text-align: left; }
+	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
+	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
 
-	.audio-player-list {
-		padding: 12px;
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
+	.toggle-arrow-premium { font-size: 12px; color: var(--fg-tertiary); opacity: 0.5; }
 
-	.audio-player-main {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		padding: 24px;
-	}
-	@media (min-width: 640px) {
-		.audio-player-main {
-			padding: 32px;
-		}
-	}
-
-	.audio-player-content {
-		width: 100%;
-		max-width: 600px;
-		margin: 0 auto;
-	}
-
-	.audio-player-header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		margin-bottom: 20px;
-	}
-
-	.audio-player-info {
-		flex: 1;
-	}
-	.audio-player-title {
-		font-size: 20px;
-		font-weight: 800;
-		color: var(--sumi);
-		margin: 0 0 2px;
-		letter-spacing: -0.02em;
-	}
-	.audio-player-subtitle {
-		font-size: 13px;
-		font-weight: 500;
-		color: var(--fg-tertiary);
-		margin: 0;
-	}
-	:global(.audio-speed-top) {
-		color: var(--fg-tertiary) !important;
-		opacity: 0.6;
-		transition: opacity 0.2s;
-	}
-	:global(.audio-speed-top:hover) {
-		opacity: 1;
-	}
-
-	.audio-player-controls-row {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-	}
-
-	.audio-player-progress-area {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
-	.audio-player-time-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	/* ── Transcript ── */
-	.transcript-wrap {
-		margin-top: 16px;
+	.transcript-expandable-content {
 		border: 1px solid var(--ink-200);
-		border-radius: 16px;
+		border-top: none;
+		border-bottom-left-radius: 20px;
+		border-bottom-right-radius: 20px;
+		background: var(--bg-surface);
 		overflow: hidden;
 	}
-	.transcript-toggle {
-		display: flex; align-items: center; justify-content: space-between;
-		width: 100%; padding: 14px 18px;
-		background: var(--bg-surface);
-		border: none; cursor: pointer;
-		font-family: inherit; font-size: 14px; font-weight: 700;
-		color: var(--sumi);
-		text-align: left;
+	.transcript-scroll-area {
+		padding: 24px;
+		max-height: 500px;
+		overflow-y: auto;
 	}
-	.transcript-toggle:hover { background: var(--ink-50); }
-	.toggle-arrow { font-size: 11px; color: var(--fg-tertiary); }
-	.transcript-body {
-		padding: 16px 18px;
-		font-size: 14px;
-		line-height: 1.9;
+	.transcript-text-jp {
+		font-size: 16px;
+		line-height: 2;
 		color: var(--fg-primary);
 		white-space: pre-wrap;
-		border-top: 1px solid var(--ink-100);
-		background: var(--paper);
-		max-height: 400px;
-		overflow-y: auto;
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
 	}
-	.transcript-romaji {
-		font-size: 13px;
-		color: var(--fg-tertiary);
-		font-style: italic;
-		line-height: 1.6;
-		border-top: 1px dashed var(--ink-200);
-		padding-top: 12px;
+	.transcript-romaji-card {
+		margin-top: 20px;
+		padding: 16px;
+		background: var(--paper);
+		border-radius: 14px;
+		border-left: 3px solid var(--hinomaru-red);
+	}
+	.romaji-label { font-size: 10px; font-weight: 800; color: var(--hinomaru-red); margin-bottom: 6px; }
+	.romaji-content { font-size: 14px; color: var(--fg-secondary); font-style: italic; line-height: 1.6; }
+
+	.footer-back-btn {
+		display: flex; align-items: center; justify-content: center; gap: 10px;
+		font-weight: 700;
 	}
 
 	/* ── PREMIUM RESULT SCREEN ── */
@@ -1214,5 +1171,29 @@
 	:global([data-theme='dark']) .timer-label {
 		background: var(--ink-100);
 		border-color: var(--ink-300);
+	}
+
+	.player-main-btn {
+		width: 64px !important;
+		height: 64px !important;
+		border-radius: 50% !important;
+		background: var(--sumi) !important;
+		color: var(--washi) !important;
+		box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+		display: flex; align-items: center; justify-content: center;
+	}
+	:global([data-theme='dark']) .player-main-btn {
+		background: var(--washi) !important;
+		color: var(--sumi) !important;
+	}
+
+	:global(.audio-player-progress-area .bg-secondary) {
+		background: var(--ink-200) !important;
+	}
+	:global(.audio-player-progress-area .bg-primary) {
+		background: var(--hinomaru-red) !important;
+	}
+	:global(.audio-player-progress-area [role="slider"] > span:last-child) {
+		background: var(--hinomaru-red) !important;
 	}
 </style>

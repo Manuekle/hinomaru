@@ -99,6 +99,10 @@
 			playbackRate = audioEl.playbackRate;
 		}
 	});
+	function handleEnded() {
+		isPlaying = false;
+		currentTime = 0;
+	}
 </script>
 
 <audio
@@ -110,6 +114,7 @@
 	onwaiting={handleWaiting}
 	onplaying={handlePlaying}
 	onerror={handleError}
+	onended={handleEnded}
 	class="hidden"
 ></audio>
 
