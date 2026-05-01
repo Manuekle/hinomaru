@@ -147,7 +147,7 @@
 			<!-- Back link -->
 			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;">
 				<a href="/conversation" class="back-link-beautiful">
-					← {$locale === 'es' ? 'Conversatorio' : 'Conversations'}
+					← {t('deck.back', $locale)}
 				</a>
 			</div>
 
