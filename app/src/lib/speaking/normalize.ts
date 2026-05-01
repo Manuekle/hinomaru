@@ -14,7 +14,7 @@ export function normalizeJapanese(text: string): string {
 	if (!text) return '';
 	return katakanaToHiragana(text)
 		.replace(/\s+/g, '')
-		.replace(/[。、！？\.\!\?,，。、・]/g, '')
+		.replace(/[。、！？.!?,，。、・]/g, '')
 		.normalize('NFC');
 }
 

@@ -1,0 +1,289 @@
+
+> sveltekit@0.0.1 lint
+> eslint .
+
+
+/home/manudev/Dev/nihongo/app/scratch/check_cols.ts
+  12:10  warning  'data' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  12:16  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/scratch/check_date_col.ts
+  12:10  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/scratch/check_publish_date.ts
+  12:10  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/scratch/check_table_name.ts
+  12:10  warning  'data' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  17:16  warning  'data2' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/scripts/check_sql.ts
+  12:7  warning  'sb' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/hooks.server.ts
+  17:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte
+   3:19  warning  'fadeIn' is defined but never used               @typescript-eslint/no-unused-vars
+   3:27  warning  'scaleIn' is defined but never used              @typescript-eslint/no-unused-vars
+  11:3   warning  'More01Icon' is defined but never used           @typescript-eslint/no-unused-vars
+  12:3   warning  'Download02Icon' is defined but never used       @typescript-eslint/no-unused-vars
+  13:3   warning  'QrCode01Icon' is defined but never used         @typescript-eslint/no-unused-vars
+  14:3   warning  'Cancel01Icon' is defined but never used         @typescript-eslint/no-unused-vars
+  21:6   warning  'isMobile' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  22:6   warning  'desktopTab' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  25:71  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/InstallPrompt.svelte
+  18:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/InteractiveText.svelte
+   7:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte
+  11:3   warning  'BrainIcon' is defined but never used       @typescript-eslint/no-unused-vars
+  12:3   warning  'Target01Icon' is defined but never used    @typescript-eslint/no-unused-vars
+  13:3   warning  'Download02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+  15:3   warning  'SparklesIcon' is defined but never used    @typescript-eslint/no-unused-vars
+  17:3   warning  'Coffee02Icon' is defined but never used    @typescript-eslint/no-unused-vars
+  18:3   warning  'Message01Icon' is defined but never used   @typescript-eslint/no-unused-vars
+  19:3   warning  'UserGroupIcon' is defined but never used   @typescript-eslint/no-unused-vars
+  20:3   warning  'SmileIcon' is defined but never used       @typescript-eslint/no-unused-vars
+  23:3   warning  'FavouriteIcon' is defined but never used   @typescript-eslint/no-unused-vars
+  25:3   warning  'GlobeIcon' is defined but never used       @typescript-eslint/no-unused-vars
+  59:49  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  62:71  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ScrollingWaveform.svelte
+  2:20  warning  'onDestroy' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/StickyFooter.svelte
+  7:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/WordPopup.svelte
+  3:11  warning  'fade' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/MotivationStep.svelte
+  11:3  warning  'Tick01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/Onboarding.svelte
+  14:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte
+  16:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/StoriesStep.svelte
+  8:3  warning  'CheckmarkCircle02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/SummaryStep.svelte
+  14:3  warning  'Tick01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/VoiceStep.svelte
+  5:9   warning  'Icon' is defined but never used            @typescript-eslint/no-unused-vars
+  6:11  warning  'VolumeHighIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/AnticipationScreen.svelte
+  5:9   warning  'Icon' is defined but never used         @typescript-eslint/no-unused-vars
+  6:11  warning  'Award01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/ResponsiveModal.svelte
+  31:6  warning  'mounted' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/context.ts
+   3:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/motion.ts
+   26:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   27:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   28:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   39:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   40:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   41:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  167:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/speaking/normalize.ts
+   2:7   warning  'KATA_START' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   3:7   warning  'KATA_END' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  17:18  error    Unnecessary escape character: \.                 no-useless-escape
+  17:20  error    Unnecessary escape character: \!                 no-useless-escape
+  17:22  error    Unnecessary escape character: \?                 no-useless-escape
+
+/home/manudev/Dev/nihongo/app/src/lib/stores/pwa.ts
+   3:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:103  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/stores/settings.ts
+  28:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/stores/toast.ts
+  21:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+layout.svelte
+   5:17  warning  'navigating' is defined but never used     @typescript-eslint/no-unused-vars
+   7:18  warning  'resolvedTheme' is defined but never used  @typescript-eslint/no-unused-vars
+  30:42  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  42:60  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  76:34  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.server.ts
+  46:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  95:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/+page.svelte
+  10:27  warning  'CheckmarkCircle01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+  19:50  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  20:65  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/alphabet/+page.svelte
+  4:19  warning  'fadeIn' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/callback/+server.ts
+  23:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/auth/reset-password/+page.svelte
+  61:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/contact/+page.svelte
+  14:3  warning  'Coffee02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/conversation/+page.svelte
+  3:11  warning  't' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/+page.svelte
+  16:11  warning  'fade' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/exam/+page.svelte
+   10:11  warning  'fade' is defined but never used                    @typescript-eslint/no-unused-vars
+   14:3   warning  'DocumentValidationIcon' is defined but never used  @typescript-eslint/no-unused-vars
+   17:3   warning  'CheckmarkCircle02Icon' is defined but never used   @typescript-eslint/no-unused-vars
+   19:3   warning  'ArrowLeft01Icon' is defined but never used         @typescript-eslint/no-unused-vars
+   34:9   warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+   44:39  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+   74:8   warning  'timerPct' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   94:30  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+   94:45  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  109:39  warning  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte
+  25:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  54:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/match/+page.svelte
+  15:11  warning  'svileo' is defined but never used                @typescript-eslint/no-unused-vars
+  22:42  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  26:28  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  28:26  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  42:6   warning  'showSuccess' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  69:16  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  82:24  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte
+   22:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   22:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  111:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/speaking/+page.svelte
+  207:9  error  Each block should have a key  svelte/require-each-key
+  277:9  error  Each block should have a key  svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/type/+page.svelte
+  25:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  99:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/write/+page.svelte
+   30:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   37:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  167:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  219:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/songs/[id]/+page.svelte
+   37:8   warning  'levelColors' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   46:14  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   65:38  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   67:53  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  303:25  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  326:24  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  327:34  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  356:25  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/stories/+page.svelte
+  12:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/stories/[id]/+page.svelte
+   79:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/+page.svelte
+   12:11  warning  'DocumentValidationIcon' is defined but never used  @typescript-eslint/no-unused-vars
+   13:11  warning  'fade' is defined but never used                    @typescript-eslint/no-unused-vars
+  123:17  warning  'resetLevel' is defined but never used              @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte
+  199:7  error  The value assigned to 'isRight' is not used in subsequent statements  no-useless-assignment
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/mock/+page.svelte
+   5:11  warning  'onMount' is defined but never used          @typescript-eslint/no-unused-vars
+  19:3   warning  'ArrowLeft01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+  21:3   warning  'Target01Icon' is defined but never used     @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte
+   2:11  warning  'goto' is defined but never used                    @typescript-eslint/no-unused-vars
+   6:9   warning  'Icon' is defined but never used                    @typescript-eslint/no-unused-vars
+   7:11  warning  'ArrowLeft02Icon' is defined but never used         @typescript-eslint/no-unused-vars
+   7:28  warning  'PrinterIcon' is defined but never used             @typescript-eslint/no-unused-vars
+   7:41  warning  'Share01Icon' is defined but never used             @typescript-eslint/no-unused-vars
+  17:8   warning  'meta' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  67:8   warning  'SECTION_NAMES' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  75:8   warning  'allDone' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  87:17  warning  'shareCert' is defined but never used               @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/login/+page.svelte
+  152:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/onboarding/+page.svelte
+  10:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte
+  164:6   warning  'overlayPaddingBottom' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  195:11  warning  'handleModalKeydown' is defined but never used             @typescript-eslint/no-unused-vars
+  203:11  warning  'handleOverlayClick' is defined but never used             @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/review/+page.svelte
+   5:20  warning  'untrack' is defined but never used       @typescript-eslint/no-unused-vars
+  24:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 174 problems (6 errors, 168 warnings)
+

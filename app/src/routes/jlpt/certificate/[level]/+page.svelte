@@ -67,7 +67,8 @@
 	const SECTION_NAMES: Record<JLPTSectionType, string> = {
 		vocabulary: 'Vocabulario',
 		grammar: 'Gramática',
-		listening: 'Escucha'
+		listening: 'Escucha',
+		mock: 'Simulacro'
 	};
 
 	const mockResult = $derived(results[`${level}_mock`]);

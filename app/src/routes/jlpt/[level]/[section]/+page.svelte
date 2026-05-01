@@ -176,7 +176,7 @@
 						mondaiTitle: m.title, 
 						mondaiId: m.id,
 						audioFile,
-						mode
+						mode: mode as 'choice' | 'typing'
 					};
 				})
 			);
@@ -196,7 +196,7 @@
 	function checkAnswer() {
 		if (checked) return;
 		
-		let isRight = false;
+		let isRight: boolean;
 		if (currentQ.mode === 'choice') {
 			if (selected === null) return;
 			isRight = selected + 1 === currentQ.answer;
@@ -205,7 +205,6 @@
 			if (!typingValue.trim()) return;
 			const correctText = currentQ.choices[currentQ.answer - 1].trim();
 			isRight = typingValue.trim().toLowerCase() === correctText.toLowerCase();
-			// Also allow Romaji if possible? (Optional refinement)
 		}
 
 		checked = true;

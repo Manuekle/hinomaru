@@ -89,7 +89,8 @@ export const LEVEL_META: Record<
 export const SECTION_LABELS: Record<JLPTSectionType, { es: string; en: string; jp: string; romaji: string }> = {
 	vocabulary: { es: 'Vocabulario', en: 'Vocabulary', jp: '語彙', romaji: 'go-i' },
 	grammar: { es: 'Gramática', en: 'Grammar', jp: '文法', romaji: 'bun-pō' },
-	listening: { es: 'Escucha', en: 'Listening', jp: '聴解', romaji: 'chōkai' }
+	listening: { es: 'Escucha', en: 'Listening', jp: '聴解', romaji: 'chōkai' },
+	mock: { es: 'Simulacro', en: 'Mock Test', jp: '模擬試験', romaji: 'mogi shiken' }
 };
 
 export const AUDIO_FILES: Record<JLPTLevel, string[]> = {

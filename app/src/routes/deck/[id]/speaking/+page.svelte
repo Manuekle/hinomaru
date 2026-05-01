@@ -204,7 +204,7 @@
 						<!-- Segments preview — only when phrase splits into multiple parts -->
 						{#if phrase.segments.length > 1}
 							<div class="segments-row">
-								{#each phrase.segments as seg}
+								{#each phrase.segments as seg, i (i)}
 									<span class="seg-chip">{seg}</span>
 								{/each}
 							</div>
@@ -274,7 +274,7 @@
 						<!-- Segments breakdown -->
 						{#if result?.segments && result.segments.length > 0}
 							<div class="seg-breakdown">
-								{#each result.segments as sr}
+								{#each result.segments as sr, i (i)}
 									<div class="seg-row" style="--seg-color:{SCORE_COLORS[sr.level]};">
 										<span class="seg-row-text jp">{sr.segment}</span>
 										<div class="seg-bar-wrap">

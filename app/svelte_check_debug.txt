@@ -1,0 +1,691 @@
+Loading svelte-check in workspace: /home/manudev/Dev/nihongo/app
+Getting Svelte diagnostics...
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/audio-player-progress.svelte:33:1
+Warn: `<div>` with a pointerdown or pointerup handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions (svelte)
+
+<div
+	onpointerdown={() => { isDragging = true; }}
+	onpointerup={() => { isDragging = false; }}
+	class={cn("relative flex w-full touch-none select-none items-center", className)}
+>
+	<Slider.Root
+		type="multiple"
+		value={value}
+		onValueChange={handleValueChange}
+		max={player.duration || 100}
+		step={0.1}
+		class="w-full"
+	>
+	<div class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary">
+		<Slider.Range class="absolute h-full bg-primary" />
+	</div>
+	<Slider.Thumb
+		index={0}
+		class="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+	/>
+	</Slider.Root>
+</div>
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:111:2
+Warn: Unused CSS selector ".drawer-header-visual"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.drawer-header-visual {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:117:2
+Warn: Unused CSS selector ".header-icon"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.header-icon {
+		width: 64px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:130:2
+Warn: Unused CSS selector ".drawer-close-row"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Close row ── */
+	.drawer-close-row {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:232:2
+Warn: Unused CSS selector ".qr-block"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── QR block ── */
+	.qr-block {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:244:2
+Warn: Unused CSS selector ".qr-url"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.qr-url {
+		font-size: 13px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:251:2
+Warn: Unused CSS selector ".desktop-desc"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Desktop description ── */
+	.desktop-desc {
+		font-size: 14px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:260:2
+Warn: Unused CSS selector ".tabs-wrap"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Tabs ── */
+	.tabs-wrap {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:269:2
+Warn: Unused CSS selector ".tab-btn"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.tab-btn {
+		flex: 1;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:287:2
+Warn: Unused CSS selector ".tab-active"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.tab-active {
+		background: var(--bg-surface);
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:294:2
+Warn: Unused CSS selector ".tab-content"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Tab content ── */
+	.tab-content {
+		min-height: 200px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:299:2
+Warn: Unused CSS selector ".pwa-note"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── PWA Note ── */
+	.pwa-note {
+		margin-top: 16px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte:1120:2
+Warn: Unused CSS selector ".cta-link-btn"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.cta-link-btn {
+		background: transparent;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte:1131:2
+Warn: Unused CSS selector ".cta-link-btn:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.cta-link-btn:hover {
+		opacity: 1;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte:1512:3
+Warn: Unused CSS selector ".level-card"
+https://svelte.dev/e/css_unused_selector (svelte)
+		}
+		.level-card {
+			padding: 20px 12px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/GoalStep.svelte:198:2
+Warn: Unused CSS selector ".footer"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.footer {
+		margin-top: auto;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/WelcomeStep.svelte:87:2
+Warn: Unused CSS selector ".footer-section"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.footer-section {
+		margin-top: auto;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte:259:2
+Warn: Unused CSS selector ".char-label"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.char-label {
+		font-size: 11px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte:354:2
+Warn: Unused CSS selector ".footer"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Footer ───────────────────────────────────── */
+	.footer {
+		flex-shrink: 0;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte:362:2
+Warn: Unused CSS selector ".skip-link"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.skip-link {
+		font-size: 13px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/ResponsiveModal.svelte:81:3
+Warn: Elements with the 'dialog' interactive role must have a tabindex value
+https://svelte.dev/e/a11y_interactive_supports_focus (svelte)
+	>
+		<div 
+			class={cn("modal-content", contentClass)} 
+			use:fadeUp={{ delay: 0.05, y: 20 }}
+			onclick={(e) => e.stopPropagation()}
+			role="dialog"
+			aria-modal="true"
+		>
+			{#if icon}
+				<div class="modal-icon-box">
+					{@render icon()}
+				</div>
+			{/if}
+			<h3 class="modal-title">{title}</h3>
+			{#if description}
+				<p class="modal-text">{description}</p>
+			{/if}
+			
+			<div class="modal-body">
+				{@render children?.()}
+			</div>
+
+			<div class={cn("flex flex-row gap-3 w-full font-ui [&>*]:flex-1", actionsClass)}>
+				{@render actions?.()}
+			</div>
+		</div>
+	</div>
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/ResponsiveModal.svelte:81:3
+Warn: Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events (svelte)
+	>
+		<div 
+			class={cn("modal-content", contentClass)} 
+			use:fadeUp={{ delay: 0.05, y: 20 }}
+			onclick={(e) => e.stopPropagation()}
+			role="dialog"
+			aria-modal="true"
+		>
+			{#if icon}
+				<div class="modal-icon-box">
+					{@render icon()}
+				</div>
+			{/if}
+			<h3 class="modal-title">{title}</h3>
+			{#if description}
+				<p class="modal-text">{description}</p>
+			{/if}
+			
+			<div class="modal-body">
+				{@render children?.()}
+			</div>
+
+			<div class={cn("flex flex-row gap-3 w-full font-ui [&>*]:flex-1", actionsClass)}>
+				{@render actions?.()}
+			</div>
+		</div>
+	</div>
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/exam/+page.svelte:523:2
+Warn: Unused CSS selector ".feedback-sub"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.feedback-title { font-size: 16px; font-weight: 800; }
+	.feedback-sub { font-size: 13px; font-weight: 600; opacity: 0.8; }
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/exam/+page.svelte:553:91
+Warn: Unused CSS selector ":global([data-theme='dark']) .rules-box"
+https://svelte.dev/e/css_unused_selector (svelte)
+	:global([data-theme='dark']) .option-item.is-selected { background: var(--ink-200); border-color: var(--sumi); }
+	:global([data-theme='dark']) .stat-pill-sm, :global([data-theme='dark']) .question-card, :global([data-theme='dark']) .rules-box, :global([data-theme='dark']) .modal-content { background: var(--ink-100); border-color: var(--ink-200); }
+</style>
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/exam/+page.svelte:553:132
+Warn: Unused CSS selector ":global([data-theme='dark']) .modal-content"
+https://svelte.dev/e/css_unused_selector (svelte)
+	:global([data-theme='dark']) .option-item.is-selected { background: var(--ink-200); border-color: var(--sumi); }
+	:global([data-theme='dark']) .stat-pill-sm, :global([data-theme='dark']) .question-card, :global([data-theme='dark']) .rules-box, :global([data-theme='dark']) .modal-content { background: var(--ink-100); border-color: var(--ink-200); }
+</style>
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte:415:2
+Warn: Unused CSS selector ".correct-answer"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.correct-answer {
+		font-size: 14px;
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/stories/+page.svelte:86:2
+Warn: Unused CSS selector ".back-link-beautiful"
+https://svelte.dev/e/css_unused_selector (svelte)
+<style>
+	.back-link-beautiful {
+		display: inline-flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/stories/+page.svelte:95:2
+Warn: Unused CSS selector ".back-link-beautiful:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.back-link-beautiful:hover {
+		color: var(--sumi);
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/+page.svelte:404:2
+Warn: Unused CSS selector ".completion-retry-btn"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.completion-cert-btn:active { transform: scale(0.95); }
+	.completion-retry-btn {
+		width: 34px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/+page.svelte:420:3
+Warn: Unused CSS selector ".completion-retry-btn:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	@media (hover: hover) {
+		.completion-retry-btn:hover {
+			background: var(--ink-100);
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/+page.svelte:426:2
+Warn: Unused CSS selector ".completion-retry-btn:active"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.completion-retry-btn:active { transform: scale(0.92); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:713:2
+Warn: Unused CSS selector ".intro-screen"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Intro ── */
+	.intro-screen { text-align: center; padding: 40px 0 20px; }
+	.intro-icon {
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:714:2
+Warn: Unused CSS selector ".intro-icon"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.intro-screen { text-align: center; padding: 40px 0 20px; }
+	.intro-icon {
+		width: 80px; height: 80px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:721:2
+Warn: Unused CSS selector ".intro-badge"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.intro-badge {
+		display: inline-block;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:730:2
+Warn: Unused CSS selector ".intro-title"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.intro-title {
+		font-size: 34px; font-weight: 700;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:736:2
+Warn: Unused CSS selector ".intro-sub"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.intro-sub { font-size: 15px; color: var(--fg-secondary); margin: 0 0 32px; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:738:2
+Warn: Unused CSS selector ".intro-stats"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.intro-stats {
+		display: inline-flex; align-items: center; gap: 0;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:746:2
+Warn: Unused CSS selector ".stat-card"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.stat-card {
+		display: flex; flex-direction: column; align-items: center;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:750:2
+Warn: Unused CSS selector ".stat-divider"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.stat-divider {
+		width: 1px; height: 36px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:754:2
+Warn: Unused CSS selector ".stat-val"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.stat-val { font-size: 28px; font-weight: 700; color: var(--sumi); line-height: 1; }
+	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:755:2
+Warn: Unused CSS selector ".stat-label"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.stat-val { font-size: 28px; font-weight: 700; color: var(--sumi); line-height: 1; }
+	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+	.unavail { font-size: 14px; color: var(--fg-secondary); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:756:2
+Warn: Unused CSS selector ".unavail"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+	.unavail { font-size: 14px; color: var(--fg-secondary); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:921:2
+Warn: Unused CSS selector ".feedback-sub"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.feedback-title { font-size: 16px; font-weight: 800; }
+	.feedback-sub { font-size: 13px; font-weight: 600; opacity: 0.8; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1012:2
+Warn: Unused CSS selector ".p-idx-tiny"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.p-idx-tiny { font-size: 10px; font-weight: 800; color: var(--fg-tertiary); }
+	.p-name-tiny { font-size: 13px; font-weight: 700; color: var(--fg-secondary); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1014:2
+Warn: Unused CSS selector ".is-active .p-idx-tiny"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.p-name-tiny { font-size: 13px; font-weight: 700; color: var(--fg-secondary); }
+	.is-active .p-idx-tiny, .is-active .p-name-tiny { color: white; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1074:2
+Warn: Unused CSS selector ".minimal-label"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.transcript-minimal { border-top: 1px solid var(--ink-100); padding-top: 32px; }
+	.minimal-label { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+	.text-minimal { font-size: 17px; line-height: 2; color: var(--fg-primary); white-space: pre-wrap; font-weight: 500; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1079:2
+Warn: Unused CSS selector ".transcript-section"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Transcript PREMIUM ── */
+	.transcript-section {
+		margin-top: 24px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1082:2
+Warn: Unused CSS selector ".transcript-toggle-card"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.transcript-toggle-card {
+		display: flex; align-items: center; justify-content: space-between;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1093:2
+Warn: Unused CSS selector ".transcript-toggle-card:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.transcript-toggle-card:hover {
+		border-color: var(--ink-300);
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1097:2
+Warn: Unused CSS selector ".transcript-toggle-card.is-open"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.transcript-toggle-card.is-open {
+		border-bottom-left-radius: 0;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1103:2
+Warn: Unused CSS selector ".toggle-left"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.toggle-left { display: flex; align-items: center; gap: 14px; }
+	.toggle-icon-box {
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1104:2
+Warn: Unused CSS selector ".toggle-icon-box"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.toggle-left { display: flex; align-items: center; gap: 14px; }
+	.toggle-icon-box {
+		width: 36px; height: 36px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1110:2
+Warn: Unused CSS selector ".toggle-text-stack"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.toggle-text-stack { display: flex; flex-direction: column; text-align: left; }
+	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1111:2
+Warn: Unused CSS selector ".toggle-label"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.toggle-text-stack { display: flex; flex-direction: column; text-align: left; }
+	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
+	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1112:2
+Warn: Unused CSS selector ".toggle-sublabel"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
+	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1114:2
+Warn: Unused CSS selector ".toggle-arrow-premium"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.toggle-arrow-premium { font-size: 12px; color: var(--fg-tertiary); opacity: 0.5; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1116:2
+Warn: Unused CSS selector ".transcript-expandable-content"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.transcript-expandable-content {
+		border: 1px solid var(--ink-200);
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1124:2
+Warn: Unused CSS selector ".transcript-scroll-area"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.transcript-scroll-area {
+		padding: 24px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1129:2
+Warn: Unused CSS selector ".transcript-text-jp"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.transcript-text-jp {
+		font-size: 16px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1135:2
+Warn: Unused CSS selector ".transcript-romaji-card"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.transcript-romaji-card {
+		margin-top: 20px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1142:2
+Warn: Unused CSS selector ".romaji-label"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.romaji-label { font-size: 10px; font-weight: 800; color: var(--hinomaru-red); margin-bottom: 6px; }
+	.romaji-content { font-size: 14px; color: var(--fg-secondary); font-style: italic; line-height: 1.6; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1143:2
+Warn: Unused CSS selector ".romaji-content"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.romaji-label { font-size: 10px; font-weight: 800; color: var(--hinomaru-red); margin-bottom: 6px; }
+	.romaji-content { font-size: 14px; color: var(--fg-secondary); font-style: italic; line-height: 1.6; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1154:2
+Warn: Unused CSS selector ".footer-back-btn"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.footer-back-btn {
+		display: flex; align-items: center; justify-content: center; gap: 10px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1185:2
+Warn: Unused CSS selector ".review-item-premium.is-review-wrong"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.review-item-premium.is-review-correct { border-color: var(--success-wash); }
+	.review-item-premium.is-review-wrong { border-color: var(--hinomaru-red-wash); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1197:2
+Warn: Unused CSS selector ".is-review-wrong .review-num"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.is-review-correct .review-num { background: var(--success-wash); color: var(--success); }
+	.is-review-wrong .review-num { background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1204:2
+Warn: Unused CSS selector ".review-user-ans"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.review-user-ans, .review-correct-ans {
+		display: flex; align-items: baseline; gap: 6px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1208:2
+Warn: Unused CSS selector ".review-x"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.review-x { font-size: 12px; font-weight: 700; color: var(--hinomaru-red); flex-shrink: 0; }
+	.review-check { font-size: 12px; font-weight: 700; color: var(--success); flex-shrink: 0; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1210:2
+Warn: Unused CSS selector ".review-wrong-text"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.review-check { font-size: 12px; font-weight: 700; color: var(--success); flex-shrink: 0; }
+	.review-wrong-text { font-size: 13px; color: var(--hinomaru-red); text-decoration: line-through; }
+	.review-correct-text { font-size: 14px; font-weight: 700; color: var(--success); }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1234:2
+Warn: Unused CSS selector ".hero-badge"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.hero-badge {
+		display: inline-flex; align-items: center; gap: 8px;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1333:2
+Warn: Unused CSS selector ":global([data-theme='dark']) .intro-stats"
+https://svelte.dev/e/css_unused_selector (svelte)
+	:global([data-theme='dark']) .stat-pill-sm,
+	:global([data-theme='dark']) .intro-stats,
+	:global([data-theme='dark']) .question-card,
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1335:2
+Warn: Unused CSS selector ":global([data-theme='dark']) .audio-player-card"
+https://svelte.dev/e/css_unused_selector (svelte)
+	:global([data-theme='dark']) .question-card,
+	:global([data-theme='dark']) .audio-player-card,
+	:global([data-theme='dark']) .review-item-premium {
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:524:2
+Warn: Unused CSS selector ".print-only"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Print (PDF Export) ── */
+	.print-only { display: none; }
+	@media print {
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:527:14
+Warn: Unused CSS selector ".dock-bar"
+https://svelte.dev/e/css_unused_selector (svelte)
+		@page { size: portrait; margin: 15mm; }
+		.no-print, .dock-bar, .app-bar { display: none !important; }
+		.print-only { display: block; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:527:25
+Warn: Unused CSS selector ".app-bar"
+https://svelte.dev/e/css_unused_selector (svelte)
+		@page { size: portrait; margin: 15mm; }
+		.no-print, .dock-bar, .app-bar { display: none !important; }
+		.print-only { display: block; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:528:3
+Warn: Unused CSS selector ".print-only"
+https://svelte.dev/e/css_unused_selector (svelte)
+		.no-print, .dock-bar, .app-bar { display: none !important; }
+		.print-only { display: block; }
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:530:3
+Warn: Unused CSS selector "body"
+https://svelte.dev/e/css_unused_selector (svelte)
+		
+		body, html, .session-layout, .cert-page, .app-container { 
+			background: white !important;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:530:9
+Warn: Unused CSS selector "html"
+https://svelte.dev/e/css_unused_selector (svelte)
+		
+		body, html, .session-layout, .cert-page, .app-container { 
+			background: white !important;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:530:15
+Warn: Unused CSS selector ".session-layout"
+https://svelte.dev/e/css_unused_selector (svelte)
+		
+		body, html, .session-layout, .cert-page, .app-container { 
+			background: white !important;
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:530:44
+Warn: Unused CSS selector ".app-container"
+https://svelte.dev/e/css_unused_selector (svelte)
+		
+		body, html, .session-layout, .cert-page, .app-container { 
+			background: white !important;
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:713:2
+Warn: Unused CSS selector ".card-row"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.card-row {
+		padding: 12px 14px;
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:717:2
+Warn: Unused CSS selector ".card-divider"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.card-divider {
+		height: 1px;
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:1018:2
+Warn: Unused CSS selector ".flag-circle-sm"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.flag-circle-sm {
+		width: 24px !important;
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:1132:2
+Warn: Unused CSS selector ".modal-actions"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.modal-actions {
+		display: grid;
+
+/home/manudev/Dev/nihongo/app/src/routes/terms/+page.svelte:418:3
+Warn: Unused CSS selector ".back-cta"
+https://svelte.dev/e/css_unused_selector (svelte)
+		}
+		.back-cta,
+		.contact-cta {
+
+/home/manudev/Dev/nihongo/app/src/routes/terms/+page.svelte:419:3
+Warn: Unused CSS selector ".contact-cta"
+https://svelte.dev/e/css_unused_selector (svelte)
+		.back-cta,
+		.contact-cta {
+			justify-content: center;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:300:2
+Warn: Unused CSS selector ".top-nav"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.top-nav {
+		display: none;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:310:2
+Warn: Unused CSS selector ".back-link-beautiful"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.back-link-beautiful {
+		display: inline-flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:321:3
+Warn: Unused CSS selector ".back-link-beautiful:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:517:2
+Warn: Unused CSS selector ".card-actions"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.card-actions {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:680:3
+Warn: Unused CSS selector ".page-title"
+https://svelte.dev/e/css_unused_selector (svelte)
+		}
+		.page-title {
+			font-size: 32px;
+
+====================================
+svelte-check found 0 errors and 90 warnings in 16 files
