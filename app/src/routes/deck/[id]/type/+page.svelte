@@ -197,11 +197,7 @@
 							? 'var(--success)'
 							: 'var(--hinomaru-red-ink)'};display:flex;flex-direction:column;gap:12px;"
 					>
-						{#if !isCorrect}
-							<div style="font-size:14px;color:var(--hinomaru-red-ink);font-weight:600;">
-								{t('session.answerIs', $locale, { a: card.en })}
-							</div>
-						{/if}
+
 
 						{#if card.example}
 							<div

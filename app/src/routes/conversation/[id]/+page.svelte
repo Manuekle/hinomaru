@@ -251,7 +251,7 @@
 									<button
 										class="option-item"
 										class:is-selected={phase === 'choice' && isPicked}
-										class:is-correct={isRevealed && choice.correct}
+										class:is-correct={isRevealed && choice.correct && selectedChoice?.correct}
 										class:is-wrong={isRevealed && isPicked && !choice.correct}
 										class:is-dimmed={isRevealed && !isPicked && !choice.correct}
 										onclick={() => pickChoice(choice, loopIdx)}
@@ -285,7 +285,7 @@
 									<span class="feedback-text">{selectedChoice.feedback_es}</span>
 								</div>
 
-								{#if currentTurn.type === 'choice' && currentTurn.next_npc}
+								{#if currentTurn.type === 'choice' && currentTurn.next_npc && selectedChoice.correct}
 									<div class="feedback-npc-response">
 										<span class="label-meta" style="display:block;margin-bottom:6px;">
 											{$locale === 'es' ? 'El NPC responde:' : 'NPC responds:'}

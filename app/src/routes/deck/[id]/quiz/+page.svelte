@@ -167,7 +167,7 @@
 						<button
 							onclick={() => pick(opt)}
 							class="option-item"
-							class:is-correct={picked && isThisCorrect}
+							class:is-correct={picked && isThisCorrect && isCorrect}
 							class:is-wrong={picked && isThisPicked && !isThisCorrect}
 							class:is-dimmed={picked && !isThisCorrect && !isThisPicked}
 							disabled={!!picked}
@@ -188,11 +188,6 @@
 							<div class="feedback-status">
 								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
 							</div>
-							{#if !isCorrect}
-								<div class="correct-answer">
-									{t('session.answerIs', $locale, { a: $locale === 'es' ? card.es : card.en })}
-								</div>
-							{/if}
 						</div>
 
 						{#if card.example}

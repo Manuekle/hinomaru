@@ -312,13 +312,13 @@
 							<button
 								class="option-item"
 								class:is-selected={selected === idx}
-								class:is-correct={checked && opt === currentQuestion.correctAnswer}
+								class:is-correct={checked && opt === currentQuestion.correctAnswer && isCurrentCorrect}
 								class:is-wrong={checked && selected === idx && opt !== currentQuestion.correctAnswer}
 								disabled={checked}
 								onclick={() => { if (!checked) selected = idx; }}
 							>
 								<div class="opt-marker">
-									{#if checked && opt === currentQuestion.correctAnswer}
+									{#if checked && opt === currentQuestion.correctAnswer && isCurrentCorrect}
 										<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
 									{:else if checked && selected === idx && opt !== currentQuestion.correctAnswer}
 										<Icon icon={Cancel01Icon} size={16} color="white" />
@@ -353,9 +353,6 @@
 							<span class="feedback-title">
 								{isCurrentCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}
 							</span>
-							{#if !isCurrentCorrect}
-								<span class="feedback-sub">{t('exam.correct_was', $locale, { a: currentQuestion.correctAnswer })}</span>
-							{/if}
 						</div>
 					</div>
 				{/if}

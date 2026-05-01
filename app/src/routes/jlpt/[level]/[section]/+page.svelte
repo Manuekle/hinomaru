@@ -340,7 +340,7 @@
 						<button
 							class="option-item"
 							class:is-selected={selected === idx}
-							class:is-correct={checked && idx + 1 === currentQ.answer}
+							class:is-correct={checked && idx + 1 === currentQ.answer && selected + 1 === currentQ.answer}
 							class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
 							disabled={checked}
 							onclick={() => { if (!checked) selected = idx; }}
@@ -375,9 +375,6 @@
 						</div>
 						<div class="feedback-text-side">
 							<span class="feedback-title">{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span>
-							{#if !isCorrect}
-								<span class="feedback-sub">{t('exam.correct_was', $locale, { a: currentQ.choices[currentQ.answer - 1] })}</span>
-							{/if}
 						</div>
 					</div>
 				{/if}
