@@ -247,16 +247,16 @@
 	);
 
 	function typeLabel(type: QuestionType): string {
-		if (type === 'multiple-choice') return $locale === 'es' ? 'Opción múltiple' : 'Multiple choice';
-		if (type === 'type-answer') return $locale === 'es' ? 'Escribir' : 'Type';
-		return $locale === 'es' ? 'Contexto' : 'Context';
+		if (type === 'multiple-choice') return t('exam.type.multiple_choice', $locale);
+		if (type === 'type-answer') return t('exam.type.type_answer', $locale);
+		return t('exam.type.context', $locale);
 	}
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
 <svelte:head>
-	<title>{$locale === 'es' ? 'Examen' : 'Exam'} — {deck?.title_en ?? ''} — Hinomaru</title>
+	<title>{t('mode.exam.title', $locale)} — {deck?.title_en ?? ''} — Hinomaru</title>
 </svelte:head>
 
 <div class="session-layout">
@@ -266,35 +266,35 @@
 				<div class="intro-icon">
 					<Icon icon={DocumentValidationIcon} size={44} color="var(--washi)" strokeWidth={1.5} />
 				</div>
-				<h1 class="intro-title">{$locale === 'es' ? 'Examen' : 'Exam'}</h1>
+				<h1 class="intro-title">{t('mode.exam.title', $locale)}</h1>
 				<p class="intro-deck">{$locale === 'es' ? deck?.title_es : deck?.title_en}</p>
 
 				<div class="rules-box">
 					<div class="rule-item">
 						<span class="rule-num">10</span>
-						<span class="rule-text">preguntas</span>
+						<span class="rule-text">{t('exam.questions', $locale)}</span>
 					</div>
 					<div class="rule-item">
 						<span class="rule-num">5:00</span>
-						<span class="rule-text">minutos</span>
+						<span class="rule-text">{t('exam.minutes', $locale)}</span>
 					</div>
 					<div class="rule-item">
 						<span class="rule-num">1×</span>
-						<span class="rule-text">intento</span>
+						<span class="rule-text">{t('exam.attempt', $locale)}</span>
 					</div>
 				</div>
 
 				{#if cards.length < 4}
-					<p class="warning-text">Necesitas al menos 4 tarjetas para el examen.</p>
+					<p class="warning-text">{t('exam.warning_min_cards', $locale)}</p>
 				{/if}
 			</div>
 
 			<StickyFooter>
 				<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto(`/deck/${deck?.id}`)}>
-					← Volver
+					← {t('deck.back', $locale)}
 				</button>
 				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:2;" onclick={startExam} disabled={cards.length < 4}>
-					Comenzar examen
+					{t('exam.start', $locale)}
 				</button>
 			</StickyFooter>
 
@@ -327,14 +327,14 @@
 					{#if currentQuestion.type === 'sentence-context' && currentQuestion.card.example_jp}
 						<p class="example-sentence jp">{currentQuestion.card.example_jp}</p>
 						<p class="context-prompt">
-							{$locale === 'es' ? `¿Qué significa "${currentQuestion.card.jp}"?` : `What does "${currentQuestion.card.jp}" mean?`}
+							{t('session.answerIs', $locale, { a: `"${currentQuestion.card.jp}"` })}
 						</p>
 					{:else}
 						<p class="question-jp jp">{currentQuestion.card.jp}</p>
 						{#if currentQuestion.card.kana && currentQuestion.card.kana !== currentQuestion.card.jp}
 							<p class="question-kana jp">{currentQuestion.card.kana}</p>
 						{/if}
-						<p class="question-prompt">{$locale === 'es' ? '¿Qué significa?' : 'What does this mean?'}</p>
+						<p class="question-prompt">{t('session.whatMean', $locale)}</p>
 					{/if}
 				</div>
 
@@ -369,7 +369,7 @@
 							class:correct={checked && isCurrentCorrect}
 							class:wrong={checked && !isCurrentCorrect}
 							type="text"
-							placeholder={$locale === 'es' ? 'Escribe la traducción...' : 'Type the translation...'}
+							placeholder={t('session.typeMean', $locale) + '...'}
 							bind:value={typedAnswer}
 							disabled={checked}
 						/>
@@ -383,10 +383,10 @@
 						</div>
 						<div class="feedback-text-side">
 							<span class="feedback-title">
-								{isCurrentCorrect ? ($locale === 'es' ? '¡Respuesta Correcta!' : 'Correct Answer!') : ($locale === 'es' ? 'Respuesta Incorrecta' : 'Incorrect Answer')}
+								{isCurrentCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}
 							</span>
 							{#if !isCurrentCorrect}
-								<span class="feedback-sub">La correcta era: <strong>{currentQuestion.correctAnswer}</strong></span>
+								<span class="feedback-sub">{t('exam.correct_was', $locale, { a: currentQuestion.correctAnswer })}</span>
 							{/if}
 						</div>
 					</div>
@@ -404,7 +404,7 @@
 					</button>
 				{:else}
 					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
-						{currentIdx + 1 < questions.length ? ($locale === 'es' ? 'Siguiente →' : 'Next →') : ($locale === 'es' ? 'Ver resultados' : 'See results')}
+						{currentIdx + 1 < questions.length ? t('exam.next', $locale) : t('exam.see_results', $locale)}
 					</button>
 				{/if}
 			</StickyFooter>
@@ -421,16 +421,16 @@
 							</svg>
 							<div class="score-labels"><span class="score-big">{pct}</span><span class="score-small">%</span></div>
 						</div>
-						<h2 class="hero-main-title">{pct >= 70 ? '¡Excelente trabajo!' : 'Sigue esforzándote'}</h2>
-						<div class="hero-xp-badge"><Icon icon={Target01Icon} size={14} color="var(--warning)" /><span>+{score * 5} XP ganados</span></div>
+						<h2 class="hero-main-title">{pct >= 70 ? t('exam.perfect', $locale) : t('exam.keep_trying', $locale)}</h2>
+						<div class="hero-xp-badge"><Icon icon={Target01Icon} size={14} color="var(--warning)" /><span>{t('exam.xp_earned', $locale, { n: score * 5 })}</span></div>
 						<p class="hero-main-sub">{$locale === 'es' ? deck?.title_es : deck?.title_en}</p>
 					</div>
 				</div>
 
 				<div class="stats-premium-row" use:fadeUp={{ delay: 0.45, y: 20 }}>
-					<div class="stat-pill-sm correct"><Icon icon={CheckmarkCircle01Icon} size={14} color="var(--success)" /><span class="stat-v">{score}</span><span class="stat-l">Correctas</span></div>
-					<div class="stat-pill-sm wrong"><Icon icon={Cancel01Icon} size={14} color="var(--hinomaru-red)" /><span class="stat-v">{wrongCount}</span><span class="stat-l">Incorrectas</span></div>
-					<div class="stat-pill-sm duration"><Icon icon={Clock01Icon} size={14} color="var(--sumi)" /><span class="stat-v">{timeUsedLabel}</span><span class="stat-l">Duración</span></div>
+					<div class="stat-pill-sm correct"><Icon icon={CheckmarkCircle01Icon} size={14} color="var(--success)" /><span class="stat-v">{score}</span><span class="stat-l">{t('exam.correct_count', $locale)}</span></div>
+					<div class="stat-pill-sm wrong"><Icon icon={Cancel01Icon} size={14} color="var(--hinomaru-red)" /><span class="stat-v">{wrongCount}</span><span class="stat-l">{t('exam.incorrect_count', $locale)}</span></div>
+					<div class="stat-pill-sm duration"><Icon icon={Clock01Icon} size={14} color="var(--sumi)" /><span class="stat-v">{timeUsedLabel}</span><span class="stat-l">{t('exam.duration', $locale)}</span></div>
 				</div>
 			</div>
 
@@ -439,7 +439,7 @@
 					← {t('deck.back', $locale)}
 				</button>
 				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={startExam}>
-					{$locale === 'es' ? 'Repetir' : 'Retry'}
+					{t('exam.retry', $locale)}
 				</button>
 			</StickyFooter>
 		{/if}
@@ -450,11 +450,11 @@
 	<div class="modal-overlay" transition:fade={{ duration: 200 }}>
 		<div class="modal-content" use:fadeUp={{ delay: 0, y: 20 }}>
 			<div class="modal-icon"><Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" /></div>
-			<h3 class="modal-title">¿Abandonar el examen?</h3>
-			<p class="modal-text">Perderás todo tu progreso actual. Esta acción no se puede deshacer.</p>
+			<h3 class="modal-title">{t('exam.exit_title', $locale)}</h3>
+			<p class="modal-text">{t('exam.exit_text', $locale)}</p>
 			<div class="modal-actions">
-				<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>Continuar</button>
-				<button class="modal-btn confirm" onclick={handleConfirmExit}>Abandonar</button>
+				<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>{t('exam.exit_cancel', $locale)}</button>
+				<button class="modal-btn confirm" onclick={handleConfirmExit}>{t('exam.exit_confirm', $locale)}</button>
 			</div>
 		</div>
 	</div>

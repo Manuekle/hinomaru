@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { goto, beforeNavigate } from '$app/navigation';
+	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { cn } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -56,7 +58,7 @@
 	const tracks = $derived(
 		audioFiles.map((file, idx) => ({
 			id: idx.toString(),
-			name: `問題 ${idx + 1}`,
+			name: t('exam.mondai', $locale, { n: idx + 1 }),
 			src: `/jlpt/audio/${file}`,
 			file
 		}))
@@ -248,7 +250,7 @@
 </script>
 
 <svelte:head>
-	<title>{level} {sectionLabel.es} — JLPT — Hinomaru</title>
+	<title>{level} {sectionLabel[$locale]} — JLPT — Hinomaru</title>
 </svelte:head>
 
 <div class="session-layout">
@@ -267,7 +269,7 @@
 
 				<div class="intro-badge">{level}</div>
 				<h1 class="intro-title">{sectionLabel.jp}</h1>
-				<p class="intro-sub">{sectionLabel.es}</p>
+				<p class="intro-sub">{sectionLabel[$locale]}</p>
 
 				<div class="intro-stats">
 					<div class="stat-card">
@@ -275,26 +277,26 @@
 							{totalQuestionsCount}
 						</span>
 						<span class="stat-label">
-							{section === 'listening' ? 'archivos' : 'preguntas'}
+							{section === 'listening' ? t('exam.intro_stats_files', $locale) : t('exam.intro_stats_questions', $locale)}
 						</span>
 					</div>
 					{#if section !== 'listening'}
 						<div class="stat-divider"></div>
 						<div class="stat-card">
 							<span class="stat-val">{test?.duration ?? 25}</span>
-							<span class="stat-label">minutos</span>
+							<span class="stat-label">{t('exam.intro_stats_minutes', $locale)}</span>
 						</div>
 					{/if}
 				</div>
 
 				{#if totalQuestionsCount === 0}
-					<p class="unavail">Contenido próximamente disponible.</p>
+					<p class="unavail">{t('exam.intro_unavail', $locale)}</p>
 				{/if}
 			</div>
 
 			<StickyFooter>
 				<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto('/jlpt')}>
-					← Volver
+					← {t('deck.back', $locale)}
 				</button>
 				<button
 					class="hm-btn hm-btn-dark hm-btn-lg"
@@ -302,7 +304,7 @@
 					onclick={startExam}
 					disabled={totalQuestionsCount === 0}
 				>
-					Comenzar
+					{t('onboarding.continue', $locale)}
 				</button>
 			</StickyFooter>
 
@@ -382,9 +384,9 @@
 							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={22} color="currentColor" />
 						</div>
 						<div class="feedback-text-side">
-							<span class="feedback-title">{isCorrect ? '¡Respuesta Correcta!' : 'Respuesta Incorrecta'}</span>
+							<span class="feedback-title">{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span>
 							{#if !isCorrect}
-								<span class="feedback-sub">La correcta era: <strong>{currentQ.choices[currentQ.answer - 1]}</strong></span>
+								<span class="feedback-sub">{t('exam.correct_was', $locale, { a: currentQ.choices[currentQ.answer - 1] })}</span>
 							{/if}
 						</div>
 					</div>
@@ -398,11 +400,11 @@
 						onclick={checkAnswer}
 						disabled={selected === null}
 					>
-						確認
+						{t('session.check', $locale)}
 					</button>
 				{:else}
 					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
-						{currentIdx + 1 < allQuestions.length ? '次へ →' : '結果を見る'}
+						{currentIdx + 1 < allQuestions.length ? t('exam.next', $locale) : t('exam.see_results', $locale)}
 					</button>
 				{/if}
 			</StickyFooter>
@@ -462,7 +464,7 @@
 											<h3 class="audio-player-title">
 												{tracks[currentAudioIdx]?.name ?? 'No track selected'}
 											</h3>
-											<p class="audio-player-subtitle">{level} {sectionLabel.es}</p>
+											<p class="audio-player-subtitle">{level} {sectionLabel[$locale]}</p>
 										</div>
 										<AudioPlayerSpeed variant="ghost" size="icon" className="audio-speed-top" />
 									</div>
@@ -492,7 +494,7 @@
 				{#if activeTranscript}
 					<div class="transcript-wrap">
 						<button class="transcript-toggle" onclick={() => (showTranscript = !showTranscript)}>
-							<span>スクリプト · Transcripción</span>
+							<span>{t('exam.transcript', $locale)}</span>
 							<span class="toggle-arrow">{showTranscript ? '▲' : '▼'}</span>
 						</button>
 						{#if showTranscript}
@@ -509,7 +511,7 @@
 
 			<StickyFooter>
 				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => goto('/jlpt')}>
-					← Volver a niveles
+					← {t('exam.back_to_levels', $locale)}
 				</button>
 			</StickyFooter>
 
@@ -540,14 +542,14 @@
 						</div>
 
 						<h2 class="hero-main-title" use:fadeUp={{ delay: 0.3, y: 10 }}>
-							{pct >= 60 ? '¡Excelente trabajo!' : 'Sigue esforzándote'}
+							{pct >= 60 ? t('exam.perfect', $locale) : t('exam.keep_trying', $locale)}
 						</h2>
 						<div class="hero-xp-badge" use:fadeUp={{ delay: 0.35, y: 10 }}>
 							<Icon icon={Target01Icon} size={14} color="var(--warning)" />
-							<span>+{score * 10} XP ganados</span>
+							<span>{t('exam.xp_earned', $locale, { n: score * 10 })}</span>
 						</div>
 						<p class="hero-main-sub" use:fadeUp={{ delay: 0.4, y: 10 }}>
-							{level} · {sectionLabel.es}
+							{level} · {sectionLabel[$locale]}
 						</p>
 					</div>
 				</div>
@@ -557,19 +559,19 @@
 					<div class="stat-pill-sm correct">
 						<Icon icon={CheckmarkCircle01Icon} size={14} color="var(--success)" />
 						<span class="stat-v">{score}</span>
-						<span class="stat-l">Correctas</span>
+						<span class="stat-l">{t('exam.correct_count', $locale)}</span>
 					</div>
 
 					<div class="stat-pill-sm wrong">
 						<Icon icon={Cancel01Icon} size={14} color="var(--hinomaru-red)" />
 						<span class="stat-v">{wrong}</span>
-						<span class="stat-l">Incorrectas</span>
+						<span class="stat-l">{t('exam.incorrect_count', $locale)}</span>
 					</div>
 
 					<div class="stat-pill-sm duration">
 						<Icon icon={Clock01Icon} size={14} color="var(--sumi)" />
 						<span class="stat-v">{timeUsedLabel}</span>
-						<span class="stat-l">Duración</span>
+						<span class="stat-l">{t('exam.duration', $locale)}</span>
 					</div>
 				</div>
 			</div>
@@ -580,7 +582,7 @@
 					<span>JLPT</span>
 				</button>
 				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:2;" onclick={startExam}>
-					Reintentar
+					{t('exam.retry', $locale)}
 				</button>
 			</StickyFooter>
 		{/if}
@@ -595,15 +597,15 @@
 			<div class="modal-icon">
 				<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />
 			</div>
-			<h3 class="modal-title">¿Abandonar el examen?</h3>
-			<p class="modal-text">Perderás todo tu progreso actual en esta sección. Esta acción no se puede deshacer.</p>
+			<h3 class="modal-title">{t('exam.exit_title', $locale)}</h3>
+			<p class="modal-text">{t('exam.exit_text', $locale)}</p>
 			
 			<div class="modal-actions">
 				<button class="modal-btn cancel" onclick={() => (showExitModal = false)}>
-					Continuar examen
+					{t('exam.exit_cancel', $locale)}
 				</button>
 				<button class="modal-btn confirm" onclick={handleConfirmExit}>
-					Abandonar
+					{t('exam.exit_confirm', $locale)}
 				</button>
 			</div>
 		</div>
