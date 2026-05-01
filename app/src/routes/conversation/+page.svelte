@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-	<title>Conversatorio — Hinomaru</title>
+	<title>Conversaciones — Hinomaru</title>
 </svelte:head>
 
 <div
@@ -27,7 +27,7 @@
 		use:fadeUp={{ delay: 0.06, y: 16 }}
 		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
 	>
-		{$locale === 'es' ? 'Conversatorio' : 'Conversations'}
+		{$locale === 'es' ? 'Conversaciones' : 'Conversations'}
 	</h1>
 
 	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">

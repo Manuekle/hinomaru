@@ -129,7 +129,7 @@
 
 <svelte:head>
 	<title>
-		{scenario ? ($locale === 'es' ? scenario.title_es : scenario.title_en) : 'Conversatorio'} — Hinomaru
+		{scenario ? ($locale === 'es' ? scenario.title_es : scenario.title_en) : ($locale === 'es' ? 'Conversaciones' : 'Conversations')} — Hinomaru
 	</title>
 </svelte:head>
 
