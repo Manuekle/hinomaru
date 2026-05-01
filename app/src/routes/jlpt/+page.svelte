@@ -108,7 +108,6 @@
 
 	let showConfirmModal = $state(false);
 	let pendingUrl = $state<string | null>(null);
-	let debugCelebration = $state(false);
 
 	function openConfirm(url: string) {
 		pendingUrl = url;
@@ -153,13 +152,8 @@
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}
 		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;cursor:default;display:flex;align-items:center;gap:12px;"
-		ondblclick={() => (debugCelebration = !debugCelebration)}
-		title="Double-click para debug"
 	>
 		{t('jlpt.title', $locale)}
-		{#if debugCelebration}
-			<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--hinomaru-red);background:var(--hinomaru-red-wash);padding:3px 8px;border-radius:6px;">DEBUG</span>
-		{/if}
 	</h1>
 
 	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">
@@ -250,7 +244,7 @@
 	</div>
 
 	<!-- Completion row — same visual language as section rows -->
-	{#if levelComplete(activeLevel) || debugCelebration}
+	{#if levelComplete(activeLevel)}
 		{@const secs2 = LEVEL_META[activeLevel]?.sections ?? []}
 		{@const scores2 = secs2.map(s => getResult(activeLevel, s)).filter(Boolean)}
 		{@const avg2 = scores2.length ? Math.round(scores2.reduce((a, r) => a + (r?.pct ?? 0), 0) / scores2.length) : 0}
