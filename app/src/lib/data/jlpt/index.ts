@@ -71,10 +71,10 @@ export const LEVEL_META: Record<
 	}
 };
 
-export const SECTION_LABELS: Record<JLPTSectionType, { es: string; jp: string; romaji: string }> = {
-	vocabulary: { es: 'Vocabulario', jp: '語彙', romaji: 'go-i' },
-	grammar: { es: 'Gramática', jp: '文法', romaji: 'bun-pō' },
-	listening: { es: 'Escucha', jp: '聴解', romaji: 'chōkai' }
+export const SECTION_LABELS: Record<JLPTSectionType, { es: string; en: string; jp: string; romaji: string }> = {
+	vocabulary: { es: 'Vocabulario', en: 'Vocabulary', jp: '語彙', romaji: 'go-i' },
+	grammar: { es: 'Gramática', en: 'Grammar', jp: '文法', romaji: 'bun-pō' },
+	listening: { es: 'Escucha', en: 'Listening', jp: '聴解', romaji: 'chōkai' }
 };
 
 export const AUDIO_FILES: Record<JLPTLevel, string[]> = {

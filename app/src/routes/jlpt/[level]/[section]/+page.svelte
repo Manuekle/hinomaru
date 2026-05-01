@@ -47,7 +47,7 @@
 
 	const level = $derived(data.level as JLPTLevel);
 	const section = $derived(data.section as JLPTSectionType);
-	const sectionLabel = $derived(SECTION_LABELS[section] ?? { es: section, jp: '' });
+	const sectionLabel = $derived(SECTION_LABELS[section] ?? { es: section, en: section, jp: '' });
 
 	// ── Test data ──────────────────────────────────────────────────────────────
 	const test = $derived(section !== 'listening' ? getTest(level, section) : null);
@@ -304,7 +304,7 @@
 					onclick={startExam}
 					disabled={totalQuestionsCount === 0}
 				>
-					{t('onboarding.continue', $locale)}
+					{t('exam.start', $locale)}
 				</button>
 			</StickyFooter>
 
@@ -317,7 +317,7 @@
 			<div class="exam-premium-header">
 				<div class="exam-header-main">
 					<div class="header-left">
-						<span class="exam-label-pill">もんだい {currentQ?.mondaiId?.split('-').pop() || 1}</span>
+						<span class="exam-label-pill">{t('exam.mondai', $locale, { n: currentQ?.mondaiId?.split('-').pop() || 1 })}</span>
 					</div>
 
 					<div class="exam-step-indicator">
