@@ -51,6 +51,10 @@
 		speakJapanese(text);
 	}
 
+	function speakSlow(text: string) {
+		speakJapanese(text, undefined, 0.7);
+	}
+
 	async function updateCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
 		const {
 			data: { user }
@@ -197,15 +201,29 @@
 						>
 							{card.jp}
 						</div>
-						<button
-							onclick={(e) => {
-								e.stopPropagation();
-								speak(card.jp);
-							}}
-							class="audio-btn"
-						>
-							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-						</button>
+						<div style="display:flex;gap:12px;margin-top:20px;">
+							<button
+								onclick={(e) => {
+									e.stopPropagation();
+									speak(card.jp);
+								}}
+								class="audio-btn"
+								title="Normal speed"
+							>
+								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+							</button>
+							<button
+								onclick={(e) => {
+									e.stopPropagation();
+									speakSlow(card.jp);
+								}}
+								class="audio-btn audio-btn-slow"
+								title="Slow speed"
+							>
+								<span style="font-size:10px;font-weight:800;letter-spacing:-0.05em;margin-right:2px;">0.7x</span>
+								<Icon icon={VolumeHighIcon} size={14} color="currentColor" strokeWidth={1.5} />
+							</button>
+						</div>
 						<div style="margin-top:16px;font-size:12px;color:var(--fg-tertiary);">
 							{t('session.flip', $locale)}
 						</div>
@@ -287,7 +305,6 @@
 	}
 
 	.audio-btn {
-		margin-top: 20px;
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
@@ -300,13 +317,24 @@
 		font-size: 18px;
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
-		transition: background 150ms ease;
+		transition: all 150ms ease;
+	}
+
+	.audio-btn-slow {
+		width: 44px;
+		border-radius: 22px;
+		padding: 0 8px;
+		font-family: var(--font-ui);
+		color: var(--hinomaru-red);
+		border-color: var(--hinomaru-red-ink);
+		background: var(--hinomaru-red-bg);
 	}
 
 	.audio-btn:hover,
 	.audio-btn:active {
 		background: var(--ink-100);
 		border-color: var(--ink-300);
+		transform: scale(1.05);
 	}
 	:global([data-theme='dark']) .audio-btn {
 		background: var(--ink-100);

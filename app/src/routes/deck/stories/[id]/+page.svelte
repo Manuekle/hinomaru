@@ -17,6 +17,16 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
+	import { getWordMetadata } from '$lib/utils/vocab_registry';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import Confetti from '$lib/components/Confetti.svelte';
+	import { fadeIn } from '$lib/motion';
+	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
+	import { updateStreak } from '$lib/utils/updateStreak';
+	import { addXP } from '$lib/utils/gamification';
+	import { svileo } from '$lib/stores/toast';
+	import type { PageData } from './$types';
 	import {
 		VolumeHighIcon,
 		Award01Icon,
@@ -28,15 +38,14 @@
 		TranslateIcon,
 		Heading01Icon,
 		Heading02Icon,
-		Heading03Icon
+		Heading03Icon,
+		CheckmarkCircle01Icon,
+		Cancel01Icon,
+		Clock01Icon,
+		Target01Icon,
+		CheckmarkCircle02Icon,
+		ArrowLeft01Icon
 	} from '@hugeicons/core-free-icons';
-	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
-	import { updateStreak } from '$lib/utils/updateStreak';
-	import { addXP } from '$lib/utils/gamification';
-	import { svileo } from '$lib/stores/toast';
-	import type { PageData } from './$types';
-	import { getWordMetadata } from '$lib/utils/vocab_registry';
-	import InteractiveText from '$lib/components/InteractiveText.svelte';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -94,7 +103,7 @@
 	const quiz: any[] = $derived(story?.quiz ?? []);
 
 	let showTranslation = $state(false);
-	let phase = $state<'read' | 'quiz' | 'result'>('read');
+	let phase = $state<'read' | 'quiz' | 'result' | 'anticipation'>('read');
 	let isReadingMode = $state(false);
 	let readingTheme = $state<'light' | 'sepia' | 'dark'>('light');
 	let fontSize = $state<'sm' | 'md' | 'lg'>('md');
@@ -138,12 +147,45 @@
 	});
 
 	let currentQ = $state(0);
-	let answers = $state<number[]>([]);
 	let selected = $state<number | null>(null);
 	let checked = $state(false);
+	let correctness = $state<boolean[]>([]);
+	let selectedHistory = $state<number[]>([]);
+	let advanceTimeout: ReturnType<typeof setTimeout> | null = null;
+	let confettiRef = $state<{ fire: () => void } | null>(null);
 
-	const score = $derived(answers.filter((ans, i) => ans === quiz[i]?.a).length);
+	// Timer
+	let timeLeft = $state(0);
+	let timerInterval: ReturnType<typeof setInterval> | null = null;
+	let timeUsed = $state(0);
+
+	const score = $derived(correctness.filter(Boolean).length);
 	const scorePct = $derived(quiz.length > 0 ? Math.round((score / quiz.length) * 100) : 0);
+	const timerLabel = $derived(
+		`${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
+	);
+	const timeUsedLabel = $derived(
+		`${Math.floor(timeUsed / 60)}:${String(timeUsed % 60).padStart(2, '0')}`
+	);
+
+	function startTimer() {
+		timeLeft = 300; // 5 minutes for a story quiz
+		timerInterval = setInterval(() => {
+			timeLeft -= 1;
+			if (timeLeft <= 0) {
+				timeLeft = 0;
+				endQuiz();
+			}
+		}, 1000);
+	}
+
+	function stopTimer() {
+		if (timerInterval) {
+			clearInterval(timerInterval);
+			timerInterval = null;
+		}
+		timeUsed = 300 - timeLeft;
+	}
 
 	const bodyJp = $derived(story?.body_jp ?? '');
 
@@ -183,26 +225,41 @@
 	}
 
 	function checkAnswer() {
-		if (selected === null) return;
+		if (selected === null || checked) return;
+		const isRight = selected === currentQuestion?.a;
 		checked = true;
-		answers = [...answers, selected];
-		if (selected === currentQuestion?.a) {
-			playCorrect();
+		correctness = [...correctness, isRight];
+		selectedHistory = [...selectedHistory, selected];
+
+		if (isRight) playCorrect();
+		else playWrong();
+
+		advanceTimeout = setTimeout(advanceQuestion, isRight ? 1800 : 2800);
+	}
+
+	function advanceQuestion() {
+		if (advanceTimeout) {
+			clearTimeout(advanceTimeout);
+			advanceTimeout = null;
+		}
+		if (currentQ + 1 >= quiz.length) {
+			endQuiz();
 		} else {
-			playWrong();
+			currentQ += 1;
+			selected = null;
+			checked = false;
 		}
 	}
 
-	function nextQuestion() {
-		checked = false;
-		selected = null;
-		if (currentQ + 1 >= quiz.length) {
+	function endQuiz() {
+		stopTimer();
+		phase = 'anticipation';
+		setTimeout(() => {
 			phase = 'result';
 			playFinish();
 			saveRead();
-		} else {
-			currentQ += 1;
-		}
+			setTimeout(() => confettiRef?.fire(), 300);
+		}, 1800);
 	}
 
 	async function saveRead() {
@@ -225,7 +282,7 @@
 				total: quiz.length
 			});
 			await updateStreak(supabase, user.id);
-			await addXP(supabase, user.id, score * 5 + 10);
+			await addXP(supabase, user.id, score * 10);
 			await invalidateAll();
 		} catch {
 			// silent fail
@@ -235,9 +292,11 @@
 	function startQuiz() {
 		phase = 'quiz';
 		currentQ = 0;
-		answers = [];
+		correctness = [];
+		selectedHistory = [];
 		selected = null;
 		checked = false;
+		startTimer();
 	}
 
 	function restartRead() {
@@ -327,11 +386,19 @@
 	<div
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 	>
-		<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:12px;">
-			<a href="/deck/stories" class="back-link-beautiful">
-				← {t('deck.back', $locale)}
-			</a>
-		</div>
+		{#if phase !== 'anticipation'}
+			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:12px;">
+				{#if phase === 'quiz'}
+					<button class="back-link-beautiful" onclick={restartRead}>
+						← {t('deck.back', $locale)}
+					</button>
+				{:else}
+					<a href="/deck/stories" class="back-link-beautiful">
+						← {t('deck.back', $locale)}
+					</a>
+				{/if}
+			</div>
+		{/if}
 
 		{#if !story}
 			<div class="empty-state" use:fadeUp={{ delay: 0, y: 16 }}>
@@ -581,85 +648,88 @@
 				</div>
 			{/if}
 		{:else if phase === 'quiz'}
-			<div class="quiz-container" use:fadeUp={{ delay: 0, y: 12 }}>
-				<!-- Progress indicator -->
-				<div class="quiz-progress-row">
-					<span class="quiz-progress-label">
-						{$locale === 'es' ? 'Pregunta' : 'Question'}
-						{currentQ + 1}
-						{$locale === 'es' ? 'de' : 'of'}
-						{quiz.length}
-					</span>
-					<span class="quiz-score-live">{answers.filter((a, i) => a === quiz[i]?.a).length} ✓</span>
-				</div>
-				<div class="quiz-progress-bar">
-					<div class="quiz-progress-fill" style="width:{(currentQ / quiz.length) * 100}%;"></div>
-				</div>
-
-				{#if currentQuestion}
-					<div class="question-box" style="margin-top:24px;" use:fadeUp={{ y: 8 }}>
-						<div class="question-header">
-							<span class="question-badge">{$locale === 'es' ? 'PREGUNTA' : 'QUESTION'}</span>
-							{#if $showRomaji && qRomaji}
-								<span class="question-romaji-hint">{qRomaji}</span>
-							{/if}
-						</div>
-
-						<h2 class="question-text jp">{qJp}</h2>
-
-						{#if qTrans && qTrans !== qJp}
-							<p class="question-translation">{qTrans}</p>
-						{/if}
-
-						<div class="options-grid">
-							{#each shuffledIndices as i, loopIdx (i)}
-								{@const optionJp = optionsJp[i]}
-								{@const optRomaji = optionsRomaji[i]}
-								{@const optTrans = optionsTrans[i]}
-								<button
-									class="option-item"
-									class:is-selected={selected === i}
-									class:is-correct={checked && i === currentQuestion.a}
-									class:is-wrong={checked && selected === i && i !== currentQuestion.a}
-									onclick={() => selectAnswer(i)}
-									disabled={checked}
-								>
-									<div class="option-marker">{String.fromCharCode(65 + loopIdx)}</div>
-									<div class="option-content">
-										<div class="option-label jp">{optionJp}</div>
-										{#if $showRomaji && optRomaji}
-											<div class="option-romaji">{optRomaji}</div>
-										{/if}
-										{#if optTrans && optTrans !== optionJp}
-											<div class="option-translation">{optTrans}</div>
-										{/if}
-									</div>
-								</button>
-							{/each}
-						</div>
+			<!-- Premium Exam Header -->
+			<div class="exam-premium-header">
+				<div class="exam-header-main">
+					<div class="header-left">
+						<span class="exam-label-pill">Quiz</span>
 					</div>
 
-					{#if checked}
-						<div
-							class="quiz-feedback-box"
-							class:correct={isCorrect}
-							class:wrong={!isCorrect}
-							use:fadeUp={{ y: 5 }}
-						>
-							<div class="feedback-icon">
-								{isCorrect ? '✓' : '✗'}
-							</div>
-							<div class="feedback-text">
-								{isCorrect
-									? $locale === 'es'
-										? '¡Excelente! Respuesta correcta.'
-										: 'Excellent! Correct answer.'
-									: $locale === 'es'
-										? 'Vaya, esa no era. ¡Sigue intentando!'
-										: "Oops, that wasn't it. Keep trying!"}
-							</div>
+					<div class="exam-step-indicator">
+						<span class="step-curr">{currentQ + 1}</span>
+						<span class="step-divider">/</span>
+						<span class="step-total">{quiz.length}</span>
+					</div>
+
+					<div class="header-right">
+						<div class="exam-timer-pill">
+							<Icon icon={Clock01Icon} size={16} color="currentColor" />
+							<span class="timer-val">{timerLabel}</span>
 						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="question-wrap" use:fadeUp={{ delay: 0.04, y: 12 }}>
+				<div class="question-card">
+					<p class="question-text jp">{qJp}</p>
+					{#if $showRomaji && qRomaji}
+						<p class="question-romaji">{qRomaji}</p>
 					{/if}
+					{#if qTrans && qTrans !== qJp}
+						<p class="question-translation">{qTrans}</p>
+					{/if}
+				</div>
+
+				<div class="options-list">
+					{#each shuffledIndices as i, loopIdx (i)}
+						{@const optionJp = optionsJp[i]}
+						{@const optRomaji = optionsRomaji[i]}
+						{@const optTrans = optionsTrans[i]}
+						<button
+							class="option-item"
+							class:is-selected={selected === i}
+							class:is-correct={checked && i === currentQuestion.a && selected === i}
+							class:is-wrong={checked && selected === i && i !== currentQuestion.a}
+							class:is-dimmed={checked && selected !== i}
+							disabled={checked}
+							onclick={() => selectAnswer(i)}
+						>
+							<div class="opt-marker">
+								{#if checked && i === currentQuestion.a && selected === i}
+									<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
+								{:else if checked && selected === i && i !== currentQuestion.a}
+									<Icon icon={Cancel01Icon} size={16} color="white" />
+								{:else}
+									{loopIdx + 1}
+								{/if}
+							</div>
+							<div class="opt-content">
+								<span class="opt-text jp">{optionJp}</span>
+								{#if $showRomaji && optRomaji}
+									<span class="opt-romaji">{optRomaji}</span>
+								{/if}
+								{#if optTrans && optTrans !== optionJp}
+									<span class="opt-translation">{optTrans}</span>
+								{/if}
+							</div>
+						</button>
+					{/each}
+				</div>
+
+				{#if checked}
+					<div 
+						class="feedback-premium-bar" 
+						class:is-correct={isCorrect}
+						use:fadeUp={{ delay: 0, y: 15 }}
+					>
+						<div class="feedback-icon-wrap">
+							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={22} color="currentColor" />
+						</div>
+						<div class="feedback-text-side">
+							<span class="feedback-title">{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span>
+						</div>
+					</div>
 				{/if}
 			</div>
 
@@ -673,99 +743,114 @@
 						{t('stories.quiz.check', $locale)}
 					</button>
 				{:else}
-					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={nextQuestion}>
-						{currentQ + 1 < quiz.length
-							? t('stories.quiz.next', $locale)
-							: t('stories.quiz.done', $locale)}
+					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
+						{currentQ + 1 < quiz.length ? t('stories.quiz.next', $locale) : t('stories.quiz.done', $locale)}
 					</button>
 				{/if}
 			</StickyFooter>
 		{:else if phase === 'result'}
-			<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
-				<div
-					class="result-badge"
-					class:result-pass={scorePct >= 70}
-					class:result-fail={scorePct < 70}
-				>
-					<Icon
-						icon={score === quiz.length ? Award01Icon : BookOpen01Icon}
-						size={48}
-						color="var(--washi)"
-						strokeWidth={1.5}
-					/>
-				</div>
-				<h2 class="result-headline">
-					{score === quiz.length
-						? $locale === 'es'
-							? '¡Perfecto!'
-							: 'Perfect!'
-						: $locale === 'es'
-							? 'Lectura completada'
-							: 'Reading complete'}
-				</h2>
+			<div use:fadeUp={{ delay: 0, y: 20 }} class="result-screen">
 
-				<!-- Score percentage with color -->
-				<div class="result-score-row">
-					<span class="result-pct" class:pass={scorePct >= 70} class:fail={scorePct < 70}>
-						{scorePct}%
-					</span>
-					<span class="result-fraction">{score} / {quiz.length}</span>
-				</div>
-
-				<!-- Question breakdown -->
-				{#if quiz.length > 0}
-					<div class="result-breakdown">
-						<p class="breakdown-heading">
-							{$locale === 'es' ? 'Detalle por pregunta' : 'Question breakdown'}
-						</p>
-						{#each quiz as q, i (i)}
-							{@const wasCorrect = answers[i] === q.a}
-							{@const qJpLocal = q.q_jp || q.q}
-							{@const qRomajiLocal = q.q_romaji}
-							{@const optsJpLocal = q.o_jp || q.o}
-
-							<div
-								class="breakdown-row"
-								class:correct={wasCorrect}
-								class:wrong={!wasCorrect}
-								use:fadeUp={{ delay: i * 0.05, y: 5 }}
-							>
-								<span class="breakdown-dot">{wasCorrect ? '✓' : '✗'}</span>
-								<div class="breakdown-content">
-									<div class="breakdown-q-group">
-										<span class="breakdown-q jp">{qJpLocal}</span>
-										{#if $showRomaji && qRomajiLocal}
-											<span class="breakdown-romaji">{qRomajiLocal}</span>
-										{/if}
-									</div>
-									{#if !wasCorrect}
-										<span class="breakdown-correct-ans">
-											{$locale === 'es' ? 'Correcta:' : 'Correct:'}
-											<span class="jp">{optsJpLocal?.[q.a] ?? '—'}</span>
-										</span>
-									{/if}
-								</div>
+				<!-- Premium Hero Header -->
+				<div class="result-premium-hero" class:is-pass={scorePct >= 70}>
+					<div class="hero-content-wrapper">
+						<div class="score-display-ring" use:fadeUp={{ delay: 0.2, y: 20 }}>
+							<svg class="progress-svg" viewBox="0 0 100 100">
+								<circle class="progress-track" cx="50" cy="50" r="45" fill="none" stroke-width="4" />
+								<circle 
+									class="progress-bar" 
+									cx="50" cy="50" r="45" 
+									fill="none" stroke-width="6" 
+									stroke-linecap="round"
+									stroke-dasharray="283"
+									stroke-dashoffset={283 - (283 * scorePct) / 100}
+								/>
+							</svg>
+							<div class="score-labels">
+								<span class="score-big">{scorePct}</span>
+								<span class="score-small">%</span>
 							</div>
-						{/each}
+						</div>
+
+						<h2 class="hero-main-title" use:fadeUp={{ delay: 0.3, y: 10 }}>
+							{scorePct >= 70 ? t('exam.perfect', $locale) : t('exam.keep_trying', $locale)}
+						</h2>
+						<div class="hero-xp-badge" use:fadeUp={{ delay: 0.35, y: 10 }}>
+							<Icon icon={Target01Icon} size={14} color="var(--warning)" />
+							<span>{t('exam.xp_earned', $locale, { n: score * 10 })}</span>
+						</div>
+						<p class="hero-main-sub" use:fadeUp={{ delay: 0.4, y: 10 }}>
+							Story Quiz · {story.level}
+						</p>
+					</div>
+				</div>
+
+				<!-- Enhanced Stats Bar -->
+				<div class="stats-premium-row" use:fadeUp={{ delay: 0.45, y: 20 }}>
+					<div class="stat-pill-sm correct">
+						<Icon icon={CheckmarkCircle01Icon} size={14} color="var(--success)" />
+						<span class="stat-v">{score}</span>
+						<span class="stat-l">{t('exam.correct_count', $locale)}</span>
+					</div>
+
+					<div class="stat-pill-sm wrong">
+						<Icon icon={Cancel01Icon} size={14} color="var(--hinomaru-red)" />
+						<span class="stat-v">{quiz.length - score}</span>
+						<span class="stat-l">{t('exam.incorrect_count', $locale)}</span>
+					</div>
+
+					<div class="stat-pill-sm duration">
+						<Icon icon={Clock01Icon} size={14} color="var(--sumi)" />
+						<span class="stat-v">{timeUsedLabel}</span>
+						<span class="stat-l">{t('exam.duration', $locale)}</span>
+					</div>
+				</div>
+
+				<!-- Answer Review -->
+				{#if correctness.some(Boolean)}
+					<div use:fadeUp={{ delay: 0.55, y: 16 }}>
+						<p class="review-section-label">Revision de respuestas</p>
+						<div class="review-list">
+							{#each quiz as q, i (i)}
+								{@const ok = correctness[i]}
+								{@const userIdx = selectedHistory[i]}
+								{@const userText = userIdx !== null ? (q.o_jp || q.o)[userIdx] : null}
+								{@const qJpLocal = q.q_jp || q.q}
+								
+								<div class="review-item-premium" class:is-review-correct={ok} class:is-review-wrong={!ok}>
+									<div class="review-num">{i + 1}</div>
+									<div class="review-body">
+										<p class="review-q jp">{qJpLocal}</p>
+										<p class="review-correct-ans">
+											<span class="review-check">{ok ? '✓' : '✗'}</span>
+											<span class="review-correct-text jp">{userText || '—'}</span>
+										</p>
+									</div>
+								</div>
+							{/each}
+						</div>
 					</div>
 				{/if}
 
-				<StickyFooter>
+				<div class="result-actions" use:fadeUp={{ delay: 0.6, y: 12 }}>
 					<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={restartRead}>
-						{$locale === 'es' ? 'Leer de nuevo' : 'Read again'}
+						<Icon icon={ArrowLeft01Icon} size={20} color="currentColor" />
+						<span>{t('stories.read_again', $locale) || 'Leer de nuevo'}</span>
 					</button>
-					<button
-						class="hm-btn hm-btn-dark hm-btn-lg"
-						style="flex:1;"
-						onclick={() => goto('/deck/stories')}
-					>
-						{$locale === 'es' ? 'Otras historias' : 'More stories'}
+					<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={() => goto('/deck/stories')}>
+						{t('stories.more_stories', $locale) || 'Otras historias'}
 					</button>
-				</StickyFooter>
+				</div>
 			</div>
 		{/if}
 	</div>
 </div>
+
+{#if phase === 'anticipation'}
+	<AnticipationScreen />
+{/if}
+
+<Confetti bind:this={confettiRef} />
 
 {#if isSpeaking}
 	<div class="now-playing-toast" data-theme={isReadingMode ? readingTheme : undefined} transition:fly={{ y: -60, duration: 300, easing: quintOut }}>
@@ -1469,6 +1554,312 @@
 		align-items: center;
 		outline: none;
 		border: none;
+	}
+
+	/* --- PREMIUM QUIZ STYLES (MATCHING JLPT) --- */
+	.exam-premium-header {
+		margin: 0 0 24px;
+	}
+	.exam-header-main {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 12px;
+	}
+	.header-left { display: flex; align-items: center; }
+	.header-right { display: flex; justify-content: flex-end; align-items: center; }
+
+	.exam-label-pill {
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 10px;
+		border-radius: 6px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.exam-step-indicator {
+		display: flex;
+		align-items: baseline;
+		gap: 3px;
+		font-family: var(--font-ui);
+		font-weight: 700;
+	}
+	.step-curr { font-size: 18px; font-weight: 800; color: var(--sumi); }
+	.step-divider { font-size: 14px; color: var(--fg-tertiary); opacity: 0.4; }
+	.step-total { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); }
+
+	.exam-timer-pill {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		padding: 6px 14px;
+		border-radius: 99px;
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		color: var(--sumi);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.question-wrap { display: flex; flex-direction: column; gap: 12px; }
+	.question-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 24px 22px;
+		box-shadow: var(--shadow-sm);
+	}
+	.question-wrap .question-text {
+		font-size: 19px;
+		line-height: 1.75;
+		color: var(--sumi);
+		margin: 0;
+		white-space: pre-line;
+	}
+
+	.question-romaji {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		margin: 8px 0 0;
+		line-height: 1.6;
+		font-style: italic;
+		letter-spacing: 0.02em;
+	}
+	.question-wrap .question-translation {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		opacity: 0.7;
+		margin-top: 8px;
+	}
+
+	.feedback-premium-bar {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 16px 20px;
+		border-radius: 20px;
+		margin-top: 12px;
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+		border: 1px solid rgba(188, 0, 45, 0.1);
+	}
+	.feedback-premium-bar.is-correct {
+		background: var(--success-wash);
+		color: var(--success);
+		border-color: rgba(46, 125, 91, 0.1);
+	}
+	.feedback-icon-wrap {
+		width: 44px; height: 44px;
+		border-radius: 14px;
+		display: flex; align-items: center; justify-content: center;
+		background: rgba(255, 255, 255, 0.5);
+		flex-shrink: 0;
+	}
+	:global([data-theme='dark']) .feedback-icon-wrap {
+		background: rgba(0, 0, 0, 0.2);
+	}
+	.feedback-text-side { display: flex; flex-direction: column; gap: 2px; }
+	.feedback-title { font-size: 16px; font-weight: 800; }
+
+	.options-list { display: flex; flex-direction: column; gap: 10px; }
+	.question-wrap .option-item {
+		display: flex; align-items: center; gap: 14px;
+		padding: 16px;
+		border: 2px solid var(--ink-200);
+		border-radius: 18px;
+		background: var(--bg-surface);
+		cursor: pointer;
+		font-family: inherit;
+		text-align: left;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		width: 100%;
+	}
+	.question-wrap .option-item:not(:disabled):hover {
+		border-color: var(--ink-400);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-sm);
+	}
+	.question-wrap .option-item.is-selected:not(.is-correct):not(.is-wrong) {
+		border-color: var(--sumi);
+		background: var(--ink-50);
+	}
+	.question-wrap .option-item.is-correct {
+		border-color: var(--success) !important;
+		background: var(--success-wash) !important;
+		border-width: 3px;
+	}
+	.question-wrap .option-item.is-wrong {
+		border-color: var(--hinomaru-red) !important;
+		background: var(--hinomaru-red-wash) !important;
+		border-width: 3px;
+	}
+	.question-wrap .option-item.is-dimmed { opacity: 0.4; }
+
+	.question-wrap .opt-marker {
+		width: 32px; height: 32px;
+		border-radius: 10px;
+		background: var(--ink-100);
+		display: flex; align-items: center; justify-content: center;
+		font-size: 14px; font-weight: 800;
+		color: var(--fg-secondary);
+		flex-shrink: 0;
+		transition: all 0.2s;
+	}
+	.question-wrap .is-selected:not(.is-correct):not(.is-wrong) .opt-marker { background: var(--sumi); color: var(--washi); }
+	.question-wrap .is-correct .opt-marker { background: var(--success); color: white; border-radius: 50%; box-shadow: 0 0 10px rgba(46, 125, 91, 0.3); }
+	.question-wrap .is-wrong .opt-marker { background: var(--hinomaru-red); color: white; border-radius: 50%; box-shadow: 0 0 10px rgba(188, 0, 45, 0.3); }
+	
+	.opt-content { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+	.opt-text { font-size: 17px; font-weight: 600; color: var(--fg-primary); line-height: 1.4; }
+	.opt-romaji { font-size: 12px; color: var(--fg-tertiary); font-style: italic; opacity: 0.7; }
+	.opt-translation { font-size: 13px; color: var(--fg-tertiary); opacity: 0.6; }
+
+	/* ── PREMIUM RESULT SCREEN ── */
+	.result-screen {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		padding-bottom: 40px;
+	}
+
+	.result-premium-hero {
+		position: relative;
+		border-radius: 32px;
+		padding: 48px 24px;
+		text-align: center;
+		overflow: hidden;
+		background: #1a1a1a;
+		color: white;
+		box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+	}
+	.result-premium-hero.is-pass {
+		background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+	}
+	.result-premium-hero:not(.is-pass) {
+		background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%);
+	}
+	.hero-content-wrapper { position: relative; z-index: 2; }
+
+	.score-display-ring {
+		position: relative;
+		width: 160px; height: 160px;
+		margin: 0 auto 32px;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.progress-svg {
+		position: absolute;
+		top: 0; left: 0; width: 100%; height: 100%;
+		transform: rotate(-90deg);
+	}
+	.progress-track { stroke: rgba(255,255,255,0.1); }
+	.progress-bar {
+		stroke: white;
+		transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.is-pass .progress-bar { stroke: #4ade80; }
+	.score-labels {
+		display: flex; align-items: baseline; gap: 2px;
+	}
+	.score-big { font-size: 64px; font-weight: 900; line-height: 1; }
+	.score-small { font-size: 20px; font-weight: 600; opacity: 0.6; }
+
+	.hero-main-title {
+		font-size: 28px; font-weight: 800; margin: 0 0 8px;
+		letter-spacing: -0.02em;
+	}
+	.hero-xp-badge {
+		display: inline-flex; align-items: center; gap: 6px;
+		background: rgba(251, 191, 36, 0.15);
+		color: #f59e0b;
+		padding: 4px 12px; border-radius: 99px;
+		font-size: 13px; font-weight: 700;
+		margin-bottom: 12px;
+		border: 1px solid rgba(251, 191, 36, 0.2);
+	}
+	.hero-main-sub {
+		font-size: 14px; font-weight: 600; opacity: 0.6;
+		text-transform: uppercase; letter-spacing: 0.1em;
+	}
+
+	.stats-premium-row {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 24px;
+	}
+	.stat-pill-sm {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 99px;
+		padding: 8px 14px;
+		display: flex; align-items: center; gap: 6px;
+		transition: all 0.2s;
+		box-shadow: var(--shadow-sm);
+	}
+	.stat-v { font-size: 14px; font-weight: 800; color: var(--sumi); }
+	.stat-l { font-size: 11px; font-weight: 600; color: var(--fg-secondary); text-transform: lowercase; }
+
+	.review-section-label {
+		font-size: 11px; font-weight: 700;
+		text-transform: uppercase; letter-spacing: 0.08em;
+		color: var(--fg-tertiary);
+		margin: 0 0 10px;
+	}
+	.review-list {
+		display: flex; flex-direction: column; gap: 8px;
+	}
+	.review-item-premium {
+		display: flex; align-items: center; gap: 12px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		border-radius: 14px;
+		padding: 12px 14px;
+	}
+	.review-item-premium.is-review-correct { border-color: var(--success-wash); }
+	.review-item-premium.is-review-wrong { border-color: var(--hinomaru-red-wash); }
+
+	.review-num {
+		width: 22px; height: 22px;
+		border-radius: 50%;
+		background: var(--ink-100);
+		color: var(--fg-tertiary);
+		font-size: 11px; font-weight: 700;
+		display: flex; align-items: center; justify-content: center;
+		flex-shrink: 0;
+	}
+	.is-review-correct .review-num { background: var(--success-wash); color: var(--success); }
+	.is-review-wrong .review-num { background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+
+	.review-body { flex: 1; min-width: 0; }
+	.review-q {
+		font-size: 13px; color: var(--fg-secondary);
+		margin: 0 0 6px; line-height: 1.5;
+	}
+	.review-correct-ans {
+		display: flex; align-items: baseline; gap: 6px;
+		margin: 0;
+	}
+	.review-check { font-size: 12px; font-weight: 700; color: var(--success); flex-shrink: 0; }
+	.review-correct-text { font-size: 14px; font-weight: 700; color: var(--success); }
+	.review-actual-correct { font-size: 12px; color: var(--fg-tertiary); font-style: italic; }
+
+	.result-actions {
+		display: flex;
+		gap: 12px;
+		margin-top: 8px;
+	}
+
+	.jp { font-family: var(--font-jp); }
+
+	:global([data-theme='dark']) .stat-pill-sm,
+	:global([data-theme='dark']) .question-card,
+	:global([data-theme='dark']) .review-item-premium {
+		background: var(--ink-100);
+		border-color: var(--ink-200);
 	}
 
 	.reading-mode-content {

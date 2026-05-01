@@ -44,3 +44,4 @@ export const dailyGoal = createPersistedStore('hinomaru_daily_goal', 5);
 export const srsEnabled = createPersistedStore('hinomaru_srs_enabled', true);
 export const notificationsEnabled = createPersistedStore('hinomaru_notifications_enabled', true);
 export const reminderHour = createPersistedStore('hinomaru_reminder_hour', 19);
+export const ttsSpeed = createPersistedStore('hinomaru_tts_speed', 1.0);

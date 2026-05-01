@@ -416,6 +416,28 @@
 					)}
 				</button>
 			</div>
+
+			<!-- Speed Control -->
+			<div class="card" style="margin-top:12px; padding: 16px 20px;">
+				<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+					<span style="font-size:14px; font-weight:600; color:var(--fg-secondary);">{t('settings.voice.speed', $locale)}</span>
+					<span style="font-size:13px; font-weight:700; color:var(--hinomaru-red);">{$ttsSpeed}x</span>
+				</div>
+				<div class="speed-slider-container">
+					<input 
+						type="range" 
+						min="0.5" 
+						max="1.5" 
+						step="0.1" 
+						bind:value={$ttsSpeed}
+						class="hm-range"
+					/>
+				</div>
+				<div style="display:flex; justify-content:space-between; margin-top:8px;">
+					<span style="font-size:11px; color:var(--fg-tertiary); font-weight:500;">{t('settings.voice.slow', $locale)}</span>
+					<span style="font-size:11px; color:var(--fg-tertiary); font-weight:500;">{t('settings.voice.fast', $locale)}</span>
+				</div>
+			</div>
 		</div>
 
 		<!-- ── Idioma ── -->
@@ -1150,6 +1172,38 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	/* ── TTS Range Slider ── */
+	.hm-range {
+		width: 100%;
+		height: 6px;
+		-webkit-appearance: none;
+		background: var(--ink-200);
+		border-radius: 10px;
+		outline: none;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+	.hm-range::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 18px;
+		height: 18px;
+		background: var(--hinomaru-red);
+		border: 3px solid var(--bg-surface);
+		border-radius: 50%;
+		box-shadow: 0 2px 6px rgba(188, 0, 45, 0.3);
+		cursor: pointer;
+		transition: transform 0.15s var(--ease-brand);
+	}
+
+	.hm-range::-webkit-slider-thumb:hover {
+		transform: scale(1.15);
+	}
+
+	.hm-range::-webkit-slider-thumb:active {
+		transform: scale(0.95);
 	}
 
 	.hour-select {
