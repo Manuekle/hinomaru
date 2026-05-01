@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -44,7 +44,8 @@
 	let liveTranscript  = $state('');
 	let finalTranscript = $state('');
 	let speechError     = $state<string | null>(null);
-	const speechOk      = $derived(isSpeechSupported());
+	let speechOk = $state(false);
+	onMount(() => { speechOk = isSpeechSupported(); });
 
 	// ── Result ────────────────────────────────────────────────────────────────
 	let result = $state<CompareResult | null>(null);
