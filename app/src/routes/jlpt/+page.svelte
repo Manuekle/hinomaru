@@ -229,22 +229,19 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 16px;
-		padding: 16px 8px;
-		margin: 0 -8px;
+		padding: 16px 0;
 		border-bottom: 1px solid var(--ink-100);
 		background: none;
 		border-left: none;
 		border-right: none;
 		border-top: none;
-		border-radius: 12px;
+		border-radius: 4px;
 		color: inherit;
 		font-family: inherit;
 		text-align: left;
-		width: calc(100% + 16px);
+		width: 100%;
 		cursor: pointer;
-		transition:
-			background 150ms ease,
-			transform 150ms ease;
+		transition: background 150ms ease;
 		-webkit-tap-highlight-color: transparent;
 	}
 	.row:first-child {
@@ -255,15 +252,7 @@
 		cursor: default;
 	}
 
-	.row:active:not(.unavailable) {
-		background: var(--ink-100);
-		transform: scale(0.99);
-	}
-
 	@media (hover: hover) {
-		.row:not(.unavailable):hover {
-			background: var(--ink-50);
-		}
 		.row:not(.unavailable):hover .row-title {
 			color: var(--hinomaru-red);
 		}
