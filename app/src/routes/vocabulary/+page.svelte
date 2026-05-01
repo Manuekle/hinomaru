@@ -446,23 +446,32 @@
 
 	.word-card {
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
+		border: 1.5px solid var(--ink-200);
 		border-radius: 20px;
-		padding: 16px;
+		padding: 20px;
 		display: flex;
 		flex-direction: column;
 		box-shadow: var(--shadow-sm);
-		transition:
-			box-shadow 200ms ease,
-			transform 200ms ease;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 		position: relative;
 	}
 
 	@media (hover: hover) {
 		.word-card:hover {
-			transform: translateY(-2px);
+			transform: translateY(-3px);
 			box-shadow: var(--shadow-md);
+			border-color: var(--ink-300);
 		}
+	}
+
+	:global([data-theme='dark']) .word-card {
+		background: var(--ink-100);
+		border-color: var(--ink-200);
+	}
+
+	:global([data-theme='dark']) .word-card:hover {
+		background: var(--ink-200);
+		border-color: var(--ink-300);
 	}
 
 	.card-top {

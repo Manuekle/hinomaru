@@ -6,7 +6,7 @@
 	import type { JLPTLevel, JLPTSectionType } from '$lib/data/jlpt/index';
 	import { showRomaji } from '$lib/stores/settings';
 	import Icon from '$lib/Icon.svelte';
-	import { Certificate01Icon } from '@hugeicons/core-free-icons';
+	import { DocumentValidationIcon } from '@hugeicons/core-free-icons';
 	// showRomaji used for section label display
 
 	const levels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
@@ -100,7 +100,7 @@
 			use:fadeIn={{ delay: 0 }}
 			onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}
 		>
-			<Icon icon={Certificate01Icon} size={18} strokeWidth={2} color="currentColor" />
+			<Icon icon={DocumentValidationIcon} size={18} strokeWidth={2} color="currentColor" />
 			<span>Ver certificado de práctica {activeLevel}</span>
 			<span class="cert-arrow">→</span>
 		</button>

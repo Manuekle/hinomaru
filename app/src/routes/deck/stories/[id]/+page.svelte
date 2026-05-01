@@ -751,7 +751,7 @@
 				{/if}
 
 				<StickyFooter>
-					<button class="hm-btn hm-btn-ghost hm-btn-lg" style="flex:1;" onclick={restartRead}>
+					<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={restartRead}>
 						{$locale === 'es' ? 'Leer de nuevo' : 'Read again'}
 					</button>
 					<button

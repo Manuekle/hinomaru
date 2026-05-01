@@ -33,7 +33,8 @@
 		JupiterIcon,
 		Delete02Icon,
 		BubbleChatIcon,
-		Settings02Icon
+		Settings02Icon,
+		DocumentValidationIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
@@ -569,6 +570,28 @@
 								<div>
 									<span class="pref-title" style="display: block; font-size: 14px; font-weight: 600; color: var(--fg-primary);">TTS Laboratory</span>
 									<span class="pref-sub" style="display: block; font-size: 11px; color: var(--fg-tertiary);">Test anime voices & parameters</span>
+								</div>
+							</div>
+							<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+							</div>
+						</div>
+					</a>
+
+					<!-- UI Laboratory -->
+					<a 
+						href="/debug/ui" 
+						class="card debug-voicevox" 
+						style="padding: 16px; text-align: left; text-decoration: none; display: block;"
+					>
+						<div style="display: flex; align-items: center; justify-content: space-between;">
+							<div style="display: flex; align-items: center; gap: 12px;">
+								<div class="pref-icon" style="background: #34c75914; color: #34c759; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+									<Icon icon={DocumentValidationIcon} size={18} color="currentColor" />
+								</div>
+								<div>
+									<span class="pref-title" style="display: block; font-size: 14px; font-weight: 600; color: var(--fg-primary);">UI Laboratory</span>
+									<span class="pref-sub" style="display: block; font-size: 11px; color: var(--fg-tertiary);">Preview certificates & result screens</span>
 								</div>
 							</div>
 							<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">

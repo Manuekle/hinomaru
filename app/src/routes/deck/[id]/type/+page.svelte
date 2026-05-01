@@ -302,6 +302,13 @@
 	}
 	.audio-btn-type:active { transform: scale(0.92); }
 	@media (hover: hover) {
-		.audio-btn-type:hover { background: var(--ink-100); }
+		.audio-btn-type:hover {
+			background: var(--ink-100);
+			border-color: var(--ink-300);
+		}
+	}
+	:global([data-theme='dark']) .audio-btn-type {
+		background: var(--ink-100);
+		border-color: var(--ink-300);
 	}
 </style>

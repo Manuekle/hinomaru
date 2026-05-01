@@ -594,4 +594,17 @@
 			font-size: 20px;
 		}
 	}
+	/* ── Dark Mode ── */
+	:global([data-theme='dark']) .match-card {
+		background: var(--ink-100);
+		border-color: var(--ink-200);
+	}
+	:global([data-theme='dark']) .match-card.selected {
+		background: var(--hinomaru-red-wash);
+		border-color: var(--hinomaru-red);
+	}
+	:global([data-theme='dark']) .match-card.matched {
+		background: var(--success-wash);
+		border-color: var(--success);
+	}
 </style>

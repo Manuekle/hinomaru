@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-const EXACT_PUBLIC = new Set(['/', '/login', '/terms', '/privacy', '/contact']);
+const EXACT_PUBLIC = new Set(['/', '/login', '/terms', '/privacy', '/contact', '/jlpt/N5/listening']);
 const PREFIX_PUBLIC = ['/auth/callback', '/auth/reset-password'];
 
 export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {

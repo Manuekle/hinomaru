@@ -9,7 +9,7 @@
 		KeyboardIcon,
 		PencilEdit01Icon,
 		PuzzleIcon,
-		Certificate01Icon
+		DocumentValidationIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 
@@ -59,7 +59,7 @@
 			id: 'exam',
 			titleKey: 'mode.exam.title',
 			descKey: 'mode.exam.desc',
-			icon: Certificate01Icon,
+			icon: DocumentValidationIcon,
 			color: '#ff3b30'
 		}
 	];
@@ -152,31 +152,43 @@
 
 	.mode-card {
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 16px;
-		padding: 18px;
+		border: 1.5px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 20px;
 		display: flex;
 		align-items: center;
 		gap: 16px;
 		text-decoration: none;
 		color: inherit;
-		transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
+		box-shadow: var(--shadow-sm);
 	}
 
 	.mode-card:active {
-		transform: translateX(2px) scale(0.99);
-		box-shadow: var(--shadow-sm);
+		transform: scale(0.98);
+		background: var(--ink-50);
 	}
 
 	@media (hover: hover) {
 		.back-link:hover { color: var(--sumi); }
 		.mode-card:hover {
 			box-shadow: var(--shadow-md);
-			transform: translateX(4px);
+			transform: translateY(-2px);
 			border-color: var(--ink-300);
+			background: var(--bg-surface);
 		}
+	}
+
+	:global([data-theme='dark']) .mode-card {
+		background: var(--ink-100);
+		border-color: var(--ink-200);
+	}
+
+	:global([data-theme='dark']) .mode-card:hover {
+		background: var(--ink-200);
+		border-color: var(--ink-300);
 	}
 
 	.mode-icon-box {

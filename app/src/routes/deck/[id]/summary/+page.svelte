@@ -67,21 +67,22 @@
 
 	<div style="position:relative;max-width:420px;width:100%;text-align:center;">
 		<!-- Label -->
-		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="label-meta" style="margin-bottom:16px;">
+		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="summary-label" style="margin-bottom:16px;">
 			{t('summary.complete', $locale)}
 		</div>
 
 		<!-- Score — animated counter -->
 		<div
 			use:popIn={{ delay: 0.2 }}
-			style="font-size:64px;font-weight:700;letter-spacing:-0.02em;line-height:1;"
+			class="summary-score"
 		>
 			{displayScore} / {displayTotal}
 		</div>
 
 		<div
 			use:fadeUp={{ delay: 0.45, y: 8 }}
-			style="font-size:18px;color:var(--fg-secondary);margin-top:12px;"
+			class="summary-msg"
+			style="margin-top:12px;"
 		>
 			{message}
 		</div>
@@ -89,29 +90,23 @@
 		<!-- Stats cards with stagger -->
 		<div
 			use:staggerChildren={{ delay: 0.55, stagger: 0.1, y: 10 }}
-			style="display:flex;flex-direction:column;gap:10px;margin-top:40px;"
+			class="summary-stats-list"
 		>
-			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;"
-			>
-				<span style="color:var(--fg-secondary);">{t('summary.deck', $locale)}</span>
-				<span style="font-weight:600;"
-					>{$locale === 'es' ? data.deck?.title_es : data.deck?.title_en}</span
-				>
+			<div class="summary-stat-item">
+				<span class="summary-stat-key">{t('summary.deck', $locale)}</span>
+				<span class="summary-stat-val">
+					{$locale === 'es' ? data.deck?.title_es : data.deck?.title_en}
+				</span>
 			</div>
-			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;"
-			>
-				<span style="color:var(--fg-secondary);">{t('summary.xp', $locale)}</span>
-				<span style="font-weight:700;color:#b59410;">+{displayXP} XP</span>
+			<div class="summary-stat-item">
+				<span class="summary-stat-key">{t('summary.xp', $locale)}</span>
+				<span class="summary-stat-val xp">+{displayXP} XP</span>
 			</div>
-			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;"
-			>
-				<span style="color:var(--fg-secondary);">{t('summary.accuracy', $locale)}</span>
-				<span style="font-weight:600;color:{pct >= 70 ? 'var(--success)' : 'var(--hinomaru-red)'};"
-					>{pct}%</span
-				>
+			<div class="summary-stat-item">
+				<span class="summary-stat-key">{t('summary.accuracy', $locale)}</span>
+				<span class="summary-stat-val" style="color:{pct >= 70 ? 'var(--success)' : 'var(--hinomaru-red)'};">
+					{pct}%
+				</span>
 			</div>
 		</div>
 

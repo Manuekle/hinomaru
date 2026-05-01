@@ -268,7 +268,7 @@
 		font-size: 14px;
 		color: var(--fg-secondary);
 		line-height: 1.5;
-		margin: 0 0 16px;
+		margin: 0 0 20px;
 	}
 
 	.support-image-btn {
@@ -295,27 +295,30 @@
 
 	.deck-card {
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
+		border: 1.5px solid var(--ink-200);
 		border-radius: 24px;
-		padding: 20px;
+		padding: 24px;
 		cursor: pointer;
 		text-decoration: none;
 		color: inherit;
 		display: block;
 		box-shadow: var(--shadow-sm);
-		transition: box-shadow 200ms ease, transform 200ms ease;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
+
 	@media (hover: hover) {
 		.deck-card:hover {
 			box-shadow: var(--shadow-md);
-			transform: translateY(-2px);
+			transform: translateY(-4px);
+			border-color: var(--ink-300);
 		}
 	}
+
 	.deck-card:active {
 		transform: scale(0.98);
-		box-shadow: var(--shadow-sm);
+		background: var(--ink-50);
 	}
 
 	/* ── Historia del día ── */
@@ -325,16 +328,14 @@
 		justify-content: space-between;
 		gap: 16px;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
+		border: 1.5px solid var(--ink-200);
 		border-radius: 20px;
-		padding: 16px 20px;
+		padding: 20px 24px;
 		margin-top: 24px;
 		text-decoration: none;
 		color: inherit;
 		box-shadow: var(--shadow-sm);
-		transition:
-			box-shadow 200ms ease,
-			transform 200ms ease;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 		position: relative;
 		overflow: hidden;
 	}
@@ -351,15 +352,18 @@
 		.story-card:hover {
 			box-shadow: var(--shadow-md);
 			transform: translateY(-2px);
+			border-color: var(--ink-300);
 		}
 	}
 
 	.story-card:active {
 		transform: scale(0.99);
+		background: var(--ink-50);
 	}
 
 	.story-card.story-read {
-		border-color: var(--success-wash);
+		border-color: var(--success);
+		background: var(--success-wash);
 	}
 
 	.story-card-left {
@@ -571,5 +575,17 @@
 
 	.dashboard-settings-btn:active {
 		transform: scale(0.92);
+	}
+	:global([data-theme='dark']) .deck-card,
+	:global([data-theme='dark']) .story-card,
+	:global([data-theme='dark']) .support-container {
+		background: var(--ink-100);
+		border-color: var(--ink-200);
+	}
+
+	:global([data-theme='dark']) .deck-card:hover,
+	:global([data-theme='dark']) .story-card:hover {
+		background: var(--ink-200);
+		border-color: var(--ink-300);
 	}
 </style>

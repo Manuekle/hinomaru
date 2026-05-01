@@ -139,7 +139,7 @@
 			<div class="empty-state">
 				<div class="empty-icon">📭</div>
 				<p>{t('home.empty', $locale)}</p>
-				<button class="hm-btn hm-btn-dark" onclick={() => goto(`/deck/${data.deck.id}`)}>
+				<button class="hm-btn hm-btn-secondary" onclick={() => goto(`/deck/${data.deck.id}`)}>
 					{t('deck.back', $locale)}
 				</button>
 			</div>
@@ -221,7 +221,7 @@
 					<StickyFooter>
 						{#if !isCorrect}
 							<button
-								class="hm-btn hm-btn-ghost hm-btn-lg"
+								class="hm-btn hm-btn-secondary hm-btn-lg"
 								onclick={() => {
 									picked = null;
 									struggled = true;
@@ -325,6 +325,10 @@
 
 	.audio-btn-circle:active {
 		transform: scale(0.92);
+	}
+	:global([data-theme='dark']) .audio-btn-circle {
+		background: var(--ink-100);
+		border-color: var(--ink-300);
 	}
 
 	.options-grid {

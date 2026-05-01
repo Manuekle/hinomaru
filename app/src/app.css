@@ -590,3 +590,97 @@ body {
 :global([data-svileo-viewport]) {
   padding: 8px !important;
 }
+
+/* ── Result & Summary Shared Styles ───────────────────────────────────────── */
+.result-hero {
+	text-align: center;
+	margin-bottom: 32px;
+}
+
+.result-score-ring {
+	width: 130px;
+	height: 130px;
+	border-radius: 50%;
+	border: 6px solid var(--ink-200);
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 20px;
+	background: var(--bg-surface);
+	transition: border-color 0.4s ease;
+}
+
+.result-score-ring.pass { border-color: var(--success); }
+.result-score-ring.fail { border-color: var(--hinomaru-red); }
+
+.result-score-pct {
+	font-size: 42px;
+	font-weight: 800;
+	line-height: 1;
+	color: var(--sumi);
+	letter-spacing: -0.04em;
+}
+
+.pass .result-score-pct { color: var(--success); }
+.fail .result-score-pct { color: var(--hinomaru-red); }
+
+.result-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 12px;
+	margin-bottom: 32px;
+}
+
+.result-stat-card {
+	padding: 16px 8px;
+	border-radius: 18px;
+	border: 1.5px solid var(--ink-200);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	background: var(--paper);
+}
+
+.result-stat-card.correct { border-color: var(--success); background: var(--success-wash); }
+.result-stat-card.wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
+
+.result-stat-num {
+	font-size: 24px;
+	font-weight: 800;
+	color: var(--sumi);
+	line-height: 1;
+}
+
+.correct .result-stat-num { color: var(--success); }
+.wrong .result-stat-num { color: var(--hinomaru-red); }
+
+.result-stat-label {
+	font-size: 10px;
+	font-weight: 700;
+	color: var(--fg-tertiary);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.summary-stats-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 40px;
+	width: 100%;
+}
+
+.summary-stat-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 20px;
+	border-radius: 20px;
+	background: var(--bg-surface);
+	border: 1px solid var(--ink-200);
+}
+
+.summary-stat-key { font-size: 14px; color: var(--fg-secondary); }
+.summary-stat-val { font-size: 15px; font-weight: 700; color: var(--sumi); }

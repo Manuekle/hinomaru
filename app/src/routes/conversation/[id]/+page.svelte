@@ -332,7 +332,7 @@
 		<StickyFooter>
 			{#if phase === 'result'}
 				<button
-					class="hm-btn hm-btn-ghost hm-btn-lg"
+					class="hm-btn hm-btn-secondary hm-btn-lg"
 					style="flex:1;"
 					onclick={() => goto('/conversation')}
 				>

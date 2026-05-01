@@ -296,6 +296,11 @@
 	.audio-btn:hover,
 	.audio-btn:active {
 		background: var(--ink-100);
+		border-color: var(--ink-300);
+	}
+	:global([data-theme='dark']) .audio-btn {
+		background: var(--ink-100);
+		border-color: var(--ink-300);
 	}
 
 	.audio-btn-sm {
