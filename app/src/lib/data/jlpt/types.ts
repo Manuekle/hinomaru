@@ -1,5 +1,5 @@
 export type JLPTLevel = 'N1' | 'N2' | 'N3' | 'N4' | 'N5';
-export type JLPTSectionType = 'vocabulary' | 'grammar' | 'listening';
+export type JLPTSectionType = 'vocabulary' | 'grammar' | 'listening' | 'mock';
 
 export interface JLPTQuestion {
 	id: number;

@@ -70,16 +70,9 @@
 		listening: 'Escucha'
 	};
 
-	const totalScore = $derived(() => {
-		let sum = 0; let max = 0;
-		for (const sec of sections) {
-			const r = results[`${level}_${sec}`];
-			if (r) { sum += r.score; max += r.total; }
-		}
-		return max > 0 ? Math.round((sum / max) * 100) : 0;
-	});
-
-	const allDone = $derived(sections.every((sec) => !!results[`${level}_${sec}`]));
+	const mockResult = $derived(results[`${level}_mock`]);
+	const totalScore = $derived(() => mockResult ? mockResult.pct : 0);
+	const allDone = $derived(!!mockResult);
 
 	function formatDate(iso: string): string {
 		try {
@@ -100,19 +93,17 @@
 	}
 
 	function updateIssueDate(r: Record<string, SectionResult>) {
-		const dates = sections.map((s) => r[`${level}_${s}`]?.date).filter(Boolean) as string[];
-		issueDate = formatDate(dates.length ? dates.sort().reverse()[0] : new Date().toISOString());
+		const res = r[`${level}_mock`];
+		issueDate = formatDate(res ? res.date : new Date().toISOString());
 	}
 
 	onMount(async () => {
 		// Load localStorage first for instant display
 		const r: Record<string, SectionResult> = {};
 		for (const lv of ['N5', 'N4', 'N3', 'N2', 'N1'] as JLPTLevel[]) {
-			for (const sec of ['vocabulary', 'grammar', 'listening'] as JLPTSectionType[]) {
-				const raw = localStorage.getItem(`jlpt_result_${lv}_${sec}`);
-				if (raw) {
-					try { r[`${lv}_${sec}`] = JSON.parse(raw); } catch { /* ignore */ }
-				}
+			const raw = localStorage.getItem(`jlpt_result_${lv}_mock`);
+			if (raw) {
+				try { r[`${lv}_mock`] = JSON.parse(raw); } catch { /* ignore */ }
 			}
 		}
 		results = r;

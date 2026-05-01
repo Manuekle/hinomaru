@@ -94,11 +94,17 @@
 		return (LEVEL_META[level]?.sections ?? []).filter((sec) => hasContent(level, sec)).length;
 	}
 
-	const SECTION_ICONS: Record<JLPTSectionType, string> = {
+	const SECTION_ICONS: Record<string, string> = {
 		vocabulary: '語',
 		grammar: '文',
-		listening: '聴'
+		listening: '聴',
+		mock: '試'
 	};
+
+	function mockPassed(level: JLPTLevel): boolean {
+		const res = getResult(level, 'mock');
+		return res !== null && res.pct >= 70;
+	}
 
 	let showConfirmModal = $state(false);
 	let pendingUrl = $state<string | null>(null);
@@ -115,7 +121,7 @@
 	}
 
 	async function resetLevel(level: JLPTLevel) {
-		const secs: JLPTSectionType[] = LEVEL_META[level]?.sections ?? [];
+		const secs: JLPTSectionType[] = [...(LEVEL_META[level]?.sections ?? []), 'mock'];
 		// Clear localStorage
 		for (const s of secs) {
 			try { localStorage.removeItem(`jlpt_result_${level}_${s}`); } catch { /* ignore */ }
@@ -248,23 +254,36 @@
 		{@const secs2 = LEVEL_META[activeLevel]?.sections ?? []}
 		{@const scores2 = secs2.map(s => getResult(activeLevel, s)).filter(Boolean)}
 		{@const avg2 = scores2.length ? Math.round(scores2.reduce((a, r) => a + (r?.pct ?? 0), 0) / scores2.length) : 0}
+		{@const passed = mockPassed(activeLevel)}
+
 		<div class="completion-row" use:fadeIn={{ delay: 0 }}>
-			<div class="completion-row-icon">🏆</div>
+			<div class="completion-row-icon">{passed ? '🏆' : '🎯'}</div>
 			<div class="completion-row-body">
 				<div class="completion-row-top">
-					<span class="completion-row-title">{t('jlpt.completed', $locale, { level: activeLevel })}</span>
+					<span class="completion-row-title">
+						{passed 
+							? t('jlpt.mock.passed', $locale) 
+							: t('jlpt.completed', $locale, { level: activeLevel })}
+					</span>
 				</div>
 				<div class="completion-row-sub">
-					{#if scores2.length > 0}{avg2}% promedio &middot; {/if}{t('jlpt.ready', $locale)}
+					{#if passed}
+						{t('jlpt.ready', $locale)}
+					{:else}
+						{#if scores2.length > 0}{avg2}% promedio &middot; {/if}{t('jlpt.mock.desc', $locale)}
+					{/if}
 				</div>
 			</div>
 			<div class="completion-row-right">
-				<button class="completion-cert-btn" onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}>
-					{t('jlpt.certificate', $locale)}
-				</button>
-				<button class="completion-retry-btn" onclick={() => resetLevel(activeLevel)} title={t('jlpt.retry', $locale)}>
-					↺
-				</button>
+				{#if passed}
+					<button class="completion-cert-btn" onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}>
+						{t('jlpt.certificate', $locale)}
+					</button>
+				{:else}
+					<button class="completion-cert-btn" onclick={() => goto(`/jlpt/${activeLevel}/mock`)}>
+						{t('jlpt.mock.start', $locale)}
+					</button>
+				{/if}
 			</div>
 		</div>
 	{/if}

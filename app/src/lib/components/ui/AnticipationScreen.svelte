@@ -3,122 +3,150 @@
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
-	import { Target01Icon } from '@hugeicons/core-free-icons';
+	import { Award01Icon } from '@hugeicons/core-free-icons';
 </script>
 
-<div class="anticipation-overlay" use:popIn={{ duration: 0.4 }}>
-	<div class="anticipation-content" use:fadeUp={{ delay: 0.2, y: 15 }}>
-		<div class="icon-pulse-wrapper">
-			<div class="pulse-ring"></div>
-			<div class="pulse-ring delay"></div>
-			<div class="icon-box">
-				<Icon icon={Target01Icon} size={32} color="white" />
+<div class="anticipation-overlay" use:popIn={{ duration: 0.5 }}>
+	<div class="anticipation-content" use:fadeUp={{ delay: 0.2, y: 20 }}>
+		<div class="glowing-icon-wrapper">
+			<div class="glow-ring"></div>
+			<div class="glow-ring delay"></div>
+			<div class="hinomaru-seal">
+				<div class="hinomaru-red-dot"></div>
+			</div>
+			<svg class="scanning-circle" viewBox="0 0 100 100">
+				<circle cx="50" cy="50" r="48" fill="none" stroke="var(--hinomaru-red)" stroke-width="2" stroke-dasharray="10 292" />
+			</svg>
+		</div>
+		<div class="status-stack">
+			<p class="status-text">{t('exam.calculating', $locale)}</p>
+			<div class="progress-bar-mini">
+				<div class="progress-fill"></div>
 			</div>
 		</div>
-		<p class="anticipation-text">{t('exam.calculating', $locale)}</p>
 	</div>
 </div>
 
 <style>
 	.anticipation-overlay {
 		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: var(--paper);
+		inset: 0;
+		background: rgba(255, 255, 255, 0.85);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 9999;
+		z-index: 10000;
+	}
+
+	:global(.dark) .anticipation-overlay {
+		background: rgba(18, 18, 18, 0.9);
 	}
 
 	.anticipation-content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 32px;
+		gap: 40px;
 	}
 
-	.icon-pulse-wrapper {
+	.glowing-icon-wrapper {
 		position: relative;
-		width: 80px;
-		height: 80px;
+		width: 120px;
+		height: 120px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.icon-box {
+	.hinomaru-seal {
 		position: relative;
-		z-index: 2;
-		width: 64px;
-		height: 64px;
-		background: var(--hinomaru-red);
+		z-index: 5;
+		width: 80px;
+		height: 80px;
+		background: #ffffff;
 		border-radius: 20px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.3);
-		animation: icon-float 2s ease-in-out infinite alternate;
+		box-shadow: var(--shadow-lg);
+		border: 1px solid var(--ink-200);
 	}
 
-	.pulse-ring {
+	.hinomaru-red-dot {
+		width: 36px;
+		height: 36px;
+		background: #bc002d;
+		border-radius: 50%;
+		box-shadow: 0 0 15px rgba(188, 0, 45, 0.2);
+	}
+
+	.glow-ring {
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 64px;
-		height: 64px;
+		width: 80px;
+		height: 80px;
 		border-radius: 24px;
 		background: var(--hinomaru-red);
 		opacity: 0;
-		animation: pulse-out 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-		z-index: 1;
+		animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 	}
 
-	.pulse-ring.delay {
-		animation-delay: 0.75s;
+	.glow-ring.delay {
+		animation-delay: 1s;
 	}
 
-	.anticipation-text {
-		font-size: 15px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-		letter-spacing: 0.08em;
+	.scanning-circle {
+		position: absolute;
+		width: 130px;
+		height: 130px;
+		animation: rotate-scan 2s linear infinite;
+	}
+
+	.status-stack {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.status-text {
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--sumi);
+		letter-spacing: 0.2em;
 		text-transform: uppercase;
-		animation: text-breathe 1.5s ease-in-out infinite alternate;
+		margin: 0;
 		font-family: var(--font-ui);
 	}
 
-	@keyframes icon-float {
-		0% {
-			transform: translateY(0) scale(1);
-		}
-		100% {
-			transform: translateY(-4px) scale(1.02);
-		}
+	.progress-bar-mini {
+		width: 140px;
+		height: 3px;
+		background: var(--ink-100);
+		border-radius: 99px;
+		overflow: hidden;
 	}
 
-	@keyframes pulse-out {
-		0% {
-			width: 64px;
-			height: 64px;
-			opacity: 0.4;
-		}
-		100% {
-			width: 140px;
-			height: 140px;
-			opacity: 0;
-		}
+	.progress-fill {
+		height: 100%;
+		background: var(--hinomaru-red);
+		width: 30%;
+		animation: progress-slide 2s ease-in-out infinite;
 	}
 
-	@keyframes text-breathe {
-		0% {
-			opacity: 0.4;
-		}
-		100% {
-			opacity: 1;
-		}
+	@keyframes pulse-glow {
+		0% { transform: scale(1); opacity: 0.3; }
+		100% { transform: scale(1.6); opacity: 0; }
+	}
+
+	@keyframes rotate-scan {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+
+	@keyframes progress-slide {
+		0% { transform: translateX(-100%); }
+		100% { transform: translateX(400%); }
 	}
 </style>

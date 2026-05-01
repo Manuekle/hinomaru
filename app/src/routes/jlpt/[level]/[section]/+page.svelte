@@ -74,6 +74,7 @@
 		mondaiTitle: string;
 		mondaiId: string;
 		audioFile?: string;
+		mode: 'choice' | 'typing';
 	}
 	let allQuestions = $state<FlatQuestion[]>([]);
 
@@ -94,6 +95,7 @@
 	let checked = $state(false);
 	let correctness = $state<boolean[]>([]);
 	let selectedHistory = $state<number[]>([]);
+	let typingValue = $state('');
 	let advanceTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	// Timer
@@ -162,13 +164,19 @@
 						? test.audioFiles[qIdx] 
 						: undefined;
 
+					// Randomize mode for variety (30% typing for vocab/grammar)
+					const mode = (section === 'listening') 
+						? 'choice' 
+						: (Math.random() < 0.3 ? 'typing' : 'choice');
+
 					return { 
 						...q, 
 						choices: shuffledChoices,
 						answer: newAnswer,
 						mondaiTitle: m.title, 
 						mondaiId: m.id,
-						audioFile
+						audioFile,
+						mode
 					};
 				})
 			);
@@ -180,16 +188,28 @@
 		checked = false;
 		correctness = [];
 		selectedHistory = [];
+		typingValue = '';
 		phase = 'exam';
 		startTimer();
 	}
 
 	function checkAnswer() {
-		if (checked || selected === null) return;
-		const isRight = selected + 1 === currentQ.answer;
+		if (checked) return;
+		
+		let isRight = false;
+		if (currentQ.mode === 'choice') {
+			if (selected === null) return;
+			isRight = selected + 1 === currentQ.answer;
+			selectedHistory = [...selectedHistory, selected];
+		} else {
+			if (!typingValue.trim()) return;
+			const correctText = currentQ.choices[currentQ.answer - 1].trim();
+			isRight = typingValue.trim().toLowerCase() === correctText.toLowerCase();
+			// Also allow Romaji if possible? (Optional refinement)
+		}
+
 		checked = true;
 		correctness = [...correctness, isRight];
-		selectedHistory = [...selectedHistory, selected];
 		if (isRight) playCorrect(); else playWrong();
 		advanceTimeout = setTimeout(advanceQuestion, isRight ? 1800 : 2800);
 	}
@@ -206,6 +226,7 @@
 		if (currentIdx + 1 >= allQuestions.length) { endExam(); return; }
 		currentIdx += 1;
 		selected = null;
+		typingValue = '';
 		checked = false;
 	}
 
@@ -247,7 +268,7 @@
 	}
 
 	const isCorrect = $derived(
-		checked && selected !== null && selected + 1 === currentQ?.answer
+		checked && correctness[currentIdx] === true
 	);
 
 	// ── Navigation Protection ─────────────────────────────────────────────────
@@ -355,34 +376,60 @@
 					{/if}
 				</div>
 
-				<div class="options-list">
-					{#each currentQ.choices as choice, idx (idx)}
-						<button
-							class="option-item"
-							class:is-selected={selected === idx}
-							class:is-correct={checked && selected === idx && idx + 1 === currentQ.answer}
-							class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
+				{#if currentQ.mode === 'choice'}
+					<div class="options-list">
+						{#each currentQ.choices as choice, idx (idx)}
+							<button
+								class="option-item"
+								class:is-selected={selected === idx}
+								class:is-correct={checked && idx + 1 === currentQ.answer}
+								class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
+								class:is-dimmed={checked && selected !== idx && idx + 1 !== currentQ.answer}
+								disabled={checked}
+								onclick={() => { if (!checked) selected = idx; }}
+							>
+								<div class="opt-marker">
+									{#if checked && idx + 1 === currentQ.answer}
+										<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
+									{:else if checked && selected === idx && idx + 1 !== currentQ.answer}
+										<Icon icon={Cancel01Icon} size={16} color="white" />
+									{:else}
+										{idx + 1}
+									{/if}
+								</div>
+								<div class="opt-content">
+									<span class="opt-text jp">{choice}</span>
+									{#if $showRomaji && kanaToRomaji(choice)}
+										<span class="opt-romaji">{kanaToRomaji(choice)}</span>
+									{/if}
+								</div>
+							</button>
+						{/each}
+					</div>
+				{:else}
+					<div class="typing-area" use:fadeUp={{ delay: 0.1, y: 10 }}>
+						<input
+							type="text"
+							class="hm-input typing-input jp"
+							class:is-correct={checked && isCorrect}
+							class:is-wrong={checked && !isCorrect}
+							placeholder={t('exam.type_answer', $locale)}
+							bind:value={typingValue}
 							disabled={checked}
-							onclick={() => { if (!checked) selected = idx; }}
-						>
-							<div class="opt-marker">
-								{#if checked && selected === idx && idx + 1 === currentQ.answer}
-									<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
-								{:else if checked && selected === idx && idx + 1 !== currentQ.answer}
-									<Icon icon={Cancel01Icon} size={16} color="white" />
-								{:else}
-									{idx + 1}
-								{/if}
+							onkeydown={(e) => { if (e.key === 'Enter') checkAnswer(); }}
+							autocomplete="off"
+							autocorrect="off"
+							autocapitalize="off"
+							spellcheck="false"
+						/>
+						{#if checked && !isCorrect}
+							<div class="typing-reveal" use:fadeIn>
+								<span class="reveal-label">{t('exam.correct_answer', $locale)}:</span>
+								<span class="reveal-val jp">{currentQ.choices[currentQ.answer - 1]}</span>
 							</div>
-							<div class="opt-content">
-								<span class="opt-text jp">{choice}</span>
-								{#if $showRomaji && kanaToRomaji(choice)}
-									<span class="opt-romaji">{kanaToRomaji(choice)}</span>
-								{/if}
-							</div>
-						</button>
-					{/each}
-				</div>
+						{/if}
+					</div>
+				{/if}
 
 				{#if checked}
 					<div 
@@ -405,7 +452,7 @@
 					<button
 						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
 						onclick={checkAnswer}
-						disabled={selected === null}
+						disabled={currentQ.mode === 'choice' ? selected === null : !typingValue.trim()}
 					>
 						{t('session.check', $locale)}
 					</button>
@@ -1095,6 +1142,15 @@
 	}
 	.romaji-label { font-size: 10px; font-weight: 800; color: var(--hinomaru-red); margin-bottom: 6px; }
 	.romaji-content { font-size: 14px; color: var(--fg-secondary); font-style: italic; line-height: 1.6; }
+
+	.typing-area { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
+	.typing-input { height: 64px !important; font-size: 20px !important; text-align: center; border-width: 2px !important; }
+	.typing-input.is-correct { border-color: var(--success) !important; background: var(--success-wash) !important; }
+	.typing-input.is-wrong { border-color: var(--hinomaru-red) !important; background: var(--hinomaru-red-wash) !important; }
+	.typing-reveal { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: var(--bg-surface); border: 1px dashed var(--ink-300); border-radius: 12px; }
+	.reveal-label { font-size: 13px; color: var(--fg-secondary); font-weight: 600; }
+	.reveal-val { font-size: 16px; font-weight: 800; color: var(--hinomaru-red); }
+	.is-dimmed { opacity: 0.4; }
 
 	.footer-back-btn {
 		display: flex; align-items: center; justify-content: center; gap: 10px;
