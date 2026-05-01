@@ -205,8 +205,8 @@
 	.row {
 		display: flex;
 		align-items: flex-start;
-		gap: 16px;
-		padding: 16px 0;
+		gap: 20px;
+		padding: 20px 0;
 		border-bottom: 1px solid var(--ink-100);
 		background: none;
 		border-left: none;
@@ -275,7 +275,7 @@
 
 	.row-title {
 		font-size: 18px;
-		font-weight: 700;
+		font-weight: 600;
 		color: var(--fg-primary);
 		line-height: 1.2;
 		transition: color 150ms;

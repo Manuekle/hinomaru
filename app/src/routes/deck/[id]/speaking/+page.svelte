@@ -14,7 +14,6 @@
 		Mic01Icon,
 		CheckmarkCircle01Icon,
 		Cancel01Icon,
-		ArrowReloadHorizontalIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
@@ -190,12 +189,14 @@
 							<div class="reading">{phrase.reading}</div>
 						{/if}
 
-						<!-- Segments preview -->
-						<div class="segments-row">
-							{#each phrase.segments as seg}
-								<span class="seg-chip">{seg}</span>
-							{/each}
-						</div>
+						<!-- Segments preview — only when phrase splits into multiple parts -->
+						{#if phrase.segments.length > 1}
+							<div class="segments-row">
+								{#each phrase.segments as seg}
+									<span class="seg-chip">{seg}</span>
+								{/each}
+							</div>
+						{/if}
 
 						<!-- Meaning -->
 						<div class="meaning">{phrase.meaning}</div>
@@ -311,8 +312,7 @@
 					style="flex:1;"
 					onclick={retry}
 				>
-					<Icon icon={ArrowReloadHorizontalIcon} size={18} color="currentColor" />
-					{t('session.again', $locale)}
+					Otra vez
 				</button>
 				<button
 					class="hm-btn hm-btn-primary touch-action-manip"
