@@ -6,7 +6,8 @@
 		preferredVoice,
 		notificationsEnabled,
 		srsEnabled,
-		reminderHour
+		reminderHour,
+		ttsSpeed
 	} from '$lib/stores/settings';
 	import { scheduleReminder, clearReminder } from '$lib/utils/reminders';
 	import { onMount } from 'svelte';
