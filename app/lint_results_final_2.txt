@@ -122,7 +122,6 @@
    7:18  warning  'resolvedTheme' is defined but never used  @typescript-eslint/no-unused-vars
   30:42  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
   42:60  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
-  63:14  warning  'e' is defined but never used              @typescript-eslint/no-unused-vars
   76:34  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/+page.server.ts
@@ -164,7 +163,6 @@
    89:30  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
    89:45  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
   104:39  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
-  204:11  error    Empty block statement                              no-empty
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte
   24:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
@@ -220,17 +218,11 @@
   129:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
   173:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-/home/manudev/Dev/nihongo/app/src/routes/jlpt/+page.svelte
-  23:67  error  Empty block statement  no-empty
-
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte
-   17:3   warning  'CheckmarkCircle02Icon' is defined but never used  @typescript-eslint/no-unused-vars
-  207:12  warning  'e' is defined but never used                      @typescript-eslint/no-unused-vars
+  17:3  warning  'CheckmarkCircle02Icon' is defined but never used  @typescript-eslint/no-unused-vars
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte
-   76:8   warning  'allDone' is assigned a value but never used  @typescript-eslint/no-unused-vars
-   91:12  warning  'e' is defined but never used                 @typescript-eslint/no-unused-vars
-  104:15  warning  'e' is defined but never used                 @typescript-eslint/no-unused-vars
+  76:8  warning  'allDone' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 /home/manudev/Dev/nihongo/app/src/routes/login/+page.svelte
   152:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
@@ -240,13 +232,12 @@
   10:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte
-   19:11  warning  'speakVoicevox' is defined but never used  @typescript-eslint/no-unused-vars
-  260:13  warning  'e' is defined but never used              @typescript-eslint/no-unused-vars
+  19:11  warning  'speakVoicevox' is defined but never used  @typescript-eslint/no-unused-vars
 
 /home/manudev/Dev/nihongo/app/src/routes/vocabulary/review/+page.svelte
    5:20  warning  'untrack' is defined but never used       @typescript-eslint/no-unused-vars
   24:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
   49:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-✖ 145 problems (2 errors, 143 warnings)
+✖ 138 problems (0 errors, 138 warnings)
 

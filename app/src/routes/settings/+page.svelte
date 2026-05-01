@@ -257,7 +257,9 @@
 		} else {
 			try {
 				localStorage.removeItem('hinomaru_onboarding_completed');
-			} catch {}
+			} catch {
+				// Ignore localStorage errors
+			}
 			await supabase.auth.signOut();
 			await invalidateAll();
 			goto('/login');
@@ -525,7 +527,7 @@
 							onchange={(e) => setReminderHour(Number((e.target as HTMLSelectElement).value))}
 							aria-label={t('settings.reminderHour', $locale)}
 						>
-							{#each Array(24) as _, h}
+							{#each Array(24) as _, h (h)}
 								<option value={h}>{String(h).padStart(2, '0')}:00</option>
 							{/each}
 						</select>
@@ -631,7 +633,6 @@
 </div>
 
 {#if showDeleteConfirm}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		class="modal-overlay"
 		transition:fly={{ duration: 200, opacity: 0 }}

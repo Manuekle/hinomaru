@@ -25,31 +25,42 @@
   17:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte
-   3:11  warning  'fadeUp' is defined but never used        @typescript-eslint/no-unused-vars
-   3:19  warning  'fadeIn' is defined but never used        @typescript-eslint/no-unused-vars
-  25:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  36:11  warning  'close' is defined but never used         @typescript-eslint/no-unused-vars
+   3:19  warning  'fadeIn' is defined but never used               @typescript-eslint/no-unused-vars
+   3:27  warning  'scaleIn' is defined but never used              @typescript-eslint/no-unused-vars
+  11:3   warning  'More01Icon' is defined but never used           @typescript-eslint/no-unused-vars
+  12:3   warning  'Download02Icon' is defined but never used       @typescript-eslint/no-unused-vars
+  13:3   warning  'QrCode01Icon' is defined but never used         @typescript-eslint/no-unused-vars
+  14:3   warning  'Cancel01Icon' is defined but never used         @typescript-eslint/no-unused-vars
+  21:6   warning  'isMobile' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  22:6   warning  'desktopTab' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  25:71  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/lib/components/InstallPrompt.svelte
-   9:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  15:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/lib/components/InteractiveText.svelte
-   2:11  warning  'getWordMetadata' is defined but never used  @typescript-eslint/no-unused-vars
-  37:5   warning  'found' is assigned a value but never used   @typescript-eslint/no-unused-vars
-  67:2   error    Each block should have a key                 svelte/require-each-key
+   7:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte
-   7:9   warning  'SupportKofi' is defined but never used        @typescript-eslint/no-unused-vars
-  25:71  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
-  29:49  warning  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
-  31:8   warning  'features' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   11:3   warning  'BrainIcon' is defined but never used       @typescript-eslint/no-unused-vars
+   12:3   warning  'Target01Icon' is defined but never used    @typescript-eslint/no-unused-vars
+   13:3   warning  'Download02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+   15:3   warning  'SparklesIcon' is defined but never used    @typescript-eslint/no-unused-vars
+   17:3   warning  'Coffee02Icon' is defined but never used    @typescript-eslint/no-unused-vars
+   18:3   warning  'Message01Icon' is defined but never used   @typescript-eslint/no-unused-vars
+   19:3   warning  'UserGroupIcon' is defined but never used   @typescript-eslint/no-unused-vars
+   20:3   warning  'SmileIcon' is defined but never used       @typescript-eslint/no-unused-vars
+   23:3   warning  'FavouriteIcon' is defined but never used   @typescript-eslint/no-unused-vars
+   25:3   warning  'GlobeIcon' is defined but never used       @typescript-eslint/no-unused-vars
+   59:49  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+   62:71  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  230:4   error    Each block should have a key                svelte/require-each-key
+  246:5   error    Each block should have a key                svelte/require-each-key
+  304:4   error    Each block should have a key                svelte/require-each-key
 
 /home/manudev/Dev/nihongo/app/src/lib/components/ScrollingWaveform.svelte
   2:20  warning  'onDestroy' is defined but never used  @typescript-eslint/no-unused-vars
-
-/home/manudev/Dev/nihongo/app/src/lib/components/SessionNav.svelte
-  15:18  error  Parsing error: ',' expected
 
 /home/manudev/Dev/nihongo/app/src/lib/components/StickyFooter.svelte
   7:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
@@ -57,34 +68,219 @@
 /home/manudev/Dev/nihongo/app/src/lib/components/WordPopup.svelte
   3:11  warning  'fade' is defined but never used  @typescript-eslint/no-unused-vars
 
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/MotivationStep.svelte
+  11:3  warning  'Tick01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
 /home/manudev/Dev/nihongo/app/src/lib/components/onboarding/Onboarding.svelte
-  15:11  warning  'locale' is defined but never used               @typescript-eslint/no-unused-vars
-  16:11  warning  't' is defined but never used                    @typescript-eslint/no-unused-vars
-  17:9   warning  'Icon' is defined but never used                 @typescript-eslint/no-unused-vars
-  18:11  warning  'ArrowLeft02Icon' is defined but never used      @typescript-eslint/no-unused-vars
-  20:53  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
-  23:8   warning  'totalSteps' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  40:6   warning  'progress' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  14:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte
-  15:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  37:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  56:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/StoriesStep.svelte
+  8:3  warning  'CheckmarkCircle02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/SummaryStep.svelte
+  14:3  warning  'Tick01Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/VoiceStep.svelte
+  5:9   warning  'Icon' is defined but never used            @typescript-eslint/no-unused-vars
+  6:11  warning  'VolumeHighIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/Orb.svelte
+  169:13  error  The value assigned to 't' is not used in subsequent statements          no-useless-assignment
+  240:9   error  The value assigned to 'targetIn' is not used in subsequent statements   no-useless-assignment
+  241:9   error  The value assigned to 'targetOut' is not used in subsequent statements  no-useless-assignment
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/audio-player-speed.svelte
+  45:3  error  Each block should have a key  svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/context.ts
+  3:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/data/jlpt/listening_transcripts.ts
+   186:12   error  Irregular whitespace not allowed  no-irregular-whitespace
+   195:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   196:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   204:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   205:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   213:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   214:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   222:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   223:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   231:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   232:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   240:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   241:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   248:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   249:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   257:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   258:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   266:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   267:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   275:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   276:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   284:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   285:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   293:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   294:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   302:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   303:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   541:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   542:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   550:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   551:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   559:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   560:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   568:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   569:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   577:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   578:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   586:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   587:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   594:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   595:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   603:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   604:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   612:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   613:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   621:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   622:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   630:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   631:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   639:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   640:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   648:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   649:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   657:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   658:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   666:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   667:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   723:25   error  Irregular whitespace not allowed  no-irregular-whitespace
+   725:32   error  Irregular whitespace not allowed  no-irregular-whitespace
+   762:28   error  Irregular whitespace not allowed  no-irregular-whitespace
+   764:41   error  Irregular whitespace not allowed  no-irregular-whitespace
+   779:7    error  Irregular whitespace not allowed  no-irregular-whitespace
+   779:17   error  Irregular whitespace not allowed  no-irregular-whitespace
+   794:39   error  Irregular whitespace not allowed  no-irregular-whitespace
+   798:21   error  Irregular whitespace not allowed  no-irregular-whitespace
+   813:8    error  Irregular whitespace not allowed  no-irregular-whitespace
+   832:61   error  Irregular whitespace not allowed  no-irregular-whitespace
+   836:14   error  Irregular whitespace not allowed  no-irregular-whitespace
+   884:8    error  Irregular whitespace not allowed  no-irregular-whitespace
+   938:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   939:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   947:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   948:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   956:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   957:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   965:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   966:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   974:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   975:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   982:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   983:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   991:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+   992:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1000:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1001:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1009:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1010:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1018:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1019:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1027:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1028:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1036:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1037:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1045:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1046:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1054:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1055:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1063:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1064:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1089:74   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1198:5    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1229:159  error  Irregular whitespace not allowed  no-irregular-whitespace
+  1301:23   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1380:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1381:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1389:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1390:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1398:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1399:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1407:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1408:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1416:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1417:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1425:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1426:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1434:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1435:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1443:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1444:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1452:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1453:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1461:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1462:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1470:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1471:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1479:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1480:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1488:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1489:1    error  Irregular whitespace not allowed  no-irregular-whitespace
+  1541:10   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1616:29   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1631:33   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1635:32   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1684:10   error  Irregular whitespace not allowed  no-irregular-whitespace
+  1705:18   error  Irregular whitespace not allowed  no-irregular-whitespace
+
+/home/manudev/Dev/nihongo/app/src/lib/motion.ts
+   87:6   error    Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+   87:12  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+   87:61  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  127:7   error    Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  127:13  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+  127:62  warning  Unexpected any. Specify a different type                               @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/lib/stores/pwa.ts
+   3:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:103  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/lib/stores/settings.ts
   28:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
+/home/manudev/Dev/nihongo/app/src/lib/stores/toast.ts
+  21:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
 /home/manudev/Dev/nihongo/app/src/routes/+layout.svelte
-   5:17  warning  'navigating' is defined but never used    @typescript-eslint/no-unused-vars
-  26:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   5:17  warning  'navigating' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+   7:18  warning  'resolvedTheme' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+  10:2   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  30:42  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  42:60  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  63:13  error    Empty block statement                                                                                                no-empty
+  74:34  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/+page.server.ts
   46:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
   95:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/+page.svelte
-  17:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  18:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/alphabet/+page.svelte
   4:19  warning  'fadeIn' is defined but never used  @typescript-eslint/no-unused-vars
@@ -95,17 +291,34 @@
 /home/manudev/Dev/nihongo/app/src/routes/auth/reset-password/+page.svelte
   61:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
+/home/manudev/Dev/nihongo/app/src/routes/contact/+page.svelte
+  14:3  warning  'Coffee02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/conversation/+page.svelte
+  3:11  warning  't' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/debug/tts/+page.svelte
+  11:3  warning  'Settings02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/manudev/Dev/nihongo/app/src/routes/debug/ui/+page.svelte
+  18:3   warning  'Settings02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+  20:11  warning  'kanaToRomaji' is defined but never used    @typescript-eslint/no-unused-vars
+  21:11  warning  'showRomaji' is defined but never used      @typescript-eslint/no-unused-vars
+
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/exam/+page.svelte
-  25:9   warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
-  35:39  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
-  52:6   warning  'startedAt' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  70:30  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
-  70:45  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
-  93:39  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   17:3   warning  'CheckmarkCircle02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+   19:3   warning  'ArrowLeft01Icon' is defined but never used        @typescript-eslint/no-unused-vars
+   31:9   warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   41:39  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   89:30  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+   89:45  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  104:39  warning  Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+  204:11  error    Empty block statement                              no-empty
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte
-  22:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  50:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  52:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/match/+page.svelte
   15:11  warning  'svileo' is defined but never used                @typescript-eslint/no-unused-vars
@@ -117,12 +330,14 @@
   82:24  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte
-  19:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  99:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   21:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   21:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/type/+page.svelte
-  22:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  87:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  94:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/[id]/write/+page.svelte
    29:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
@@ -135,45 +350,57 @@
 /home/manudev/Dev/nihongo/app/src/routes/deck/songs/[id]/+page.svelte
    37:8   warning  'levelColors' is assigned a value but never used  @typescript-eslint/no-unused-vars
    46:14  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-   64:28  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-   65:53  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  254:25  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  277:24  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  278:34  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
-  307:25  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   65:38  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   67:53  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  303:25  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  326:24  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  327:34  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  356:25  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/stories/+page.svelte
   12:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/deck/stories/[id]/+page.svelte
-   72:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-   87:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  115:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  116:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  123:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  124:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/+page.svelte
+  23:67  error  Empty block statement  no-empty
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte
+   17:3   warning  'CheckmarkCircle02Icon' is defined but never used  @typescript-eslint/no-unused-vars
+  207:11  error    Empty block statement                              no-empty
+  416:11  error    Each block should have a key                       svelte/require-each-key
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte
+   76:8   warning  'allDone' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   91:11  error    Empty block statement                         no-empty
+   99:67  error    Empty block statement                         no-empty
+  180:6   error    Each block should have a key                  svelte/require-each-key
+  239:4   error    Each block should have a key                  svelte/require-each-key
 
 /home/manudev/Dev/nihongo/app/src/routes/login/+page.svelte
-  159:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  203:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/onboarding/+page.svelte
-  7:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 /home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte
-  9:11  warning  'fade' is defined but never used  @typescript-eslint/no-unused-vars
-
-/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte
-    4:27  warning  'staggerChildren' is defined but never used                                @typescript-eslint/no-unused-vars
-    6:21  warning  'cubicIn' is defined but never used                                        @typescript-eslint/no-unused-vars
-   16:3   warning  'ArrowLeft02Icon' is defined but never used                                @typescript-eslint/no-unused-vars
-   95:16  error    Found a mutable instance of the built-in Set class. Use SvelteSet instead  svelte/prefer-svelte-reactivity
-  198:5   error    Each block should have a key                                               svelte/require-each-key
+   19:11  warning  'speakVoicevox' is defined but never used      @typescript-eslint/no-unused-vars
+  260:12  error    Empty block statement                          no-empty
+  528:8   error    Each block should have a key                   svelte/require-each-key
+  634:21  error    svelte-ignore comment is used, but not warned  svelte/no-unused-svelte-ignore
 
 /home/manudev/Dev/nihongo/app/src/routes/vocabulary/review/+page.svelte
-  24:39  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
-  30:6   warning  'finishing' is assigned a value but never used  @typescript-eslint/no-unused-vars
-  60:39  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   5:20  warning  'untrack' is defined but never used       @typescript-eslint/no-unused-vars
+  24:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-✖ 98 problems (4 errors, 94 warnings)
+✖ 293 problems (157 errors, 136 warnings)
 

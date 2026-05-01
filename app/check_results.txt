@@ -1,0 +1,361 @@
+
+> sveltekit@0.0.1 check
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /home/manudev/Dev/nihongo/app
+Getting Svelte diagnostics...
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/audio-player-progress.svelte:36:2
+Error: Object literal may only specify known properties, and '"onPointerDown"' does not exist in type 'SliderRootProps'. (ts)
+	onValueChange={handleValueChange}
+	onPointerDown={() => (isDragging = true)}
+	onPointerUp={() => (isDragging = false)}
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/audio-player-progress.svelte:42:10
+Error: Property 'Track' does not exist on type 'typeof import("/home/manudev/Dev/nihongo/app/node_modules/bits-ui/dist/bits/slider/exports")'. (ts)
+>
+	<Slider.Track class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary">
+		<Slider.Range class="absolute h-full bg-primary" />
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/audio-player-progress.svelte:44:11
+Error: Property 'Track' does not exist on type 'typeof import("/home/manudev/Dev/nihongo/app/node_modules/bits-ui/dist/bits/slider/exports")'. (ts)
+		<Slider.Range class="absolute h-full bg-primary" />
+	</Slider.Track>
+	<Slider.Thumb
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/audio-player/audio-player-progress.svelte:45:14
+Error: Type '{ class: string; }' is not assignable to type 'Omit<{ disabled?: boolean | undefined; index: number; }, "children" | "child"> & { child?: Snippet<[SliderThumbSnippetProps & { props: Record<string, unknown>; }]> | undefined; children?: Snippet<...> | undefined; style?: string | ... 2 more ... | undefined; ref?: HTMLElement | ... 1 more ... | undefined; } & Withou...'.
+  Property 'index' is missing in type '{ class: string; }' but required in type 'Omit<{ disabled?: boolean | undefined; index: number; }, "children" | "child">'. (ts)
+	</Slider.Track>
+	<Slider.Thumb
+		class="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:111:2
+Warn: Unused CSS selector ".drawer-header-visual"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.drawer-header-visual {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:117:2
+Warn: Unused CSS selector ".header-icon"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.header-icon {
+		width: 64px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:130:2
+Warn: Unused CSS selector ".drawer-close-row"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Close row ── */
+	.drawer-close-row {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:232:2
+Warn: Unused CSS selector ".qr-block"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── QR block ── */
+	.qr-block {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:244:2
+Warn: Unused CSS selector ".qr-url"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.qr-url {
+		font-size: 13px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:251:2
+Warn: Unused CSS selector ".desktop-desc"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Desktop description ── */
+	.desktop-desc {
+		font-size: 14px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:260:2
+Warn: Unused CSS selector ".tabs-wrap"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Tabs ── */
+	.tabs-wrap {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:269:2
+Warn: Unused CSS selector ".tab-btn"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.tab-btn {
+		flex: 1;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:287:2
+Warn: Unused CSS selector ".tab-active"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.tab-active {
+		background: var(--bg-surface);
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:294:2
+Warn: Unused CSS selector ".tab-content"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Tab content ── */
+	.tab-content {
+		min-height: 200px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/AppDownloadDrawer.svelte:299:2
+Warn: Unused CSS selector ".pwa-note"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── PWA Note ── */
+	.pwa-note {
+		margin-top: 16px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte:1116:2
+Warn: Unused CSS selector ".cta-link-btn"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.cta-link-btn {
+		background: transparent;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte:1127:2
+Warn: Unused CSS selector ".cta-link-btn:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.cta-link-btn:hover {
+		opacity: 1;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/Landing.svelte:1508:3
+Warn: Unused CSS selector ".level-card"
+https://svelte.dev/e/css_unused_selector (svelte)
+		}
+		.level-card {
+			padding: 20px 12px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/WordOfTheDay.svelte:28:21
+Warn: This reference only captures the initial value of `initiallySaved`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	let { word, initiallySaved = false } = $props<{ word: Word | null; initiallySaved?: boolean }>();
+	let saved = $state(initiallySaved);
+	let saving = $state(false);
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/GoalStep.svelte:198:2
+Warn: Unused CSS selector ".footer"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.footer {
+		margin-top: auto;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/WelcomeStep.svelte:87:2
+Warn: Unused CSS selector ".footer-section"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.footer-section {
+		margin-top: auto;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte:259:2
+Warn: Unused CSS selector ".char-label"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.char-label {
+		font-size: 11px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte:354:2
+Warn: Unused CSS selector ".footer"
+https://svelte.dev/e/css_unused_selector (svelte)
+	/* ── Footer ───────────────────────────────────── */
+	.footer {
+		flex-shrink: 0;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/onboarding/PracticeStep.svelte:362:2
+Warn: Unused CSS selector ".skip-link"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.skip-link {
+		font-size: 13px;
+
+/home/manudev/Dev/nihongo/app/src/lib/components/ui/Orb.svelte:173:28
+Warn: This reference only captures the initial value of `seed`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+
+	const random = splitmix32(seed);
+	const offsets = new Float32Array(Array.from({ length: 7 }, () => random() * Math.PI * 2));
+
+/home/manudev/Dev/nihongo/app/src/routes/alphabet/+page.svelte:35:2
+Warn: Unused CSS selector ".back-link-beautiful"
+https://svelte.dev/e/css_unused_selector (svelte)
+<style>
+	.back-link-beautiful {
+		display: inline-flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/alphabet/+page.svelte:45:3
+Warn: Unused CSS selector ".back-link-beautiful:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+
+/home/manudev/Dev/nihongo/app/src/routes/conversation/+page.svelte:91:2
+Warn: Unused CSS selector ".back-link-beautiful"
+https://svelte.dev/e/css_unused_selector (svelte)
+<style>
+	.back-link-beautiful {
+		display: inline-flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/conversation/+page.svelte:101:3
+Warn: Unused CSS selector ".back-link-beautiful:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+
+/home/manudev/Dev/nihongo/app/src/routes/debug/ui/+page.svelte:548:2
+Warn: Unused CSS selector ".stat-meta"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.stat-meta { display: flex; align-items: baseline; gap: 6px; flex: 1; text-align: left; }
+	.stat-v { font-size: 16px; font-weight: 800; color: var(--sumi); }
+
+/home/manudev/Dev/nihongo/app/src/routes/debug/ui/+page.svelte:549:2
+Warn: Unused CSS selector ".stat-v"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.stat-meta { display: flex; align-items: baseline; gap: 6px; flex: 1; text-align: left; }
+	.stat-v { font-size: 16px; font-weight: 800; color: var(--sumi); }
+	.stat-l { font-size: 11px; font-weight: 600; color: var(--fg-secondary); }
+
+/home/manudev/Dev/nihongo/app/src/routes/debug/ui/+page.svelte:550:2
+Warn: Unused CSS selector ".stat-l"
+https://svelte.dev/e/css_unused_selector (svelte)
+	.stat-v { font-size: 16px; font-weight: 800; color: var(--sumi); }
+	.stat-l { font-size: 11px; font-weight: 600; color: var(--fg-secondary); }
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/flashcards/+page.svelte:24:40
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	const supabase = createClient();
+	const queue = createMistakeQueue<any>(data.cards as any[]);
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte:21:40
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	const supabase = createClient();
+	const queue = createMistakeQueue<any>(data.cards as any[]);
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/quiz/+page.svelte:408:2
+Warn: Unused CSS selector ".correct.feedback-status"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.correct.feedback-status { color: var(--success); }
+	.wrong .feedback-status { color: var(--hinomaru-red-ink); }
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/[id]/type/+page.svelte:24:40
+Warn: This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally (svelte)
+	const supabase = createClient();
+	const queue = createMistakeQueue<any>(data.cards as any[]);
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/stories/+page.svelte:86:2
+Warn: Unused CSS selector ".back-link-beautiful"
+https://svelte.dev/e/css_unused_selector (svelte)
+<style>
+	.back-link-beautiful {
+		display: inline-flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/deck/stories/+page.svelte:95:2
+Warn: Unused CSS selector ".back-link-beautiful:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	}
+	.back-link-beautiful:hover {
+		color: var(--sumi);
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:160:4
+Error: Type '{ choices: string[]; answer: number; mondaiTitle: string; mondaiId: string; id: number; sentence: string; underlined?: string | undefined; }[]' is not assignable to type 'FlatQuestion[]'.
+  Type '{ choices: string[]; answer: number; mondaiTitle: string; mondaiId: string; id: number; sentence: string; underlined?: string; }' is not assignable to type 'FlatQuestion'.
+    Types of property 'choices' are incompatible.
+      Type 'string[]' is not assignable to type '[string, string, string, string]'.
+        Target requires 4 element(s) but source may have fewer. (ts)
+			);
+			allQuestions = shuffleArray(flat);
+		}
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:317:53
+Error: Property 'mondai' does not exist on type 'FlatQuestion'. Did you mean 'mondaiId'? (ts)
+					<div class="exam-meta-group">
+						<span class="exam-label-pill">もんだい {currentQ?.mondai || 1}</span>
+						<div class="exam-step-indicator">
+
+/home/manudev/Dev/nihongo/app/src/routes/jlpt/certificate/[level]/+page.svelte:219:4
+Error: `{@const}` must be the immediate child of `{#snippet}`, `{#if}`, `{:else if}`, `{:else}`, `{#each}`, `{:then}`, `{:catch}`, `<svelte:fragment>`, `<svelte:boundary>` or `<Component>`
+https://svelte.dev/e/const_tag_invalid_placement (svelte)
+		<div class="level-exam-info">
+			{@const info = LEVEL_INFO[level]}
+			<div class="exam-info-row">
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:794:2
+Warn: Unused CSS selector ".card-row"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.card-row {
+		padding: 12px 14px;
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:798:2
+Warn: Unused CSS selector ".card-divider"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.card-divider {
+		height: 1px;
+
+/home/manudev/Dev/nihongo/app/src/routes/settings/+page.svelte:1095:2
+Warn: Unused CSS selector ".flag-circle-sm"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.flag-circle-sm {
+		width: 24px !important;
+
+/home/manudev/Dev/nihongo/app/src/routes/terms/+page.svelte:418:3
+Warn: Unused CSS selector ".back-cta"
+https://svelte.dev/e/css_unused_selector (svelte)
+		}
+		.back-cta,
+		.contact-cta {
+
+/home/manudev/Dev/nihongo/app/src/routes/terms/+page.svelte:419:3
+Warn: Unused CSS selector ".contact-cta"
+https://svelte.dev/e/css_unused_selector (svelte)
+		.back-cta,
+		.contact-cta {
+			justify-content: center;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:300:2
+Warn: Unused CSS selector ".top-nav"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.top-nav {
+		display: none;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:310:2
+Warn: Unused CSS selector ".back-link-beautiful"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.back-link-beautiful {
+		display: inline-flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:321:3
+Warn: Unused CSS selector ".back-link-beautiful:hover"
+https://svelte.dev/e/css_unused_selector (svelte)
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:517:2
+Warn: Unused CSS selector ".card-actions"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+	.card-actions {
+		display: flex;
+
+/home/manudev/Dev/nihongo/app/src/routes/vocabulary/+page.svelte:680:3
+Warn: Unused CSS selector ".page-title"
+https://svelte.dev/e/css_unused_selector (svelte)
+		}
+		.page-title {
+			font-size: 32px;
+
+====================================
+svelte-check found 7 errors and 44 warnings in 20 files

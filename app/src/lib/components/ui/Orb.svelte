@@ -166,7 +166,7 @@
 			t = Math.imul(t, 0x21f0aaad);
 			t = t ^ (t >>> 15);
 			t = Math.imul(t, 0x735a2d97);
-			return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
+			return ((t ^ (t >>> 15)) >>> 0) / 4294967296;
 		};
 	}
 
@@ -237,8 +237,8 @@
 					u.uOpacity.value = Math.min(1, u.uOpacity.value + delta * 2);
 				}
 
-				let targetIn = 0;
-				let targetOut = 0.3;
+				let targetIn: number;
+				let targetOut: number;
 
 				const t = u.uTime.value * 2;
 				if (agentState === 'listening') {

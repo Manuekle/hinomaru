@@ -204,7 +204,9 @@
 				`jlpt_result_${level}_${section}`,
 				JSON.stringify({ score, total: allQuestions.length, pct, date: new Date().toISOString() })
 			);
-		} catch {}
+		} catch {
+			// Ignore localStorage errors
+		}
 	}
 
 	const isCorrect = $derived(
@@ -413,7 +415,7 @@
 							<div class="audio-player-sidebar">
 								<div class="audio-player-scroll">
 									<div class="audio-player-list">
-										{#each tracks as track, idx}
+										{#each tracks as track, idx (track.id)}
 											{@const player = getAudioPlayerContext()}
 											{@const isActive = player.activeItem?.id === track.id}
 											{@const isPlaying = isActive && player.isPlaying}

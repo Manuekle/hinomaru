@@ -227,7 +227,7 @@
 	<section class="levels-section">
 		<h2 use:inView>{t('landing.hero.path', $locale)}</h2>
 		<div class="levels-grid" use:inViewStagger={{ stagger: 0.05, y: 20 }}>
-			{#each levels as level}
+			{#each levels as level (level.id)}
 				<div class="level-tag">
 					<span class="level-name">{level.id}</span>
 					<span class="level-label">{level.label}</span>
@@ -243,7 +243,7 @@
 				<h2 use:inView>{t('landing.preview.title', $locale)}</h2>
 			</div>
 			<div class="preview-grid" use:inViewStagger={{ stagger: 0.1, y: 20 }}>
-				{#each previewDecks as deck}
+				{#each previewDecks as deck (deck.id)}
 					<a href="/deck/{deck.id}" class="deck-preview-card">
 						<div class="deck-card-icon">
 							{#if deck.title_es.includes('hiragana') || deck.title_en.includes('hiragana')}
@@ -301,7 +301,7 @@
 		</div>
 
 		<div class="features-stack" use:inViewStagger={{ stagger: 0.15, y: 28 }}>
-			{#each features as feature}
+			{#each features as feature (feature.id)}
 				<div class="feature-item">
 					<div class="feature-image">
 						<div class="mockup-mobile-wrapper">

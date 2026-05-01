@@ -7,7 +7,7 @@
 	import { theme, resolvedTheme } from '$lib/stores/theme';
 	import { t } from '$lib/i18n';
 	import { untrack } from 'svelte';
-	// @ts-ignore - Virtual module from vite-plugin-pwa
+	// @ts-expect-error - Virtual module from vite-plugin-pwa
 	import { pwaInfo } from 'virtual:pwa-info';
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
@@ -60,7 +60,9 @@
 			if (event === 'SIGNED_OUT') {
 				try {
 					localStorage.removeItem('hinomaru_onboarding_completed');
-				} catch {}
+				} catch {
+					// Ignore localStorage errors
+				}
 				clearReminder();
 			}
 			if (newSession?.expires_at !== session?.expires_at) {

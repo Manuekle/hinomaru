@@ -20,7 +20,13 @@
 		for (const lv of levels) {
 			for (const sec of ['vocabulary', 'grammar', 'listening'] as JLPTSectionType[]) {
 				const raw = localStorage.getItem(`jlpt_result_${lv}_${sec}`);
-				if (raw) { try { r[`${lv}_${sec}`] = JSON.parse(raw); } catch {} }
+				if (raw) {
+					try {
+						r[`${lv}_${sec}`] = JSON.parse(raw);
+					} catch {
+						// Ignore parse errors
+					}
+				}
 			}
 		}
 		results = r;

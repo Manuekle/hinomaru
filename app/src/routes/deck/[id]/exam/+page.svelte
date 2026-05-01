@@ -201,7 +201,9 @@
 			await updateStreak(supabase, user.id);
 			const xpEarned = score * 5;
 			if (xpEarned > 0) await addXP(supabase, user.id, xpEarned);
-		} catch {}
+		} catch {
+			// Ignore database/save errors
+		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {

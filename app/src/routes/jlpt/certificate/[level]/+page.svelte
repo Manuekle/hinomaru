@@ -88,7 +88,9 @@
 	async function shareCert() {
 		try {
 			await navigator.share({ title: `Certificado JLPT ${level}`, text: `Completé la práctica JLPT ${level} en Hinomaru con ${totalScore()}% de acierto.` });
-		} catch {}
+		} catch {
+			// Ignore share errors
+		}
 	}
 
 	onMount(() => {
@@ -96,7 +98,13 @@
 		for (const lv of ['N5', 'N4', 'N3', 'N2', 'N1'] as JLPTLevel[]) {
 			for (const sec of ['vocabulary', 'grammar', 'listening'] as JLPTSectionType[]) {
 				const raw = localStorage.getItem(`jlpt_result_${lv}_${sec}`);
-				if (raw) { try { r[`${lv}_${sec}`] = JSON.parse(raw); } catch {} }
+				if (raw) {
+					try {
+						r[`${lv}_${sec}`] = JSON.parse(raw);
+					} catch {
+						// Ignore parse errors
+					}
+				}
 			}
 		}
 		results = r;
@@ -177,7 +185,7 @@
 
 				<!-- Scores -->
 				<div class="scores-row">
-					{#each sections as sec}
+					{#each sections as sec (sec)}
 						{@const r = results[`${level}_${sec}`]}
 						<div class="score-item">
 							<span class="score-val" class:pass={r && r.pct >= 70} class:fail={r && r.pct < 70}>
@@ -236,7 +244,7 @@
 		</div>
 
 		<div class="steps-list">
-			{#each JLPT_STEPS as step}
+			{#each JLPT_STEPS as step (step.step)}
 				<div class="step-card">
 					<div class="step-num">{step.step}</div>
 					<div class="step-body">

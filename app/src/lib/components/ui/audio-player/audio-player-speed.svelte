@@ -42,7 +42,7 @@
 		<Settings class="h-4 w-4" />
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
-		{#each speeds as s}
+		{#each speeds as s (s)}
 			<DropdownMenu.Item
 				onclick={() => setSpeed(s)}
 				class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"

@@ -84,7 +84,10 @@ export function inView(node: HTMLElement, opts: InViewOpts = {}) {
 					const clear = () => {
 						node.style.willChange = '';
 					};
-					(a as any).finished?.then(clear).catch(clear) ?? (a as any).then?.(clear, clear);
+					const finished = (a as any).finished || a;
+					if (finished && typeof (finished as any).then === 'function') {
+						(finished as any).then(clear).catch(clear);
+					}
 					observer.disconnect();
 				}
 			}
@@ -124,7 +127,10 @@ export function inViewStagger(node: HTMLElement, opts: InViewStaggerOpts = {}) {
 						const clear = () => {
 							c.style.willChange = '';
 						};
-						(a as any).finished?.then(clear).catch(clear) ?? (a as any).then?.(clear, clear);
+						const finished = (a as any).finished || a;
+						if (finished && typeof (finished as any).then === 'function') {
+							(finished as any).then(clear).catch(clear);
+						}
 					});
 					observer.disconnect();
 				}
