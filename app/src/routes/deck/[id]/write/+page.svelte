@@ -13,6 +13,7 @@
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import {
 		CleanIcon,
@@ -45,6 +46,7 @@
 	let i = $state(0);
 	let correctCount = $state(0);
 	let struggled = $state(false);
+	let showAnticipation = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const card = $derived(quizCards[i]);
@@ -352,7 +354,10 @@
 					animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
 				}
 				await saveSession(correctCount, data.cards.length);
-				goto(`/deck/${data.deck.id}/summary?${params}`);
+				showAnticipation = true;
+				setTimeout(() => {
+					goto(`/deck/${data.deck.id}/summary?${params}`);
+				}, 1800);
 			} else {
 				if (cardEl) {
 					await animate(cardEl, { opacity: [1, 0], x: [0, -40] }, { duration: 0.2, ease: 'easeIn' })
@@ -548,6 +553,10 @@
 		</StickyFooter>
 	{/if}
 </div>
+
+{#if showAnticipation}
+	<AnticipationScreen />
+{/if}
 
 <style>
 	.write-page {

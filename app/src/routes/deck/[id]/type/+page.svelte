@@ -13,6 +13,7 @@
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import type { PageData } from './$types';
 
 	function focusOnMount(node: HTMLElement) {
@@ -27,6 +28,7 @@
 	let submitted = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
+	let showAnticipation = $state(false);
 	let inputEl = $state<HTMLInputElement | null>(null);
 
 	const cards = $derived(queue.cards);
@@ -83,7 +85,10 @@
 				});
 				await updateStreak(supabase, user.id);
 			}
-			goto(`/deck/${data.deck.id}/summary?${params}`);
+			showAnticipation = true;
+			setTimeout(() => {
+				goto(`/deck/${data.deck.id}/summary?${params}`);
+			}, 1800);
 		} else {
 			submitted = false;
 			answer = '';
@@ -275,6 +280,10 @@
 		</div>
 	{/if}
 </div>
+
+{#if showAnticipation}
+	<AnticipationScreen />
+{/if}
 
 <style>
 	.audio-btn-type {

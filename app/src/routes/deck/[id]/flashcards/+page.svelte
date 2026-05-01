@@ -17,6 +17,7 @@
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -26,6 +27,7 @@
 	let flipped = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
+	let showAnticipation = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const cards = $derived(queue.cards);
@@ -88,8 +90,11 @@
 			if (cardEl) {
 				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
 			}
-			goto(`/deck/${data.deck.id}/summary?${params}`);
 			saveSession(correct, queue.originalTotal);
+			showAnticipation = true;
+			setTimeout(() => {
+				goto(`/deck/${data.deck.id}/summary?${params}`);
+			}, 1800);
 		} else {
 			// Slide out current, slide in next
 			if (cardEl) {
@@ -268,6 +273,10 @@
 		</div>
 	{/if}
 </div>
+
+{#if showAnticipation}
+	<AnticipationScreen />
+{/if}
 
 <style>
 	@media (hover: hover) {

@@ -7,7 +7,7 @@
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { Settings02Icon } from '@hugeicons/core-free-icons';
+	import { Settings02Icon, CheckmarkCircle01Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -97,19 +97,19 @@
 				class="story-card"
 				class:story-read={data.storyRead}
 			>
-				<div class="story-card-left">
-					<div class="story-card-icon">🏮</div>
-					<div>
-						<div class="story-card-label">{t('stories.today', $locale)}</div>
-						<div class="story-card-title">
-							{$locale === 'es' ? data.todayStory.title_es : data.todayStory.title_en}
-						</div>
-						<div class="story-card-preview">
-							{[...data.todayStory.body_jp].slice(0, 28).join('')}{[...data.todayStory.body_jp]
-								.length > 28
-								? '…'
-								: ''}
-						</div>
+				<div class="story-card-icon" class:story-icon-read={data.storyRead}>
+					🏮
+				</div>
+				<div class="story-card-info">
+					<div class="story-card-label">{t('stories.today', $locale)}</div>
+					<div class="story-card-title">
+						{$locale === 'es' ? data.todayStory.title_es : data.todayStory.title_en}
+					</div>
+					<div class="story-card-preview">
+						{[...data.todayStory.body_jp].slice(0, 28).join('')}{[...data.todayStory.body_jp]
+							.length > 28
+							? '…'
+							: ''}
 					</div>
 				</div>
 				<div class="story-card-right">
@@ -323,9 +323,9 @@
 
 	/* ── Historia del día ── */
 	.story-card {
-		display: flex;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
 		align-items: center;
-		justify-content: space-between;
 		gap: 16px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
@@ -344,8 +344,12 @@
 		content: '';
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(135deg, rgba(188, 0, 45, 0.04) 0%, transparent 60%);
+		background: linear-gradient(135deg, var(--hinomaru-red) 0%, transparent 100%);
+		opacity: 0.02;
 		pointer-events: none;
+	}
+	:global([data-theme='dark']) .story-card::before {
+		opacity: 0.05;
 	}
 
 	@media (hover: hover) {
@@ -362,27 +366,39 @@
 	}
 
 	.story-card.story-read {
-		border-color: var(--success);
-		background: var(--success-wash);
+		border-color: var(--ink-200);
+		background: rgba(46, 125, 91, 0.03);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+	:global([data-theme='dark']) .story-card.story-read {
+		border-color: var(--ink-200);
+		background: rgba(46, 125, 91, 0.08);
+	}
+	.story-icon-read {
+		background: rgba(46, 125, 91, 0.1) !important;
 	}
 
-	.story-card-left {
-		display: flex;
-		align-items: center;
-		gap: 14px;
+	.story-card-info {
 		min-width: 0;
+		overflow: hidden;
 	}
 
 	.story-card-icon {
 		flex-shrink: 0;
 		width: 44px;
 		height: 44px;
-		background: var(--sumi);
-		border-radius: 12px;
+		background: var(--ink-100);
+		border-radius: 14px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--washi);
+		font-size: 22px;
+		transition: transform 0.2s;
+		position: relative;
+	}
+	:global([data-theme='dark']) .story-card-icon {
+		background: var(--ink-200);
 	}
 
 	.story-card-label {
@@ -409,7 +425,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 200px;
+		max-width: 100%;
 	}
 
 	.story-card-right {
@@ -471,7 +487,7 @@
 		align-items: center;
 		justify-content: center;
 		background: var(--ink-50);
-		border-radius: 12px;
+		border-radius: 50%;
 		border: 1px solid var(--ink-100);
 		flex-shrink: 0;
 	}

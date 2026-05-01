@@ -24,6 +24,7 @@
 	import Confetti from '$lib/components/Confetti.svelte';
 	import type { PageData } from './$types';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -46,7 +47,7 @@
 	let confettiRef = $state<{ fire: () => void } | null>(null);
 
 	// ── Exam state ──────────────────────────────────────────────────────────────
-	type Phase = 'intro' | 'exam' | 'result';
+	type Phase = 'intro' | 'exam' | 'anticipation' | 'result';
 	let phase = $state<Phase>('intro');
 	let questions = $state<ExamQuestion[]>([]);
 	let currentIdx = $state(0);
@@ -185,10 +186,13 @@
 
 	async function endExam() {
 		stopTimer();
-		phase = 'result';
-		playFinish();
-		setTimeout(() => confettiRef?.fire(), 300);
-		await saveSession();
+		phase = 'anticipation';
+		setTimeout(async () => {
+			phase = 'result';
+			playFinish();
+			setTimeout(() => confettiRef?.fire(), 300);
+			await saveSession();
+		}, 1800);
 	}
 
 	async function saveSession() {
@@ -414,6 +418,10 @@
 		{/if}
 	</div>
 </div>
+
+{#if phase === 'anticipation'}
+	<AnticipationScreen />
+{/if}
 
 {#snippet exitIcon()}
 	<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />

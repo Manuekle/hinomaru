@@ -14,6 +14,7 @@
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -23,6 +24,7 @@
 	let picked = $state<string | null>(null);
 	let correct = $state(0);
 	let struggled = $state(false);
+	let showAnticipation = $state(false);
 
 	const cards = $derived(queue.cards);
 	const i = $derived(queue.index);
@@ -95,7 +97,10 @@
 				});
 				await updateStreak(supabase, user.id);
 			}
-			goto(`/deck/${data.deck.id}/summary?${params}`);
+			showAnticipation = true;
+			setTimeout(() => {
+				goto(`/deck/${data.deck.id}/summary?${params}`);
+			}, 1800);
 		} else {
 			picked = null;
 			queue.advance();
@@ -239,6 +244,10 @@
 		{/if}
 	</div>
 </div>
+
+{#if showAnticipation}
+	<AnticipationScreen />
+{/if}
 
 <style>
 	.session-layout {

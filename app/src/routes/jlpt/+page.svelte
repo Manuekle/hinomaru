@@ -102,6 +102,7 @@
 
 	let showConfirmModal = $state(false);
 	let pendingUrl = $state<string | null>(null);
+	let debugCelebration = $state(false);
 
 	function openConfirm(url: string) {
 		pendingUrl = url;
@@ -111,6 +112,28 @@
 	function handleConfirm() {
 		if (pendingUrl) goto(pendingUrl);
 		showConfirmModal = false;
+	}
+
+	async function resetLevel(level: JLPTLevel) {
+		const secs: JLPTSectionType[] = LEVEL_META[level]?.sections ?? [];
+		// Clear localStorage
+		for (const s of secs) {
+			try { localStorage.removeItem(`jlpt_result_${level}_${s}`); } catch { /* ignore */ }
+		}
+		// Clear Supabase if logged in
+		try {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				await supabase.from('jlpt_results')
+					.delete()
+					.eq('user_id', user.id)
+					.eq('level', level);
+			}
+		} catch { /* offline */ }
+		// Update reactive state
+		const updated = { ...results };
+		for (const s of secs) delete updated[`${level}_${s}`];
+		results = updated;
 	}
 </script>
 
@@ -123,9 +146,14 @@
 >
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}
-		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
+		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;cursor:default;display:flex;align-items:center;gap:12px;"
+		ondblclick={() => (debugCelebration = !debugCelebration)}
+		title="Double-click para debug"
 	>
 		{t('jlpt.title', $locale)}
+		{#if debugCelebration}
+			<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--hinomaru-red);background:var(--hinomaru-red-wash);padding:3px 8px;border-radius:6px;">DEBUG</span>
+		{/if}
 	</h1>
 
 	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">
@@ -156,18 +184,6 @@
 		</p>
 	{/if}
 
-	<!-- Certificate banner if level complete -->
-	{#if levelComplete(activeLevel)}
-		<button
-			class="cert-banner"
-			use:fadeIn={{ delay: 0 }}
-			onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}
-		>
-			<Icon icon={DocumentValidationIcon} size={18} strokeWidth={2} color="currentColor" />
-			<span>{t('jlpt.certBanner', $locale, { level: activeLevel })}</span>
-			<span class="cert-arrow">→</span>
-		</button>
-	{/if}
 
 	<!-- Section rows -->
 	<div class="list" use:staggerChildren={{ delay: 0.25, stagger: 0.07, y: 10 }}>
@@ -227,6 +243,32 @@
 		{/each}
 	</div>
 
+	<!-- Completion row — same visual language as section rows -->
+	{#if levelComplete(activeLevel) || debugCelebration}
+		{@const secs2 = LEVEL_META[activeLevel]?.sections ?? []}
+		{@const scores2 = secs2.map(s => getResult(activeLevel, s)).filter(Boolean)}
+		{@const avg2 = scores2.length ? Math.round(scores2.reduce((a, r) => a + (r?.pct ?? 0), 0) / scores2.length) : 0}
+		<div class="completion-row" use:fadeIn={{ delay: 0 }}>
+			<div class="completion-row-icon">🏆</div>
+			<div class="completion-row-body">
+				<div class="completion-row-top">
+					<span class="completion-row-title">{t('jlpt.completed', $locale, { level: activeLevel })}</span>
+				</div>
+				<div class="completion-row-sub">
+					{#if scores2.length > 0}{avg2}% promedio &middot; {/if}{t('jlpt.ready', $locale)}
+				</div>
+			</div>
+			<div class="completion-row-right">
+				<button class="completion-cert-btn" onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}>
+					{t('jlpt.certificate', $locale)}
+				</button>
+				<button class="completion-retry-btn" onclick={() => resetLevel(activeLevel)} title={t('jlpt.retry', $locale)}>
+					↺
+				</button>
+			</div>
+		</div>
+	{/if}
+
 	<p style="font-size:11px;color:var(--fg-tertiary);text-align:center;margin-top:48px;">
 		{t('jlpt.materials', $locale)}
 	</p>
@@ -270,32 +312,100 @@
 		border-color: var(--sumi);
 	}
 
-	/* Certificate banner */
-	.cert-banner {
+	/* Completion row — matches .row visual language */
+	.completion-row {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		width: 100%;
-		padding: 12px 16px;
-		margin-bottom: 12px;
-		background: var(--sumi);
-		color: var(--washi);
+		gap: 16px;
+		padding: 16px 0;
+		border-top: 1px solid var(--ink-100);
+	}
+	.completion-row-icon {
+		width: 32px;
+		height: 32px;
+		border-radius: 8px;
+		background: rgba(212, 175, 55, 0.18);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 15px;
+		flex-shrink: 0;
+		border: 1px solid rgba(212, 175, 55, 0.3);
+	}
+	.completion-row-body {
+		flex: 1;
+		min-width: 0;
+	}
+	.completion-row-top {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 3px;
+	}
+	.completion-row-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+	.completion-row-sub {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		font-weight: 500;
+	}
+	.completion-row-right {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex-shrink: 0;
+	}
+	.completion-cert-btn {
+		height: 34px;
+		padding: 0 14px;
+		border-radius: 999px;
+		background: var(--hinomaru-red);
+		color: #fff;
 		border: none;
-		border-radius: 14px;
 		font-family: inherit;
-		font-size: 14px;
-		font-weight: 600;
+		font-size: 13px;
+		font-weight: 700;
 		cursor: pointer;
-		transition: opacity 0.15s;
-		text-align: left;
+		transition: all 0.15s;
+		white-space: nowrap;
+		box-shadow: 0 3px 10px rgba(188,0,45,0.35);
 	}
-	.cert-banner:hover {
-		opacity: 0.88;
+	@media (hover: hover) {
+		.completion-cert-btn:hover {
+			background: #a0002a;
+			transform: translateY(-1px);
+			box-shadow: 0 5px 14px rgba(188,0,45,0.45);
+		}
 	}
-	.cert-arrow {
-		margin-left: auto;
+	.completion-cert-btn:active { transform: scale(0.95); }
+	.completion-retry-btn {
+		width: 34px;
+		height: 34px;
+		border-radius: 50%;
+		background: none;
+		color: var(--fg-tertiary);
+		border: 1px solid var(--ink-200);
 		font-size: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: all 0.15s;
+		flex-shrink: 0;
 	}
+	@media (hover: hover) {
+		.completion-retry-btn:hover {
+			background: var(--ink-100);
+			color: var(--fg-primary);
+			border-color: var(--ink-300);
+		}
+	}
+	.completion-retry-btn:active { transform: scale(0.92); }
+
 
 	/* List */
 	.list {

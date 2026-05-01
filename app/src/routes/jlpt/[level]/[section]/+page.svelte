@@ -6,6 +6,7 @@
 	import { createClient } from '$lib/supabase';
 	import { addXP } from '$lib/utils/gamification';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import Icon from '$lib/Icon.svelte';
@@ -86,7 +87,7 @@
 	}
 
 	// ── Phase & state ─────────────────────────────────────────────────────────
-	type Phase = 'intro' | 'exam' | 'result' | 'listening';
+	type Phase = 'intro' | 'exam' | 'result' | 'listening' | 'anticipation';
 	let phase = $state<Phase>('intro');
 	let currentIdx = $state(0);
 	let selected = $state<number | null>(null);
@@ -230,10 +231,13 @@
 
 	function endExam() {
 		stopTimer();
-		phase = 'result';
-		playFinish();
-		saveResult(section, score, allQuestions.length, pct);
-		setTimeout(() => confettiRef?.fire(), 300);
+		phase = 'anticipation';
+		setTimeout(() => {
+			phase = 'result';
+			playFinish();
+			saveResult(section, score, allQuestions.length, pct);
+			setTimeout(() => confettiRef?.fire(), 300);
+		}, 1800);
 	}
 
 	function finishListening() {
@@ -622,6 +626,10 @@
 
 	</div>
 </div>
+
+{#if phase === 'anticipation'}
+	<AnticipationScreen />
+{/if}
 
 {#snippet exitIcon()}
 	<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />

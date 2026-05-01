@@ -18,6 +18,7 @@
 	import { svileo } from '$lib/stores/toast';
 	import { conversations, type DialogueChoice } from '$lib/data/conversations';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 
 	const supabase = createClient();
 
@@ -25,7 +26,7 @@
 	const scenario = $derived(conversations.find((c) => c.id === scenarioId));
 
 	// ── State ─────────────────────────────────────────────────────────
-	type Phase = 'npc' | 'choice' | 'feedback' | 'result';
+	type Phase = 'npc' | 'choice' | 'feedback' | 'anticipation' | 'result';
 	let phase = $state<Phase>('npc');
 	let turnIndex = $state(0);
 	let score = $state(0);
@@ -78,27 +79,30 @@
 	}
 
 	async function finishConversation() {
-		phase = 'result';
-		playFinish();
-		if (scorePct >= 70) {
-			fireConfetti = true;
-			setTimeout(() => (fireConfetti = false), 4000);
-		}
-		try {
-			const { data: { user } } = await supabase.auth.getUser();
-			if (user) {
-				await supabase.from('sessions').insert({
-					user_id: user.id,
-					mode: 'conversation',
-					correct: score,
-					total: totalChoices
-				});
-				await updateStreak(supabase, user.id);
-				await addXP(supabase, user.id, score * 5 + 10);
-				await invalidateAll();
+		phase = 'anticipation';
+		setTimeout(async () => {
+			phase = 'result';
+			playFinish();
+			if (scorePct >= 70) {
+				fireConfetti = true;
+				setTimeout(() => (fireConfetti = false), 4000);
 			}
-		} catch { /* non-critical */ }
-		svileo.success({ title: t('conversation.complete', $locale) });
+			try {
+				const { data: { user } } = await supabase.auth.getUser();
+				if (user) {
+					await supabase.from('sessions').insert({
+						user_id: user.id,
+						mode: 'conversation',
+						correct: score,
+						total: totalChoices
+					});
+					await updateStreak(supabase, user.id);
+					await addXP(supabase, user.id, score * 5 + 10);
+					await invalidateAll();
+				}
+			} catch { /* non-critical */ }
+			svileo.success({ title: t('conversation.complete', $locale) });
+		}, 1800);
 	}
 
 	function restart() {
@@ -362,6 +366,10 @@
 
 {#if fireConfetti}
 	<Confetti fireOnMount={true} />
+{/if}
+
+{#if phase === 'anticipation'}
+	<AnticipationScreen />
 {/if}
 
 <style>

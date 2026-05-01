@@ -59,9 +59,9 @@ export function classify(score: number): ScoreLevel {
 }
 
 export const SCORE_LABELS: Record<ScoreLevel, string> = {
-	correct: '✅ Correcto',
-	close: '🟡 Casi correcto',
-	wrong: '❌ Incorrecto'
+	correct: 'Correcto',
+	close: 'Casi correcto',
+	wrong: 'Incorrecto'
 };
 
 export const SCORE_COLORS: Record<ScoreLevel, string> = {

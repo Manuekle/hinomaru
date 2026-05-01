@@ -737,7 +737,7 @@
 	.avatar {
 		width: 72px;
 		height: 72px;
-		border-radius: 20px;
+		border-radius: 50%;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		display: flex;
@@ -746,12 +746,12 @@
 		font-size: 36px;
 		cursor: pointer;
 		padding: 0;
-		transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+		transition: all 0.2s var(--ease-brand);
 		box-shadow: var(--shadow-sm);
 	}
 	@media (hover: hover) {
 		.avatar:hover {
-			transform: scale(1.05) translateY(-2px);
+			transform: scale(1.02);
 			box-shadow: var(--shadow-md);
 			border-color: var(--ink-300);
 		}
@@ -822,8 +822,8 @@
 		aspect-ratio: 1;
 		padding: 0;
 		cursor: pointer;
-		border-radius: 16px;
-		transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+		border-radius: 50%;
+		transition: all 0.2s var(--ease-brand);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -832,7 +832,7 @@
 	@media (hover: hover) {
 		.emoji-btn:hover {
 			background: var(--bg-surface);
-			transform: scale(1.18) translateY(-4px);
+			transform: scale(1.08);
 			z-index: 2;
 			box-shadow: var(--shadow-md);
 			border-color: var(--ink-200);

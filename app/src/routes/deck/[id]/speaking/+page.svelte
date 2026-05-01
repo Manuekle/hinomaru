@@ -9,16 +9,12 @@
 	import Icon from '$lib/Icon.svelte';
 	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import {
-		VolumeHighIcon,
-		Mic01Icon,
-		CheckmarkCircle01Icon,
-		Cancel01Icon,
-	} from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Mic01Icon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
 	import { comparePhrase, SCORE_COLORS, SCORE_LABELS, type CompareResult } from '$lib/speaking/compare';
 	import { cardsToPhrases } from '$lib/speaking/deck-phrases';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -37,6 +33,7 @@
 	// ── Phase ─────────────────────────────────────────────────────────────────
 	type Phase = 'idle' | 'playing' | 'recording' | 'result';
 	let phase = $state<Phase>('idle');
+	let showAnticipation = $state(false);
 
 	// ── Speech ────────────────────────────────────────────────────────────────
 	const recognizer    = new JapaneseSpeechRecognizer();
@@ -127,7 +124,10 @@
 	function advance(gotIt: boolean) {
 		if (gotIt) passed++;
 		if (idx + 1 >= phrases.length) {
-			goto(`/deck/${deck?.id}/summary?correct=${passed}&total=${phrases.length}&mode=speaking`);
+			showAnticipation = true;
+			setTimeout(() => {
+				goto(`/deck/${deck?.id}/summary?correct=${passed}&total=${phrases.length}&mode=speaking`);
+			}, 1800);
 			return;
 		}
 		idx++;
@@ -147,8 +147,8 @@
 		return '26px';
 	}
 
-	// ── Score ring ────────────────────────────────────────────────────────────
-	const RING_R    = 38;
+	// ── Score ring (72px viewBox, r=30) ──────────────────────────────────────
+	const RING_R    = 30;
 	const RING_CIRC = 2 * Math.PI * RING_R;
 	const ringOffset = $derived(result ? RING_CIRC - RING_CIRC * result.overallScore : RING_CIRC);
 	const ringColor  = $derived(result ? SCORE_COLORS[result.overallLevel] : 'var(--ink-200)');
@@ -170,7 +170,6 @@
 
 	{#if phrases.length === 0}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;">
-			<div style="font-size:48px;">📭</div>
 			<p style="color:var(--fg-secondary);">{t('speaking.noWords', $locale)}</p>
 			<a href="/deck/{deck?.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
 		</div>
@@ -179,7 +178,7 @@
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 24px 140px;gap:28px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;">
 
 			{#if speechWarn}
-				<div class="speech-warn">⚠ {speechWarn}</div>
+				<div class="speech-warn">{speechWarn}</div>
 			{/if}
 
 			<!-- ── Card ── -->
@@ -240,57 +239,52 @@
 
 					<!-- Back: result -->
 					<div class="card-face card-back">
-						<!-- Score ring -->
-						<div class="ring-wrap">
-							<svg class="ring-svg" viewBox="0 0 88 88">
-								<circle class="ring-track" cx="44" cy="44" r={RING_R} fill="none" stroke-width="6" />
-								<circle
-									class="ring-bar"
-									cx="44" cy="44" r={RING_R}
-									fill="none" stroke-width="7"
-									stroke-linecap="round"
-									stroke-dasharray={RING_CIRC}
-									stroke-dashoffset={ringOffset}
-									style="stroke:{ringColor};"
-								/>
-							</svg>
-							<div class="ring-label">
-								<span class="ring-pct" style="color:{ringColor};">{result ? Math.round(result.overallScore * 100) : 0}</span>
-								<span class="ring-sym">%</span>
+						<!-- Score + verdict -->
+						<div class="score-row">
+							<div class="score-ring-wrap">
+								<svg class="ring-svg" viewBox="0 0 72 72">
+									<circle class="ring-track" cx="36" cy="36" r={RING_R} fill="none" stroke-width="5" />
+									<circle
+										class="ring-bar"
+										cx="36" cy="36" r={RING_R}
+										fill="none" stroke-width="5"
+										stroke-linecap="round"
+										stroke-dasharray={RING_CIRC}
+										stroke-dashoffset={ringOffset}
+										style="stroke:{ringColor};"
+									/>
+								</svg>
+								<span class="ring-num" style="color:{ringColor};">{result ? Math.round(result.overallScore * 100) : 0}</span>
+							</div>
+							<div class="score-info">
+								<div class="verdict" style="color:{ringColor};">{result ? SCORE_LABELS[result.overallLevel] : ''}</div>
+								<div class="back-word jp">{phrase.text}</div>
+								{#if finalTranscript || liveTranscript}
+									<div class="heard-inline">
+										<span class="heard-label">{t('speaking.heard', $locale)}</span>
+										<span class="jp heard-text">{finalTranscript || liveTranscript}</span>
+									</div>
+								{/if}
 							</div>
 						</div>
 
-						<div class="verdict" style="color:{ringColor};">
-							{result ? SCORE_LABELS[result.overallLevel] : ''}
-						</div>
-
-						<!-- Heard -->
-						{#if finalTranscript || liveTranscript}
-							<div class="heard-row">
-								<span class="heard-label">{t('speaking.heard', $locale)}</span>
-								<span class="heard-text jp">{finalTranscript || liveTranscript}</span>
-							</div>
-						{/if}
+						<!-- Divider -->
+						<div class="result-divider"></div>
 
 						<!-- Segments breakdown -->
-						<div class="seg-breakdown">
-							{#each result?.segments ?? [] as sr}
-								<div class="seg-row">
-									{#if sr.level === 'correct'}
-										<Icon icon={CheckmarkCircle01Icon} size={15} color="var(--success)" />
-									{:else if sr.level === 'close'}
-										<span style="font-size:13px;line-height:1;">🟡</span>
-									{:else}
-										<Icon icon={Cancel01Icon} size={15} color="var(--hinomaru-red)" />
-									{/if}
-									<span class="seg-row-text jp" style="color:{SCORE_COLORS[sr.level]};">{sr.segment}</span>
-									<span class="seg-row-pct">{Math.round(sr.score * 100)}%</span>
-								</div>
-							{/each}
-						</div>
-
-						<!-- Target word reminder -->
-						<div class="back-word jp">{phrase.text}</div>
+						{#if result?.segments && result.segments.length > 0}
+							<div class="seg-breakdown">
+								{#each result.segments as sr}
+									<div class="seg-row" style="--seg-color:{SCORE_COLORS[sr.level]};">
+										<span class="seg-row-text jp">{sr.segment}</span>
+										<div class="seg-bar-wrap">
+											<div class="seg-bar" style="width:{Math.round(sr.score*100)}%;background:{SCORE_COLORS[sr.level]};"></div>
+										</div>
+										<span class="seg-row-pct" style="color:{SCORE_COLORS[sr.level]};">{Math.round(sr.score * 100)}%</span>
+									</div>
+								{/each}
+							</div>
+						{/if}
 					</div>
 
 				</div>
@@ -339,6 +333,10 @@
 	{/if}
 
 </div>
+
+{#if showAnticipation}
+	<AnticipationScreen />
+{/if}
 
 <style>
 	/* ── Card 3D scene (same as flashcards) ── */
@@ -456,52 +454,74 @@
 	.error-text { font-size: 12px; color: var(--hinomaru-red); font-weight: 600; text-align: center; }
 
 	/* Back — result */
-	.ring-wrap {
+	.card-back { gap: 14px; }
+
+	.score-row {
+		display: flex; align-items: center; gap: 16px;
+		width: 100%;
+	}
+	.score-ring-wrap {
 		position: relative;
-		width: 88px; height: 88px;
-		display: flex; align-items: center; justify-content: center;
+		width: 72px; height: 72px;
 		flex-shrink: 0;
+		display: flex; align-items: center; justify-content: center;
 	}
 	.ring-svg {
-		position: absolute; top: 0; left: 0;
+		position: absolute; inset: 0;
 		width: 100%; height: 100%;
 		transform: rotate(-90deg);
 	}
 	.ring-track { stroke: var(--ink-100); }
-	.ring-bar { transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
-	.ring-label { position: relative; display: flex; align-items: baseline; gap: 1px; }
-	.ring-pct { font-size: 22px; font-weight: 900; line-height: 1; }
-	.ring-sym { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); }
-
-	.verdict { font-size: 16px; font-weight: 800; }
-
-	.heard-row {
-		display: flex; align-items: center; gap: 8px;
-		background: var(--ink-50, var(--paper));
-		border: 1px solid var(--ink-100);
-		border-radius: 10px;
-		padding: 8px 12px;
-		width: 100%;
+	.ring-bar { transition: stroke-dashoffset 0.7s cubic-bezier(0.34, 1.2, 0.64, 1); }
+	.ring-num {
+		position: relative;
+		font-size: 20px; font-weight: 900; line-height: 1;
 	}
-	.heard-label { font-size: 10px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; white-space: nowrap; }
-	.heard-text  { font-size: 15px; font-weight: 600; color: var(--sumi); flex: 1; }
 
-	.seg-breakdown { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+	.score-info {
+		display: flex; flex-direction: column; gap: 3px;
+		min-width: 0;
+	}
+	.verdict { font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
+	.back-word {
+		font-size: 22px; font-weight: 700;
+		color: var(--sumi);
+		line-height: 1.1;
+	}
+	.heard-inline {
+		display: flex; align-items: baseline; gap: 5px;
+		margin-top: 2px;
+	}
+	.heard-label {
+		font-size: 9px; font-weight: 700;
+		text-transform: uppercase; letter-spacing: 0.06em;
+		color: var(--fg-tertiary); white-space: nowrap;
+	}
+	.heard-text { font-size: 13px; font-weight: 600; color: var(--fg-secondary); }
+
+	.result-divider {
+		width: 100%; height: 1px;
+		background: var(--ink-100);
+		flex-shrink: 0;
+	}
+
+	.seg-breakdown { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 	.seg-row {
 		display: flex; align-items: center; gap: 8px;
-		padding: 6px 10px;
-		background: var(--paper);
-		border-radius: 8px;
+		padding: 0 4px;
+		border-left: 3px solid var(--seg-color);
+		padding-left: 10px;
 	}
-	.seg-row-text { font-size: 16px; font-weight: 700; flex: 1; }
-	.seg-row-pct  { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); }
-
-	.back-word {
-		font-size: 24px; font-weight: 700;
-		color: var(--fg-tertiary);
-		margin-top: auto;
-		opacity: 0.4;
+	.seg-row-text { font-size: 15px; font-weight: 700; flex: 1; color: var(--sumi); }
+	.seg-bar-wrap {
+		width: 48px; height: 4px;
+		background: var(--ink-100);
+		border-radius: 2px;
+		overflow: hidden;
+		flex-shrink: 0;
 	}
+	.seg-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+	.seg-row-pct { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
 
 	/* Footer buttons */
 	.recording-btn {
