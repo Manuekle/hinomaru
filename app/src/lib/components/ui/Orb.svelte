@@ -170,8 +170,8 @@
 		};
 	}
 
-	const random = splitmix32(seed);
-	const offsets = new Float32Array(Array.from({ length: 7 }, () => random() * Math.PI * 2));
+	const random = $derived(splitmix32(seed));
+	const offsets = $derived(new Float32Array(Array.from({ length: 7 }, () => random() * Math.PI * 2)));
 
 	let curIn = 0;
 	let curOut = 0.3;

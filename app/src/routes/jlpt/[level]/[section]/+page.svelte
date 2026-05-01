@@ -63,7 +63,9 @@
 	);
 
 	// ── Flat question list ────────────────────────────────────────────────────
-	interface FlatQuestion extends JLPTQuestion {
+	interface FlatQuestion extends Omit<JLPTQuestion, 'choices' | 'answer'> {
+		choices: string[];
+		answer: number;
 		mondaiTitle: string;
 		mondaiId: string;
 	}
@@ -316,7 +318,7 @@
 			<div class="exam-premium-header">
 				<div class="exam-header-main">
 					<div class="exam-meta-group">
-						<span class="exam-label-pill">もんだい {currentQ?.mondai || 1}</span>
+						<span class="exam-label-pill">もんだい {currentQ?.mondaiId?.split('-').pop() || 1}</span>
 						<div class="exam-step-indicator">
 							<span class="step-curr">{currentIdx + 1}</span>
 							<span class="step-divider">/</span>

@@ -21,7 +21,7 @@
 
 	let { data } = $props<{ data: PageData }>();
 	const supabase = createClient();
-	const queue = createMistakeQueue<any>(data.cards as any[]);
+	const queue = $derived.by(() => createMistakeQueue<any>(data.cards as any[]));
 
 	let flipped = $state(false);
 	let correct = $state(0);

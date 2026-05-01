@@ -18,7 +18,7 @@
 
 	let { data } = $props<{ data: PageData }>();
 	const supabase = createClient();
-	const queue = createMistakeQueue<any>(data.cards as any[]);
+	const queue = $derived.by(() => createMistakeQueue<any>(data.cards as any[]));
 
 	let picked = $state<string | null>(null);
 	let correct = $state(0);
@@ -405,7 +405,7 @@
 		font-size: 18px;
 	}
 
-	.correct.feedback-status { color: var(--success); }
+	.correct .feedback-status { color: var(--success); }
 	.wrong .feedback-status { color: var(--hinomaru-red-ink); }
 
 	.correct-answer {

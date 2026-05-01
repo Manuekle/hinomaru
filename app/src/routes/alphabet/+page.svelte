@@ -32,20 +32,6 @@
 </div>
 
 <style>
-	.back-link-beautiful {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 13px;
-		color: var(--fg-secondary);
-		text-decoration: none;
-		transition: color 150ms ease;
-	}
-	@media (hover: hover) {
-		.back-link-beautiful:hover {
-			color: var(--sumi);
-		}
-	}
 
 	.chart-section {
 		background: var(--bg-surface);

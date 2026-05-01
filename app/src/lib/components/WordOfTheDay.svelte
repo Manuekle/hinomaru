@@ -25,7 +25,7 @@
 	}
 
 	let { word, initiallySaved = false } = $props<{ word: Word | null; initiallySaved?: boolean }>();
-	let saved = $state(initiallySaved);
+	let saved = $state(false);
 	let saving = $state(false);
 
 	$effect(() => {

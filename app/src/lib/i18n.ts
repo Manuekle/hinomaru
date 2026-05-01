@@ -125,7 +125,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.dark': 'Dark',
 		'settings.showRomaji': 'Show Romaji',
 		'settings.preferences': 'Preferences',
-		'settings.debugReset': 'Reset Onboarding (Debug)',
+
 		'pwa.install.title': 'Install Hinomaru',
 		'pwa.install.desc': 'Study offline and with a better experience.',
 		'pwa.install.ios': 'Tap the Share icon and "Add to Home Screen"',
@@ -547,7 +547,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.dark': 'Oscuro',
 		'settings.showRomaji': 'Mostrar Romaji',
 		'settings.preferences': 'Preferencias',
-		'settings.debugReset': 'Reiniciar Onboarding (Debug)',
+
 		'pwa.install.title': 'Instalar Hinomaru',
 		'pwa.install.desc': 'Estudia sin conexión y con una mejor experiencia.',
 		'pwa.install.ios': 'Pulsa el icono Compartir y "Añadir a la pantalla de inicio"',

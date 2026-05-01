@@ -56,6 +56,7 @@
 		N2: { passing: '90/180 pts totales', sections: 'Vocabulario, Gramática/Lectura, Escucha', duration: '155 min' },
 		N1: { passing: '100/180 pts totales', sections: 'Vocabulario, Gramática/Lectura, Escucha', duration: '170 min' }
 	};
+	const info = $derived(LEVEL_INFO[level]);
 
 	const sections: JLPTSectionType[] = ['vocabulary', 'grammar'];
 	const SECTION_NAMES: Record<JLPTSectionType, string> = {
@@ -224,7 +225,6 @@
 		</p>
 
 		<div class="level-exam-info">
-			{@const info = LEVEL_INFO[level]}
 			<div class="exam-info-row">
 				<span class="ei-label">Nivel</span>
 				<span class="ei-val">{level}</span>

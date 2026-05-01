@@ -30,19 +30,25 @@
 	}
 </script>
 
-<Slider.Root
-	value={value}
-	onValueChange={handleValueChange}
-	onPointerDown={() => (isDragging = true)}
-	onPointerUp={() => (isDragging = false)}
-	max={player.duration || 100}
-	step={0.1}
+<div
+	onpointerdown={() => { isDragging = true; }}
+	onpointerup={() => { isDragging = false; }}
 	class={cn("relative flex w-full touch-none select-none items-center", className)}
 >
-	<Slider.Track class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary">
+	<Slider.Root
+		type="multiple"
+		value={value}
+		onValueChange={handleValueChange}
+		max={player.duration || 100}
+		step={0.1}
+		class="w-full"
+	>
+	<div class="relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary">
 		<Slider.Range class="absolute h-full bg-primary" />
-	</Slider.Track>
+	</div>
 	<Slider.Thumb
+		index={0}
 		class="block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
 	/>
-</Slider.Root>
+	</Slider.Root>
+</div>
