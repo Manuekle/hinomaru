@@ -23,10 +23,6 @@
 	const pct = $derived(
 		deck.card_count > 0 ? Math.round(((deck.learned ?? 0) / deck.card_count) * 100) : 0
 	);
-	const dailyGoal = $derived(data.dailyGoal ?? 5);
-	const learnedToday = $derived(data.learnedToday ?? 0);
-	const dailyPct = $derived(Math.min(100, Math.round((learnedToday / dailyGoal) * 100)));
-	const goalMet = $derived(learnedToday >= dailyGoal);
 
 	const modes = [
 		{
@@ -139,24 +135,6 @@
 		</div>
 	</div>
 
-	<!-- Daily Goal Progress -->
-	<div class="daily-goal-wrap" use:fadeUp={{ delay: 0.28, y: 8 }}>
-		<div class="daily-goal-header">
-			<span class="daily-goal-label">
-				{#if goalMet}
-					✓ {t('deck.dailyGoalMet', $locale)}
-				{:else}
-					{t('deck.dailyGoalProgress', $locale, { done: learnedToday, total: dailyGoal })}
-				{/if}
-			</span>
-			<span class="daily-goal-count" class:goal-met={goalMet}>
-				{learnedToday}/{dailyGoal}
-			</span>
-		</div>
-		<div class="daily-goal-track">
-			<div class="daily-goal-fill" class:goal-met={goalMet} style="width:{dailyPct}%"></div>
-		</div>
-	</div>
 
 	<!-- Mode list with stagger -->
 	<div class="list" style="margin-top:32px;" use:staggerChildren={{ delay: 0.3, stagger: 0.06, y: 8 }}>
@@ -326,64 +304,5 @@
 		transition:
 			color 150ms,
 			transform 150ms;
-	}
-	/* ── Daily Goal ── */
-	.daily-goal-wrap {
-		margin-top: 32px;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 16px;
-		padding: 16px 20px;
-		box-shadow: var(--shadow-sm);
-	}
-
-	:global([data-theme='dark']) .daily-goal-wrap {
-		background: var(--ink-100);
-		border-color: var(--ink-200);
-	}
-
-	.daily-goal-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 10px;
-	}
-
-	.daily-goal-label {
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--fg-secondary);
-	}
-
-	.daily-goal-count {
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-	}
-
-	.daily-goal-count.goal-met {
-		color: var(--success);
-	}
-
-	.daily-goal-track {
-		height: 6px;
-		background: var(--ink-100);
-		border-radius: 999px;
-		overflow: hidden;
-	}
-
-	:global([data-theme='dark']) .daily-goal-track {
-		background: var(--ink-200);
-	}
-
-	.daily-goal-fill {
-		height: 100%;
-		background: var(--hinomaru-red);
-		border-radius: 999px;
-		transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-	}
-
-	.daily-goal-fill.goal-met {
-		background: var(--success);
 	}
 </style>
