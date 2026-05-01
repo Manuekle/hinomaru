@@ -45,11 +45,27 @@ export class JapaneseSpeechRecognizer {
 			return;
 		}
 
-		// Preflight mic permission — surfaces denials immediately
+		// Check mic permission — only prompt via getUserMedia if not already granted
 		try {
-			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			// We don't keep the stream — Speech API opens its own. Release tracks.
-			stream.getTracks().forEach((t) => t.stop());
+			let permState: PermissionState = 'prompt';
+			if (navigator.permissions) {
+				try {
+					const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+					permState = perm.state;
+				} catch {
+					// permissions API not supported — fall through to getUserMedia
+				}
+			}
+			if (permState === 'denied') {
+				onError('Permiso de micrófono denegado.');
+				return;
+			}
+			if (permState === 'prompt') {
+				// Only call getUserMedia when we actually need to ask
+				const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+				stream.getTracks().forEach((t) => t.stop());
+			}
+			// 'granted' → skip, Speech API will use it directly
 		} catch (err) {
 			console.warn('[speech] mic permission failed', err);
 			onError('Permiso de micrófono denegado o micrófono no disponible.');
