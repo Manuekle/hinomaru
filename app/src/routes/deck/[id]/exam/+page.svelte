@@ -299,9 +299,7 @@
 			</StickyFooter>
 
 		{:else if phase === 'exam' && currentQuestion}
-			<div class="timer-bar-wrap">
-				<div class="timer-bar-fill" class:critical={timerCritical} style="width: {timerPct}%"></div>
-			</div>
+
 
 			<div class="exam-premium-header">
 				<div class="exam-header-main">
@@ -462,10 +460,7 @@
 	.session-layout { display: flex; flex-direction: column; min-height: 100vh; background: var(--paper); }
 	.session-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom)); }
 
-	/* ── Timer Bar ── */
-	.timer-bar-wrap { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--ink-100); z-index: 100; }
-	.timer-bar-fill { height: 100%; background: var(--sumi); transition: width 0.4s ease; opacity: 0.35; }
-	.timer-bar-fill.critical { background: var(--hinomaru-red); opacity: 0.8; }
+
 
 	/* ── Intro ── */
 	.intro-screen { text-align: center; padding: 40px 0 20px; }

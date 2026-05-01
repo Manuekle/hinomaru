@@ -77,7 +77,7 @@
 	</a>
 
 	<!-- Pills -->
-	<div use:fadeUp={{ delay: 0.04, y: 10 }} style="display:flex;gap:8px;margin-bottom:16px;">
+	<div use:fadeUp={{ delay: 0.05, y: 8 }} style="display:flex;gap:8px;margin-bottom:16px;">
 		<span class="hm-pill hm-pill-red">{deck.level}</span>
 		<span class="hm-pill hm-pill-ink"
 			>{$locale === 'es' ? (deck.kind_es ?? deck.kind) : deck.kind}</span
@@ -86,21 +86,21 @@
 
 	<!-- Title -->
 	<h1
-		use:fadeUp={{ delay: 0.1, y: 16 }}
+		use:fadeUp={{ delay: 0.1, y: 12 }}
 		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
 	>
 		{$locale === 'es' ? deck.title_es : deck.title_en}
 	</h1>
 
 	<p
-		use:fadeUp={{ delay: 0.15, y: 12 }}
+		use:fadeUp={{ delay: 0.15, y: 10 }}
 		style="font-size:18px;color:var(--fg-secondary);margin:0;line-height:1.55;"
 	>
 		{$locale === 'es' ? deck.desc_es : deck.desc_en}
 	</p>
 
 	<!-- Progress bar -->
-	<div use:fadeUp={{ delay: 0.2, y: 10 }} style="margin-top:28px;">
+	<div use:fadeUp={{ delay: 0.2, y: 8 }} style="margin-top:28px;">
 		<div class="hm-progress" style="height:6px;">
 			<div class="hm-progress-bar" style="width:{pct}%;height:6px;"></div>
 		</div>
@@ -111,12 +111,12 @@
 	</div>
 
 	<!-- Mode list with stagger -->
-	<div class="label-meta" use:fadeIn={{ delay: 0.28 }} style="margin-top:48px;margin-bottom:12px;">
+	<div class="label-meta" use:fadeIn={{ delay: 0.25 }} style="margin-top:48px;margin-bottom:12px;">
 		{t('deck.chooseMode', $locale)}
 	</div>
 
 	<div
-		use:staggerChildren={{ delay: 0.3, stagger: 0.08, y: 12 }}
+		use:staggerChildren={{ delay: 0.3, stagger: 0.06, y: 8 }}
 		style="display:flex;flex-direction:column;gap:10px;"
 	>
 		{#each modes as mode (mode.id)}
@@ -160,7 +160,11 @@
 		gap: 16px;
 		text-decoration: none;
 		color: inherit;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		transition:
+			box-shadow 0.2s ease,
+			transform 0.2s ease,
+			background 0.2s ease,
+			border-color 0.2s ease;
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 		box-shadow: var(--shadow-sm);

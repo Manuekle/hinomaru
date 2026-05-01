@@ -261,14 +261,27 @@
 			transform: translateX(3px);
 		}
 	}
+	.row:not(.unavailable):active .row-title {
+		color: var(--hinomaru-red);
+	}
+	.row:not(.unavailable):active .row-arrow {
+		color: var(--hinomaru-red);
+		transform: scale(0.9) translateX(2px);
+	}
 
 	.row-icon-jp {
-		font-size: 22px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
 		min-width: 28px;
-		padding-top: 2px;
+		height: 28px;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		line-height: 1;
+		flex-shrink: 0;
 	}
 
 	.row-body {

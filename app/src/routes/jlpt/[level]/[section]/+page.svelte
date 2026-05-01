@@ -120,9 +120,7 @@
 		return test.mondai.reduce((acc, m) => acc + m.questions.length, 0);
 	});
 
-	const progressPct = $derived(
-		allQuestions.length > 0 ? (currentIdx / allQuestions.length) * 100 : 0
-	);
+
 
 	// ── Timer ─────────────────────────────────────────────────────────────────
 	function startTimer() {
@@ -311,14 +309,7 @@
 		<!-- ── EXAM ── -->
 		{:else if phase === 'exam' && currentQ}
 			<!-- Progress + timer bar -->
-			<div class="exam-top-bars">
-				<div class="progress-bar-wrap">
-					<div class="progress-bar-fill" style="width:{progressPct}%"></div>
-				</div>
-				<div class="timer-bar-wrap">
-					<div class="timer-bar-fill" class:critical={timerCritical} style="width:{timerPct}%"></div>
-				</div>
-			</div>
+
 
 			<!-- Premium Exam Header -->
 			<div class="exam-premium-header">
@@ -674,32 +665,7 @@
 	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
 	.unavail { font-size: 14px; color: var(--fg-secondary); }
 
-	/* ── Exam top bars ── */
-	.exam-top-bars {
-		position: fixed;
-		top: 0; left: 0; right: 0;
-		z-index: 100;
-	}
-	.progress-bar-wrap {
-		height: 3px;
-		background: var(--ink-100);
-	}
-	.progress-bar-fill {
-		height: 100%;
-		background: var(--sumi);
-		transition: width 0.4s ease;
-		opacity: 0.35;
-	}
-	.timer-bar-wrap {
-		height: 3px;
-		background: transparent;
-	}
-	.timer-bar-fill {
-		height: 100%;
-		background: var(--sumi);
-		transition: width 1s linear, background 0.5s;
-	}
-	.timer-bar-fill.critical { background: var(--hinomaru-red); }
+
 
 	/* ── PREMIUM EXAM HEADER ── */
 	.exam-premium-header {

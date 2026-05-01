@@ -135,12 +135,17 @@
 		.row:hover .row-title {
 			color: var(--hinomaru-red);
 		}
-	}
-	@media (hover: hover) {
 		.row:hover .row-arrow {
 			color: var(--hinomaru-red);
 			transform: translateX(3px);
 		}
+	}
+	.row:active .row-title {
+		color: var(--hinomaru-red);
+	}
+	.row:active .row-arrow {
+		color: var(--hinomaru-red);
+		transform: scale(0.9) translateX(2px);
 	}
 
 	.row-num {
