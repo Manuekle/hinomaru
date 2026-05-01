@@ -7,8 +7,11 @@ import { grammar as n5Grammar } from './n5/grammar';
 import { vocabulary as n4Vocab } from './n4/vocabulary';
 import { grammar as n4Grammar } from './n4/grammar';
 import { vocabulary as n3Vocab } from './n3/vocabulary';
+import { grammar as n3Grammar } from './n3/grammar';
 import { vocabulary as n2Vocab } from './n2/vocabulary';
+import { grammar as n2Grammar } from './n2/grammar';
 import { vocabulary as n1Vocab } from './n1/vocabulary';
+import { grammar as n1Grammar } from './n1/grammar';
 
 export const DECKS: DeckDef[] = [
 	// ── N5 ────────────────────────────────────────────────────────────────────
@@ -113,7 +116,7 @@ export const DECKS: DeckDef[] = [
 		title_es: 'Gramática N3 — 50 patrones',
 		desc_en: 'Complex conditionals, passive, causative, and more.',
 		desc_es: 'Condicionales, pasiva, causativa y más.',
-		grammar: []
+		grammar: n3Grammar
 	},
 
 	// ── N2 ────────────────────────────────────────────────────────────────────
@@ -137,7 +140,7 @@ export const DECKS: DeckDef[] = [
 		title_es: 'Gramática N2 — 60 patrones',
 		desc_en: 'Formal expressions, nuanced modality, and written style.',
 		desc_es: 'Expresiones formales, modalidad y estilo escrito.',
-		grammar: []
+		grammar: n2Grammar
 	},
 
 	// ── N1 ────────────────────────────────────────────────────────────────────
@@ -161,7 +164,7 @@ export const DECKS: DeckDef[] = [
 		title_es: 'Gramática N1 — 60 patrones',
 		desc_en: 'Classical forms, rare expressions, and advanced nuance.',
 		desc_es: 'Formas clásicas, expresiones raras y matices avanzados.',
-		grammar: []
+		grammar: n1Grammar
 	}
 ];
 
