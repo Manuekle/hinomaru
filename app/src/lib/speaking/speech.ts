@@ -8,10 +8,19 @@ export type ResultCallback = (r: RecognitionResult) => void;
 export type ErrorCallback  = (err: string) => void;
 export type EndCallback    = () => void;
 
-// Checks at call time (SSR-safe)
+export type SpeechStatus =
+	| { ok: true }
+	| { ok: false; reason: 'no-window' | 'insecure' | 'unsupported' };
+
+export function getSpeechStatus(): SpeechStatus {
+	if (typeof window === 'undefined') return { ok: false, reason: 'no-window' };
+	if (!window.isSecureContext) return { ok: false, reason: 'insecure' };
+	const has = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+	return has ? { ok: true } : { ok: false, reason: 'unsupported' };
+}
+
 export function isSpeechSupported(): boolean {
-	if (typeof window === 'undefined') return false;
-	return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+	return getSpeechStatus().ok;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,11 +32,30 @@ export class JapaneseSpeechRecognizer {
 
 	get active() { return this._active; }
 
-	start(onResult: ResultCallback, onError: ErrorCallback, onEnd: EndCallback) {
-		if (!isSpeechSupported()) {
-			onError('Web Speech API no disponible. Usa Chrome o Edge.');
+	async start(onResult: ResultCallback, onError: ErrorCallback, onEnd: EndCallback) {
+		const status = getSpeechStatus();
+		if (!status.ok) {
+			const msg =
+				status.reason === 'insecure'
+					? 'Reconocimiento de voz requiere HTTPS o localhost.'
+					: status.reason === 'unsupported'
+					? 'Tu navegador no soporta reconocimiento de voz. Usa Chrome, Edge o Safari.'
+					: 'Reconocimiento de voz no disponible.';
+			onError(msg);
 			return;
 		}
+
+		// Preflight mic permission — surfaces denials immediately
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			// We don't keep the stream — Speech API opens its own. Release tracks.
+			stream.getTracks().forEach((t) => t.stop());
+		} catch (err) {
+			console.warn('[speech] mic permission failed', err);
+			onError('Permiso de micrófono denegado o micrófono no disponible.');
+			return;
+		}
+
 		if (this._active) this.stop();
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +63,7 @@ export class JapaneseSpeechRecognizer {
 
 		this.rec = new SR();
 		this.rec.lang = 'ja-JP';
-		this.rec.interimResults = true;   // show partial results live
+		this.rec.interimResults = true;
 		this.rec.maxAlternatives = 3;
 		this.rec.continuous = false;
 
@@ -51,13 +79,15 @@ export class JapaneseSpeechRecognizer {
 		};
 
 		this.rec.onerror = (e: SpeechRecognitionErrorEvent) => {
+			console.warn('[speech] onerror', e.error);
 			this._active = false;
 			const msg: Record<string, string> = {
 				'no-speech':      'No se detectó voz. Habla más cerca del micrófono.',
 				'audio-capture':  'No se encontró micrófono.',
 				'not-allowed':    'Permiso de micrófono denegado.',
 				'network':        'Error de red en el reconocimiento.',
-				'aborted':        'Reconocimiento cancelado.'
+				'aborted':        'Reconocimiento cancelado.',
+				'language-not-supported': 'Idioma japonés no soportado por este navegador.'
 			};
 			onError(msg[e.error] ?? `Error: ${e.error}`);
 		};
@@ -67,8 +97,15 @@ export class JapaneseSpeechRecognizer {
 			onEnd();
 		};
 
-		this.rec.start();
-		this._active = true;
+		try {
+			this.rec.start();
+			this._active = true;
+		} catch (err) {
+			this._active = false;
+			console.warn('[speech] start() threw', err);
+			const msg = err instanceof Error ? err.message : 'No se pudo iniciar reconocimiento';
+			onError(msg);
+		}
 	}
 
 	stop() {

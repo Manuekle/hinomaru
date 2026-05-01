@@ -17,7 +17,7 @@
 		ArrowReloadHorizontalIcon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
-	import { isSpeechSupported, JapaneseSpeechRecognizer } from '$lib/speaking/speech';
+	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
 	import { comparePhrase, SCORE_COLORS, SCORE_LABELS, type CompareResult } from '$lib/speaking/compare';
 	import { cardsToPhrases } from '$lib/speaking/deck-phrases';
 
@@ -44,8 +44,19 @@
 	let liveTranscript  = $state('');
 	let finalTranscript = $state('');
 	let speechError     = $state<string | null>(null);
-	let speechOk = $state(false);
-	onMount(() => { speechOk = isSpeechSupported(); });
+	let speechStatus = $state<SpeechStatus>({ ok: false, reason: 'no-window' });
+	let speechHost = $state('');
+	onMount(() => {
+		speechStatus = getSpeechStatus();
+		speechHost = typeof location !== 'undefined' ? location.host : '';
+	});
+	const speechOk = $derived(speechStatus.ok);
+	const speechWarn = $derived.by(() => {
+		if (speechStatus.ok) return '';
+		if (speechStatus.reason === 'insecure') return `Pronunciación requiere HTTPS o localhost. Estás en: ${speechHost}`;
+		if (speechStatus.reason === 'unsupported') return 'Tu navegador no soporta reconocimiento de voz. Usa Chrome, Edge o Safari.';
+		return '';
+	});
 
 	// ── Result ────────────────────────────────────────────────────────────────
 	let result = $state<CompareResult | null>(null);
@@ -58,7 +69,7 @@
 		phase = 'idle';
 	}
 
-	function startRecording() {
+	async function startRecording() {
 		if (!phrase || !speechOk) return;
 		speechError    = null;
 		liveTranscript = '';
@@ -66,7 +77,7 @@
 		result         = null;
 		phase          = 'recording';
 
-		recognizer.start(
+		await recognizer.start(
 			(r) => {
 				liveTranscript = r.transcript;
 				if (r.isFinal) finalTranscript = r.transcript;
@@ -74,13 +85,20 @@
 			(err) => { speechError = err; phase = 'idle'; },
 			() => {
 				const spoken = finalTranscript || liveTranscript;
+				if (!spoken && !speechError) {
+					speechError = 'No se detectó voz. Habla más cerca del micrófono e intenta otra vez.';
+					phase = 'idle';
+					return;
+				}
 				if (spoken && phrase) {
 					const res = comparePhrase(phrase.text, spoken, phrase.segments);
 					result = res;
 					if (res.overallLevel === 'correct') playCorrect();
 					else playWrong();
+					phase = 'result';
+				} else {
+					phase = 'idle';
 				}
-				phase = 'result';
 			}
 		);
 	}
@@ -147,6 +165,10 @@
 
 	{:else if phrase}
 		<div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 24px 140px;gap:28px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;">
+
+			{#if speechWarn}
+				<div class="speech-warn">⚠ {speechWarn}</div>
+			{/if}
 
 			<!-- ── Card ── -->
 			<div class="card-scene" style="width:100%;max-width:360px;aspect-ratio:3/4;">
@@ -271,7 +293,7 @@
 					disabled={!speechOk || phase === 'playing'}
 				>
 					<Icon icon={Mic01Icon} size={18} color="currentColor" />
-					Hablar
+					{speechOk ? 'Hablar' : 'Pronunciación no disponible'}
 				</button>
 
 			{:else if phase === 'recording'}
@@ -479,6 +501,20 @@
 		flex-shrink: 0;
 	}
 	@keyframes pulse-btn { from { opacity: 1; } to { opacity: 0.75; } }
+
+	.speech-warn {
+		width: 100%;
+		max-width: 360px;
+		padding: 10px 14px;
+		border-radius: 12px;
+		background: rgba(245, 158, 11, 0.12);
+		border: 1px solid rgba(245, 158, 11, 0.4);
+		color: var(--warning, #b45309);
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.4;
+		text-align: center;
+	}
 
 	.jp { font-family: var(--font-jp); }
 	.touch-action-manip { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
