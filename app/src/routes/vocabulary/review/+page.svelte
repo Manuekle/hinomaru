@@ -278,7 +278,7 @@
 		{/if}
 	</div>
 
-	{#if word && !finished}
+	{#if word}
 		<StickyFooter>
 			{#if !flipped}
 				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => (flipped = true)}>
