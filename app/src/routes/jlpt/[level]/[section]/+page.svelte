@@ -370,8 +370,8 @@
 
 				<div class="question-card">
 					<p class="question-text jp">{currentQ.sentence}</p>
-					{#if $showRomaji}
-						<p class="question-romaji">{kanaToRomaji(currentQ.sentence)}</p>
+					{#if $showRomaji && currentQ.romaji}
+						<p class="question-romaji">{currentQ.romaji}</p>
 					{/if}
 				</div>
 
@@ -398,8 +398,8 @@
 								</div>
 								<div class="opt-content">
 									<span class="opt-text jp">{choice}</span>
-									{#if $showRomaji && kanaToRomaji(choice)}
-										<span class="opt-romaji">{kanaToRomaji(choice)}</span>
+									{#if $showRomaji && currentQ.choices_romaji?.[idx]}
+										<span class="opt-romaji">{currentQ.choices_romaji[idx]}</span>
 									{/if}
 								</div>
 							</button>
@@ -550,8 +550,8 @@
 					{#if activeTranscript}
 						<div class="transcript-minimal" use:fadeUp={{ delay: 0.2, y: 5 }}>
 							<div class="jp text-minimal">{activeTranscript}</div>
-							{#if $showRomaji && kanaToRomaji(activeTranscript)}
-								<div class="romaji-minimal">{kanaToRomaji(activeTranscript)}</div>
+							{#if $showRomaji && currentQ.romaji}
+								<div class="romaji-minimal">{currentQ.romaji}</div>
 							{/if}
 						</div>
 					{/if}

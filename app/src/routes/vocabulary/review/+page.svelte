@@ -233,43 +233,27 @@
 
 								<div class="divider"></div>
 
-								<div class="details-section">
-									<div class="kana-row">
-										<div class="jp kana-text">{word.kana}</div>
-										<button
-											onclick={(e) => { e.stopPropagation(); speak(word.kana); }}
-											class="mini-audio"
-										>
-											<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
-										</button>
-									</div>
-
-									{#if word.pos}
-										<div class="pos-tag">{word.pos_es || word.pos}</div>
-									{/if}
-
-									{#if word.example}
-										<div class="example-section">
-											<div class="example-jp jp">
-												{word.example}
-												<button
-													onclick={(e) => { e.stopPropagation(); speak(word.example); }}
-													class="mini-audio"
-												>
-													<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
-												</button>
-											</div>
-											{#if $showRomaji}
-												<div class="example-romaji">
-													{word.example_romaji || word.extra?.example_romaji || kanaToRomaji(word.example_kana || word.example)}
-												</div>
-											{/if}
-											<div class="example-translation">
-												{$locale === 'es' ? word.example_es : word.example_en}
-											</div>
+								{#if word.example}
+									<div class="example-section">
+										<div class="example-jp jp">
+											{word.example}
+											<button
+												onclick={(e) => { e.stopPropagation(); speak(word.example); }}
+												class="mini-audio"
+											>
+												<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
+											</button>
 										</div>
-									{/if}
-								</div>
+										{#if $showRomaji}
+											<div class="example-romaji">
+												{word.example_romaji || word.extra?.example_romaji || kanaToRomaji(word.example_kana || word.example)}
+											</div>
+										{/if}
+										<div class="example-translation">
+											{$locale === 'es' ? word.example_es : word.example_en}
+										</div>
+									</div>
+								{/if}
 							</div>
 						</div>
 					</div>
@@ -471,27 +455,6 @@
 		margin: 24px 0;
 	}
 
-	.kana-row {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		margin-bottom: 4px;
-	}
-
-	.kana-text {
-		font-size: 18px;
-		font-weight: 600;
-		color: var(--fg-primary);
-	}
-
-	.pos-tag {
-		font-size: 11px;
-		color: var(--fg-tertiary);
-		font-style: italic;
-		margin-bottom: 16px;
-	}
-
 	.example-section {
 		display: flex;
 		flex-direction: column;
@@ -523,6 +486,7 @@
 		font-size: 13px;
 		font-weight: 700;
 		color: var(--hinomaru-red);
+		margin-bottom: 8px;
 	}
 
 	.example-translation {

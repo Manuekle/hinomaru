@@ -245,7 +245,7 @@
 										<div class="example-text jp">{card.example}</div>
 										{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
 											<div class="example-romaji">
-												{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example)}
+												{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}
 											</div>
 										{/if}
 										<div class="example-translation">

@@ -239,7 +239,7 @@
 										</div>
 										{#if $showRomaji}
 											<div class="example-romaji">
-												{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example)}
+												{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}
 											</div>
 										{/if}
 										<div class="example-translation">
