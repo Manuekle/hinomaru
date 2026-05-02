@@ -172,7 +172,8 @@
 		</button>
 
 		<div class="header-progress">
-			{queue.index + 1} / {queue.total}
+			<span class="session-index">{queue.index + 1} / {queue.total}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: data.totalCards })}</span>
 		</div>
 
 		<button 
@@ -196,73 +197,60 @@
 			/>
 		{:else if card}
 			<div class="speaking-viewer">
-				<div class="card-face minimal-card">
-					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
+				<!-- Card — same visual as flashcard front -->
+				<div class="card-outer">
+					<div class="speak-card">
 
-					<button
-						onclick={playAudio}
-						aria-label="Play pronunciation"
-						class="audio-pill normal"
-						style="margin: 0 auto;"
-					>
-						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
-					</button>
 
-					<div class="jp card-jp">{card.jp}</div>
-					
-					{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
-						<div class="romaji card-romaji">{card.romaji}</div>
-					{/if}
+						<div class="word-center">
+							<div class="jp word-text" style="font-size:{card.jp.length <= 4 ? 'var(--fs-display)' : card.jp.length <= 6 ? 'var(--fs-2xl)' : card.jp.length <= 10 ? 'var(--fs-xl)' : 'var(--fs-lg)'};">{card.jp}</div>
+							{#if $showRomaji && card.romaji}
+								<div class="romaji-sub">{card.romaji}</div>
+							{/if}
+							<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
+						</div>
 
-					<div class="card-hint">{$locale === 'es' ? card.es : card.en}</div>
+						<button onclick={playAudio} class="audio-listen" aria-label="Play pronunciation">
+							<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
+							<span>{t('speaking.listen', $locale)}</span>
+						</button>
+					</div>
 				</div>
 
-				<div class="mic-section">
-					<button 
-						class="mic-btn" 
+				<!-- Mic + feedback below card -->
+				<div class="mic-area">
+					<button
+						class="mic-btn"
 						class:is-recording={isRecording}
 						onclick={toggleRecording}
 						disabled={submitted}
+						aria-label={isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
 					>
 						<div class="mic-ring"></div>
-						<div class="mic-icon-wrapper">
-							<Icon icon={isRecording ? Tick02Icon : Mic01Icon} size={32} color="white" />
-						</div>
+						<Icon icon={isRecording ? Tick02Icon : Mic01Icon} size={30} color="currentColor" />
 					</button>
-					
-					<div class="mic-label">
+					<div class="mic-label" aria-hidden="true">
 						{isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
 					</div>
-
-					{#if transcript}
-						<div class="transcript-box" use:fadeUp={{ y: 10 }}>
-							<div class="transcript-label">{t('speaking.heard', $locale)}</div>
-							<div class="transcript-text jp">{transcript}</div>
-						</div>
-					{/if}
-
-					{#if error}
-						<div class="error-msg" use:fadeIn>{error}</div>
-					{/if}
-
-					{#if submitted}
-						<div
-							class="feedback-box"
-							class:correct={isCorrect}
-							class:wrong={!isCorrect}
-							use:fadeUp={{ y: 10 }}
-						>
-							<div class="feedback-status">
-								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-							</div>
-							{#if !isCorrect}
-								<div class="correct-answer">
-									{t('session.answerIs', $locale, { a: card.jp })}
-								</div>
-							{/if}
-						</div>
-					{/if}
 				</div>
+
+				{#if transcript}
+					<div class="transcript-box" use:fadeUp={{ y: 8 }}>
+						<span class="transcript-label">{t('speaking.heard', $locale)}</span>
+						<div class="transcript-text jp">{transcript}</div>
+					</div>
+				{/if}
+
+				{#if error}
+					<div class="error-msg" use:fadeIn>{error}</div>
+				{/if}
+
+				{#if submitted}
+					<div class="feedback-row" class:correct={isCorrect} use:fadeUp={{ y: 8 }}>
+						<Icon icon={isCorrect ? ArrowRight01Icon : Cancel01Icon} size={16} color="currentColor" />
+						<span>{isCorrect ? t('session.correct', $locale) : t('session.answerIs', $locale, { a: card.jp })}</span>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -298,9 +286,25 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.close-btn, .lang-btn {
@@ -317,146 +321,196 @@
 	}
 
 	.speaking-viewer {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 32px;
+		align-items: center;
+		justify-content: center;
+		gap: clamp(20px, 5vh, 32px);
 		width: 100%;
-		max-width: 520px;
+		max-width: 480px;
 		margin: 0 auto;
-		padding: 24px;
+		padding: 24px 0 8px;
 	}
 
-	.minimal-card {
+	.card-outer {
+		width: 100%;
+	}
+
+	.speak-card {
 		background: var(--bg-surface);
-		border-radius: 40px;
-		padding: 40px 32px;
-		text-align: center;
-		box-shadow: var(--shadow-md);
-		position: relative;
-		border: 1px solid var(--ink-100);
+		border: 1px solid var(--ink-200);
+		border-radius: 28px;
+		box-shadow: 0 4px 24px rgba(26,26,26,0.08), 0 1px 4px rgba(26,26,26,0.04);
+		padding: 20px 24px 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		min-height: clamp(200px, 40vw, 280px);
 	}
 
 	.card-tag {
-		font-size: 11px;
+		font-size: 10px;
 		font-weight: 800;
-		color: var(--fg-tertiary);
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		margin-bottom: 24px;
+		color: var(--fg-tertiary);
+		background: var(--bg-muted);
+		padding: 4px 10px;
+		border-radius: 20px;
+		align-self: flex-start;
 	}
 
-	.audio-pill {
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		border: 1.5px solid var(--ink-200);
-		background: var(--bg-surface);
+	.word-center {
+		flex: 1;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		color: var(--fg-secondary);
-		transition: all 0.2s;
+		gap: 10px;
+		text-align: center;
 	}
 
-	.card-jp {
-		font-size: 42px;
-		font-weight: 800;
+	.word-text {
 		color: var(--fg-primary);
-		margin-top: 24px;
-		line-height: 1.2;
+		line-height: 1;
+		font-weight: 700;
 	}
 
-	.card-romaji {
-		margin-top: 8px;
-		font-size: 18px;
+	.romaji-sub {
+		font-size: clamp(14px, 3.5vw, 17px);
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
 
-	.card-hint {
-		margin-top: 24px;
-		font-size: 18px;
+	.meaning-sub {
+		font-size: clamp(16px, 4vw, 20px);
 		font-weight: 600;
 		color: var(--fg-secondary);
 	}
 
-	.mic-section {
+	.audio-listen {
+		height: 44px;
+		padding: 0 18px;
+		border-radius: 22px;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--fg-secondary);
+		font-size: 13px;
+		font-weight: 700;
+		cursor: pointer;
+		font-family: inherit;
+		-webkit-tap-highlight-color: transparent;
+		transition: all 0.15s;
+	}
+
+	.audio-listen:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
+	}
+
+	.mic-area {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 16px;
+		gap: 14px;
+		padding: 8px 0;
 	}
 
 	.mic-btn {
-		width: 96px;
-		height: 96px;
+		width: 88px;
+		height: 88px;
 		border-radius: 50%;
 		border: none;
 		background: var(--hinomaru-red);
+		color: white;
 		position: relative;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 8px 32px rgba(188, 0, 45, 0.3);
-		transition: transform 0.2s;
+		box-shadow: 0 6px 24px rgba(188, 0, 45, 0.28);
+		transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s, color 0.15s;
+		-webkit-tap-highlight-color: transparent;
 	}
 
-	.mic-btn:active { transform: scale(0.92); }
-	.mic-btn:disabled { opacity: 0.5; cursor: default; }
+	.mic-btn:active { transform: scale(0.92); box-shadow: 0 2px 12px rgba(188, 0, 45, 0.2); }
+	.mic-btn:disabled { opacity: 0.45; cursor: default; }
 
 	.mic-ring {
 		position: absolute;
-		inset: -8px;
+		inset: -10px;
 		border-radius: 50%;
 		border: 2px solid var(--hinomaru-red);
 		opacity: 0;
+		pointer-events: none;
 	}
 
 	.is-recording .mic-ring {
-		animation: pulse-ring 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-		opacity: 1;
+		animation: pulse-ring 1.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+	}
+
+	.is-recording {
+		background: var(--fg-primary);
+		color: var(--bg-surface);
+		box-shadow: 0 6px 24px rgba(26, 26, 26, 0.2);
 	}
 
 	@keyframes pulse-ring {
-		0% { transform: scale(0.8); opacity: 0.8; }
-		100% { transform: scale(1.3); opacity: 0; }
+		0% { transform: scale(0.85); opacity: 0.7; }
+		100% { transform: scale(1.35); opacity: 0; }
 	}
 
 	.mic-label {
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 800;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.08em;
 	}
 
 	.transcript-box {
 		width: 100%;
-		padding: 20px;
+		padding: 14px 18px;
 		background: var(--bg-muted);
-		border-radius: 20px;
+		border-radius: 16px;
 		text-align: center;
 	}
 
-	.transcript-label { font-size: 11px; font-weight: 800; color: var(--fg-tertiary); margin-bottom: 4px; }
-	.transcript-text { font-size: 20px; font-weight: 700; color: var(--fg-primary); }
+	.transcript-label {
+		display: block;
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--fg-tertiary);
+		margin-bottom: 6px;
+	}
 
-	.error-msg { color: var(--hinomaru-red); font-size: 14px; font-weight: 600; }
+	.transcript-text { font-size: 22px; font-weight: 700; color: var(--fg-primary); }
 
-	.feedback-box {
+	.error-msg { font-size: 14px; font-weight: 600; color: var(--hinomaru-red); }
+
+	.feedback-row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 16px;
+		border-radius: 14px;
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+		font-size: 15px;
+		font-weight: 700;
 		width: 100%;
-		padding: 24px;
-		border-radius: 24px;
-		background: var(--bg-surface);
-		box-shadow: var(--shadow-sm);
-		border: 1px solid var(--ink-100);
-		text-align: center;
 	}
 
-	.feedback-status { font-weight: 800; font-size: 18px; }
-	.correct .feedback-status { color: var(--success); }
-	.wrong .feedback-status { color: var(--hinomaru-red); }
-
-	.correct-answer { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+	.feedback-row.correct {
+		background: var(--success-wash);
+		color: var(--success);
+	}
 </style>

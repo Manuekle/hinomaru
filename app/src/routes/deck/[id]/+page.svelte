@@ -2,17 +2,6 @@
 	import { locale } from '$lib/stores/locale';
 	import { t } from '$lib/i18n';
 	import { fadeUp, staggerChildren, fadeIn } from '$lib/motion';
-	import Icon from '$lib/Icon.svelte';
-	import {
-		Cards02Icon,
-		Target01Icon,
-		KeyboardIcon,
-		PencilEdit01Icon,
-		PuzzleIcon,
-		DocumentValidationIcon,
-		AlertCircleIcon,
-		Mic01Icon
-	} from '@hugeicons/core-free-icons';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
@@ -29,43 +18,37 @@
 			id: 'flashcards',
 			titleKey: 'mode.flashcards.title',
 			descKey: 'mode.flashcards.desc',
-			icon: Cards02Icon,
-			color: '#ff2d55'
+			icon: '📇'
 		},
 		{
 			id: 'quiz',
 			titleKey: 'mode.quiz.title',
 			descKey: 'mode.quiz.desc',
-			icon: Target01Icon,
-			color: '#007aff'
+			icon: '🎯'
 		},
 		{
 			id: 'type',
 			titleKey: 'mode.type.title',
 			descKey: 'mode.type.desc',
-			icon: KeyboardIcon,
-			color: '#ff9500'
+			icon: '⌨️'
 		},
 		{
 			id: 'write',
 			titleKey: 'mode.write.title',
 			descKey: 'mode.write.desc',
-			icon: PencilEdit01Icon,
-			color: '#af52de'
+			icon: '✍️'
 		},
 		{
 			id: 'match',
 			titleKey: 'mode.match.title',
 			descKey: 'mode.match.desc',
-			icon: PuzzleIcon,
-			color: '#34c759'
+			icon: '🧩'
 		},
 		{
 			id: 'speaking',
 			titleKey: 'mode.speaking.title',
 			descKey: 'mode.speaking.desc',
-			icon: Mic01Icon,
-			color: '#bc002d'
+			icon: '🎙️'
 		}
 	];
 
@@ -85,15 +68,12 @@
 	<!-- Pills -->
 	<div use:fadeUp={{ delay: 0.05, y: 8 }} style="display:flex;gap:8px;margin-bottom:16px;">
 		<span class="hm-pill hm-pill-red">{deck.level}</span>
-		<span class="hm-pill hm-pill-ink"
-			>{$locale === 'es' ? (deck.kind_es ?? deck.kind) : deck.kind}</span
-		>
 	</div>
 
 	<!-- Title -->
 	<h1
 		use:fadeUp={{ delay: 0.1, y: 12 }}
-		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
+		style="font-size:clamp(28px,6vw,40px);font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
 	>
 		{$locale === 'es' ? deck.title_es : deck.title_en}
 	</h1>
@@ -110,9 +90,13 @@
 		<div class="hm-progress" style="height:6px;">
 			<div class="hm-progress-bar" style="width:{pct}%;height:6px; box-shadow: 0 0 15px rgba(188, 0, 45, 0.4), 0 0 5px rgba(188, 0, 45, 0.6);"></div>
 		</div>
-		<div style="display:flex;justify-content:space-between;margin-top:10px;" class="label-meta">
-			<span>{t('deck.learnedN', $locale, { n: deck.learned ?? 0 })}</span>
-			<span>{t('deck.toGo', $locale, { n: deck.card_count - (deck.learned ?? 0) })}</span>
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+			<span class="label-meta">
+				{pct === 100
+					? t('home.complete', $locale)
+					: t('home.learned', $locale, { a: deck.learned ?? 0, b: deck.card_count })}
+			</span>
+			<span style="font-size:13px;font-weight:800;color:var(--hinomaru-red);">{pct}%</span>
 		</div>
 	</div>
 
@@ -127,12 +111,9 @@
 					goto(url);
 				}}
 			>
-				<div class="row-icon-box">
-					<Icon icon={mode.icon} size={15} strokeWidth={2.5} color="currentColor" />
-				</div>
-
 				<div class="row-body">
 					<div class="row-top">
+						<span class="row-icon">{mode.icon}</span>
 						<span class="row-title">{t(mode.titleKey, $locale)}</span>
 					</div>
 					<div class="row-sub">{t(mode.descKey, $locale)}</div>
@@ -167,7 +148,7 @@
 	.row {
 		display: flex;
 		align-items: flex-start;
-		gap: 20px;
+		gap: 16px;
 		padding: 24px 0;
 		border-bottom: 1px solid var(--ink-100);
 		background: none;
@@ -210,18 +191,8 @@
 		transform: scale(0.9) translateX(2px);
 	}
 
-	.row-icon-box {
-		width: 28px;
-		height: 28px;
-		border-radius: 8px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		margin-top: 2px;
-		background: var(--hinomaru-red-wash);
-		color: var(--hinomaru-red);
-	}
+
+
 
 	.row-body {
 		flex: 1;
@@ -233,6 +204,12 @@
 		align-items: center;
 		gap: 8px;
 		margin-bottom: 3px;
+	}
+
+	.row-icon {
+		font-size: 17px;
+		line-height: 1;
+		flex-shrink: 0;
 	}
 
 	.row-title {

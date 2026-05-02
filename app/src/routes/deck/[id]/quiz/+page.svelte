@@ -16,8 +16,7 @@
 	import { t } from '$lib/i18n';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import { kanaToRomaji } from '$lib/utils/romaji';
-	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
+import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -170,25 +169,14 @@
 			/>
 		{:else if card}
 			<div class="quiz-viewer">
-				<div class="card-face minimal-card">
-					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
-					
-					<button
-						onclick={playAudio}
-						aria-label="Play pronunciation"
-						class="audio-pill normal"
-						style="margin: 0 auto;"
-					>
-						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+				<div class="word-card">
+					<button onclick={playAudio} class="audio-corner" aria-label="Play pronunciation">
+						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 					</button>
-
-					<div class="jp card-jp">{card.jp}</div>
-					
-					{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
-						<div class="romaji card-romaji">{card.romaji}</div>
+					<div class="jp word-big">{card.jp}</div>
+					{#if $showRomaji && card.romaji}
+						<div class="romaji-line">{card.romaji}</div>
 					{/if}
-
-					<div class="card-hint">{t('session.whatMean', $locale)}</div>
 				</div>
 
 				<div class="options-list">
@@ -198,16 +186,16 @@
 						<button
 							onclick={() => pick(opt)}
 							class="option-item"
-							class:is-correct={picked && isThisCorrect}
+							class:is-correct={picked && isThisPicked && isThisCorrect}
 							class:is-wrong={picked && isThisPicked && !isThisCorrect}
-							class:is-dimmed={picked && !isThisCorrect && !isThisPicked}
+							class:is-dimmed={picked && !isThisPicked}
 							disabled={!!picked}
 						>
 							<div class="opt-marker">
-								{#if picked && isThisCorrect}
-									<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
+								{#if picked && isThisPicked && isThisCorrect}
+									<Icon icon={CheckmarkCircle01Icon} size={14} color="white" />
 								{:else if picked && isThisPicked && !isThisCorrect}
-									<Icon icon={Cancel01Icon} size={16} color="white" />
+									<Icon icon={Cancel01Icon} size={14} color="white" />
 								{:else}
 									{String.fromCharCode(65 + idx)}
 								{/if}
@@ -218,25 +206,15 @@
 				</div>
 
 				{#if picked}
-					<div
-						class="feedback-premium-bar"
-						class:is-correct={isCorrect}
-						use:fadeUp={{ y: 15 }}
-					>
-						<div class="feedback-icon-wrap">
-							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={22} color="currentColor" />
-						</div>
-						<div class="feedback-text-side">
-							<span class="feedback-title">
-								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-							</span>
-						</div>
+					<div class="feedback-bar" class:is-correct={isCorrect} use:fadeUp={{ y: 10 }}>
+						<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={18} color="currentColor" />
+						<span class="fb-label">{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}</span>
 					</div>
 
 					{#if !isCorrect && card.example}
-						<div class="example-box compact" use:fadeIn>
-							<div class="example-jp jp">{card.example}</div>
-							<div class="example-en">{$locale === 'es' ? card.example_es : card.example_en}</div>
+						<div class="example-hint" use:fadeIn>
+							<div class="jp" style="font-size:15px;font-weight:600;color:var(--fg-primary);">{card.example}</div>
+							<div style="font-size:13px;color:var(--fg-secondary);margin-top:3px;">{$locale === 'es' ? card.example_es : card.example_en}</div>
 						</div>
 					{/if}
 				{/if}
@@ -294,174 +272,173 @@
 	}
 
 	.quiz-viewer {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		justify-content: center;
+		gap: 16px;
 		width: 100%;
-		max-width: 520px;
+		max-width: 480px;
 		margin: 0 auto;
-		padding: 24px;
+		padding: 20px 0 8px;
 	}
 
-	.minimal-card {
-		background: var(--bg-surface);
-		border-radius: 40px;
-		padding: 40px 32px;
-		text-align: center;
-		box-shadow: var(--shadow-md);
+	.word-card {
 		position: relative;
-		border: 1px solid var(--ink-100);
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		box-shadow: 0 2px 12px rgba(26,26,26,0.06);
+		padding: 20px 20px 18px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		text-align: center;
 	}
 
-	.card-tag {
-		font-size: 11px;
-		font-weight: 800;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		margin-bottom: 24px;
-	}
-
-	.audio-pill {
-		width: 48px;
-		height: 48px;
+	.audio-corner {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 32px;
+		height: 32px;
 		border-radius: 50%;
 		border: 1.5px solid var(--ink-200);
-		background: var(--bg-surface);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-secondary);
-		transition: all 0.2s;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+		transition: background 0.15s;
 	}
 
-	.card-jp {
-		font-size: 42px;
+	.audio-corner:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
+	}
+
+	.word-big {
+		font-size: clamp(36px, 10vw, 56px);
 		font-weight: 800;
 		color: var(--fg-primary);
-		margin-top: 24px;
-		line-height: 1.2;
+		line-height: 1;
+		padding: 0 36px;
 	}
 
-	.card-romaji {
-		margin-top: 8px;
-		font-size: 18px;
+	.romaji-line {
+		font-size: clamp(13px, 3.5vw, 16px);
 		font-weight: 700;
 		color: var(--hinomaru-red);
-	}
-
-	.card-hint {
-		margin-top: 24px;
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
 	}
 
 	.options-list {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 10px;
 	}
 
 	.option-item {
 		display: flex;
 		align-items: center;
-		gap: 16px;
-		padding: 20px;
+		gap: 12px;
+		padding: 16px 16px;
 		border: 1.5px solid var(--ink-200);
-		border-radius: 20px;
+		border-radius: 14px;
 		background: var(--bg-surface);
 		cursor: pointer;
 		text-align: left;
-		transition: all 0.2s;
+		transition: border-color 0.15s, background 0.15s, opacity 0.15s, transform 0.1s;
 		width: 100%;
+		-webkit-tap-highlight-color: transparent;
+		font-family: inherit;
+		box-shadow: 0 1px 4px rgba(26,26,26,0.04);
 	}
 
 	.option-item:not(:disabled):hover {
-		border-color: var(--hinomaru-red);
-		transform: translateY(-2px);
-		box-shadow: var(--shadow-sm);
+		border-color: var(--ink-300);
+		transform: translateY(-1px);
+		box-shadow: 0 3px 10px rgba(26,26,26,0.08);
+	}
+
+	.option-item:not(:disabled):active {
+		transform: scale(0.98);
+		background: var(--bg-muted);
+	}
+
+	.option-item:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 1px;
 	}
 
 	.option-item.is-correct {
 		border-color: var(--success) !important;
 		background: var(--success-wash) !important;
-		color: var(--success);
+		transform: none !important;
 	}
 
 	.option-item.is-wrong {
 		border-color: var(--hinomaru-red) !important;
 		background: var(--hinomaru-red-wash) !important;
-		color: var(--hinomaru-red);
+		transform: none !important;
 	}
 
-	.option-item.is-dimmed {
-		opacity: 0.4;
-	}
+	.option-item.is-dimmed { opacity: 0.38; }
 
 	.opt-marker {
-		width: 36px;
-		height: 36px;
-		border-radius: 10px;
+		width: 28px;
+		height: 28px;
+		border-radius: 8px;
 		background: var(--bg-muted);
+		border: 1px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 14px;
-		font-weight: 800;
+		font-size: 11px;
+		font-weight: 900;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
+		letter-spacing: 0;
 	}
 
-	.option-item.is-correct .opt-marker { background: var(--success); color: white; }
-	.option-item.is-wrong .opt-marker { background: var(--hinomaru-red); color: white; }
+	.option-item.is-correct .opt-marker { background: var(--success); border-color: var(--success); color: white; }
+	.option-item.is-wrong .opt-marker { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
 
 	.opt-text {
-		font-size: 16px;
-		font-weight: 700;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		line-height: 1.35;
 	}
 
-	.feedback-premium-bar {
+	.option-item.is-correct .opt-text { color: var(--success); }
+	.option-item.is-wrong .opt-text { color: var(--hinomaru-red); }
+
+	.feedback-bar {
 		display: flex;
 		align-items: center;
-		gap: 16px;
-		padding: 16px 20px;
-		border-radius: 20px;
-		margin-top: 12px;
-		background: var(--hinomaru-red-wash);
-		color: var(--hinomaru-red-ink);
-		border: 1.5px solid rgba(188, 0, 45, 0.1);
-	}
-
-	.feedback-premium-bar.is-correct {
-		background: var(--success-wash);
-		color: var(--success-ink);
-		border-color: rgba(46, 125, 91, 0.1);
-	}
-
-	.feedback-icon-wrap {
-		width: 44px;
-		height: 44px;
+		gap: 10px;
+		padding: 12px 16px;
 		border-radius: 14px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(255, 255, 255, 0.5);
-		flex-shrink: 0;
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+		border: 1.5px solid rgba(188, 0, 45, 0.12);
 	}
 
-	.feedback-title { font-size: 16px; font-weight: 800; }
+	.feedback-bar.is-correct {
+		background: var(--success-wash);
+		color: var(--success);
+		border-color: rgba(46, 125, 91, 0.12);
+	}
 
-	.example-box.compact {
-		margin-top: 12px;
-		padding: 16px;
+	.fb-label { font-size: 15px; font-weight: 800; }
+
+	.example-hint {
+		padding: 14px;
 		background: var(--bg-muted);
-		border-radius: 20px;
+		border-radius: 14px;
 		text-align: center;
 	}
-
-	.example-jp { font-size: 16px; color: var(--fg-primary); font-weight: 600; }
-	.example-en { font-size: 13px; color: var(--fg-secondary); margin-top: 4px; }
 </style>

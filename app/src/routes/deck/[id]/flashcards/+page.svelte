@@ -182,69 +182,57 @@
 					tabindex="0"
 					bind:this={cardEl}
 					class="card-scene"
+					aria-label="Flashcard — tap to flip"
 					onclick={() => (flipped = !flipped)}
-					onkeydown={(e) => e.key === 'Enter' && (flipped = !flipped)}
+					onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), (flipped = !flipped))}
 				>
 					<div class="card-body" class:flipped>
 						<!-- Front -->
 						<div class="card-face card-front">
-							<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
-							
-							<div class="jp word-text" style="font-size:{getFontSize(card.jp)};">
-								{card.jp}
+
+
+							<div class="word-center">
+								<div class="jp word-text" style="font-size:{getFontSize(card.jp)};">{card.jp}</div>
+								<div class="audio-row">
+									<button
+										onclick={(e) => { e.stopPropagation(); speak(card.jp); }}
+										class="audio-btn"
+										aria-label="Play normal speed"
+									>
+										<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
+									</button>
+									<button
+										onclick={(e) => { e.stopPropagation(); speak(card.jp, true); }}
+										class="audio-btn slow-btn"
+										aria-label="Play slow speed"
+									>
+										<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+										<span class="slow-label" aria-hidden="true">0.7×</span>
+									</button>
+								</div>
 							</div>
 
-							<div class="audio-controls">
-								<button
-									onclick={(e) => { e.stopPropagation(); speak(card.jp); }}
-									class="audio-pill normal"
-								>
-									<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
-								</button>
-								<button
-									onclick={(e) => { e.stopPropagation(); speak(card.jp, true); }}
-									class="audio-pill slow"
-								>
-									<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
-									<span class="slow-label">0.7x</span>
-								</button>
-							</div>
-
-							<div class="tap-label">{t('session.flip', $locale)}</div>
+							<span class="tap-hint" aria-hidden="true">{t('session.flip', $locale)}</span>
 						</div>
 
 						<!-- Back -->
 						<div class="card-face card-back">
-							<div class="back-content">
-								<div class="meaning-large">
-									{$locale === 'es' ? card.es : card.en}
-								</div>
-
-								<div class="romaji-red">
-									{card.romaji}
-								</div>
-
-								<div class="divider"></div>
+							<div class="back-scroll">
+								<div class="meaning-large">{$locale === 'es' ? card.es : card.en}</div>
+								<div class="romaji-red">{card.romaji}</div>
 
 								{#if card.example}
-									<div class="example-section">
+									<div class="example-block">
 										<div class="example-jp jp">
 											{card.example}
-											<button
-												onclick={(e) => { e.stopPropagation(); speak(card.example); }}
-												class="mini-audio"
-											>
-												<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
+											<button onclick={(e) => { e.stopPropagation(); speak(card.example); }} class="mini-audio">
+												<Icon icon={VolumeHighIcon} size={13} color="currentColor" />
 											</button>
 										</div>
 										{#if $showRomaji}
-											<div class="example-romaji">
-												{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}
-											</div>
+											<div class="example-romaji">{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}</div>
 										{/if}
-										<div class="example-translation">
-											{$locale === 'es' ? card.example_es : card.example_en}
-										</div>
+										<div class="example-translation">{$locale === 'es' ? card.example_es : card.example_en}</div>
 									</div>
 								{/if}
 							</div>
@@ -318,149 +306,175 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 24px;
+		padding: 24px 0 24px;
 	}
 
 	.card-scene {
 		width: 100%;
-		max-width: 520px;
-		aspect-ratio: 3/4.2;
-		perspective: 1500px;
+		max-width: 440px;
+		height: min(480px, calc(100dvh - 210px));
+		perspective: 1200px;
 		cursor: pointer;
 		background: none;
 		border: none;
 		padding: 0;
-		display: block;
-		text-align: left;
+		display: flex;
 		font: inherit;
+	}
+
+	.card-scene:focus-visible {
+		outline: 3px solid var(--hinomaru-red);
+		outline-offset: 6px;
+		border-radius: 32px;
 	}
 
 	.card-body {
 		position: relative;
 		width: 100%;
 		height: 100%;
-		transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+		flex: 1;
+		transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.64, 1);
 		transform-style: preserve-3d;
 	}
 
-	.card-body.flipped {
-		transform: rotateY(180deg);
-	}
+	.card-body.flipped { transform: rotateY(180deg); }
 
 	.card-face {
 		position: absolute;
 		inset: 0;
 		backface-visibility: hidden;
-		background: var(--bg-surface);
-		border-radius: 40px;
-		box-shadow: var(--shadow-lg);
+		border-radius: 28px;
 		display: flex;
 		flex-direction: column;
-		padding: 48px 32px;
-		overflow: hidden;
-		border: 1px solid var(--ink-100);
+		border: 1px solid var(--ink-200);
+		box-shadow: 0 4px 24px rgba(26,26,26,0.08), 0 1px 4px rgba(26,26,26,0.04);
 	}
 
 	.card-front {
+		background: var(--bg-surface);
 		align-items: center;
 		justify-content: space-between;
+		padding: 20px 24px 24px;
+		overflow: hidden;
 	}
 
 	.card-back {
 		transform: rotateY(180deg);
-		justify-content: center;
+		background: var(--bg-surface);
+		padding: 0;
+		overflow: hidden;
 	}
 
 	.card-tag {
-		font-size: 12px;
+		font-size: 10px;
 		font-weight: 800;
-		color: var(--fg-tertiary);
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		letter-spacing: 0.15em;
+		color: var(--fg-tertiary);
+		background: var(--bg-muted);
+		padding: 4px 10px;
+		border-radius: 20px;
+	}
+
+	.word-center {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 20px;
 	}
 
 	.word-text {
 		color: var(--fg-primary);
-		line-height: 1.1;
+		line-height: 1;
 		text-align: center;
 		font-weight: 700;
-		margin: auto 0;
 	}
 
-	.audio-controls {
+	.audio-row {
 		display: flex;
-		gap: 16px;
-		margin-bottom: 24px;
+		gap: 10px;
 	}
 
-	.audio-pill {
-		width: 52px;
-		height: 52px;
-		border-radius: 50%;
+	.audio-btn {
+		height: 44px;
+		padding: 0 16px;
+		border-radius: 22px;
 		border: 1.5px solid var(--ink-200);
-		background: var(--bg-surface);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		gap: 6px;
 		color: var(--fg-secondary);
-		transition: all 0.2s;
-		position: relative;
+		cursor: pointer;
+		transition: all 0.15s;
+		font-family: inherit;
+		-webkit-tap-highlight-color: transparent;
 	}
 
-	.audio-pill.slow {
+	.audio-btn:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
+	}
+
+	.slow-btn {
 		border-color: var(--hinomaru-red);
 		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
 	}
 
 	.slow-label {
-		position: absolute;
-		font-size: 9px;
+		font-size: 11px;
 		font-weight: 800;
-		background: var(--bg-surface);
-		color: var(--hinomaru-red);
-		padding: 0 4px;
-		top: -4px;
 	}
 
-	.tap-label {
-		font-size: 12px;
-		font-weight: 600;
+	.tap-hint {
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		color: var(--fg-tertiary);
 	}
 
-	/* Back styling */
-	.back-content {
+	.back-scroll {
+		flex: 1;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		padding: 28px 24px;
 		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.meaning-large {
-		font-size: 40px;
+		font-size: clamp(28px, 7vw, 38px);
 		font-weight: 900;
 		color: var(--fg-primary);
 		line-height: 1.1;
 	}
 
 	.romaji-red {
-		margin-top: 12px;
-		font-size: 20px;
+		margin-top: 10px;
+		font-size: clamp(16px, 4vw, 20px);
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
 
-	.divider {
-		height: 1.5px;
-		background: var(--ink-100);
-		margin: 32px 0;
-	}
-
-	.example-section {
+	.example-block {
+		margin-top: 20px;
+		padding-top: 20px;
+		border-top: 1px solid var(--ink-100);
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 6px;
+		width: 100%;
 	}
 
 	.example-jp {
-		font-size: 20px;
+		font-size: 17px;
 		font-weight: 600;
 		color: var(--fg-primary);
 		display: flex;
@@ -470,34 +484,29 @@
 	}
 
 	.mini-audio {
-		width: 28px;
-		height: 28px;
+		flex-shrink: 0;
+		width: 26px;
+		height: 26px;
 		border-radius: 50%;
 		border: 1px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-tertiary);
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	.example-romaji {
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
 
 	.example-translation {
-		font-size: 15px;
+		font-size: 14px;
 		color: var(--fg-secondary);
-	}
-
-	.btn-text {
-		margin-left: 8px;
-	}
-
-	@media (max-width: 400px) {
-		.btn-text {
-			display: none;
-		}
+		line-height: 1.4;
 	}
 </style>

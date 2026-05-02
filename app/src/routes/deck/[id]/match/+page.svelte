@@ -219,7 +219,7 @@
 							{#if !isMatched}
 								<div class="card-inner">
 									<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
-									{#if item.type === 'jp' && $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
+									{#if item.type === 'jp' && $showRomaji && item.romaji}
 										<div class="romaji-hint">{item.romaji}</div>
 									{/if}
 								</div>
@@ -228,9 +228,6 @@
 							{/if}
 						</button>
 					{/each}
-				</div>
-				<div class="round-hint">
-					{t('session.matchHint', $locale)}
 				</div>
 			</div>
 		{:else}
@@ -302,26 +299,26 @@
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		padding: 24px;
+		padding: 24px 0;
 	}
 
 	.match-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 16px;
+		gap: 10px;
 		width: 100%;
 		max-width: 520px;
 	}
 
 	.match-card {
-		aspect-ratio: 1.8/1;
+		min-height: clamp(64px, 14vw, 80px);
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
-		border-radius: 24px;
+		border-radius: 18px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 16px;
+		padding: 12px;
 		cursor: pointer;
 		transition: all 0.2s;
 		position: relative;
@@ -346,9 +343,10 @@
 	.match-card.matched {
 		border-color: var(--success);
 		background: var(--success-wash);
-		opacity: 0.5;
+		opacity: 0.45;
 		cursor: default;
-		transform: scale(0.95);
+		transform: scale(0.92);
+		transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 
 	.match-card.wrong {
@@ -360,14 +358,14 @@
 	.card-inner { text-align: center; }
 
 	.card-text {
-		font-size: 16px;
+		font-size: clamp(13px, 3.5vw, 16px);
 		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.2;
 	}
 
 	.card-text.jp {
-		font-size: 26px;
+		font-size: clamp(18px, 5vw, 26px);
 		font-family: var(--font-jp);
 	}
 
@@ -379,15 +377,6 @@
 	}
 
 	.matched-icon { font-size: 28px; color: var(--success); }
-
-	.round-hint {
-		margin-top: 40px;
-		font-size: 14px;
-		color: var(--fg-tertiary);
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
 
 	.finish-overlay {
 		display: flex;
@@ -439,10 +428,4 @@
 		40%, 60% { transform: translate3d(4px, 0, 0); }
 	}
 
-	@media (max-width: 480px) {
-		.match-grid { gap: 12px; }
-		.match-card { border-radius: 20px; padding: 12px; }
-		.card-text { font-size: 15px; }
-		.card-text.jp { font-size: 22px; }
-	}
 </style>

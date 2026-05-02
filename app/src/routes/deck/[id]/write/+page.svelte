@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onDestroy } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
-	import { playCorrect, playWrong } from '$lib/utils/sounds';
-	import { animate } from 'motion';
-	import { calculateNextReview, mapPerformanceToQuality, type SRSState } from '$lib/srs';
+	import { playCorrect } from '$lib/utils/sounds';
+	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import { kanaToRomaji } from '$lib/utils/romaji';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
@@ -21,11 +18,10 @@
 		ViewOffIcon,
 		Cancel01Icon,
 		VolumeHighIcon,
-		Clock01Icon,
 		TranslateIcon
 	} from '@hugeicons/core-free-icons';
 	import { onMount } from 'svelte';
-	import { fadeIn, fadeUp } from '$lib/motion';
+	import { fadeIn } from '$lib/motion';
 	import type { PageData } from './$types';
 
 	interface HanziWriterInstance {
@@ -171,14 +167,15 @@
 		const outlineColor = theme === 'dark' ? '#444444' : '#f0f0f0';
 
 		for (const char of writableChars) {
+			const charData = await fetchCharData(char, char.codePointAt(0)!);
+			if (!charData) continue;
+
 			const box = document.createElement('div');
 			box.style.width = `${boxSize}px`;
 			box.style.height = `${boxSize}px`;
 			box.style.background = 'transparent';
 			box.style.display = useSequential ? 'none' : 'block';
 			hanziContainer?.appendChild(box);
-
-			const charData = await fetchCharData(char, char.codePointAt(0)!);
 
 			const writer = HanziWriter.create(box, char, {
 				width: boxSize,
@@ -189,7 +186,7 @@
 				delayBetweenStrokes: 100,
 				strokeColor,
 				outlineColor,
-				charDataLoader: () => charData
+				charDataLoader: () => charData as any
 			});
 
 			writers.push({ writer, box, char });
@@ -197,7 +194,12 @@
 
 		if (iteration === setupIteration) {
 			loadingWriters = false;
-			startQuiz();
+			if (writers.length === 0) {
+				checked = true;
+				playCorrect();
+			} else {
+				startQuiz();
+			}
 		}
 	}
 
@@ -276,7 +278,8 @@
 		</button>
 
 		<div class="header-progress">
-			{i + 1} / {quizCards.length}
+			<span class="session-index">{i + 1} / {quizCards.length}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: data.totalCards })}</span>
 		</div>
 
 		<button 
@@ -300,29 +303,29 @@
 			/>
 		{:else if card}
 			<div class="write-viewer">
-				<div class="card-face minimal-card">
-					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
+				<div class="prompt-card">
+					<div class="prompt-row">
+						<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
+						<button onclick={() => speakJapanese(card.jp)} aria-label="Play pronunciation" class="audio-corner">
+							<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
+						</button>
+					</div>
 
-					<button
-						onclick={() => speakJapanese(card.jp)}
-						aria-label="Play pronunciation"
-						class="audio-pill normal"
-						style="margin: 0 auto;"
-					>
-						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
-					</button>
-
-					<div class="meaning-label">{t('session.whatMean', $locale)}</div>
-					<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
-					
-					{#if card.example}
-						<div class="example-box">
-							<div class="example-jp jp">{card.example}</div>
-							<div class="example-en">{$locale === 'es' ? card.example_es : card.example_en}</div>
-						</div>
+					{#if $showRomaji && card.romaji}
+						<div class="romaji" style="margin-top:-10px; margin-bottom: 4px;">{card.romaji}</div>
 					{/if}
 
-					<div class="card-hint">{t('session.writeThis', $locale)}</div>
+					{#if card.example}
+						<div class="example-box">
+							<div class="jp" style="font-size:13px;font-weight:600;color:var(--fg-primary);">{card.example}</div>
+							{#if $showRomaji}
+								<div class="romaji" style="font-size:11px; margin-top:2px; margin-bottom: 2px;">
+									{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}
+								</div>
+							{/if}
+							<div style="font-size:12px;color:var(--fg-secondary);margin-top:2px;">{$locale === 'es' ? card.example_es : card.example_en}</div>
+						</div>
+					{/if}
 				</div>
 
 				<div class="canvas-section">
@@ -345,7 +348,7 @@
 					<div class="canvas-wrapper" class:loading={loadingWriters}>
 						<div bind:this={hanziContainer} class="hanzi-container"></div>
 						{#if loadingWriters}
-							<div class="loader-overlay" transition:fadeIn>
+							<div class="loader-overlay">
 								<DotLoader />
 							</div>
 						{/if}
@@ -392,9 +395,25 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.close-btn, .lang-btn {
@@ -411,87 +430,85 @@
 	}
 
 	.write-viewer {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 		gap: 16px;
 		width: 100%;
 		max-width: 520px;
 		margin: 0 auto;
-		padding: 24px;
+		padding: 20px 0 8px;
 	}
 
-	.minimal-card {
+	.prompt-card {
 		background: var(--bg-surface);
-		border-radius: 32px;
-		padding: 24px 20px;
-		text-align: center;
-		box-shadow: var(--shadow-sm);
-		position: relative;
-		border: 1px solid var(--ink-100);
+		border: 1px solid var(--ink-200);
+		border-radius: 24px;
+		box-shadow: 0 4px 24px rgba(26,26,26,0.07), 0 1px 4px rgba(26,26,26,0.04);
+		padding: 24px 24px 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
 	}
 
-	.card-tag {
-		font-size: 10px;
-		font-weight: 800;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		margin-bottom: 12px;
+	.prompt-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		width: 100%;
 	}
 
-	.audio-pill {
-		width: 40px;
-		height: 40px;
+	.meaning-text {
+		flex: 1;
+		font-size: clamp(18px, 4.5vw, 24px);
+		font-weight: 900;
+		color: var(--fg-primary);
+		line-height: 1.3;
+	}
+
+	.audio-corner {
+		flex-shrink: 0;
+		width: 36px;
+		height: 36px;
 		border-radius: 50%;
 		border: 1.5px solid var(--ink-200);
-		background: var(--bg-surface);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-secondary);
-		transition: all 0.2s;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+		transition: background 0.15s;
 	}
 
-	.meaning-label {
-		font-size: 11px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-top: 16px;
-		margin-bottom: 4px;
-	}
-
-	.meaning-text {
-		font-size: 24px;
-		font-weight: 800;
-		color: var(--hinomaru-red);
-		line-height: 1.2;
+	.audio-corner:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
 	}
 
 	.example-box {
-		margin-top: 12px;
-		padding: 12px;
+		width: 100%;
+		padding: 14px 16px;
 		background: var(--bg-muted);
-		border-radius: 16px;
+		border-radius: 14px;
+		text-align: left;
 	}
 
-	.example-jp { font-size: 14px; color: var(--fg-primary); font-weight: 600; }
-	.example-en { font-size: 12px; color: var(--fg-secondary); margin-top: 2px; }
-
-	.card-hint {
-		margin-top: 16px;
-		font-size: 11px;
+	.romaji {
+		font-family: var(--font-ui);
+		font-size: var(--fs-sm);
 		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		color: var(--hinomaru-red);
+		letter-spacing: 0.02em;
 	}
 
 	.canvas-section {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 20px;
 	}
 
 	.canvas-header {
@@ -546,14 +563,13 @@
 	.canvas-wrapper {
 		position: relative;
 		background: var(--bg-surface);
-		border-radius: 32px;
+		border-radius: 24px;
 		border: 1.5px solid var(--ink-200);
-		padding: 24px;
-		min-height: 280px;
+		padding: 16px;
+		min-height: clamp(180px, 50vw, 260px);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: var(--shadow-sm);
 		overflow: hidden;
 	}
 
@@ -576,13 +592,4 @@
 		z-index: 10;
 	}
 
-	.footer-hint {
-		flex: 1;
-		text-align: center;
-		font-size: 14px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
 </style>

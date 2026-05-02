@@ -83,7 +83,10 @@ export async function loadDeckSession(
 	});
 
 	// --- 4. Build session: reviews first, then new words ---
-	let session = forceAll ? [...cards].sort(() => Math.random() - 0.5) : [...reviewCards, ...newCards];
+	const remainingSlots = forceAll ? newCards.length : Math.max(0, dailyGoal - learnedToday);
+	const sessionNewCards = newCards.slice(0, remainingSlots);
+
+	let session = forceAll ? [...cards].sort(() => Math.random() - 0.5) : [...reviewCards, ...sessionNewCards];
 
 	// --- 5. Reinforcement: If session is empty, include most recently learned cards ---
 	const learnedCards = cards.filter((c: any) => c.progress?.[0]?.learned);

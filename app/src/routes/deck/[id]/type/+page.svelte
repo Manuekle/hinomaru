@@ -1,12 +1,9 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		VolumeHighIcon, 
-		Cancel01Icon, 
-		CheckmarkCircle01Icon,
-		TranslateIcon,
-		Clock01Icon,
-		ArrowRight01Icon
+	import {
+		VolumeHighIcon,
+		Cancel01Icon,
+		TranslateIcon
 	} from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
@@ -159,7 +156,8 @@
 		</button>
 
 		<div class="header-progress">
-			{queue.index + 1} / {queue.total}
+			<span class="session-index">{queue.index + 1} / {queue.total}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: data.totalCards })}</span>
 		</div>
 
 		<button 
@@ -183,80 +181,52 @@
 			/>
 		{:else if card}
 			<div class="type-viewer">
-				<div class="card-face minimal-card">
-					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
-
-					<button
-						onclick={playAudio}
-						aria-label="Play pronunciation"
-						class="audio-pill normal"
-						style="margin: 0 auto;"
-					>
-						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+				<div class="word-card">
+					<button onclick={playAudio} class="audio-corner" aria-label="Play pronunciation">
+						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 					</button>
-
-					<div class="jp card-jp">{card.jp}</div>
-					
-					{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
-						<div class="romaji card-romaji">{card.romaji}</div>
+					<div class="jp word-big">{card.jp}</div>
+					{#if $showRomaji && card.romaji}
+						<div class="romaji-line">{card.romaji}</div>
 					{/if}
-
-					<div class="card-hint">{t('session.whatMean', $locale)}</div>
 				</div>
 
-				<div class="input-section">
-					<input
-						use:focusOnMount
-						type="text"
-						bind:value={answer}
-						bind:this={inputEl}
-						onkeydown={keydown}
-						placeholder={t('session.typeTranslation', $locale)}
-						class="hm-input type-input"
-						class:is-correct={submitted && isCorrect}
-						class:is-wrong={submitted && !isCorrect}
-						disabled={submitted}
-						autocomplete="off"
-						autocorrect="off"
-						spellcheck="false"
-					/>
+				<input
+					use:focusOnMount
+					type="text"
+					bind:value={answer}
+					bind:this={inputEl}
+					onkeydown={keydown}
+					placeholder={t('session.typeTranslation', $locale)}
+					class="type-input"
+					class:is-correct={submitted && isCorrect}
+					class:is-wrong={submitted && !isCorrect}
+					disabled={submitted}
+					autocomplete="off"
+					autocorrect="off"
+					spellcheck="false"
+				/>
 
-					{#if submitted}
-						<div
-							class="feedback-box"
-							class:correct={isCorrect}
-							class:wrong={!isCorrect}
-							use:fadeUp={{ y: 10 }}
-						>
-							<div class="feedback-header">
-								<div class="feedback-status">
-									{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-								</div>
-								{#if !isCorrect}
-									<div class="correct-answer">
-										{t('session.correctWas', $locale)}: <strong>{$locale === 'es' ? card.es : card.en}</strong>
-									</div>
-								{/if}
-							</div>
-
-							{#if card.example}
-								<div class="example-section">
-									<div class="example-content">
-										<div class="example-text jp">{card.example}</div>
-										{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
-											<div class="example-romaji">
-												{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}
-											</div>
-										{/if}
-										<div class="example-translation">
-											{$locale === 'es' ? card.example_es : card.example_en}
-										</div>
-									</div>
-								</div>
-							{/if}
+				{#if submitted}
+					<div class="feedback-box" class:correct={isCorrect} class:wrong={!isCorrect} use:fadeUp={{ y: 10 }}>
+						<div class="feedback-status">
+							{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
 						</div>
-					{/if}
-				</div>
+						{#if !isCorrect}
+							<div class="correct-answer">{t('session.correctWas', $locale)}: <strong>{$locale === 'es' ? card.es : card.en}</strong></div>
+						{/if}
+
+						{#if card.example}
+							<div class="example-section">
+								<div class="example-text jp">{card.example}</div>
+								{#if $showRomaji && card.romaji}
+									<div class="example-romaji">{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}</div>
+								{/if}
+								<div class="example-translation">{$locale === 'es' ? card.example_es : card.example_en}</div>
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -302,9 +272,25 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.close-btn, .lang-btn {
@@ -321,139 +307,143 @@
 	}
 
 	.type-viewer {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		justify-content: center;
+		gap: 18px;
 		width: 100%;
-		max-width: 520px;
+		max-width: 480px;
 		margin: 0 auto;
-		padding: 24px;
+		padding: 20px 0 8px;
 	}
 
-	.minimal-card {
-		background: var(--bg-surface);
-		border-radius: 40px;
-		padding: 40px 32px;
-		text-align: center;
-		box-shadow: var(--shadow-md);
+	.word-card {
 		position: relative;
-		border: 1px solid var(--ink-100);
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 28px;
+		box-shadow: 0 4px 24px rgba(26,26,26,0.08), 0 1px 4px rgba(26,26,26,0.04);
+		padding: clamp(28px, 6vw, 48px) 24px clamp(28px, 6vw, 40px);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		text-align: center;
+		width: 100%;
 	}
 
-	.card-tag {
-		font-size: 11px;
-		font-weight: 800;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		margin-bottom: 24px;
-	}
-
-	.audio-pill {
-		width: 48px;
-		height: 48px;
+	.audio-corner {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		width: 34px;
+		height: 34px;
 		border-radius: 50%;
 		border: 1.5px solid var(--ink-200);
-		background: var(--bg-surface);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-secondary);
-		transition: all 0.2s;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+		transition: background 0.15s;
 	}
 
-	.card-jp {
-		font-size: 42px;
+	.audio-corner:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
+	}
+
+	.word-big {
+		font-size: clamp(44px, 12vw, 64px);
 		font-weight: 800;
 		color: var(--fg-primary);
-		margin-top: 24px;
-		line-height: 1.2;
+		line-height: 1;
+		padding: 0 40px;
 	}
 
-	.card-romaji {
-		margin-top: 8px;
-		font-size: 18px;
+	.romaji-line {
+		font-size: clamp(15px, 4vw, 18px);
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
 
-	.card-hint {
-		margin-top: 24px;
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.input-section {
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-	}
-
 	.type-input {
 		width: 100%;
-		padding: 24px;
+		padding: 18px 20px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
-		border-radius: 24px;
-		font-size: 24px;
+		border-radius: 18px;
+		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-primary);
 		text-align: center;
-		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
-		box-shadow: var(--shadow-sm);
+		font-family: inherit;
+		transition: border-color 0.15s, box-shadow 0.15s;
 	}
 
 	.type-input::placeholder {
-		font-weight: 500;
-		font-size: 18px;
+		font-weight: 400;
+		font-size: 16px;
 		color: var(--fg-tertiary);
-		opacity: 0.6;
 	}
 
 	.type-input:focus {
 		outline: none;
 		border-color: var(--hinomaru-red);
-		box-shadow: 0 0 0 4px var(--hinomaru-red-wash), var(--shadow-md);
-		transform: scale(1.01);
+		box-shadow: 0 0 0 3px var(--hinomaru-red-wash);
 	}
 
 	.type-input.is-correct {
 		border-color: var(--success);
 		background: var(--success-wash);
 		color: var(--success);
+		box-shadow: 0 0 0 3px rgba(46,125,91,0.12);
 	}
 
 	.type-input.is-wrong {
 		border-color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 		color: var(--hinomaru-red);
+		box-shadow: 0 0 0 3px rgba(188,0,45,0.12);
 	}
 
 	.feedback-box {
-		padding: 24px;
-		border-radius: 24px;
+		padding: 16px 18px;
+		border-radius: 16px;
+		border: 1.5px solid var(--ink-200);
 		background: var(--bg-surface);
-		box-shadow: var(--shadow-sm);
-		border: 1px solid var(--ink-100);
+		max-height: 200px;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
 	}
 
-	.feedback-status { font-weight: 800; font-size: 18px; }
+	.feedback-box.correct {
+		border-color: var(--success);
+		background: var(--success-wash);
+	}
+
+	.feedback-box.wrong {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+	}
+
+	.feedback-status { font-weight: 800; font-size: 16px; }
 	.correct .feedback-status { color: var(--success); }
 	.wrong .feedback-status { color: var(--hinomaru-red); }
 
 	.correct-answer { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
-	.correct-answer strong { color: var(--fg-primary); }
+	.correct-answer strong { color: var(--fg-primary); font-weight: 700; }
 
 	.example-section {
-		margin-top: 16px;
-		padding-top: 16px;
+		margin-top: 14px;
+		padding-top: 14px;
 		border-top: 1px solid var(--ink-100);
 	}
 
-	.example-text { font-size: 17px; color: var(--fg-primary); font-weight: 600; }
-	.example-romaji { font-size: 13px; color: var(--hinomaru-red); margin-top: 4px; }
-	.example-translation { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+	.example-text { font-size: 16px; color: var(--fg-primary); font-weight: 600; }
+	.example-romaji { font-size: 12px; color: var(--hinomaru-red); margin-top: 3px; font-weight: 700; }
+	.example-translation { font-size: 13px; color: var(--fg-secondary); margin-top: 3px; }
 </style>

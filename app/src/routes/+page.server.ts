@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const today = new Date().toISOString().split('T')[0];
 
 	// Start all queries in parallel
-	const [decksRes, progressRes, streakRes, storyRes, wordRes] = await Promise.all([
+	const [decksRes, progressRes, streakRes, storyRes, wordRes, cardsRes] = await Promise.all([
 		locals.supabase.from('decks').select('*').order('level', { ascending: true }),
 		user
 			? locals.supabase
@@ -24,7 +24,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 					.lte('publish_date', today)
 					.order('id')
 			: Promise.resolve({ data: [] }),
-		locals.supabase.from('daily_words').select('*').eq('publish_date', today).maybeSingle()
+		locals.supabase.from('daily_words').select('*').eq('publish_date', today).maybeSingle(),
+		locals.supabase.from('cards').select('deck_id')
 	]);
 
 	const decks = decksRes.data ?? [];
@@ -32,6 +33,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const profile = streakRes.data;
 	const stories = storyRes.data ?? [];
 	const todayWord = wordRes.data;
+	const allCards = cardsRes.data ?? [];
+
+	// Calculate real card counts per deck
+	const realCardCounts: Record<string, number> = {};
+	for (const c of allCards) {
+		if (c.deck_id) {
+			realCardCounts[c.deck_id] = (realCardCounts[c.deck_id] ?? 0) + 1;
+		}
+	}
 
 	// Deterministic daily rotation matching /deck/stories/today
 	const daysSinceEpoch = Math.floor(Date.now() / 86_400_000);
@@ -124,6 +134,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		motivation: (profile as any)?.motivation,
 		decks: decks.map((d: any) => ({
 			...d,
+			card_count: realCardCounts[d.id] ?? d.card_count,
 			learned: learnedByDeck[d.id] ?? 0,
 			due: dueByDeck[d.id] ?? 0
 		})),
