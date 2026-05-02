@@ -240,6 +240,12 @@
 										{/if}
 										<div class="example-translation">{$locale === 'es' ? word.example_es : word.example_en}</div>
 									</div>
+								{:else}
+									<div class="example-block example-empty">
+										<div class="example-empty-text">
+											{$locale === 'es' ? 'Sin ejemplo disponible' : 'No example available'}
+										</div>
+									</div>
 								{/if}
 							</div>
 						</div>
@@ -450,6 +456,11 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
+	}
+
+	@supports (height: 1px) {
+		.back-scroll > :global(*) { flex-shrink: 0; }
 	}
 
 	.meaning-large {
@@ -502,6 +513,16 @@
 
 	.example-romaji { font-size: 13px; font-weight: 700; color: var(--hinomaru-red); }
 	.example-translation { font-size: 14px; color: var(--fg-secondary); line-height: 1.4; }
+
+	.example-empty { align-items: center; }
+	.example-empty-text {
+		font-size: 13px;
+		font-style: italic;
+		color: var(--fg-tertiary);
+		padding: 6px 12px;
+		background: var(--bg-muted);
+		border-radius: 10px;
+	}
 
 	.empty-state-wrapper {
 		flex: 1;

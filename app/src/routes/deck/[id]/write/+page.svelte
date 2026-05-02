@@ -404,7 +404,7 @@
 						{/if}
 						
 						<button class="tool-btn" onclick={toggleGuide} title={showGuide ? t('session.hideGuide', $locale) : t('session.showGuide', $locale)}>
-							<Icon icon={showGuide ? ViewOffIcon : EyeIcon} size={20} color="currentColor" />
+							<Icon icon={showGuide ? ViewOffIcon : EyeIcon} size={16} color="currentColor" />
 						</button>
 					</div>
 
@@ -625,15 +625,27 @@
 	}
 
 	.tool-btn {
-		width: 40px;
-		height: 40px;
-		border-radius: 12px;
+		width: 30px;
+		height: 30px;
+		border-radius: 8px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-secondary);
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.tool-btn:hover {
+		background: var(--bg-muted);
+		color: var(--fg-primary);
+		border-color: var(--ink-300);
+	}
+
+	.tool-btn:active {
+		transform: scale(0.95);
 	}
 
 	.canvas-wrapper {

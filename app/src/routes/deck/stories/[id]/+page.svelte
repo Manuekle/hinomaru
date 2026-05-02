@@ -56,7 +56,18 @@
 	let savedVocab = $state(new Set<string>());
 	let savingVocab = $state(new Set<string>());
 
-	async function saveVocabWord(word: { jp: string; kana: string; en: string; es: string }) {
+	async function saveVocabWord(word: {
+		jp: string;
+		kana: string;
+		en: string;
+		es: string;
+		romaji?: string;
+		example?: string;
+		example_en?: string;
+		example_es?: string;
+		example_kana?: string;
+		example_romaji?: string;
+	}) {
 		if (savedVocab.has(word.jp) || savingVocab.has(word.jp) || !supabase) return;
 		savingVocab = new Set([...savingVocab, word.jp]);
 		try {
@@ -68,8 +79,14 @@
 				user_id: user.id,
 				jp: word.jp,
 				kana: word.kana,
+				romaji: word.romaji ?? null,
 				en: word.en,
-				es: word.es
+				es: word.es,
+				example: word.example ?? null,
+				example_en: word.example_en ?? null,
+				example_es: word.example_es ?? null,
+				example_kana: word.example_kana ?? null,
+				example_romaji: word.example_romaji ?? null
 			});
 			if (error) {
 				if (error.code === '23505') {

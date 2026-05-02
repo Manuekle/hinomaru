@@ -23,7 +23,7 @@
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn, fadeUp } from '$lib/motion';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -38,8 +38,12 @@
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 	let error = $state<string | null>(null);
-	let supported = $state(true);
 	let lastErrorCode = $state<string | null>(null);
+
+	// Support detection: 'checking' until onMount runs (avoids flash of unsupported on SSR/first paint).
+	let supportState = $state<'checking' | 'supported' | 'unsupported' | 'denied'>('checking');
+	let mediaStream: MediaStream | null = null;
+	let unmounted = false;
 
 	function levenshtein(a: string, b: string): number {
 		if (a === b) return 0;
@@ -65,62 +69,124 @@
 
 	const card = $derived(queue.current);
 
-	let recognition: any;
+	let recognition: any = null;
 
 	onMount(() => {
 		const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 		if (!SpeechRecognition) {
-			supported = false;
+			supportState = 'unsupported';
 			return;
 		}
 		recognition = new SpeechRecognition();
 		recognition.lang = 'ja-JP';
 		recognition.interimResults = false;
 		recognition.maxAlternatives = 1;
+		recognition.continuous = false;
 
 		recognition.onresult = (event: any) => {
+			if (unmounted) return;
 			transcript = event.results[0][0].transcript;
 			isRecording = false;
 			processing = true;
 			setTimeout(() => {
+				if (unmounted) return;
 				processing = false;
 				submit();
 			}, 350);
 		};
 
 		recognition.onerror = (event: any) => {
+			if (unmounted) return;
 			console.error('Speech recognition error', event.error);
 			isRecording = false;
 			processing = false;
 			lastErrorCode = event.error;
-			if (event.error === 'no-speech') {
+			if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+				supportState = 'denied';
+				error = $locale === 'es'
+					? 'Permiso de micrófono denegado. Habilítalo en los ajustes del navegador.'
+					: 'Microphone permission denied. Enable it in browser settings.';
+			} else if (event.error === 'no-speech') {
 				error = t('speaking.noSpeech', $locale);
+			} else if (event.error === 'aborted') {
+				error = null;
 			} else {
 				error = t('speaking.unavailable', $locale);
 			}
+			stopMediaTracks();
 		};
 
 		recognition.onend = () => {
+			if (unmounted) return;
 			isRecording = false;
+			stopMediaTracks();
 		};
+
+		supportState = 'supported';
 	});
 
-	function toggleRecording() {
-		if (!supported || !recognition) return;
+	function stopMediaTracks() {
+		if (mediaStream) {
+			try { mediaStream.getTracks().forEach((tr) => tr.stop()); } catch { /* ignore */ }
+			mediaStream = null;
+		}
+	}
+
+	function fullStop() {
+		try { recognition?.abort?.(); } catch { /* ignore */ }
+		try { recognition?.stop?.(); } catch { /* ignore */ }
+		isRecording = false;
+		processing = false;
+		stopMediaTracks();
+	}
+
+	onDestroy(() => {
+		unmounted = true;
+		if (recognition) {
+			recognition.onresult = null;
+			recognition.onerror = null;
+			recognition.onend = null;
+		}
+		fullStop();
+	});
+
+	async function toggleRecording() {
+		if (supportState !== 'supported' || !recognition) return;
 		if (isRecording) {
 			try { recognition.stop(); } catch { /* ignore */ }
 			isRecording = false;
+			stopMediaTracks();
 			return;
 		}
 		error = null;
 		lastErrorCode = null;
 		transcript = '';
 		submitted = false;
+
+		// Acquire MediaStream explicitly so we can stop tracks on unmount —
+		// SpeechRecognition.stop() does not always release the mic on iOS Safari.
+		if (navigator.mediaDevices?.getUserMedia) {
+			try {
+				mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+			} catch (e: any) {
+				if (e?.name === 'NotAllowedError' || e?.name === 'SecurityError') {
+					supportState = 'denied';
+					error = $locale === 'es'
+						? 'Permiso de micrófono denegado. Habilítalo en los ajustes del navegador.'
+						: 'Microphone permission denied. Enable it in browser settings.';
+				} else {
+					error = t('speaking.unavailable', $locale);
+				}
+				return;
+			}
+		}
+
 		try {
 			recognition.start();
 			isRecording = true;
 		} catch (e) {
 			isRecording = false;
+			stopMediaTracks();
 			error = t('speaking.unavailable', $locale);
 		}
 	}
@@ -151,6 +217,7 @@
 	}
 
 	async function next() {
+		fullStop();
 		updateCardProgress(card, isCorrect, struggled);
 
 		if (!isCorrect) {
@@ -212,7 +279,7 @@
 
 <div class="session-layout premium-bg">
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={() => goto(`/deck/${data.deck.id}`)}>
+		<button class="close-btn" onclick={() => { fullStop(); goto(`/deck/${data.deck.id}`); }}>
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
 		</button>
 
@@ -255,17 +322,23 @@
 						{#if rom}<div class="romaji-sub">{rom}</div>{/if}
 					{/if}
 					<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
-					<button onclick={playAudio} class="audio-listen" aria-label="Play pronunciation">
-						<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
-						<span>{t('speaking.listen', $locale)}</span>
-					</button>
 				</div>
 
-				{#if !supported}
+				{#if supportState === 'checking'}
+					<div class="status-msg" use:fadeIn aria-live="polite">
+						{$locale === 'es' ? 'Verificando soporte…' : 'Checking support…'}
+					</div>
+				{:else if supportState === 'unsupported'}
 					<div class="error-msg" use:fadeIn>
 						{$locale === 'es'
 							? 'Reconocimiento de voz no disponible en este navegador. Usa Chrome o Edge.'
 							: 'Speech recognition not supported in this browser. Try Chrome or Edge.'}
+					</div>
+				{:else if supportState === 'denied'}
+					<div class="error-msg" use:fadeIn>
+						{$locale === 'es'
+							? 'Permiso de micrófono denegado. Habilítalo en los ajustes del navegador y recarga.'
+							: 'Microphone permission denied. Enable it in browser settings and reload.'}
 					</div>
 				{:else}
 					<div class="mic-area">
@@ -309,17 +382,10 @@
 					</div>
 				{/if}
 
-				<div class="transcript-box" aria-live="polite" class:empty={!transcript}>
-					{#if transcript}
-						<span class="transcript-label">{t('speaking.heard', $locale)}</span>
-						<div class="transcript-text jp">{transcript}</div>
-					{/if}
-				</div>
-
-				{#if error}
+				{#if error && !submitted}
 					<div class="error-msg" use:fadeIn>
 						{error}
-						{#if lastErrorCode === 'no-speech' && !submitted}
+						{#if lastErrorCode === 'no-speech'}
 							<button class="retry-btn" onclick={toggleRecording}>
 								{$locale === 'es' ? 'Intentar de nuevo' : 'Try again'}
 							</button>
@@ -328,15 +394,38 @@
 				{/if}
 
 				{#if submitted}
-					<div class="feedback-row" class:correct={isCorrect} use:fadeUp={{ y: 8 }}>
-						<div class="feedback-head">
-							<Icon icon={isCorrect ? ArrowRight01Icon : Cancel01Icon} size={18} color="currentColor" />
-							<span>{isCorrect ? t('session.correct', $locale) : t('session.answerIs', $locale, { a: card.jp })}</span>
+					{@const verdict = similarity >= 85 ? 'correct' : similarity >= 60 ? 'close' : 'wrong'}
+					<div class="result-card" data-verdict={verdict} use:fadeUp={{ y: 12 }}>
+						<div class="result-head">
+							<div class="verdict-icon">
+								<Icon icon={verdict === 'correct' ? Tick02Icon : verdict === 'close' ? ArrowRight01Icon : Cancel01Icon} size={20} color="currentColor" />
+							</div>
+							<div class="verdict-text">
+								{#if verdict === 'correct'}
+									{$locale === 'es' ? '¡Correcto!' : 'Correct!'}
+								{:else if verdict === 'close'}
+									{$locale === 'es' ? 'Casi' : 'Close'}
+								{:else}
+									{$locale === 'es' ? 'Inténtalo de nuevo' : 'Try again'}
+								{/if}
+							</div>
+							<div class="verdict-pct">{similarity}%</div>
 						</div>
+
+						<div class="result-grid">
+							<div class="result-row">
+								<span class="result-label">{$locale === 'es' ? 'Esperado' : 'Expected'}</span>
+								<span class="result-value jp">{card.jp}</span>
+							</div>
+							<div class="result-row">
+								<span class="result-label">{$locale === 'es' ? 'Reconocido' : 'Heard'}</span>
+								<span class="result-value jp">{transcript || '—'}</span>
+							</div>
+						</div>
+
 						<div class="similarity-bar" aria-label="Similarity">
 							<div class="similarity-fill" style="width:{similarity}%"></div>
 						</div>
-						<div class="similarity-label">{$locale === 'es' ? 'Similitud' : 'Similarity'}: <strong>{similarity}%</strong></div>
 					</div>
 				{/if}
 			</div>
@@ -486,27 +575,11 @@
 		color: var(--fg-secondary);
 	}
 
-	.audio-listen {
-		height: 44px;
-		padding: 0 18px;
-		border-radius: 22px;
-		border: 1.5px solid var(--ink-200);
-		background: var(--bg-muted);
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		color: var(--fg-secondary);
+	.status-msg {
 		font-size: 13px;
-		font-weight: 700;
-		cursor: pointer;
-		font-family: inherit;
-		-webkit-tap-highlight-color: transparent;
-		transition: all 0.15s;
-	}
-
-	.audio-listen:focus-visible {
-		outline: 2px solid var(--hinomaru-red);
-		outline-offset: 2px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+		text-align: center;
 	}
 
 	.mic-area {
@@ -627,26 +700,6 @@
 		min-height: 16px;
 	}
 
-	.transcript-box {
-		width: 100%;
-		padding: 14px 18px;
-		background: var(--bg-muted);
-		border-radius: 16px;
-		text-align: center;
-	}
-
-	.transcript-label {
-		display: block;
-		font-size: 10px;
-		font-weight: 800;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--fg-tertiary);
-		margin-bottom: 6px;
-	}
-
-	.transcript-text { font-size: 22px; font-weight: 700; color: var(--fg-primary); }
-
 	.error-msg {
 		font-size: 14px;
 		font-weight: 600;
@@ -669,35 +722,94 @@
 		cursor: pointer;
 	}
 
-	.transcript-box.empty {
-		visibility: hidden;
-		min-height: 56px;
+	.result-card {
+		width: 100%;
+		background: var(--bg-surface);
+		border-radius: 20px;
+		border: 1.5px solid var(--ink-200);
+		box-shadow: 0 8px 32px rgba(26,26,26,0.06);
+		padding: 18px 18px 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		animation: result-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.feedback-row {
+	@keyframes result-pop {
+		from { transform: scale(0.96); opacity: 0; }
+		to { transform: scale(1); opacity: 1; }
+	}
+
+	.result-card[data-verdict="correct"] { border-color: var(--success); background: linear-gradient(180deg, var(--success-wash), var(--bg-surface) 60%); }
+	.result-card[data-verdict="close"] { border-color: #d4a017; background: linear-gradient(180deg, rgba(212,160,23,0.08), var(--bg-surface) 60%); }
+	.result-card[data-verdict="wrong"] { border-color: var(--hinomaru-red); background: linear-gradient(180deg, var(--hinomaru-red-wash), var(--bg-surface) 60%); }
+
+	.result-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.verdict-icon {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		flex-shrink: 0;
+	}
+
+	.result-card[data-verdict="correct"] .verdict-icon { background: var(--success); }
+	.result-card[data-verdict="close"] .verdict-icon { background: #d4a017; }
+	.result-card[data-verdict="wrong"] .verdict-icon { background: var(--hinomaru-red); }
+
+	.verdict-text {
+		font-size: 16px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		flex: 1;
+	}
+
+	.verdict-pct {
+		font-size: 18px;
+		font-weight: 900;
+		color: var(--fg-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.result-grid {
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		padding: 14px 18px;
-		border-radius: 16px;
-		background: var(--hinomaru-red-wash);
-		color: var(--hinomaru-red);
-		font-size: 15px;
-		font-weight: 700;
-		width: 100%;
-		border: 1.5px solid rgba(188, 0, 45, 0.15);
+		padding: 12px 14px;
+		background: var(--bg-muted);
+		border-radius: 12px;
 	}
 
-	.feedback-row.correct {
-		background: var(--success-wash);
-		color: var(--success);
-		border-color: rgba(46, 125, 91, 0.18);
-	}
-
-	.feedback-head {
+	.result-row {
 		display: flex;
-		align-items: center;
-		gap: 8px;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.result-label {
+		font-size: 10px;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--fg-tertiary);
+		flex-shrink: 0;
+	}
+
+	.result-value {
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		text-align: right;
+		word-break: break-word;
 	}
 
 	.similarity-bar {
@@ -710,15 +822,11 @@
 
 	.similarity-fill {
 		height: 100%;
-		background: currentColor;
 		border-radius: 999px;
 		transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.similarity-label {
-		font-size: 12px;
-		font-weight: 600;
-		opacity: 0.85;
-	}
-	.similarity-label strong { font-weight: 800; }
+	.result-card[data-verdict="correct"] .similarity-fill { background: var(--success); }
+	.result-card[data-verdict="close"] .similarity-fill { background: #d4a017; }
+	.result-card[data-verdict="wrong"] .similarity-fill { background: var(--hinomaru-red); }
 </style>

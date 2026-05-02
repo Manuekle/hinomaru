@@ -100,6 +100,13 @@
 		romaji?: string;
 		en: string;
 		es: string;
+		example?: string;
+		example_en?: string;
+		example_es?: string;
+		example_kana?: string;
+		example_romaji?: string;
+		category?: string;
+		category_es?: string;
 	}) {
 		if (savedVocab.has(word.jp) || savingVocab.has(word.jp) || !supabase) return;
 		savingVocab = new Set([...savingVocab, word.jp]);
@@ -112,8 +119,16 @@
 				user_id: user.id,
 				jp: word.jp,
 				kana: word.kana,
+				romaji: word.romaji ?? null,
 				en: word.en,
-				es: word.es
+				es: word.es,
+				example: word.example ?? null,
+				example_en: word.example_en ?? null,
+				example_es: word.example_es ?? null,
+				example_kana: word.example_kana ?? null,
+				example_romaji: word.example_romaji ?? null,
+				category: word.category ?? null,
+				category_es: word.category_es ?? null
 			});
 			if (error) {
 				if (error.code === '23505') {
