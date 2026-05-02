@@ -22,6 +22,8 @@
 	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
 	import { comparePhrase } from '$lib/speaking/compare';
 	import { Mic01Icon } from '@hugeicons/core-free-icons';
+	import { onDestroy } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 
 
 	const supabase = createClient();
@@ -41,8 +43,8 @@
 	let fireConfetti = $state(false);
 
 	// Roleplay Mode
-	let roleplayMode = $state(true);
-	const recognizer = new JapaneseSpeechRecognizer();
+	let roleplayMode = $state(false);
+	const recognizer: JapaneseSpeechRecognizer = new JapaneseSpeechRecognizer();
 	let liveTranscript = $state('');
 	let isRecording = $state(false);
 	let speechError = $state<string | null>(null);
@@ -196,12 +198,13 @@
 		if (!scenario) { goto('/conversation'); return; }
 		speechStatus = getSpeechStatus();
 		speechHost = typeof location !== 'undefined' ? location.host : '';
+		if (!speechStatus.ok) {
+			roleplayMode = false;
+		}
 		const first = scenario.turns[0];
 		phase = first.type === 'choice' ? 'choice' : 'npc';
 	});
 
-	import { onDestroy } from 'svelte';
-	import { beforeNavigate } from '$app/navigation';
 	beforeNavigate(() => recognizer.abort());
 	onDestroy(() => recognizer.abort());
 
@@ -243,9 +246,10 @@
 						class="roleplay-toggle" 
 						class:active={roleplayMode}
 						onclick={() => (roleplayMode = !roleplayMode)}
+						aria-label={roleplayMode ? ($locale === 'es' ? 'Desactivar voz' : 'Disable voice') : ($locale === 'es' ? 'Activar voz' : 'Enable voice')}
 					>
 						<Icon icon={Mic01Icon} size={14} color="currentColor" />
-						{roleplayMode ? ($locale === 'es' ? 'Roleplay: ON' : 'Roleplay: ON') : ($locale === 'es' ? 'Roleplay: OFF' : 'Roleplay: OFF')}
+						<span>{roleplayMode ? ($locale === 'es' ? 'Voz: ON' : 'Voice: ON') : ($locale === 'es' ? 'Voz: OFF' : 'Voice: OFF')}</span>
 					</button>
 				{/if}
 			</div>

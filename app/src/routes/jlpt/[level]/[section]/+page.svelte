@@ -75,6 +75,8 @@
 		mondaiId: string;
 		audioFile?: string;
 		mode: 'choice' | 'typing';
+		romaji?: string;
+		choices_romaji?: string[];
 	}
 	let allQuestions = $state<FlatQuestion[]>([]);
 

@@ -83,22 +83,28 @@ export async function loadDeckSession(
 	});
 
 	// --- 4. Build session: reviews first, then new words ---
-	const remainingSlots = forceAll ? newCards.length : Math.max(0, dailyGoal - learnedToday);
+	// We use newSlots as a minimum floor for new cards to avoid tiny sessions,
+	// while still respecting the daily goal if it's larger.
+	const remainingSlots = forceAll ? newCards.length : Math.max(newSlots, dailyGoal - learnedToday);
 	const sessionNewCards = newCards.slice(0, remainingSlots);
 
 	let session = forceAll ? [...cards].sort(() => Math.random() - 0.5) : [...reviewCards, ...sessionNewCards];
 
-	// --- 5. Reinforcement: If session is empty, include most recently learned cards ---
+	// --- 5. Reinforcement: If session is too small, include most recently learned cards ---
 	const learnedCards = cards.filter((c: any) => c.progress?.[0]?.learned);
 	
-	if (!forceAll && session.length === 0 && learnedCards.length > 0) {
-		session = learnedCards
+	if (!forceAll && session.length < newSlots && learnedCards.length > 0) {
+		const existingIds = new Set(session.map(c => c.id));
+		const reinforcement = learnedCards
+			.filter(c => !existingIds.has(c.id))
 			.sort((a, b) => {
 				const da = new Date(a.progress[0].last_seen || 0).getTime();
 				const db = new Date(b.progress[0].last_seen || 0).getTime();
 				return db - da; // most recent first
 			})
-			.slice(0, 10);
+			.slice(0, newSlots - session.length);
+		
+		session = [...session, ...reinforcement];
 	}
 
 	const goalMet = learnedToday >= dailyGoal && reviewCards.length === 0;

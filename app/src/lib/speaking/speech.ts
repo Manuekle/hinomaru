@@ -35,7 +35,7 @@ export class JapaneseSpeechRecognizer {
 
 	get active() { return this._active || this._starting; }
 
-	async start(onResult: ResultCallback, onError: ErrorCallback, onEnd: EndCallback) {
+	public async start(onResult: ResultCallback, onError: ErrorCallback, onEnd: EndCallback) {
 		if (this._starting || this._active) {
 			this.abort();
 		}
@@ -147,7 +147,7 @@ export class JapaneseSpeechRecognizer {
 		}
 	}
 
-	stop() {
+	public stop() {
 		if (!this.rec) {
 			this._active = false;
 			this._starting = false;
@@ -157,7 +157,7 @@ export class JapaneseSpeechRecognizer {
 		try { this.rec.stop(); } catch { /* ignore */ }
 	}
 
-	abort() {
+	public abort() {
 		if (this.rec) {
 			try {
 				this.rec.onresult = null;

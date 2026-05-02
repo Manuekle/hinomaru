@@ -41,6 +41,8 @@
 		answer: number;
 		type: 'vocabulary' | 'grammar';
 		mondaiId: string;
+		romaji?: string;
+		choices_romaji?: string[];
 	}
 	let allQuestions = $state<FlatQuestion[]>([]);
 
