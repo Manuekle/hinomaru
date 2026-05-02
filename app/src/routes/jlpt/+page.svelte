@@ -180,7 +180,7 @@
 	<!-- Progress indicator -->
 	{#if completedCount(activeLevel) > 0}
 		<p use:fadeIn={{ delay: 0.2 }} style="font-size:12px;color:var(--fg-tertiary);margin:0 0 14px;font-weight:600;">
-			{completedCount(activeLevel)}/{totalAvailable(activeLevel)} secciones completadas
+			{completedCount(activeLevel)}/{totalAvailable(activeLevel)} {t('jlpt.sections_completed', $locale)}
 		</p>
 	{/if}
 
@@ -220,7 +220,7 @@
 						{#if section === 'listening'}
 							{t('jlpt.audioCount', $locale, { n: audioCount })}
 						{:else}
-							{t('jlpt.questionCount', $locale, { n: qCount })} · {lbl.es}
+							{t('jlpt.questionCount', $locale, { n: qCount })} · {lbl[$locale]}
 						{/if}
 					</div>
 				</div>
@@ -264,7 +264,7 @@
 					{#if passed}
 						{t('jlpt.ready', $locale)}
 					{:else}
-						{#if scores2.length > 0}{avg2}% promedio &middot; {/if}{t('jlpt.mock.desc', $locale)}
+						{#if scores2.length > 0}{avg2}% {t('jlpt.average', $locale)} &middot; {/if}{t('jlpt.mock.desc', $locale)}
 					{/if}
 				</div>
 			</div>

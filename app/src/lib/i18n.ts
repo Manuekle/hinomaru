@@ -570,7 +570,9 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'jlpt.sections.vocabulary': 'Vocabulary',
 		'jlpt.sections.grammar': 'Grammar',
 		'jlpt.sections.reading': 'Reading',
-		'jlpt.sections.listening': 'Listening'
+		'jlpt.sections.listening': 'Listening',
+		'jlpt.sections_completed': 'sections completed',
+		'jlpt.average': 'average'
 	},
 	es: {
 		'auth.signin.subtitle': 'Inicia sesión para guardar tu progreso.',
@@ -1102,6 +1104,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'jlpt.sections.grammar': 'Gramática',
 		'jlpt.sections.reading': 'Lectura',
 		'jlpt.sections.listening': 'Escucha',
+		'jlpt.sections_completed': 'secciones completadas',
+		'jlpt.average': 'promedio',
 		'landing.hero.badge': 'DOMINIO DEL JAPONÉS',
 		'landing.hero.tagline': 'Aprende japonés para el mundo real',
 		'landing.hero.tagline.pre': 'Aprende japonés para el',
