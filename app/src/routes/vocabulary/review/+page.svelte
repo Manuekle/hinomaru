@@ -11,11 +11,11 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import { kanaToRomaji } from '$lib/utils/romaji';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import { addXP } from '$lib/utils/gamification';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import { getWordMetadata } from '$lib/utils/vocab_registry';
+	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import { fadeIn } from '$lib/motion';
 	import type { PageData } from './$types';
@@ -27,12 +27,18 @@
 	let i = $state(0);
 	let flipped = $state(false);
 	let struggled = $state(false);
+	let correct = $state(0);
+	let showAnticipation = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 	let confettiRef = $state<{ fire: () => void } | null>(null);
 
 	const word = $derived(words[i]);
-	const meta = $derived(word ? getWordMetadata(word.jp) : null);
-	const pct = $derived(words.length > 0 ? ((i + 1) / words.length) * 100 : 0);
+	const rom = $derived(word ? safeRomaji(word.romaji, word.kana || word.jp) : '');
+	const exRom = $derived(
+		word?.example
+			? safeRomaji(word.example_romaji || word.extra?.example_romaji, word.example_kana || word.example)
+			: ''
+	);
 
 	onMount(() => {
 		if (cardEl) {
@@ -48,10 +54,8 @@
 		speakJapanese(text, undefined, slow ? 0.7 : 1);
 	}
 
-	async function updateWordProgress(w: any, gotIt: boolean, hadDifficulty: boolean = false) {
-		const {
-			data: { user }
-		} = await supabase.auth.getUser();
+	async function updateWordProgress(w: any, gotIt: boolean, hadDifficulty: boolean) {
+		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
 
 		const currentSRS = {
@@ -60,58 +64,55 @@
 			interval_days: w.interval_days || 0,
 			next_review: w.next_review
 		};
-
 		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentSRS);
 
 		await supabase
 			.from('user_saved_words')
-			.update({
-				...nextState,
-				last_seen: new Date().toISOString()
-			})
+			.update({ ...nextState, last_seen: new Date().toISOString() })
 			.eq('id', w.id);
 	}
 
 	async function next(gotIt: boolean) {
-		if (gotIt) playCorrect();
+		if (gotIt && !struggled) {
+			correct++;
+			playCorrect();
+		}
 		updateWordProgress(word, gotIt, struggled);
-
 		flipped = false;
 
 		if (i >= words.length - 1) {
 			playFinish();
-			if (cardEl) {
-				animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
-			}
 			confettiRef?.fire();
 			saveSession();
-			setTimeout(() => goto('/vocabulary'), 1500);
+			showAnticipation = true;
+			setTimeout(() => goto('/vocabulary'), 1600);
+			return;
+		}
+
+		if (cardEl) {
+			const dir = gotIt ? -1 : 1;
+			await animate(
+				cardEl,
+				{ opacity: [1, 0], x: [0, dir * 40] },
+				{ duration: 0.2, ease: 'easeIn' }
+			).finished;
+			i++;
+			flipped = false;
+			struggled = false;
+			await animate(
+				cardEl,
+				{ opacity: [0, 1], x: [dir * -40, 0] },
+				{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+			);
 		} else {
-			if (cardEl) {
-				const dir = gotIt ? -1 : 1;
-				await animate(
-					cardEl,
-					{ opacity: [1, 0], x: [0, dir * 40] },
-					{ duration: 0.2, ease: 'easeIn' }
-				).finished;
-				i++;
-				flipped = false;
-				struggled = false;
-				await animate(
-					cardEl,
-					{ opacity: [0, 1], x: [dir * -40, 0] },
-					{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-				);
-			} else {
-				i++;
-				flipped = false;
-				struggled = false;
-			}
+			i++;
+			flipped = false;
+			struggled = false;
 		}
 	}
 
-	async function retry() {
+	function retry() {
 		struggled = true;
 		playWrong();
 		flipped = false;
@@ -121,20 +122,16 @@
 	}
 
 	async function saveSession() {
-		const {
-			data: { user }
-		} = await supabase.auth.getUser();
+		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
-
 		await supabase.from('sessions').insert({
 			user_id: user.id,
 			mode: 'vocabulary_review',
-			correct: words.length,
+			correct,
 			total: words.length
 		});
-
 		await updateStreak(supabase, user.id);
-		await addXP(supabase, user.id, 15);
+		await addXP(supabase, user.id, correct * 5);
 	}
 
 	function getFontSize(text: string) {
@@ -159,11 +156,11 @@
 		</button>
 
 		<div class="header-progress">
-			{i + 1} / {words.length}
+			{Math.min(i + 1, words.length)} / {words.length}
 		</div>
 
-		<button 
-			class="lang-btn" 
+		<button
+			class="lang-btn"
 			class:active={$showRomaji}
 			onclick={() => ($showRomaji = !$showRomaji)}
 			title="Toggle Romaji"
@@ -189,8 +186,9 @@
 					tabindex="0"
 					bind:this={cardEl}
 					class="card-scene"
+					aria-label="Flashcard — tap to flip"
 					onclick={() => (flipped = !flipped)}
-					onkeydown={(e) => e.key === ' ' && (flipped = !flipped)}
+					onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), (flipped = !flipped))}
 				>
 					<div class="card-body" class:flipped>
 						<!-- Front -->
@@ -200,35 +198,45 @@
 							<div class="word-center">
 								<div class="jp word-text" style="font-size:{getFontSize(word.jp)};">{word.jp}</div>
 								<div class="audio-row">
-									<button onclick={(e) => { e.stopPropagation(); speak(word.jp); }} class="audio-btn">
+									<button
+										onclick={(e) => { e.stopPropagation(); speak(word.jp); }}
+										class="audio-btn"
+										aria-label="Play normal speed"
+									>
 										<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
 									</button>
-									<button onclick={(e) => { e.stopPropagation(); speak(word.jp, true); }} class="audio-btn slow-btn">
+									<button
+										onclick={(e) => { e.stopPropagation(); speak(word.jp, true); }}
+										class="audio-btn slow-btn"
+										aria-label="Play slow speed"
+									>
 										<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
-										<span class="slow-label">0.7×</span>
+										<span class="slow-label" aria-hidden="true">0.7×</span>
 									</button>
 								</div>
 							</div>
 
-							<span class="tap-hint">{t('session.flip', $locale)}</span>
+							<span class="tap-hint" aria-hidden="true">{t('session.flip', $locale)}</span>
 						</div>
 
 						<!-- Back -->
 						<div class="card-face card-back">
 							<div class="back-scroll">
 								<div class="meaning-large">{$locale === 'es' ? word.es : word.en}</div>
-								<div class="romaji-red">{word.romaji || kanaToRomaji(word.kana)}</div>
+								{#if $showRomaji && rom}
+									<div class="romaji-red">{rom}</div>
+								{/if}
 
 								{#if word.example}
 									<div class="example-block">
 										<div class="example-jp jp">
 											{word.example}
-											<button onclick={(e) => { e.stopPropagation(); speak(word.example); }} class="mini-audio">
+											<button onclick={(e) => { e.stopPropagation(); speak(word.example); }} class="mini-audio" aria-label="Play example">
 												<Icon icon={VolumeHighIcon} size={13} color="currentColor" />
 											</button>
 										</div>
-										{#if $showRomaji}
-											<div class="example-romaji">{word.example_romaji || word.extra?.example_romaji || kanaToRomaji(word.example_kana || word.example)}</div>
+										{#if $showRomaji && exRom}
+											<div class="example-romaji">{exRom}</div>
 										{/if}
 										<div class="example-translation">{$locale === 'es' ? word.example_es : word.example_en}</div>
 									</div>
@@ -241,7 +249,7 @@
 		{/if}
 	</div>
 
-	{#if word}
+	{#if word && !showAnticipation}
 		<StickyFooter>
 			{#if !flipped}
 				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => (flipped = true)}>
@@ -258,6 +266,10 @@
 		</StickyFooter>
 	{/if}
 </div>
+
+{#if showAnticipation}
+	<AnticipationScreen />
+{/if}
 
 <style>
 	.premium-bg {
@@ -300,7 +312,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 24px 0 24px;
+		padding: 24px 0;
 	}
 
 	.card-scene {
@@ -312,16 +324,24 @@
 		background: none;
 		border: none;
 		padding: 0;
-		display: block;
+		display: flex;
 		font: inherit;
+	}
+
+	.card-scene:focus-visible {
+		outline: 3px solid var(--hinomaru-red);
+		outline-offset: 6px;
+		border-radius: 32px;
 	}
 
 	.card-body {
 		position: relative;
 		width: 100%;
 		height: 100%;
-		transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.64, 1);
+		flex: 1;
+		transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 		transform-style: preserve-3d;
+		will-change: transform;
 	}
 
 	.card-body.flipped { transform: rotateY(180deg); }
@@ -394,8 +414,15 @@
 		align-items: center;
 		gap: 6px;
 		color: var(--fg-secondary);
+		cursor: pointer;
 		transition: all 0.15s;
 		font-family: inherit;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.audio-btn:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
 	}
 
 	.slow-btn {
@@ -470,6 +497,7 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-tertiary);
+		cursor: pointer;
 	}
 
 	.example-romaji { font-size: 13px; font-weight: 700; color: var(--hinomaru-red); }

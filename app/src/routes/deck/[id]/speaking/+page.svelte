@@ -31,6 +31,7 @@
 	const queue = $derived.by(() => createMistakeQueue<any>(data.cards as any[]));
 
 	let isRecording = $state(false);
+	let processing = $state(false);
 	let transcript = $state('');
 	let submitted = $state(false);
 	let correct = $state(0);
@@ -39,6 +40,28 @@
 	let error = $state<string | null>(null);
 	let supported = $state(true);
 	let lastErrorCode = $state<string | null>(null);
+
+	function levenshtein(a: string, b: string): number {
+		if (a === b) return 0;
+		if (!a.length) return b.length;
+		if (!b.length) return a.length;
+		const dp: number[] = Array(b.length + 1);
+		for (let j = 0; j <= b.length; j++) dp[j] = j;
+		for (let i = 1; i <= a.length; i++) {
+			let prev = dp[0];
+			dp[0] = i;
+			for (let j = 1; j <= b.length; j++) {
+				const tmp = dp[j];
+				dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+				prev = tmp;
+			}
+		}
+		return dp[b.length];
+	}
+
+	const micState = $derived<'idle' | 'recording' | 'processing' | 'done'>(
+		submitted ? 'done' : isRecording ? 'recording' : processing ? 'processing' : 'idle'
+	);
 
 	const card = $derived(queue.current);
 
@@ -58,12 +81,17 @@
 		recognition.onresult = (event: any) => {
 			transcript = event.results[0][0].transcript;
 			isRecording = false;
-			submit();
+			processing = true;
+			setTimeout(() => {
+				processing = false;
+				submit();
+			}, 350);
 		};
 
 		recognition.onerror = (event: any) => {
 			console.error('Speech recognition error', event.error);
 			isRecording = false;
+			processing = false;
 			lastErrorCode = event.error;
 			if (event.error === 'no-speech') {
 				error = t('speaking.noSpeech', $locale);
@@ -97,13 +125,19 @@
 		}
 	}
 
-	const isCorrect = $derived.by(() => {
-		if (!card || !transcript) return false;
-		const normalize = (s: string) => s.normalize('NFKC').replace(/[、。！？.,\s]/g, '').toLowerCase();
-		const user = normalize(transcript);
-		const target = normalize(card.jp);
-		return user === target;
+	const normalize = (s: string) => s.normalize('NFKC').replace(/[、。！？.,\s]/g, '').toLowerCase();
+
+	const similarity = $derived.by(() => {
+		if (!card || !transcript) return 0;
+		const u = normalize(transcript);
+		const tgt = normalize(card.jp);
+		if (!u || !tgt) return 0;
+		const dist = levenshtein(u, tgt);
+		const maxLen = Math.max(u.length, tgt.length);
+		return Math.max(0, Math.round(((maxLen - dist) / maxLen) * 100));
 	});
+
+	const isCorrect = $derived(similarity >= 85);
 
 	function submit() {
 		submitted = true;
@@ -208,25 +242,23 @@
 			/>
 		{:else if card}
 			<div class="speaking-viewer">
-				<!-- Card — same visual as flashcard front -->
-				<div class="card-outer">
-					<div class="speak-card">
-
-
-						<div class="word-center">
-							<div class="jp word-text" style="font-size:{card.jp.length <= 4 ? 'var(--fs-display)' : card.jp.length <= 6 ? 'var(--fs-2xl)' : card.jp.length <= 10 ? 'var(--fs-xl)' : 'var(--fs-lg)'};">{card.jp}</div>
-							{#if $showRomaji}
-								{@const rom = safeRomaji(card.romaji, card.jp)}
-								{#if rom}<div class="romaji-sub">{rom}</div>{/if}
-							{/if}
-							<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
-						</div>
-
-						<button onclick={playAudio} class="audio-listen" aria-label="Play pronunciation">
-							<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
-							<span>{t('speaking.listen', $locale)}</span>
+				<div class="prompt-card">
+					<div class="prompt-meta">
+						<span class="prompt-tag">{t('mode.speaking.title', $locale)}</span>
+						<button onclick={playAudio} class="audio-mini" aria-label="Play pronunciation">
+							<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
 						</button>
 					</div>
+					<div class="jp word-text" style="font-size:{card.jp.length <= 4 ? 'var(--fs-display)' : card.jp.length <= 6 ? 'var(--fs-2xl)' : card.jp.length <= 10 ? 'var(--fs-xl)' : 'var(--fs-lg)'};">{card.jp}</div>
+					{#if $showRomaji}
+						{@const rom = safeRomaji(card.romaji, card.jp)}
+						{#if rom}<div class="romaji-sub">{rom}</div>{/if}
+					{/if}
+					<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
+					<button onclick={playAudio} class="audio-listen" aria-label="Play pronunciation">
+						<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
+						<span>{t('speaking.listen', $locale)}</span>
+					</button>
 				</div>
 
 				{#if !supported}
@@ -236,21 +268,43 @@
 							: 'Speech recognition not supported in this browser. Try Chrome or Edge.'}
 					</div>
 				{:else}
-					<!-- Mic + feedback below card -->
 					<div class="mic-area">
 						<button
 							class="mic-btn"
-							class:is-recording={isRecording}
+							data-state={micState}
 							onclick={toggleRecording}
-							disabled={submitted}
+							disabled={submitted || processing}
 							aria-label={isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
 							aria-pressed={isRecording}
 						>
 							<div class="mic-ring"></div>
-							<Icon icon={isRecording ? Tick02Icon : Mic01Icon} size={30} color="currentColor" />
+							<div class="mic-ring mic-ring-2"></div>
+							{#if micState === 'recording'}
+								<div class="wave" aria-hidden="true">
+									{#each Array(5) as _, idx (idx)}
+										<span style="animation-delay:{idx * 0.1}s"></span>
+									{/each}
+								</div>
+							{:else if micState === 'processing'}
+								<div class="dots" aria-hidden="true">
+									<span></span><span></span><span></span>
+								</div>
+							{:else if micState === 'done'}
+								<Icon icon={isCorrect ? Tick02Icon : Cancel01Icon} size={32} color="currentColor" />
+							{:else}
+								<Icon icon={Mic01Icon} size={32} color="currentColor" />
+							{/if}
 						</button>
 						<div class="mic-label" aria-hidden="true">
-							{isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
+							{#if micState === 'recording'}
+								{t('speaking.stop', $locale)}
+							{:else if micState === 'processing'}
+								{$locale === 'es' ? 'Procesando…' : 'Processing…'}
+							{:else if micState === 'done'}
+								{isCorrect ? `${similarity}%` : `${similarity}%`}
+							{:else}
+								{t('speaking.speak', $locale)}
+							{/if}
 						</div>
 					</div>
 				{/if}
@@ -275,8 +329,14 @@
 
 				{#if submitted}
 					<div class="feedback-row" class:correct={isCorrect} use:fadeUp={{ y: 8 }}>
-						<Icon icon={isCorrect ? ArrowRight01Icon : Cancel01Icon} size={16} color="currentColor" />
-						<span>{isCorrect ? t('session.correct', $locale) : t('session.answerIs', $locale, { a: card.jp })}</span>
+						<div class="feedback-head">
+							<Icon icon={isCorrect ? ArrowRight01Icon : Cancel01Icon} size={18} color="currentColor" />
+							<span>{isCorrect ? t('session.correct', $locale) : t('session.answerIs', $locale, { a: card.jp })}</span>
+						</div>
+						<div class="similarity-bar" aria-label="Similarity">
+							<div class="similarity-fill" style="width:{similarity}%"></div>
+						</div>
+						<div class="similarity-label">{$locale === 'es' ? 'Similitud' : 'Similarity'}: <strong>{similarity}%</strong></div>
 					</div>
 				{/if}
 			</div>
@@ -361,50 +421,57 @@
 		padding: 24px 0 8px;
 	}
 
-	.card-outer {
+	.prompt-card {
 		width: 100%;
-	}
-
-	.speak-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 28px;
-		box-shadow: 0 4px 24px rgba(26,26,26,0.08), 0 1px 4px rgba(26,26,26,0.04);
-		padding: 20px 24px 24px;
+		box-shadow: 0 8px 32px rgba(26,26,26,0.06), 0 1px 4px rgba(26,26,26,0.04);
+		padding: 18px 22px 22px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
-		gap: 16px;
-		min-height: clamp(200px, 40vw, 280px);
+		gap: 14px;
+		text-align: center;
 	}
 
-	.card-tag {
+	.prompt-meta {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+	}
+
+	.prompt-tag {
 		font-size: 10px;
 		font-weight: 800;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		color: var(--fg-tertiary);
-		background: var(--bg-muted);
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
 		padding: 4px 10px;
 		border-radius: 20px;
-		align-self: flex-start;
 	}
 
-	.word-center {
-		flex: 1;
+	.audio-mini {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
-		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 10px;
-		text-align: center;
+		color: var(--fg-secondary);
+		cursor: pointer;
 	}
 
 	.word-text {
 		color: var(--fg-primary);
-		line-height: 1;
-		font-weight: 700;
+		line-height: 1.05;
+		font-weight: 800;
+		padding: 8px 0;
+		word-break: break-word;
 	}
 
 	.romaji-sub {
@@ -446,60 +513,118 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 14px;
-		padding: 8px 0;
+		gap: 16px;
+		padding: 12px 0 4px;
 	}
 
 	.mic-btn {
-		width: 88px;
-		height: 88px;
+		width: 104px;
+		height: 104px;
 		border-radius: 50%;
 		border: none;
-		background: var(--hinomaru-red);
+		background: linear-gradient(135deg, var(--hinomaru-red), #d4002f);
 		color: white;
 		position: relative;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 6px 24px rgba(188, 0, 45, 0.28);
-		transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s, color 0.15s;
+		box-shadow: 0 10px 32px rgba(188, 0, 45, 0.32), inset 0 1px 0 rgba(255,255,255,0.2);
+		transition: transform 0.18s cubic-bezier(0.34, 1.5, 0.64, 1), box-shadow 0.2s, background 0.2s;
 		-webkit-tap-highlight-color: transparent;
 	}
 
-	.mic-btn:active { transform: scale(0.92); box-shadow: 0 2px 12px rgba(188, 0, 45, 0.2); }
-	.mic-btn:disabled { opacity: 0.45; cursor: default; }
+	.mic-btn:active { transform: scale(0.94); }
+	.mic-btn:disabled { cursor: default; }
+
+	.mic-btn[data-state="processing"] {
+		background: linear-gradient(135deg, #555, #2a2a2a);
+		box-shadow: 0 10px 32px rgba(0,0,0,0.25);
+	}
+
+	.mic-btn[data-state="recording"] {
+		background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+		box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+		transform: scale(1.04);
+	}
+
+	.mic-btn[data-state="done"] {
+		background: linear-gradient(135deg, #2e7d5b, #1f5e44);
+		box-shadow: 0 10px 32px rgba(46, 125, 91, 0.3);
+	}
+
+	.mic-btn[data-state="done"]:disabled { opacity: 1; }
 
 	.mic-ring {
 		position: absolute;
-		inset: -10px;
+		inset: -8px;
 		border-radius: 50%;
 		border: 2px solid var(--hinomaru-red);
 		opacity: 0;
 		pointer-events: none;
 	}
 
-	.is-recording .mic-ring {
-		animation: pulse-ring 1.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-	}
+	.mic-ring-2 { inset: -16px; }
 
-	.is-recording {
-		background: var(--fg-primary);
-		color: var(--bg-surface);
-		box-shadow: 0 6px 24px rgba(26, 26, 26, 0.2);
+	.mic-btn[data-state="recording"] .mic-ring {
+		border-color: rgba(188, 0, 45, 0.6);
+		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+	}
+	.mic-btn[data-state="recording"] .mic-ring-2 {
+		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
 	}
 
 	@keyframes pulse-ring {
-		0% { transform: scale(0.85); opacity: 0.7; }
-		100% { transform: scale(1.35); opacity: 0; }
+		0% { transform: scale(0.9); opacity: 0.7; }
+		100% { transform: scale(1.5); opacity: 0; }
+	}
+
+	.wave {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		height: 36px;
+	}
+
+	.wave span {
+		width: 4px;
+		height: 100%;
+		background: white;
+		border-radius: 2px;
+		animation: wave-bounce 0.9s ease-in-out infinite;
+		transform-origin: center;
+	}
+
+	@keyframes wave-bounce {
+		0%, 100% { transform: scaleY(0.3); }
+		50% { transform: scaleY(1); }
+	}
+
+	.dots {
+		display: flex;
+		gap: 6px;
+	}
+	.dots span {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: white;
+		animation: dot-pulse 1s ease-in-out infinite;
+	}
+	.dots span:nth-child(2) { animation-delay: 0.15s; }
+	.dots span:nth-child(3) { animation-delay: 0.3s; }
+	@keyframes dot-pulse {
+		0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+		40% { opacity: 1; transform: scale(1.1); }
 	}
 
 	.mic-label {
 		font-size: 12px;
 		font-weight: 800;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
+		min-height: 16px;
 	}
 
 	.transcript-box {
@@ -551,19 +676,49 @@
 
 	.feedback-row {
 		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 16px;
-		border-radius: 14px;
+		flex-direction: column;
+		gap: 10px;
+		padding: 14px 18px;
+		border-radius: 16px;
 		background: var(--hinomaru-red-wash);
 		color: var(--hinomaru-red);
 		font-size: 15px;
 		font-weight: 700;
 		width: 100%;
+		border: 1.5px solid rgba(188, 0, 45, 0.15);
 	}
 
 	.feedback-row.correct {
 		background: var(--success-wash);
 		color: var(--success);
+		border-color: rgba(46, 125, 91, 0.18);
 	}
+
+	.feedback-head {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.similarity-bar {
+		width: 100%;
+		height: 8px;
+		background: rgba(0,0,0,0.06);
+		border-radius: 999px;
+		overflow: hidden;
+	}
+
+	.similarity-fill {
+		height: 100%;
+		background: currentColor;
+		border-radius: 999px;
+		transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.similarity-label {
+		font-size: 12px;
+		font-weight: 600;
+		opacity: 0.85;
+	}
+	.similarity-label strong { font-weight: 800; }
 </style>

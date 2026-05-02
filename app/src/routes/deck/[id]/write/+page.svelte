@@ -83,6 +83,7 @@
 	let checked = $state(false);
 	let strokeError = $state(false);
 	let showGuide = $state(true);
+	let charJustCompleted = $state(false);
 
 	let hanziContainer = $state<HTMLDivElement | null>(null);
 	let writers = $state<{ writer: HanziWriterInstance; box: HTMLDivElement; char: string }[]>([]);
@@ -174,7 +175,9 @@
 
 		const theme = document.documentElement.getAttribute('data-theme') || 'light';
 		const strokeColor = theme === 'dark' ? '#ff0033' : '#bc002d';
-		const outlineColor = theme === 'dark' ? '#444444' : '#f0f0f0';
+		const outlineColor = theme === 'dark' ? '#444444' : '#e8e8e8';
+		const drawingColor = theme === 'dark' ? '#ff3355' : '#bc002d';
+		const highlightColor = '#2e7d5b';
 
 		const charDataResults = await Promise.all(
 			chars.map((c) => fetchCharData(c, c.codePointAt(0)!))
@@ -209,6 +212,10 @@
 				delayBetweenStrokes: 100,
 				strokeColor,
 				outlineColor,
+				drawingColor,
+				drawingWidth: 18,
+				highlightOnComplete: true,
+				highlightCompleteColor: highlightColor,
 				charDataLoader: () => charData as any
 			});
 
@@ -244,13 +251,17 @@
 		if (current) {
 			current.writer.quiz({
 				onComplete: () => {
-					if (currentQuizIndex < writers.length - 1) {
-						currentQuizIndex++;
-						startQuiz();
-					} else {
-						checked = true;
-						playCorrect();
-					}
+					charJustCompleted = true;
+					setTimeout(() => {
+						charJustCompleted = false;
+						if (currentQuizIndex < writers.length - 1) {
+							currentQuizIndex++;
+							startQuiz();
+						} else {
+							checked = true;
+							playCorrect();
+						}
+					}, 700);
 				}
 			});
 		}
@@ -573,27 +584,33 @@
 	.canvas-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-start;
+		gap: 8px;
 		padding: 0 8px;
 	}
 
 	.char-progress {
 		display: flex;
-		gap: 8px;
+		flex-wrap: wrap;
+		gap: 6px;
+		min-width: 0;
+		flex: 1;
 	}
 
 	.char-dot {
-		width: 32px;
-		height: 32px;
+		width: 30px;
+		height: 30px;
 		border-radius: 8px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
+		flex-shrink: 0;
+		transition: transform 0.2s, background 0.2s, border-color 0.2s;
 	}
 
 	.char-dot.active {
