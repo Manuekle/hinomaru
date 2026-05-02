@@ -8,7 +8,7 @@
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import Roadmap from '$lib/components/Roadmap.svelte';
-	import { Settings02Icon, CheckmarkCircle01Icon, LayoutGrid02Icon, RouteIcon } from '@hugeicons/core-free-icons';
+	import { Settings02Icon, CheckmarkCircle01Icon, Grid02Icon, RouteIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -170,7 +170,7 @@
 					class="view-mode-btn"
 					class:active={viewMode === 'grid'}
 				>
-					<Icon icon={LayoutGrid02Icon} size={18} color="currentColor" />
+					<Icon icon={Grid02Icon} size={18} color="currentColor" />
 				</button>
 				<button 
 					onclick={() => viewMode = 'roadmap'}
