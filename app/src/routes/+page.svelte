@@ -7,7 +7,8 @@
 	import Landing from '$lib/components/Landing.svelte';
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { Settings02Icon, CheckmarkCircle01Icon } from '@hugeicons/core-free-icons';
+	import Roadmap from '$lib/components/Roadmap.svelte';
+	import { Settings02Icon, CheckmarkCircle01Icon, LayoutGrid02Icon, RouteIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -15,6 +16,7 @@
 
 	const levels = ['Survival', 'N5', 'N4', 'N3', 'N2', 'N1'];
 	let activeLevel = $state(data.motivation === 'travel' ? 'Survival' : 'N5');
+	let viewMode = $state('roadmap'); // 'grid' or 'roadmap'
 
 
 	const filtered = $derived(data.decks.filter((d: any) => d.level === activeLevel));
@@ -138,25 +140,46 @@
 
 		<div
 			use:fadeIn={{ delay: 0.18 }}
-			class="hide-scrollbar"
-			style="display:flex;gap:8px;margin-top:32px;margin-bottom:20px;overflow-x:auto;"
+			style="display:flex; justify-content: space-between; align-items: center; margin-top: 32px; margin-bottom: 20px;"
 		>
-			{#each levels as level (level)}
-				<button
-					onclick={() => {
-						activeLevel = level;
-					}}
-					class="touch-action-manip"
-					style="height:42px;padding:0 16px;border-radius:999px;
-               border:1px solid {activeLevel === level ? 'var(--sumi)' : 'var(--ink-200)'};
-               background:{activeLevel === level ? 'var(--sumi)' : 'var(--bg-surface)'};
-               color:{activeLevel === level ? 'var(--bg-surface)' : 'var(--sumi)'};
-               font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-ui);
-               white-space:nowrap;flex-shrink:0;transition:background 180ms ease,color 180ms ease,border-color 180ms ease;"
+			<div
+				class="hide-scrollbar"
+				style="display:flex;gap:8px;overflow-x:auto;"
+			>
+				{#each levels as level (level)}
+					<button
+						onclick={() => {
+							activeLevel = level;
+						}}
+						class="touch-action-manip"
+						style="height:42px;padding:0 16px;border-radius:999px;
+						border:1px solid {activeLevel === level ? 'var(--sumi)' : 'var(--ink-200)'};
+						background:{activeLevel === level ? 'var(--sumi)' : 'var(--bg-surface)'};
+						color:{activeLevel === level ? 'var(--bg-surface)' : 'var(--sumi)'};
+						font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-ui);
+						white-space:nowrap;flex-shrink:0;transition:all 180ms ease;"
+					>
+						{level}
+					</button>
+				{/each}
+			</div>
+
+			<div style="display: flex; gap: 4px;">
+				<button 
+					onclick={() => viewMode = 'grid'}
+					class="view-mode-btn"
+					class:active={viewMode === 'grid'}
 				>
-					{level}
+					<Icon icon={LayoutGrid02Icon} size={18} color="currentColor" />
 				</button>
-			{/each}
+				<button 
+					onclick={() => viewMode = 'roadmap'}
+					class="view-mode-btn"
+					class:active={viewMode === 'roadmap'}
+				>
+					<Icon icon={RouteIcon} size={18} color="currentColor" />
+				</button>
+			</div>
 		</div>
 
 		<div style="display:grid; grid-template-columns: 1fr;">
@@ -164,16 +187,20 @@
 				<div
 					in:fly={{ y: 20, duration: 300, delay: 200, easing: cubicOut }}
 					out:fly={{ y: -20, duration: 200, easing: cubicIn }}
-					style="grid-area: 1 / 1; display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px; align-content: start;"
+					style="grid-area: 1 / 1; align-content: start;"
 				>
-					{#if filtered.length === 0}
-						<div
-							style="padding:40px;text-align:center;color:var(--fg-tertiary);border:1px dashed var(--ink-200);border-radius:24px;grid-column:1 / -1;"
-						>
-							{t('home.empty', $locale)}
-						</div>
-					{/if}
-					{#each filtered as deck (deck.id)}
+					{#if viewMode === 'roadmap' && activeLevel === 'N5'}
+						<Roadmap decks={data.decks} />
+					{:else}
+						<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+							{#if filtered.length === 0}
+								<div
+									style="padding:40px;text-align:center;color:var(--fg-tertiary);border:1px dashed var(--ink-200);border-radius:24px;grid-column:1 / -1;"
+								>
+									{t('home.empty', $locale)}
+								</div>
+							{/if}
+							{#each filtered as deck (deck.id)}
 						{@const pct =
 							deck.card_count > 0 ? Math.round(((deck.learned ?? 0) / deck.card_count) * 100) : 0}
 						{@const complete = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
@@ -222,7 +249,9 @@
 								</div>
 							</div>
 						</a>
-					{/each}
+							{/each}
+						</div>
+					{/if}
 				</div>
 			{/key}
 		</div>
@@ -445,6 +474,26 @@
 		align-items: flex-end;
 		gap: 8px;
 		flex-shrink: 0;
+	}
+
+	.view-mode-btn {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		color: var(--fg-tertiary);
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.view-mode-btn.active {
+		background: var(--sumi);
+		border-color: var(--sumi);
+		color: var(--bg-surface);
 	}
 
 	.story-level-pill {

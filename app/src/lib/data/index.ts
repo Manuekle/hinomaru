@@ -101,15 +101,16 @@ export const DECKS: DeckDef[] = [
 		cards: healthPhrases
 	},
 
+	// ── N5 — Roadmap Units ───────────────────────────────────────────────────
 	{
 		id: 'n5-hiragana',
 		level: 'N5',
 		kind: 'Hiragana',
 		kind_es: 'Hiragana',
-		title_en: 'All 46 hiragana',
-		title_es: 'Los 46 hiragana',
-		desc_en: 'The foundational syllabary. Start here if it is your first time.',
-		desc_es: 'El silabario base. Empieza aquí si es tu primera vez.',
+		title_en: 'Hiragana Foundations',
+		title_es: 'Bases del Hiragana',
+		desc_en: 'The essential Japanese alphabet.',
+		desc_es: 'El alfabeto japonés esencial.',
 		cards: n5Hiragana
 	},
 	{
@@ -117,22 +118,143 @@ export const DECKS: DeckDef[] = [
 		level: 'N5',
 		kind: 'Katakana',
 		kind_es: 'Katakana',
-		title_en: 'All 46 katakana',
-		title_es: 'Los 46 katakana',
-		desc_en: 'Used for foreign loanwords, emphasis, and onomatopoeia.',
-		desc_es: 'Para extranjerismos, énfasis y onomatopeya.',
+		title_en: 'Katakana Alphabet',
+		title_es: 'Alfabeto Katakana',
+		desc_en: 'For foreign words and emphasis.',
+		desc_es: 'Para palabras extranjeras y énfasis.',
 		cards: n5Katakana
 	},
 	{
-		id: 'n5-vocab',
+		id: 'n5-greetings',
 		level: 'N5',
 		kind: 'Vocabulary',
 		kind_es: 'Vocabulario',
-		title_en: 'Essential vocabulary',
-		title_es: 'Vocabulario esencial',
-		desc_en: '149 must-know words: greetings, verbs, adjectives, daily life.',
-		desc_es: '149 palabras clave: saludos, verbos, adjetivos, vida cotidiana.',
-		cards: n5Vocab
+		title_en: 'Greetings',
+		title_es: 'Saludos y Cortesía',
+		desc_en: 'Learn to say hello and thank you.',
+		desc_es: 'Aprende a decir hola y gracias.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Saludos')
+	},
+	{
+		id: 'survival-intro',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Introductions',
+		title_es: 'Presentación Personal',
+		desc_en: 'Say your name and where you are from.',
+		desc_es: 'Di tu nombre y de dónde vienes.',
+		cards: introPhrases
+	},
+	{
+		id: 'n5-numbers',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Numbers',
+		title_es: 'Números',
+		desc_en: 'Counting from 1 to 100.',
+		desc_es: 'Contando del 1 al 100.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Números')
+	},
+	{
+		id: 'n5-family',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Family',
+		title_es: 'La Familia',
+		desc_en: 'Identify family members.',
+		desc_es: 'Identifica a los miembros de la familia.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Familia')
+	},
+	{
+		id: 'n5-food',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Food & Drinks',
+		title_es: 'Comida y Bebida',
+		desc_en: 'Ramen, Sushi, and more.',
+		desc_es: 'Ramen, Sushi y más.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Comida')
+	},
+	{
+		id: 'n5-animals',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Animals',
+		title_es: 'Animales',
+		desc_en: 'Common pets and animals.',
+		desc_es: 'Mascotas y animales comunes.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Animales')
+	},
+	{
+		id: 'n5-colors',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Colors',
+		title_es: 'Colores',
+		desc_en: 'Red, Blue, Green...',
+		desc_es: 'Rojo, Azul, Verde...',
+		cards: n5Vocab.filter((c) => c.category_es === 'Colores')
+	},
+	{
+		id: 'n5-weather',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Weather & Nature',
+		title_es: 'Clima y Naturaleza',
+		desc_en: 'Sun, rain, and mountains.',
+		desc_es: 'Sol, lluvia y montañas.',
+		cards: n5Vocab.filter((c) => c.category_es?.match(/Clima|Naturaleza/))
+	},
+	{
+		id: 'n5-verbs',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Action Verbs',
+		title_es: 'Verbos de Acción',
+		desc_en: 'Eat, sleep, and study.',
+		desc_es: 'Comer, dormir y estudiar.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Verbos')
+	},
+	{
+		id: 'n5-adjectives',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Adjectives',
+		title_es: 'Adjetivos',
+		desc_en: 'Describe things: big, small, new.',
+		desc_es: 'Describe cosas: grande, pequeño, nuevo.',
+		cards: n5Vocab.filter((c) => c.pos_es?.match(/adj/i))
+	},
+	{
+		id: 'n5-places',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Places & Travel',
+		title_es: 'Lugares y Viajes',
+		desc_en: 'School, Station, Hospital.',
+		desc_es: 'Escuela, Estación, Hospital.',
+		cards: n5Vocab.filter((c) => c.category_es?.match(/Lugares|Transporte/))
+	},
+	{
+		id: 'n5-grammar-intro',
+		level: 'N5',
+		kind: 'Grammar',
+		kind_es: 'Gramática',
+		title_en: 'Basic Sentences',
+		title_es: 'Frases Básicas (Desu)',
+		desc_en: 'How to use "Desu" and "Wa".',
+		desc_es: 'Cómo usar "Desu" y "Wa".',
+		grammar: n5Grammar.slice(0, 5)
 	},
 	{
 		id: 'n5-kanji',
