@@ -12,6 +12,7 @@ import { vocabulary as n2Vocab } from './n2/vocabulary';
 import { grammar as n2Grammar } from './n2/grammar';
 import { vocabulary as n1Vocab } from './n1/vocabulary';
 import { grammar as n1Grammar } from './n1/grammar';
+import { phrases as introPhrases } from './survival/introduction';
 import { phrases as survivalPhrases } from './survival/phrases';
 import { restaurantPhrases } from './survival/restaurant';
 import { shoppingPhrases } from './survival/shopping';
@@ -20,6 +21,18 @@ import { hotelPhrases } from './survival/hotel';
 import { healthPhrases } from './survival/health';
 
 export const DECKS: DeckDef[] = [
+	// ── Introduction ──────────────────────────────────────────────────────────
+	{
+		id: 'survival-intro',
+		level: 'Survival',
+		kind: 'Vocabulary',
+		kind_es: 'Supervivencia',
+		title_en: 'Self-Introduction',
+		title_es: 'Presentación Personal',
+		desc_en: 'Learn to introduce yourself and share basic info.',
+		desc_es: 'Aprende a presentarte y compartir información básica.',
+		cards: introPhrases
+	},
 	// ── Survival ──────────────────────────────────────────────────────────────
 	{
 		id: 'survival-travel',
