@@ -1,4 +1,5 @@
 import { normalizeJapanese } from './normalize';
+import { kanaToRomaji } from '../utils/romaji';
 
 // ── Auto-split a Japanese phrase into natural segments ────────────────────────
 // Strategy: split after common particles/auxiliaries so segments feel natural.
@@ -62,7 +63,7 @@ export function cardsToPhrases(
 				phrases.push({
 					id: `${c.id}-example`,
 					text: c.example,
-					reading: c.example_romaji ?? c.example,
+					reading: c.example_romaji ?? kanaToRomaji(c.example),
 					meaning: exMeaning || meaning,
 					segments: autoSegment(c.example),
 					isExample: true

@@ -7,12 +7,13 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { onMount, onDestroy } from 'svelte';
-	import SessionNav from '$lib/components/SessionNav.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { Award01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { Award01Icon, VolumeHighIcon, Clock01Icon, Cancel01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
+	import { fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
-	import { svileo } from '$lib/stores/toast';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
@@ -22,27 +23,23 @@
 	const allCards = $derived(data.cards as any[]);
 	const supabase = createClient();
 
-	// ── State ──────────────────────────────────────────────────────────────
 	let sessionCards = $state<any[]>([]);
 	let currentIndex = $state(0);
 	let currentSet = $state<any[]>([]);
 
-	// Track selection by unique key = id+type
 	let selectedKey = $state<string | null>(null);
 	let matchedIds = new SvelteSet<string>();
-	let wrongKeys = new SvelteSet<string>(); // flash red on wrong pick
-	let wrongCounts = new Map<string, number>(); // card.id -> wrong match attempts
+	let wrongKeys = new SvelteSet<string>();
+	let wrongCounts = new Map<string, number>();
 
-	// Timer
 	let elapsed = $state(0);
 	let timerInterval: ReturnType<typeof setInterval> | null = null;
 
 	let finalTime = $state(0);
 	let finished = $state(false);
-	let transitioning = $state(false); // prevent clicks during set transition
-	let showSuccess = $state(false); // brief green flash per match
+	let transitioning = $state(false);
 
-	const SET_SIZE = 4; // pairs per round
+	const SET_SIZE = 4;
 
 	onMount(() => {
 		sessionCards = [...allCards].sort(() => Math.random() - 0.5);
@@ -56,7 +53,6 @@
 		if (timerInterval) clearInterval(timerInterval);
 	});
 
-	// ── Helpers ────────────────────────────────────────────────────────────
 	function makeKey(id: string, type: string) {
 		return `${id}__${type}`;
 	}
@@ -79,39 +75,32 @@
 		transitioning = false;
 	}
 
-	// ── Selection logic ────────────────────────────────────────────────────
 	function select(item: any) {
 		if (transitioning) return;
 		if (matchedIds.has(item.id)) return;
 
 		const key = makeKey(item.id, item.type);
 
-		// Tap same card → deselect
 		if (selectedKey === key) {
 			selectedKey = null;
 			return;
 		}
 
-		// Play audio for JP cards
 		if (item.type === 'jp') speakJapanese(item.text);
 
-		// Nothing selected yet → select this
 		if (!selectedKey) {
 			selectedKey = key;
 			return;
 		}
 
-		// Parse the previously selected key
 		const [prevId, prevType] = selectedKey.split('__');
 
 		if (prevId === item.id && prevType !== item.type) {
-			// ✅ Correct match!
 			matchedIds.add(item.id);
 			selectedKey = null;
 			wrongKeys.clear();
 			playCorrect();
 
-			// Check if the round is complete
 			const roundSize = Math.min(SET_SIZE, sessionCards.length - currentIndex);
 			if (matchedIds.size >= roundSize) {
 				transitioning = true;
@@ -121,7 +110,6 @@
 				}, 500);
 			}
 		} else {
-			// ❌ Wrong match — flash red briefly, track per card
 			const prevCardId = prevId;
 			wrongCounts.set(prevCardId, (wrongCounts.get(prevCardId) ?? 0) + 1);
 			wrongCounts.set(item.id, (wrongCounts.get(item.id) ?? 0) + 1);
@@ -136,14 +124,12 @@
 		}
 	}
 
-	// ── Game finish ────────────────────────────────────────────────────────
 	async function finishGame() {
 		if (timerInterval) clearInterval(timerInterval);
 		finalTime = elapsed;
 		finished = true;
 		playFinish();
 
-		// Fire DB ops in background — don't block UI
 		supabase.auth.getUser().then(async ({ data: { user } }) => {
 			if (!user) return;
 			await supabase.from('sessions').insert({
@@ -177,13 +163,6 @@
 		goto(`/deck/${data.deck.id}`);
 	}
 
-	// ── Derived ────────────────────────────────────────────────────────────
-	const progress = $derived(
-		allCards.length > 0
-			? Math.min(100, ((currentIndex + matchedIds.size) / allCards.length) * 100)
-			: 0
-	);
-
 	const formatTime = (s: number) => {
 		const m = Math.floor(s / 60);
 		const sec = s % 60;
@@ -191,426 +170,291 @@
 	};
 </script>
 
-<div class="match-container">
-	<SessionNav
-		{progress}
-		current={currentIndex + matchedIds.size}
-		total={sessionCards.length}
-		title={t('session.matchMode', $locale)}
-		showTimer={true}
-		{elapsed}
-		onClose={goBack}
-	/>
+<div class="session-layout premium-bg">
+	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+		<button class="close-btn" onclick={goBack}>
+			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+		</button>
 
-	{#if allCards.length === 0}
-		<!-- Empty state -->
-		<div
-			style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;"
-		>
-			<div style="font-size:48px;margin-bottom:16px;">📭</div>
-			<p style="color:var(--fg-secondary);">{t('home.empty', $locale)}</p>
-			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark" style="text-decoration:none;"
-				>{t('deck.back', $locale)}</a
-			>
+		<div class="header-progress">
+			{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}
 		</div>
-	{:else if !finished}
-		<!-- Centered game area -->
-		<div class="game-area">
-			<div class="match-grid" style="--cols:2;--rows:{Math.ceil(currentSet.length / 2)};">
-				{#each currentSet as item (item.id + item.type)}
-					{@const key = makeKey(item.id, item.type)}
-					{@const isMatched = matchedIds.has(item.id)}
-					{@const isSelected = selectedKey === key}
-					{@const isWrong = wrongKeys.has(key)}
-					<!-- Keep matched cards in DOM as placeholders so grid doesn't shift -->
-					<button
-						class="match-card"
-						class:selected={isSelected}
-						class:matched={isMatched}
-						class:wrong={isWrong}
-						class:jp-card={item.type === 'jp' && !isMatched}
-						onclick={() => select(item)}
-						disabled={isMatched || transitioning}
-						aria-pressed={isSelected}
-					>
-						{#if !isMatched}
-							<div class="card-inner">
-								<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
-								{#if isSelected && item.type === 'jp' && $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-									<div class="romaji-hint">{item.romaji}</div>
-								{/if}
-								{#if item.type === 'jp'}
-									<div class="audio-hint">
-										<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-									</div>
-								{/if}
-							</div>
-						{:else}
-							<!-- Matched state: show checkmark briefly then collapse -->
-							<div class="matched-icon">✓</div>
-						{/if}
-					</button>
-				{/each}
-			</div>
 
-			<!-- Round hint -->
-			<div class="round-hint">
-				{t('session.matchHint', $locale) || 'Empareja el japonés con su significado'}
-			</div>
-		</div>
-	{:else}
-		<!-- Finish screen -->
-		<div class="finish-overlay">
-			<div class="finish-card">
-				<div class="finish-icon">
-					<Icon icon={Award01Icon} size={48} color="var(--washi)" strokeWidth={1.5} />
+		<button class="lang-btn">
+			<Icon icon={TranslateIcon} size={24} color="currentColor" />
+		</button>
+	</div>
+
+	<div class="session-container">
+		{#if allCards.length === 0}
+			<SessionEmptyState 
+				totalCards={data.totalCards} 
+				learnedCount={data.learnedCount}
+				sessionCount={allCards.length} 
+				deckId={data.deck.id} 
+				modeLabel={t('mode.match.title', $locale)}
+			/>
+		{:else if !finished}
+			<div class="game-area">
+				<div class="match-grid">
+					{#each currentSet as item (item.id + item.type)}
+						{@const key = makeKey(item.id, item.type)}
+						{@const isMatched = matchedIds.has(item.id)}
+						{@const isSelected = selectedKey === key}
+						{@const isWrong = wrongKeys.has(key)}
+						<button
+							class="match-card"
+							class:selected={isSelected}
+							class:matched={isMatched}
+							class:wrong={isWrong}
+							class:jp-card={item.type === 'jp'}
+							onclick={() => select(item)}
+							disabled={isMatched || transitioning}
+						>
+							{#if !isMatched}
+								<div class="card-inner">
+									<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
+									{#if item.type === 'jp' && $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
+										<div class="romaji-hint">{item.romaji}</div>
+									{/if}
+								</div>
+							{:else}
+								<div class="matched-icon">✓</div>
+							{/if}
+						</button>
+					{/each}
 				</div>
-				<h2>{t('session.wellDone', $locale) || '¡Muy bien!'}</h2>
-				<div class="finish-time">{formatTime(finalTime)}</div>
-				<p style="color:var(--fg-secondary);font-size:15px;margin:0 0 32px;">
-					{allCards.length}
-					{t('home.cards', $locale) || 'cartas'} completadas
-				</p>
-				<div class="finish-actions">
-					<button
-						class="hm-btn hm-btn-secondary"
-						style="flex:1;"
-						onclick={() => {
-							if (timerInterval) clearInterval(timerInterval);
-							finished = false;
-							currentIndex = 0;
-							elapsed = 0;
-							wrongCounts.clear();
-							sessionCards = [...allCards].sort(() => Math.random() - 0.5);
-							loadNextSet();
-							timerInterval = setInterval(() => elapsed++, 1000);
-						}}
-					>
-						↺ {t('session.again', $locale) || 'Otra vez'}
-					</button>
-					<button class="hm-btn hm-btn-dark" style="flex:1;" onclick={goBack}>
-						{t('session.finish', $locale) || 'Terminar'}
-					</button>
+				<div class="round-hint">
+					{t('session.matchHint', $locale)}
 				</div>
 			</div>
-		</div>
-	{/if}
-
-	{#if finished}
-		<Confetti fireOnMount={true} />
-	{/if}
+		{:else}
+			<div class="finish-overlay">
+				<div class="finish-card">
+					<div class="finish-icon">
+						<Icon icon={Award01Icon} size={48} color="white" />
+					</div>
+					<h2 class="well-done">{t('session.wellDone', $locale)}</h2>
+					<div class="finish-time">{formatTime(finalTime)}</div>
+					<p class="finish-desc">{allCards.length} {t('home.cards', $locale)} completadas</p>
+					<div class="finish-actions">
+						<button class="action-btn-secondary" style="flex:1;" onclick={() => location.reload()}>
+							↺ {t('session.again', $locale)}
+						</button>
+						<button class="action-btn-primary" style="flex:1;" onclick={goBack}>
+							{t('session.finish', $locale)}
+						</button>
+					</div>
+				</div>
+			</div>
+		{/if}
+	</div>
 </div>
 
+{#if finished}
+	<Confetti fireOnMount={true} />
+{/if}
+
 <style>
-	.match-container {
-		display: flex;
-		flex-direction: column;
+	.premium-bg {
+		background-color: var(--bg-page);
 		min-height: 100dvh;
-		background: var(--paper);
-		padding-bottom: 0;
 	}
 
-	/* ── Centered game area ── */
+	.premium-header-minimal {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
+		background: var(--bg-surface);
+		border-bottom: 1px solid var(--ink-200);
+	}
+
+	.header-progress {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--fg-primary);
+	}
+
+	.close-btn, .lang-btn {
+		color: var(--fg-secondary);
+		background: none;
+		border: none;
+		padding: 8px;
+		cursor: pointer;
+	}
+
 	.game-area {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 32px 0 max(24px, env(safe-area-inset-bottom));
+		width: 100%;
+		padding: 24px;
 	}
 
-	/* ── Grid ── */
 	.match-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 10px;
-		padding: 0 16px;
-		max-width: 540px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
 		width: 100%;
-		box-sizing: border-box;
-		align-content: start;
+		max-width: 520px;
 	}
 
-	/* ── Cards ── */
 	.match-card {
+		aspect-ratio: 1.8/1;
 		background: var(--bg-surface);
-		border: 2px solid var(--ink-200);
-		border-radius: 18px;
+		border: 1.5px solid var(--ink-200);
+		border-radius: 24px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 16px 12px;
-		min-height: 80px;
+		padding: 16px;
 		cursor: pointer;
-		transition:
-			border-color 180ms ease,
-			background 180ms ease,
-			transform 150ms ease,
-			opacity 300ms ease,
-			box-shadow 180ms ease;
-		text-align: center;
+		transition: all 0.2s;
 		position: relative;
-		overflow: hidden;
-		touch-action: manipulation;
+		box-shadow: var(--shadow-sm);
 	}
 
-	.match-card::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: transparent;
-		transition: background 180ms ease;
-		pointer-events: none;
-		border-radius: 16px;
-	}
-
-	@media (hover: hover) {
-		.match-card:not(:disabled):hover {
-			border-color: var(--ink-300);
-			box-shadow: var(--shadow-sm);
-			transform: translateY(-1px);
-		}
-	}
-
-	.match-card:not(:disabled):active {
-		transform: scale(0.96);
-	}
-
-	/* JP cards get a subtle tint to distinguish them */
 	.match-card.jp-card {
-		background: color-mix(in srgb, var(--bg-surface) 96%, var(--hinomaru-red) 4%);
+		background: var(--bg-muted);
+	}
+
+	.match-card:not(:disabled):hover {
+		transform: translateY(-2px);
+		border-color: var(--hinomaru-red);
 	}
 
 	.match-card.selected {
 		border-color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
-		box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.15);
-		transform: scale(1.02);
-	}
-
-	.match-card.wrong {
-		border-color: #e55;
-		background: rgba(220, 50, 50, 0.08);
-		animation: shake 0.4s ease;
+		box-shadow: 0 0 0 4px var(--hinomaru-red-wash);
 	}
 
 	.match-card.matched {
 		border-color: var(--success);
 		background: var(--success-wash);
-		pointer-events: none;
+		opacity: 0.5;
 		cursor: default;
-		animation: match-success 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+		transform: scale(0.95);
 	}
 
-	.matched-icon {
-		font-size: 24px;
-		color: var(--success);
-		font-weight: 600;
-		opacity: 0;
-		animation: fade-check 0.4s ease 0.1s forwards;
+	.match-card.wrong {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		animation: shake 0.4s;
 	}
 
-	@keyframes match-success {
-		0% {
-			transform: scale(1);
-			border-color: var(--success);
-			background: var(--success-wash);
-			opacity: 1;
-		}
-		40% {
-			transform: scale(1.06);
-		}
-		100% {
-			transform: scale(1);
-			opacity: 1;
-		}
-	}
-
-	@keyframes fade-check {
-		0% {
-			opacity: 0;
-			transform: scale(0.5);
-		}
-		60% {
-			opacity: 1;
-			transform: scale(1.2);
-		}
-		100% {
-			opacity: 1;
-			transform: scale(1);
-		}
-	}
-
-	.card-inner {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 4px;
-		width: 100%;
-	}
+	.card-inner { text-align: center; }
 
 	.card-text {
-		font-size: 15px;
-		color: var(--sumi);
-		font-weight: 600;
-		line-height: 1.3;
-		word-break: break-word;
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		line-height: 1.2;
 	}
 
 	.card-text.jp {
-		font-size: 22px;
+		font-size: 26px;
 		font-family: var(--font-jp);
-		font-weight: 700;
 	}
 
 	.romaji-hint {
-		font-size: 11px;
+		font-size: 12px;
+		font-weight: 700;
 		color: var(--hinomaru-red);
-		font-weight: 600;
-		opacity: 0.85;
-		letter-spacing: 0.02em;
+		margin-top: 6px;
 	}
 
-	.audio-hint {
-		font-size: 12px;
-		opacity: 0.3;
-		position: absolute;
-		bottom: 6px;
-		right: 8px;
-	}
+	.matched-icon { font-size: 28px; color: var(--success); }
 
-	/* ── Round hint ── */
 	.round-hint {
-		text-align: center;
-		font-size: 12px;
+		margin-top: 40px;
+		font-size: 14px;
 		color: var(--fg-tertiary);
-		padding: 12px 24px 20px;
-		font-weight: 500;
-		font-family: var(--font-ui);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
-	/* ── Finish screen ── */
 	.finish-overlay {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
-		backdrop-filter: blur(8px);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		width: 100%;
 		padding: 24px;
-		z-index: 100;
 	}
 
 	.finish-card {
 		background: var(--bg-surface);
-		border-radius: 32px;
-		padding: 40px 32px;
+		border-radius: 40px;
+		padding: 48px 40px;
 		width: 100%;
-		max-width: 360px;
+		max-width: 440px;
 		text-align: center;
 		box-shadow: var(--shadow-lg);
-		animation: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+		border: 1px solid var(--ink-100);
 	}
 
 	.finish-icon {
-		width: 80px;
-		height: 80px;
-		border-radius: 50%;
+		width: 88px;
+		height: 88px;
 		background: var(--hinomaru-red);
+		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 0 auto 20px;
+		margin: 0 auto 24px;
+		box-shadow: 0 8px 24px var(--hinomaru-red-wash);
 	}
 
-	.finish-card h2 {
-		margin: 0 0 4px;
-		font-size: 28px;
-		font-weight: 600;
-		letter-spacing: -0.02em;
-		color: var(--sumi);
-	}
+	.well-done { font-size: 28px; font-weight: 900; color: var(--fg-primary); margin-bottom: 8px; }
 
 	.finish-time {
-		font-size: 48px;
-		font-weight: 600;
+		font-size: 56px;
+		font-weight: 900;
 		color: var(--hinomaru-red);
-		font-variant-numeric: tabular-nums;
+		margin: 12px 0;
 		letter-spacing: -0.02em;
-		margin-bottom: 8px;
 	}
 
-	.finish-actions {
-		display: flex;
-		gap: 10px;
-		width: 100%;
+	.finish-desc { color: var(--fg-secondary); font-size: 16px; margin-bottom: 32px; }
+
+	.finish-actions { display: flex; gap: 12px; }
+
+	.action-btn-primary {
+		height: 60px;
+		border-radius: 30px;
+		background: var(--hinomaru-red);
+		color: #fff;
+		border: none;
+		font-size: 17px;
+		font-weight: 800;
+		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
 	}
 
-	/* ── Animations ── */
+	.action-btn-secondary {
+		height: 60px;
+		border-radius: 30px;
+		background: var(--bg-surface);
+		color: var(--fg-primary);
+		border: 1.5px solid var(--ink-200);
+		font-size: 17px;
+		font-weight: 800;
+	}
+
 	@keyframes shake {
-		0%,
-		100% {
-			transform: translateX(0);
-		}
-		20% {
-			transform: translateX(-6px);
-		}
-		40% {
-			transform: translateX(6px);
-		}
-		60% {
-			transform: translateX(-4px);
-		}
-		80% {
-			transform: translateX(4px);
-		}
+		10%, 90% { transform: translate3d(-1px, 0, 0); }
+		20%, 80% { transform: translate3d(2px, 0, 0); }
+		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+		40%, 60% { transform: translate3d(4px, 0, 0); }
 	}
 
-	@keyframes slide-up {
-		from {
-			opacity: 0;
-			transform: translateY(24px) scale(0.96);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0) scale(1);
-		}
-	}
-
-	/* ── Mobile tweaks ── */
-	@media (max-width: 420px) {
-		.game-area {
-			padding: 20px 0 max(20px, env(safe-area-inset-bottom));
-		}
-		.match-grid {
-			gap: 8px;
-			padding: 0 12px;
-		}
-		.match-card {
-			padding: 12px 8px;
-			min-height: 70px;
-			border-radius: 14px;
-		}
-		.card-text {
-			font-size: 14px;
-		}
-		.card-text.jp {
-			font-size: 20px;
-		}
-	}
-	/* ── Dark Mode ── */
-	:global([data-theme='dark']) .match-card {
-		background: var(--ink-100);
-		border-color: var(--ink-200);
-	}
-	:global([data-theme='dark']) .match-card.selected {
-		background: var(--hinomaru-red-wash);
-		border-color: var(--hinomaru-red);
-	}
-	:global([data-theme='dark']) .match-card.matched {
-		background: var(--success-wash);
-		border-color: var(--success);
+	@media (max-width: 480px) {
+		.match-grid { gap: 12px; }
+		.match-card { border-radius: 20px; padding: 12px; }
+		.card-text { font-size: 15px; }
+		.card-text.jp { font-size: 22px; }
 	}
 </style>

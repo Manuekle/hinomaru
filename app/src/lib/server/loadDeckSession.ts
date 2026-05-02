@@ -8,6 +8,8 @@ export interface DeckSessionData {
 	goalMet: boolean;
 	reviewCount: number;
 	newCount: number;
+	learnedCount: number;
+	totalCards: number;
 }
 
 /**
@@ -22,7 +24,8 @@ export interface DeckSessionData {
 export async function loadDeckSession(
 	supabase: SupabaseClient,
 	deckId: string,
-	userId: string | null
+	userId: string | null,
+	forceAll: boolean = false
 ): Promise<DeckSessionData> {
 	const now = new Date().toISOString();
 
@@ -80,9 +83,24 @@ export async function loadDeckSession(
 	});
 
 	// --- 4. Build session: reviews first, then new words ---
-	const session = [...reviewCards, ...newCards];
+	let session = forceAll ? [...cards].sort(() => Math.random() - 0.5) : [...reviewCards, ...newCards];
+
+	// --- 5. Reinforcement: If session is empty, include most recently learned cards ---
+	const learnedCards = cards.filter((c: any) => c.progress?.[0]?.learned);
+	
+	if (!forceAll && session.length === 0 && learnedCards.length > 0) {
+		session = learnedCards
+			.sort((a, b) => {
+				const da = new Date(a.progress[0].last_seen || 0).getTime();
+				const db = new Date(b.progress[0].last_seen || 0).getTime();
+				return db - da; // most recent first
+			})
+			.slice(0, 10);
+	}
 
 	const goalMet = learnedToday >= dailyGoal && reviewCards.length === 0;
+
+	const learnedCount = learnedCards.length;
 
 	return {
 		cards: session,
@@ -91,6 +109,8 @@ export async function loadDeckSession(
 		newSlots,
 		goalMet,
 		reviewCount: reviewCards.length,
-		newCount: newCards.length
+		newCount: newCards.length,
+		learnedCount,
+		totalCards: cards.length
 	};
 }

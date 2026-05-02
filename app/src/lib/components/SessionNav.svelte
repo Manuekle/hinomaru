@@ -11,7 +11,8 @@
 		onClose,
 		showTimer = false,
 		elapsed = 0,
-		showRomajiToggle = false
+		showRomajiToggle = false,
+		showProgressBar = true
 	} = $props<{
 		progress: number;
 		current: number;
@@ -21,6 +22,7 @@
 		showTimer?: boolean;
 		elapsed?: number;
 		showRomajiToggle?: boolean;
+		showProgressBar?: boolean;
 	}>();
 
 	const formatTime = (s: number) => {
@@ -31,10 +33,11 @@
 </script>
 
 <div class="session-nav-container">
-	<!-- Progress bar -->
-	<div class="progress-wrapper">
-		<div class="progress-fill" style="width: {progress}%"></div>
-	</div>
+	{#if showProgressBar}
+		<div class="progress-wrapper">
+			<div class="progress-fill" style="width: {progress}%"></div>
+		</div>
+	{/if}
 
 	<div class="nav-content">
 		<!-- Left: Close button -->
@@ -50,9 +53,11 @@
 				{#if title}
 					<span class="mode-title">{title}</span>
 				{/if}
-				<span class="progress-text">
-					{current} / {total}
-				</span>
+				{#if total > 0}
+					<span class="progress-text">
+						{current} / {total}
+					</span>
+				{/if}
 			</div>
 		</div>
 

@@ -1,6 +1,11 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { 
+		VolumeHighIcon, 
+		Cancel01Icon, 
+		TranslateIcon,
+		Clock01Icon
+	} from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -11,10 +16,12 @@
 	import { t } from '$lib/i18n';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import SessionNav from '$lib/components/SessionNav.svelte';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import { kanaToRomaji } from '$lib/utils/romaji';
+	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import { fadeIn } from '$lib/motion';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -29,14 +36,27 @@
 	const cards = $derived(queue.cards);
 	const i = $derived(queue.index);
 	const card = $derived(queue.current);
-	const pct = $derived(queue.progressPct);
 	const isCorrect = $derived(picked === ($locale === 'es' ? card?.es : card?.en));
+
+	// Timer
+	let elapsed = $state(0);
+	let timerInterval: any;
+
+	const formatTime = (s: number) => {
+		const m = Math.floor(s / 60);
+		const sec = s % 60;
+		return m > 0 ? `${m}:${sec.toString().padStart(2, '0')}` : `${sec}s`;
+	};
+
+	onMount(() => {
+		timerInterval = setInterval(() => elapsed++, 1000);
+		return () => clearInterval(timerInterval);
+	});
 
 	const options = $derived.by(() => {
 		if (!card) return [];
 		const correctMeaning = $locale === 'es' ? card.es : card.en;
 
-		// Pool of unique distractors (different meaning from current card)
 		const pool = Array.from(
 			new Set(
 				cards
@@ -46,21 +66,11 @@
 			)
 		);
 
-		// Fisher-Yates partial shuffle to pick up to 2 distractors
-		const need = Math.min(2, pool.length);
-		for (let k = pool.length - 1; k > pool.length - 1 - need && k > 0; k--) {
-			const r = Math.floor(Math.random() * (k + 1));
-			[pool[k], pool[r]] = [pool[r], pool[k]];
-		}
-
-		const distractors = pool.slice(-need);
-		const result = [...distractors, correctMeaning];
-
-		// Fisher-Yates shuffle final options
-		for (let k = result.length - 1; k > 0; k--) {
-			const r = Math.floor(Math.random() * (k + 1));
-			[result[k], result[r]] = [result[r], result[k]];
-		}
+		const need = Math.min(3, pool.length);
+		const shuffled = [...pool].sort(() => Math.random() - 0.5);
+		const distractors = shuffled.slice(0, need);
+		
+		const result = [...distractors, correctMeaning].sort(() => Math.random() - 0.5);
 		return result;
 	});
 
@@ -79,7 +89,6 @@
 	async function next() {
 		updateCardProgress(card, isCorrect, struggled);
 
-		// Re-queue wrong cards at end of session (Duolingo-style)
 		if (!isCorrect) {
 			queue.requeueCurrent();
 		}
@@ -135,38 +144,51 @@
 	}
 </script>
 
-<div class="session-layout">
-	<SessionNav
-		progress={pct}
-		current={i + 1}
-		total={cards.length}
-		onClose={() => goto(`/deck/${data.deck.id}`)}
-	/>
+<div class="session-layout premium-bg">
+	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+		<button class="close-btn" onclick={() => goto(`/deck/${data.deck.id}`)}>
+			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+		</button>
+
+		<div class="header-progress">
+			{queue.index + 1} / {queue.total}
+		</div>
+
+		<button class="lang-btn">
+			<Icon icon={TranslateIcon} size={24} color="currentColor" />
+		</button>
+	</div>
 
 	<div class="session-container">
-		{#if cards.length === 0}
-			<div class="empty-state">
-				<div class="empty-icon">📭</div>
-				<p>{t('home.empty', $locale)}</p>
-				<button class="hm-btn hm-btn-secondary" onclick={() => goto(`/deck/${data.deck.id}`)}>
-					{t('deck.back', $locale)}
-				</button>
-			</div>
+		{#if data.cards.length === 0}
+			<SessionEmptyState 
+				totalCards={data.totalCards} 
+				learnedCount={data.learnedCount}
+				sessionCount={cards.length} 
+				deckId={data.deck.id} 
+				modeLabel={t('mode.quiz.title', $locale)}
+			/>
 		{:else if card}
-			<div class="card-viewer">
-				<div class="card-main">
+			<div class="quiz-viewer">
+				<div class="card-face minimal-card">
+					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
+					
 					<button
 						onclick={playAudio}
 						aria-label="Play pronunciation"
-						class="audio-btn-circle"
+						class="audio-pill normal"
+						style="margin: 0 auto;"
 					>
-						<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
 					</button>
-					<div class="label-meta">{t('session.whatMean', $locale)}</div>
+
 					<div class="jp card-jp">{card.jp}</div>
-					{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+					
+					{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
 						<div class="romaji card-romaji">{card.romaji}</div>
 					{/if}
+
+					<div class="card-hint">{t('session.whatMean', $locale)}</div>
 				</div>
 
 				<div class="options-grid">
@@ -176,7 +198,7 @@
 						<button
 							onclick={() => pick(opt)}
 							class="option-item"
-							class:is-correct={picked && isThisCorrect && isCorrect}
+							class:is-correct={picked && isThisCorrect}
 							class:is-wrong={picked && isThisPicked && !isThisCorrect}
 							class:is-dimmed={picked && !isThisCorrect && !isThisPicked}
 							disabled={!!picked}
@@ -203,50 +225,30 @@
 							<div class="example-section">
 								<div class="example-content">
 									<div class="example-text jp">{card.example}</div>
-									{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
+									{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
 										<div class="example-romaji">
-											{card.example_romaji || card.extra?.example_romaji || ''}
+											{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example)}
 										</div>
 									{/if}
 									<div class="example-translation">
 										{$locale === 'es' ? card.example_es : card.example_en}
 									</div>
 								</div>
-								<button
-									onclick={() => speakJapanese(card.example)}
-									class="audio-btn-small"
-								>
-									<Icon icon={VolumeHighIcon} size={16} color="currentColor" strokeWidth={1.5} />
-								</button>
 							</div>
 						{/if}
 					</div>
-
-					<StickyFooter>
-						{#if !isCorrect}
-							<button
-								class="hm-btn hm-btn-secondary hm-btn-lg"
-								onclick={() => {
-									picked = null;
-									struggled = true;
-								}}
-								style="flex:1;"
-							>
-								{t('session.again', $locale)}
-							</button>
-						{/if}
-						<button
-							class="hm-btn hm-btn-dark hm-btn-lg touch-action-manip"
-							onclick={next}
-							style="flex:1;"
-						>
-							{i >= cards.length - 1 ? t('session.finish', $locale) : t('session.continue', $locale)}
-						</button>
-					</StickyFooter>
 				{/if}
 			</div>
 		{/if}
 	</div>
+
+	{#if picked && !showAnticipation}
+		<div class="premium-footer">
+			<button class="action-btn-primary full" onclick={next}>
+				{t('session.next', $locale)}
+			</button>
+		</div>
+	{/if}
 </div>
 
 {#if showAnticipation}
@@ -254,218 +256,177 @@
 {/if}
 
 <style>
-	.session-layout {
+	.premium-bg {
+		background-color: var(--bg-page);
+		min-height: 100dvh;
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
-		background: var(--paper);
 	}
 
-	.session-container {
-		flex: 1;
-		width: 100%;
-		max-width: 520px;
-		margin: 0 auto;
-		padding: 32px 24px 140px;
-		box-sizing: border-box;
-	}
-
-	.empty-state {
+	.premium-header-minimal {
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 40px;
-		text-align: center;
-		height: 100%;
+		justify-content: space-between;
+		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
+		background: var(--bg-surface);
+		border-bottom: 1px solid var(--ink-200);
 	}
 
-	.empty-icon {
-		font-size: 48px;
-		margin-bottom: 16px;
+	.header-progress {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--fg-primary);
 	}
 
-	.card-viewer {
+	.close-btn, .lang-btn {
+		color: var(--fg-secondary);
+		background: none;
+		border: none;
+		padding: 8px;
+		cursor: pointer;
+	}
+
+	.quiz-viewer {
 		display: flex;
 		flex-direction: column;
 		gap: 24px;
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
+		padding: 24px;
 	}
 
-	.card-main {
+	.minimal-card {
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 24px;
-		padding: 48px 24px;
+		border-radius: 40px;
+		padding: 40px 32px;
 		text-align: center;
-		box-shadow: var(--shadow-sm);
+		box-shadow: var(--shadow-md);
 		position: relative;
+		border: 1px solid var(--ink-100);
 	}
 
-	.card-jp {
-		font-size: 64px;
-		line-height: 1.1;
-		margin: 8px 0;
+	.card-tag {
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		margin-bottom: 24px;
 	}
 
-	.card-romaji {
-		margin-top: 12px;
-		color: var(--hinomaru-red);
-		font-weight: 500;
-	}
-
-	.audio-btn-circle {
-		position: absolute;
-		top: 12px;
-		right: 12px;
-		width: 44px;
-		height: 44px;
+	.audio-pill {
+		width: 48px;
+		height: 48px;
 		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		cursor: pointer;
-		color: var(--sumi);
-		box-shadow: var(--shadow-sm);
-		transition: transform 100ms ease;
+		color: var(--fg-secondary);
+		transition: all 0.2s;
 	}
 
-	.audio-btn-circle:active {
-		transform: scale(0.92);
+	.card-jp {
+		font-size: 42px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		margin-top: 24px;
+		line-height: 1.2;
 	}
-	:global([data-theme='dark']) .audio-btn-circle {
-		background: var(--ink-100);
-		border-color: var(--ink-300);
+
+	.card-romaji {
+		margin-top: 8px;
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+	}
+
+	.card-hint {
+		margin-top: 24px;
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.options-grid {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 12px;
 	}
 
 	.option-item {
-		padding: 18px 20px;
+		padding: 20px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
-		border-radius: 16px;
+		border-radius: 20px;
 		font-size: 16px;
-		font-weight: 500;
-		color: var(--sumi);
+		font-weight: 700;
+		color: var(--fg-primary);
 		cursor: pointer;
 		text-align: center;
-		transition: all 120ms var(--ease-brand);
-		font-family: var(--font-ui);
+		transition: all 0.2s;
 	}
 
-	@media (hover: hover) {
-		.option-item:hover:not(:disabled) {
-			border-color: var(--ink-300);
-			background: var(--ink-50);
-		}
+	.option-item:hover:not(:disabled) {
+		border-color: var(--hinomaru-red);
+		transform: translateY(-1px);
 	}
 
 	.option-item.is-correct {
 		background: var(--success-wash);
 		border-color: var(--success);
 		color: var(--success);
-		font-weight: 700;
 	}
 
 	.option-item.is-wrong {
 		background: var(--hinomaru-red-wash);
 		border-color: var(--hinomaru-red);
-		color: var(--hinomaru-red-ink);
-		font-weight: 700;
+		color: var(--hinomaru-red);
 	}
 
 	.option-item.is-dimmed {
-		opacity: 0.5;
-		cursor: default;
+		opacity: 0.4;
 	}
 
 	.feedback-box {
-		padding: 20px;
-		border-radius: 20px;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
+		padding: 24px;
+		border-radius: 24px;
+		background: var(--bg-surface);
 		box-shadow: var(--shadow-sm);
+		border: 1px solid var(--ink-100);
 	}
 
-	.feedback-box.correct {
-		background: var(--success-wash);
-	}
-
-	.feedback-box.wrong {
-		background: var(--hinomaru-red-wash);
-	}
-
-	.feedback-header {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.feedback-status {
-		font-weight: 700;
-		font-size: 18px;
-	}
-
+	.feedback-status { font-weight: 800; font-size: 18px; }
 	.correct .feedback-status { color: var(--success); }
-	.wrong .feedback-status { color: var(--hinomaru-red-ink); }
-
-	.correct-answer {
-		font-size: 14px;
-		color: var(--hinomaru-red-ink);
-		opacity: 0.8;
-		margin-top: 2px;
-	}
+	.wrong .feedback-status { color: var(--hinomaru-red); }
 
 	.example-section {
+		margin-top: 16px;
 		padding-top: 16px;
-		border-top: 1.5px solid rgba(0, 0, 0, 0.05);
-		display: flex;
-		align-items: flex-start;
-		gap: 12px;
+		border-top: 1px solid var(--ink-100);
 	}
 
-	.example-content {
-		flex: 1;
+	.example-text { font-size: 17px; color: var(--fg-primary); font-weight: 600; }
+	.example-romaji { font-size: 13px; color: var(--hinomaru-red); margin-top: 4px; }
+	.example-translation { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+
+	.premium-footer {
+		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
 	}
 
-	.example-text {
-		font-size: 16px;
-		line-height: 1.5;
-		color: var(--sumi);
-	}
-
-	.example-romaji {
-		font-size: 11px;
-		color: var(--hinomaru-red-ink);
-		opacity: 0.7;
-		margin-top: 2px;
-		font-weight: 600;
-	}
-
-	.example-translation {
-		font-size: 13px;
-		color: var(--fg-secondary);
-		margin-top: 4px;
-	}
-
-	.audio-btn-small {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		border: 1px solid var(--ink-100);
-		background: var(--bg-surface);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--fg-tertiary);
-		flex-shrink: 0;
+	.action-btn-primary {
+		width: 100%;
+		height: 60px;
+		border-radius: 30px;
+		background: var(--hinomaru-red);
+		color: #fff;
+		border: none;
+		font-size: 17px;
+		font-weight: 800;
+		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
 	}
 </style>

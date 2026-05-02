@@ -7,6 +7,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Where am I?',
 		es: '¿Dónde estoy?',
 		example: 'すみません、ここはどこですか？',
+		example_romaji: 'Sumimasen, koko wa doko desu ka?',
 		example_en: 'Excuse me, where am I?',
 		example_es: 'Disculpe, ¿dónde estoy?',
 		kana: 'ここはどこですか'
@@ -17,6 +18,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Where is the station?',
 		es: '¿Dónde está la estación?',
 		example: '東京駅はどこですか？',
+		example_romaji: 'Toukyou eki wa doko desu ka?',
 		example_en: 'Where is Tokyo station?',
 		example_es: '¿Dónde está la estación de Tokio?',
 		kana: 'えきはどこですか'
@@ -27,6 +29,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Please go straight.',
 		es: 'Vaya recto, por favor.',
 		example: 'この道をまっすぐ行ってください。',
+		example_romaji: 'Kono michi o massugu itte kudasai.',
 		example_en: 'Please go straight down this road.',
 		example_es: 'Vaya recto por esta calle, por favor.',
 		kana: 'まっすぐいってください'
@@ -37,6 +40,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Please turn right.',
 		es: 'Gire a la derecha, por favor.',
 		example: '次の角を右に曲がってください。',
+		example_romaji: 'Tsugi no kado o migi ni magatte kudasai.',
 		example_en: 'Please turn right at the next corner.',
 		example_es: 'Gire a la derecha en la siguiente esquina.',
 		kana: 'みぎにまがってください'
@@ -47,6 +51,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Please turn left.',
 		es: 'Gire a la izquierda, por favor.',
 		example: '信号を左に曲がってください。',
+		example_romaji: 'Shingou o hidari ni magatte kudasai.',
 		example_en: 'Please turn left at the traffic light.',
 		example_es: 'Gire a la izquierda en el semáforo.',
 		kana: 'ひだりにまがってください'
@@ -57,6 +62,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Is it far?',
 		es: '¿Está lejos?',
 		example: 'ここから遠いですか？',
+		example_romaji: 'Koko kara tooi desu ka?',
 		example_en: 'Is it far from here?',
 		example_es: '¿Está lejos de aquí?',
 		kana: 'とおいですか'
@@ -67,6 +73,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Can I go on foot?',
 		es: '¿Puedo ir caminando?',
 		example: '駅まで歩いて行けますか？',
+		example_romaji: 'Eki made aruite ikemasu ka?',
 		example_en: 'Can I walk to the station?',
 		example_es: '¿Puedo ir caminando a la estación?',
 		kana: 'あるいていけますか'
@@ -77,8 +84,9 @@ export const directionsPhrases: CardData[] = [
 		en: 'Does this go to Shinjuku?',
 		es: '¿Esto va a Shinjuku?',
 		example: 'すみません、この電車は新宿に行きますか？',
+		example_romaji: 'Sumimasen, kono densha wa Shinjuku ni ikimasu ka?',
 		example_en: 'Excuse me, does this train go to Shinjuku?',
-		example_es: 'Disculpe, ¿este tren va a Shinjuku?',
+		example_es: 'Disculpe, este tren va a Shinjuku.',
 		kana: 'これはしんじゅくにいきますか'
 	},
 	{
@@ -87,6 +95,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'Where is the ticket counter?',
 		es: '¿Dónde está la taquilla?',
 		example: 'すみません、切符売り場はどこですか？',
+		example_romaji: 'Sumimasen, kippuuriba wa doko desu ka?',
 		example_en: 'Excuse me, where is the ticket counter?',
 		example_es: 'Disculpe, ¿dónde está la taquilla?',
 		kana: 'きっぷうりばはどこですか'
@@ -97,6 +106,7 @@ export const directionsPhrases: CardData[] = [
 		en: 'I am lost.',
 		es: 'Me he perdido.',
 		example: 'すみません、迷子になりました。',
+		example_romaji: 'Sumimasen, maigo ni narimashita.',
 		example_en: 'Excuse me, I am lost.',
 		example_es: 'Disculpe, me he perdido.',
 		kana: 'まいごになりました'

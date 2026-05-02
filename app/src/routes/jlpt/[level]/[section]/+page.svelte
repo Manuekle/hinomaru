@@ -381,9 +381,9 @@
 							<button
 								class="option-item"
 								class:is-selected={selected === idx}
-								class:is-correct={checked && idx + 1 === currentQ.answer}
+								class:is-correct={checked && idx + 1 === currentQ.answer && selected === idx}
 								class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
-								class:is-dimmed={checked && selected !== idx && idx + 1 !== currentQ.answer}
+								class:is-dimmed={checked && selected !== idx}
 								disabled={checked}
 								onclick={() => { if (!checked) selected = idx; }}
 							>
@@ -423,8 +423,7 @@
 						/>
 						{#if checked && !isCorrect}
 							<div class="typing-reveal" use:fadeIn>
-								<span class="reveal-label">{t('exam.correct_answer', $locale)}:</span>
-								<span class="reveal-val jp">{currentQ.choices[currentQ.answer - 1]}</span>
+								<span class="reveal-label">{t('exam.incorrect', $locale)}</span>
 							</div>
 						{/if}
 					</div>

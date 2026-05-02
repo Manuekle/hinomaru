@@ -69,6 +69,7 @@ async function run() {
 				en: c.en,
 				es: c.es,
 				example: c.example,
+				// example_romaji: c.example_romaji ?? '',
 				example_en: c.example_en,
 				example_es: c.example_es,
 				category: c.category ?? null,
@@ -77,7 +78,7 @@ async function run() {
 				pos_es: c.pos_es ?? null,
 				definitions_en: c.definitions_en ?? null,
 				definitions_es: c.definitions_es ?? null,
-				extra: c.extra ?? null,
+				extra: { ...(c.extra || {}), example_romaji: c.example_romaji },
 				sort_order: c.sort_order ?? 0
 			}));
 

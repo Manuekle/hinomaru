@@ -4,6 +4,7 @@ export interface CardData {
 	en: string;
 	es: string;
 	example: string;
+	example_romaji?: string;
 	example_en: string;
 	example_es: string;
 	kana?: string;

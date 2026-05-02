@@ -15,6 +15,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import SessionNav from '$lib/components/SessionNav.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
@@ -379,24 +380,32 @@
 <div
 	class="story-viewer-layout"
 	class:reading-mode={isReadingMode}
+	class:is-quiz={phase === 'quiz'}
 	data-theme={isReadingMode ? readingTheme : undefined}
 	style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
 >
+	{#if phase === 'quiz'}
+		<SessionNav 
+			progress={((currentQ + (checked ? 1 : 0)) / quiz.length) * 100}
+			current={currentQ + 1}
+			total={quiz.length}
+			title="Story Quiz"
+			onClose={restartRead}
+			showTimer={true}
+			elapsed={300 - timeLeft}
+		/>
+	{/if}
+
 	<!-- Standardized Container matching Dashboard -->
 	<div
+		class="main-story-container"
 		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 	>
-		{#if phase !== 'anticipation'}
+		{#if phase === 'read'}
 			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:12px;">
-				{#if phase === 'quiz'}
-					<button class="back-link-beautiful" onclick={restartRead}>
-						← {t('deck.back', $locale)}
-					</button>
-				{:else}
-					<a href="/deck/stories" class="back-link-beautiful">
-						← {t('deck.back', $locale)}
-					</a>
-				{/if}
+				<a href="/deck/stories" class="back-link-beautiful">
+					← {t('deck.back', $locale)}
+				</a>
 			</div>
 		{/if}
 
@@ -648,28 +657,6 @@
 				</div>
 			{/if}
 		{:else if phase === 'quiz'}
-			<!-- Premium Exam Header -->
-			<div class="exam-premium-header">
-				<div class="exam-header-main">
-					<div class="header-left">
-						<span class="exam-label-pill">Quiz</span>
-					</div>
-
-					<div class="exam-step-indicator">
-						<span class="step-curr">{currentQ + 1}</span>
-						<span class="step-divider">/</span>
-						<span class="step-total">{quiz.length}</span>
-					</div>
-
-					<div class="header-right">
-						<div class="exam-timer-pill">
-							<Icon icon={Clock01Icon} size={16} color="currentColor" />
-							<span class="timer-val">{timerLabel}</span>
-						</div>
-					</div>
-				</div>
-			</div>
-
 			<div class="question-wrap" use:fadeUp={{ delay: 0.04, y: 12 }}>
 				<div class="question-card">
 					<p class="question-text jp">{qJp}</p>
@@ -872,6 +859,17 @@
 		flex-direction: column;
 		min-height: 100vh;
 		background: var(--bg-page, var(--paper));
+	}
+
+	.story-viewer-layout.is-quiz {
+		height: 100dvh;
+		overflow: hidden;
+	}
+
+	.story-viewer-layout.is-quiz .main-story-container {
+		flex: 1;
+		overflow-y: auto;
+		padding-top: 32px !important;
 	}
 
 	.back-link-beautiful {

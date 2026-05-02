@@ -1,337 +1,272 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { goto, beforeNavigate } from '$app/navigation';
+	import Icon from '$lib/Icon.svelte';
+	import { 
+		VolumeHighIcon, 
+		Mic01Icon, 
+		Tick02Icon, 
+		Cancel01Icon,
+		TranslateIcon
+	} from '@hugeicons/core-free-icons';
+	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
+	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
-	import Icon from '$lib/Icon.svelte';
-	import SessionNav from '$lib/components/SessionNav.svelte';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import { VolumeHighIcon, Mic01Icon } from '@hugeicons/core-free-icons';
-	import type { PageData } from './$types';
-	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
-	import { comparePhrase, SCORE_COLORS, SCORE_LABELS, type CompareResult } from '$lib/speaking/compare';
-	import { cardsToPhrases } from '$lib/speaking/deck-phrases';
+	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
+	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
+	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import { fadeIn, fadeUp } from '$lib/motion';
+	import { onMount } from 'svelte';
+	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
+	const supabase = createClient();
+	const queue = $derived.by(() => createMistakeQueue<any>(data.cards as any[]));
 
-	const deck = $derived(data.deck);
-
-	// Build phrase list — words only (no examples by default, same as other modes)
-	const phrases = $derived(cardsToPhrases(data.cards, $locale).filter(p => !p.isExample));
-
-	// ── Navigation ────────────────────────────────────────────────────────────
-	let idx    = $state(0);
-	let passed = $state(0); // correct this session
-
-	const phrase  = $derived(phrases[idx]);
-	const progPct = $derived(phrases.length > 0 ? Math.round((idx / phrases.length) * 100) : 0);
-
-	// ── Phase ─────────────────────────────────────────────────────────────────
-	type Phase = 'idle' | 'playing' | 'recording' | 'result';
-	let phase = $state<Phase>('idle');
+	let isRecording = $state(false);
+	let transcript = $state('');
+	let submitted = $state(false);
+	let correct = $state(0);
+	let struggled = $state(false);
 	let showAnticipation = $state(false);
+	let error = $state<string | null>(null);
 
-	// ── Speech ────────────────────────────────────────────────────────────────
-	const recognizer    = new JapaneseSpeechRecognizer();
-	let liveTranscript   = $state('');
-	let finalTranscript  = $state('');
-	let allFinalParts    = $state<string[]>([]); // accumulate multi-result finals
-	let speechError     = $state<string | null>(null);
-	let speechStatus = $state<SpeechStatus>({ ok: false, reason: 'no-window' });
-	let speechHost = $state('');
+	const card = $derived(queue.current);
+
+	let recognition: any;
+
 	onMount(() => {
-		speechStatus = getSpeechStatus();
-		speechHost = typeof location !== 'undefined' ? location.host : '';
-	});
-	const speechOk = $derived(speechStatus.ok);
-	const speechWarn = $derived.by(() => {
-		if (speechStatus.ok) return '';
-		if (speechStatus.reason === 'insecure') return `${t('speaking.insecure', $locale)} (${speechHost})`;
-		if (speechStatus.reason === 'unsupported') return t('speaking.unsupported', $locale);
-		return '';
-	});
+		const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+		if (SpeechRecognition) {
+			recognition = new SpeechRecognition();
+			recognition.lang = 'ja-JP';
+			recognition.interimResults = false;
+			recognition.maxAlternatives = 1;
 
-	// ── Result ────────────────────────────────────────────────────────────────
-	let result = $state<CompareResult | null>(null);
+			recognition.onresult = (event: any) => {
+				transcript = event.results[0][0].transcript;
+				isRecording = false;
+				submit();
+			};
 
-	// ── Actions ───────────────────────────────────────────────────────────────
-	async function listen() {
-		if (!phrase || phase === 'recording') return;
-		phase = 'playing';
-		await speakJapanese(phrase.text);
-		phase = 'idle';
-	}
-
-	async function startRecording() {
-		if (!phrase || !speechOk) return;
-		speechError     = null;
-		liveTranscript  = '';
-		finalTranscript = '';
-		allFinalParts   = [];
-		result          = null;
-		phase          = 'recording';
-
-		await recognizer.start(
-			(r) => {
-				liveTranscript = r.transcript;
-				if (r.isFinal) {
-					allFinalParts = [...allFinalParts, r.transcript];
-					finalTranscript = allFinalParts.join('');
-				}
-			},
-			(err) => { speechError = err; phase = 'idle'; },
-			() => {
-				// Use accumulated final; fall back to last interim (often hiragana — useful for kanji targets)
-				const spoken = finalTranscript || liveTranscript;
-				if (!spoken && !speechError) {
-					speechError = t('speaking.noSpeech', $locale);
-					phase = 'idle';
-					return;
-				}
-				if (spoken && phrase) {
-					// Compare against final AND last interim separately, take best
-					const candidates = [finalTranscript, liveTranscript].filter(Boolean);
-					let best = comparePhrase(phrase.text, candidates[0], phrase.segments);
-					for (let i = 1; i < candidates.length; i++) {
-						const c = comparePhrase(phrase.text, candidates[i], phrase.segments);
-						if (c.overallScore > best.overallScore) best = c;
-					}
-					result = best;
-					if (best.overallLevel === 'correct') playCorrect();
-					else playWrong();
-					phase = 'result';
+			recognition.onerror = (event: any) => {
+				console.error('Speech recognition error', event.error);
+				isRecording = false;
+				if (event.error === 'no-speech') {
+					error = t('speaking.noSpeech', $locale);
 				} else {
-					phase = 'idle';
+					error = t('speaking.unavailable', $locale);
 				}
+			};
+
+			recognition.onend = () => {
+				isRecording = false;
+			};
+		}
+	});
+
+	function toggleRecording() {
+		if (isRecording) {
+			recognition.stop();
+		} else {
+			error = null;
+			transcript = '';
+			submitted = false;
+			try {
+				recognition.start();
+				isRecording = true;
+			} catch (e) {
+				error = t('speaking.unavailable', $locale);
 			}
-		);
+		}
 	}
 
-	function stopRecording() { recognizer.stop(); }
+	const isCorrect = $derived.by(() => {
+		if (!card || !transcript) return false;
+		// Normalize: remove punctuation and spaces
+		const normalize = (s: string) => s.replace(/[、。！？\s]/g, '');
+		const user = normalize(transcript);
+		const target = normalize(card.jp);
+		return user === target;
+	});
 
-	function retry() {
-		result          = null;
-		liveTranscript  = '';
-		finalTranscript = '';
-		speechError     = null;
-		phase           = 'idle';
+	function submit() {
+		submitted = true;
+		if (isCorrect) {
+			correct++;
+			playCorrect();
+		} else {
+			playWrong();
+		}
 	}
 
-	function advance(gotIt: boolean) {
-		if (gotIt) passed++;
-		if (idx + 1 >= phrases.length) {
+	async function next() {
+		updateCardProgress(card, isCorrect, struggled);
+
+		if (!isCorrect) {
+			queue.requeueCurrent();
+		}
+
+		if (queue.isLast) {
+			const params = new URLSearchParams({
+				correct: String(correct),
+				total: String(queue.originalTotal),
+				mode: 'speaking'
+			});
+			const { data: { user } } = await supabase.auth.getUser();
+			if (user) {
+				await supabase.from('sessions').insert({
+					user_id: user.id,
+					deck_id: data.deck.id,
+					mode: 'speaking',
+					correct,
+					total: queue.originalTotal
+				});
+				await updateStreak(supabase, user.id);
+			}
 			showAnticipation = true;
 			setTimeout(() => {
-				goto(`/deck/${deck?.id}/summary?correct=${passed}&total=${phrases.length}&mode=speaking`);
+				goto(`/deck/${data.deck.id}/summary?${params}`);
 			}, 1800);
-			return;
+		} else {
+			submitted = false;
+			transcript = '';
+			queue.advance();
 		}
-		idx++;
-		retry();
 	}
 
-	beforeNavigate(() => recognizer.stop());
-	onDestroy(() => recognizer.stop());
+	async function updateCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
+		if (!user) return;
 
-	// ── Font size (same as flashcards) ────────────────────────────────────────
-	function getFontSize(text: string) {
-		const len = text?.length || 0;
-		if (len <= 3)  return '80px';
-		if (len <= 5)  return '64px';
-		if (len <= 8)  return '48px';
-		if (len <= 11) return '36px';
-		return '26px';
+		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
+		const nextState = calculateNextReview(quality, currentProgress);
+
+		await supabase.from('progress').upsert({
+			user_id: user.id,
+			card_id: c.id,
+			learned: true,
+			...nextState,
+			last_seen: new Date().toISOString()
+		});
 	}
 
-	// ── Score ring (72px viewBox, r=30) ──────────────────────────────────────
-	const RING_R    = 30;
-	const RING_CIRC = 2 * Math.PI * RING_R;
-	const ringOffset = $derived(result ? RING_CIRC - RING_CIRC * result.overallScore : RING_CIRC);
-	const ringColor  = $derived(result ? SCORE_COLORS[result.overallLevel] : 'var(--ink-200)');
+	function playAudio() {
+		speakJapanese(card?.jp ?? '');
+	}
 </script>
 
-<svelte:head>
-	<title>Pronunciación — {$locale === 'es' ? deck?.title_es : deck?.title_en} — Hinomaru</title>
-</svelte:head>
+<div class="session-layout premium-bg">
+	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+		<button class="close-btn" onclick={() => goto(`/deck/${data.deck.id}`)}>
+			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+		</button>
 
-<div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
-
-	<SessionNav
-		progress={progPct}
-		current={idx + 1}
-		total={phrases.length}
-		showRomajiToggle={true}
-		onClose={() => goto(`/deck/${deck?.id}`)}
-	/>
-
-	{#if phrases.length === 0}
-		<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;">
-			<p style="color:var(--fg-secondary);">{t('speaking.noWords', $locale)}</p>
-			<a href="/deck/{deck?.id}" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
+		<div class="header-progress">
+			{queue.index + 1} / {queue.total}
 		</div>
 
-	{:else if phrase}
-		<div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 24px 140px;gap:28px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;">
+		<button class="lang-btn">
+			<Icon icon={TranslateIcon} size={24} color="currentColor" />
+		</button>
+	</div>
 
-			{#if speechWarn}
-				<div class="speech-warn">{speechWarn}</div>
-			{/if}
+	<div class="session-container">
+		{#if data.cards.length === 0}
+			<SessionEmptyState 
+				totalCards={data.totalCards} 
+				learnedCount={data.learnedCount}
+				sessionCount={queue.total} 
+				deckId={data.deck.id} 
+				modeLabel={t('mode.speaking.title', $locale)}
+			/>
+		{:else if card}
+			<div class="speaking-viewer">
+				<div class="card-face minimal-card">
+					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
 
-			<!-- ── Card ── -->
-			<div class="card-scene" style="width:100%;max-width:360px;aspect-ratio:3/4;">
-				<div class="card-body" class:flipped={phase === 'result'}>
+					<button
+						onclick={playAudio}
+						aria-label="Play pronunciation"
+						class="audio-pill normal"
+						style="margin: 0 auto;"
+					>
+						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+					</button>
 
-					<!-- Front: JP word + controls -->
-					<div class="card-face card-front">
-						<div class="card-tag">
-							{$locale === 'es' ? (deck?.kind_es ?? deck?.kind) : deck?.kind}
+					<div class="jp card-jp">{card.jp}</div>
+					
+					{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
+						<div class="romaji card-romaji">{card.romaji}</div>
+					{/if}
+
+					<div class="card-hint">{$locale === 'es' ? card.es : card.en}</div>
+				</div>
+
+				<div class="mic-section">
+					<button 
+						class="mic-btn" 
+						class:is-recording={isRecording}
+						onclick={toggleRecording}
+						disabled={submitted}
+					>
+						<div class="mic-ring"></div>
+						<div class="mic-icon-wrapper">
+							<Icon icon={isRecording ? Tick02Icon : Mic01Icon} size={32} color="white" />
 						</div>
+					</button>
+					
+					<div class="mic-label">
+						{isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
+					</div>
 
-						<!-- Big JP -->
+					{#if transcript}
+						<div class="transcript-box" use:fadeUp={{ y: 10 }}>
+							<div class="transcript-label">{t('speaking.heard', $locale)}</div>
+							<div class="transcript-text jp">{transcript}</div>
+						</div>
+					{/if}
+
+					{#if error}
+						<div class="error-msg" use:fadeIn>{error}</div>
+					{/if}
+
+					{#if submitted}
 						<div
-							class="jp word-text"
-							style="font-size:{getFontSize(phrase.text)};"
-						>{phrase.text}</div>
-
-						{#if $showRomaji}
-							<div class="reading">{phrase.reading}</div>
-						{/if}
-
-						<!-- Segments preview — only when phrase splits into multiple parts -->
-						{#if phrase.segments.length > 1}
-							<div class="segments-row">
-								{#each phrase.segments as seg, i (i)}
-									<span class="seg-chip">{seg}</span>
-								{/each}
-							</div>
-						{/if}
-
-						<!-- Meaning -->
-						<div class="meaning">{phrase.meaning}</div>
-
-						<!-- Listen button -->
-						<button
-							class="audio-btn"
-							class:is-active={phase === 'playing'}
-							onclick={(e) => { e.stopPropagation(); listen(); }}
-							disabled={phase === 'recording'}
-							aria-label="Escuchar"
+							class="feedback-box"
+							class:correct={isCorrect}
+							class:wrong={!isCorrect}
+							use:fadeUp={{ y: 10 }}
 						>
-							<Icon icon={VolumeHighIcon} size={20} color="currentColor" strokeWidth={1.5} />
-						</button>
-
-						<!-- Live transcript while recording -->
-						{#if phase === 'recording'}
-							<div class="live-bar">
-								<span class="live-dot"></span>
-								<span class="jp live-text">{liveTranscript || '…'}</span>
+							<div class="feedback-status">
+								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
 							</div>
-						{/if}
-
-						{#if speechError}
-							<div class="error-text">{speechError}</div>
-						{/if}
-					</div>
-
-					<!-- Back: result -->
-					<div class="card-face card-back">
-						<!-- Score + verdict -->
-						<div class="score-row">
-							<div class="score-ring-wrap">
-								<svg class="ring-svg" viewBox="0 0 72 72">
-									<circle class="ring-track" cx="36" cy="36" r={RING_R} fill="none" stroke-width="5" />
-									<circle
-										class="ring-bar"
-										cx="36" cy="36" r={RING_R}
-										fill="none" stroke-width="5"
-										stroke-linecap="round"
-										stroke-dasharray={RING_CIRC}
-										stroke-dashoffset={ringOffset}
-										style="stroke:{ringColor};"
-									/>
-								</svg>
-								<span class="ring-num" style="color:{ringColor};">{result ? Math.round(result.overallScore * 100) : 0}</span>
-							</div>
-							<div class="score-info">
-								<div class="verdict" style="color:{ringColor};">{result ? SCORE_LABELS[result.overallLevel] : ''}</div>
-								<div class="back-word jp">{phrase.text}</div>
-								{#if finalTranscript || liveTranscript}
-									<div class="heard-inline">
-										<span class="heard-label">{t('speaking.heard', $locale)}</span>
-										<span class="jp heard-text">{finalTranscript || liveTranscript}</span>
-									</div>
-								{/if}
-							</div>
+							{#if !isCorrect}
+								<div class="correct-answer">
+									{t('session.answerIs', $locale, { a: card.jp })}
+								</div>
+							{/if}
 						</div>
-
-						<!-- Divider -->
-						<div class="result-divider"></div>
-
-						<!-- Segments breakdown -->
-						{#if result?.segments && result.segments.length > 0}
-							<div class="seg-breakdown">
-								{#each result.segments as sr, i (i)}
-									<div class="seg-row" style="--seg-color:{SCORE_COLORS[sr.level]};">
-										<span class="seg-row-text jp">{sr.segment}</span>
-										<div class="seg-bar-wrap">
-											<div class="seg-bar" style="width:{Math.round(sr.score*100)}%;background:{SCORE_COLORS[sr.level]};"></div>
-										</div>
-										<span class="seg-row-pct" style="color:{SCORE_COLORS[sr.level]};">{Math.round(sr.score * 100)}%</span>
-									</div>
-								{/each}
-							</div>
-						{/if}
-					</div>
-
+					{/if}
 				</div>
 			</div>
+		{/if}
+	</div>
 
+	{#if submitted && !showAnticipation}
+		<div class="premium-footer">
+			<button class="action-btn-primary full" onclick={next}>
+				{t('session.next', $locale)}
+			</button>
 		</div>
-
-		<!-- ── Footer ── -->
-		<StickyFooter>
-			{#if phase === 'idle' || phase === 'playing'}
-				<button
-					class="hm-btn hm-btn-primary hm-btn-full touch-action-manip"
-					onclick={startRecording}
-					disabled={!speechOk || phase === 'playing'}
-				>
-					<Icon icon={Mic01Icon} size={18} color="currentColor" />
-					{speechOk ? t('speaking.speak', $locale) : t('speaking.unavailable', $locale)}
-				</button>
-
-			{:else if phase === 'recording'}
-				<button
-					class="hm-btn hm-btn-dark hm-btn-full touch-action-manip recording-btn"
-					onclick={stopRecording}
-				>
-					<span class="rec-dot"></span>
-					{t('speaking.stop', $locale)}
-				</button>
-
-			{:else if phase === 'result' && result}
-				<button
-					class="hm-btn hm-btn-secondary touch-action-manip"
-					style="flex:1;"
-					onclick={retry}
-				>
-					{t('session.again', $locale)}
-				</button>
-				<button
-					class="hm-btn hm-btn-primary touch-action-manip"
-					style="flex:2;"
-					onclick={() => advance(result!.overallLevel === 'correct')}
-				>
-					{idx + 1 < phrases.length ? t('exam.next', $locale) : t('exam.see_results', $locale)}
-				</button>
-			{/if}
-		</StickyFooter>
 	{/if}
-
 </div>
 
 {#if showAnticipation}
@@ -339,216 +274,193 @@
 {/if}
 
 <style>
-	/* ── Card 3D scene (same as flashcards) ── */
-	.card-scene {
-		perspective: 1000px;
-		cursor: default;
+	.premium-bg {
+		background-color: var(--bg-page);
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
 	}
-	.card-body {
-		width: 100%;
-		height: 100%;
-		position: relative;
-		transform-style: preserve-3d;
-		transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-		border-radius: 28px;
-	}
-	.card-body.flipped { transform: rotateY(180deg); }
 
-	.card-face {
-		position: absolute;
-		inset: 0;
-		border-radius: 28px;
+	.premium-header-minimal {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		box-shadow: var(--shadow-md, 0 8px 32px rgba(0,0,0,0.08));
-		backface-visibility: hidden;
-		-webkit-backface-visibility: hidden;
+		border-bottom: 1px solid var(--ink-200);
+	}
+
+	.header-progress {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--fg-primary);
+	}
+
+	.close-btn, .lang-btn {
+		color: var(--fg-secondary);
+		background: none;
+		border: none;
+		padding: 8px;
+		cursor: pointer;
+	}
+
+	.speaking-viewer {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
+		padding: 24px;
+	}
+
+	.minimal-card {
+		background: var(--bg-surface);
+		border-radius: 40px;
+		padding: 40px 32px;
+		text-align: center;
+		box-shadow: var(--shadow-md);
+		position: relative;
+		border: 1px solid var(--ink-100);
+	}
+
+	.card-tag {
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		margin-bottom: 24px;
+	}
+
+	.audio-pill {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-surface);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-secondary);
+		transition: all 0.2s;
+	}
+
+	.card-jp {
+		font-size: 42px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		margin-top: 24px;
+		line-height: 1.2;
+	}
+
+	.card-romaji {
+		margin-top: 8px;
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+	}
+
+	.card-hint {
+		margin-top: 24px;
+		font-size: 18px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+	}
+
+	.mic-section {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 28px 24px;
-		gap: 10px;
-		overflow: hidden;
+		gap: 16px;
 	}
-	.card-back { transform: rotateY(180deg); justify-content: flex-start; padding-top: 24px; }
 
-	/* Front */
-	.card-tag {
-		position: absolute;
-		top: 20px; left: 20px;
-		font-size: 10px; font-weight: 700;
-		text-transform: uppercase; letter-spacing: 0.06em;
-		color: var(--fg-tertiary);
-	}
-	.word-text {
-		line-height: 1.1;
-		text-align: center;
-		word-break: break-word;
-		color: var(--sumi);
-		font-weight: 700;
-	}
-	.reading {
-		font-size: 13px;
-		color: var(--hinomaru-red);
-		font-weight: 600;
-		letter-spacing: 0.02em;
-	}
-	.segments-row {
-		display: flex; flex-wrap: wrap; gap: 5px;
-		justify-content: center;
-	}
-	.seg-chip {
-		font-family: var(--font-jp);
-		font-size: 12px; font-weight: 600;
-		padding: 2px 8px;
-		border: 1.5px solid var(--ink-200);
-		border-radius: 7px;
-		color: var(--fg-tertiary);
-	}
-	.meaning {
-		font-size: 15px;
-		color: var(--fg-secondary);
-		font-weight: 500;
-		text-align: center;
-	}
-	.audio-btn {
-		width: 44px; height: 44px;
+	.mic-btn {
+		width: 96px;
+		height: 96px;
 		border-radius: 50%;
-		border: 1px solid var(--ink-200);
-		background: var(--bg-surface);
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center; justify-content: center;
-		color: var(--fg-secondary);
-		touch-action: manipulation;
-		-webkit-tap-highlight-color: transparent;
-		transition: background 150ms, color 150ms;
-		margin-top: 4px;
-	}
-	.audio-btn:hover:not(:disabled), .audio-btn.is-active {
-		background: var(--ink-100);
-		border-color: var(--ink-300);
-	}
-	.audio-btn:disabled { opacity: 0.4; cursor: default; }
-
-	/* Live bar */
-	.live-bar {
-		display: flex; align-items: center; gap: 8px;
-		background: var(--hinomaru-red-wash);
-		border: 1px solid rgba(188,0,45,0.15);
-		border-radius: 12px;
-		padding: 8px 14px;
-		width: 100%; max-width: 280px;
-		margin-top: 4px;
-	}
-	.live-dot {
-		width: 8px; height: 8px;
-		border-radius: 50%;
+		border: none;
 		background: var(--hinomaru-red);
-		flex-shrink: 0;
-		animation: blink 0.75s infinite alternate;
-	}
-	@keyframes blink { from { opacity: 1; } to { opacity: 0.15; } }
-	.live-text { font-size: 15px; font-weight: 600; color: var(--sumi); flex: 1; }
-	.error-text { font-size: 12px; color: var(--hinomaru-red); font-weight: 600; text-align: center; }
-
-	/* Back — result */
-	.card-back { gap: 14px; }
-
-	.score-row {
-		display: flex; align-items: center; gap: 16px;
-		width: 100%;
-	}
-	.score-ring-wrap {
 		position: relative;
-		width: 72px; height: 72px;
-		flex-shrink: 0;
-		display: flex; align-items: center; justify-content: center;
-	}
-	.ring-svg {
-		position: absolute; inset: 0;
-		width: 100%; height: 100%;
-		transform: rotate(-90deg);
-	}
-	.ring-track { stroke: var(--ink-100); }
-	.ring-bar { transition: stroke-dashoffset 0.7s cubic-bezier(0.34, 1.2, 0.64, 1); }
-	.ring-num {
-		position: relative;
-		font-size: 20px; font-weight: 900; line-height: 1;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 8px 32px rgba(188, 0, 45, 0.3);
+		transition: transform 0.2s;
 	}
 
-	.score-info {
-		display: flex; flex-direction: column; gap: 3px;
-		min-width: 0;
-	}
-	.verdict { font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
-	.back-word {
-		font-size: 22px; font-weight: 700;
-		color: var(--sumi);
-		line-height: 1.1;
-	}
-	.heard-inline {
-		display: flex; align-items: baseline; gap: 5px;
-		margin-top: 2px;
-	}
-	.heard-label {
-		font-size: 9px; font-weight: 700;
-		text-transform: uppercase; letter-spacing: 0.06em;
-		color: var(--fg-tertiary); white-space: nowrap;
-	}
-	.heard-text { font-size: 13px; font-weight: 600; color: var(--fg-secondary); }
+	.mic-btn:active { transform: scale(0.92); }
+	.mic-btn:disabled { opacity: 0.5; cursor: default; }
 
-	.result-divider {
-		width: 100%; height: 1px;
-		background: var(--ink-100);
-		flex-shrink: 0;
+	.mic-ring {
+		position: absolute;
+		inset: -8px;
+		border-radius: 50%;
+		border: 2px solid var(--hinomaru-red);
+		opacity: 0;
 	}
 
-	.seg-breakdown { width: 100%; display: flex; flex-direction: column; gap: 6px; }
-	.seg-row {
-		display: flex; align-items: center; gap: 8px;
-		padding: 0 4px;
-		border-left: 3px solid var(--seg-color);
-		padding-left: 10px;
+	.is-recording .mic-ring {
+		animation: pulse-ring 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+		opacity: 1;
 	}
-	.seg-row-text { font-size: 15px; font-weight: 700; flex: 1; color: var(--sumi); }
-	.seg-bar-wrap {
-		width: 48px; height: 4px;
-		background: var(--ink-100);
-		border-radius: 2px;
-		overflow: hidden;
-		flex-shrink: 0;
-	}
-	.seg-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
-	.seg-row-pct { font-size: 11px; font-weight: 700; min-width: 28px; text-align: right; }
 
-	/* Footer buttons */
-	.recording-btn {
-		animation: pulse-btn 0.7s infinite alternate;
-		display: flex; align-items: center; gap: 8px;
+	@keyframes pulse-ring {
+		0% { transform: scale(0.8); opacity: 0.8; }
+		100% { transform: scale(1.3); opacity: 0; }
 	}
-	.rec-dot {
-		width: 9px; height: 9px;
-		border-radius: 50%; background: var(--hinomaru-red);
-		flex-shrink: 0;
-	}
-	@keyframes pulse-btn { from { opacity: 1; } to { opacity: 0.75; } }
 
-	.speech-warn {
+	.mic-label {
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.transcript-box {
 		width: 100%;
-		max-width: 360px;
-		padding: 10px 14px;
-		border-radius: 12px;
-		background: rgba(245, 158, 11, 0.12);
-		border: 1px solid rgba(245, 158, 11, 0.4);
-		color: var(--warning, #b45309);
-		font-size: 13px;
-		font-weight: 600;
-		line-height: 1.4;
+		padding: 20px;
+		background: var(--bg-muted);
+		border-radius: 20px;
 		text-align: center;
 	}
 
-	.jp { font-family: var(--font-jp); }
-	.touch-action-manip { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+	.transcript-label { font-size: 11px; font-weight: 800; color: var(--fg-tertiary); margin-bottom: 4px; }
+	.transcript-text { font-size: 20px; font-weight: 700; color: var(--fg-primary); }
+
+	.error-msg { color: var(--hinomaru-red); font-size: 14px; font-weight: 600; }
+
+	.feedback-box {
+		width: 100%;
+		padding: 24px;
+		border-radius: 24px;
+		background: var(--bg-surface);
+		box-shadow: var(--shadow-sm);
+		border: 1px solid var(--ink-100);
+		text-align: center;
+	}
+
+	.feedback-status { font-weight: 800; font-size: 18px; }
+	.correct .feedback-status { color: var(--success); }
+	.wrong .feedback-status { color: var(--hinomaru-red); }
+
+	.correct-answer { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+
+	.premium-footer {
+		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
+	}
+
+	.action-btn-primary {
+		width: 100%;
+		height: 60px;
+		border-radius: 30px;
+		background: var(--hinomaru-red);
+		color: #fff;
+		border: none;
+		font-size: 17px;
+		font-weight: 800;
+		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
+	}
 </style>

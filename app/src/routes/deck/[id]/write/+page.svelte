@@ -10,20 +10,22 @@
 	import { animate } from 'motion';
 	import { calculateNextReview, mapPerformanceToQuality, type SRSState } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import SessionNav from '$lib/components/SessionNav.svelte';
+	import { kanaToRomaji } from '$lib/utils/romaji';
+	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import {
-		CleanIcon,
 		EyeIcon,
 		ViewOffIcon,
 		Cancel01Icon,
-		CheckmarkCircle01Icon,
-		InboxIcon,
-		VolumeHighIcon
+		VolumeHighIcon,
+		Clock01Icon,
+		TranslateIcon
 	} from '@hugeicons/core-free-icons';
+	import { onMount } from 'svelte';
+	import { fadeIn, fadeUp } from '$lib/motion';
 	import type { PageData } from './$types';
 
 	interface HanziWriterInstance {
@@ -47,10 +49,23 @@
 	let correctCount = $state(0);
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
-	let cardEl = $state<HTMLDivElement | null>(null);
 
 	const card = $derived(quizCards[i]);
-	const pct = $derived(((i + 1) / quizCards.length) * 100);
+
+	// Timer
+	let elapsed = $state(0);
+	let timerInterval: any;
+
+	const formatTime = (s: number) => {
+		const m = Math.floor(s / 60);
+		const sec = s % 60;
+		return m > 0 ? `${m}:${sec.toString().padStart(2, '0')}` : `${sec}s`;
+	};
+
+	onMount(() => {
+		timerInterval = setInterval(() => elapsed++, 1000);
+		return () => clearInterval(timerInterval);
+	});
 
 	let checked = $state(false);
 	let showGuide = $state(true);
@@ -61,10 +76,9 @@
 	let loadingWriters = $state(true);
 	let setupIteration = 0;
 
-	// Whether we use sequential (one-at-a-time) mode
-	const sequential = $derived(
-		card ? (Array.from(card.jp) as string[]).filter(isKanjiKana).length > 2 : false
-	);
+	// Sequential mode if many chars
+	const writableChars = $derived(card ? (Array.from(card.jp) as string[]).filter(isKanjiKana) : []);
+	const sequential = $derived(writableChars.length > 2);
 
 	function isKanjiKana(ch: string): boolean {
 		const code = ch.codePointAt(0)!;
@@ -104,8 +118,6 @@
 
 		if (iteration !== setupIteration) return;
 
-		const chars = Array.from(card.jp) as string[];
-		const writableChars = chars.filter(isKanjiKana);
 		const useSequential = writableChars.length > 2;
 
 		const containerWidth = hanziContainer?.clientWidth || 320;
@@ -113,10 +125,9 @@
 		let boxSize: number;
 
 		if (useSequential || writableChars.length === 1) {
-			boxSize = Math.min(320, containerWidth - 16);
+			boxSize = Math.min(280, containerWidth - 16);
 		} else {
-			// 2 chars side-by-side
-			boxSize = Math.min(220, (containerWidth - gap) / 2);
+			boxSize = Math.min(180, (containerWidth - gap) / 2);
 		}
 
 		async function fetchCharData(char: string, code: number): Promise<unknown> {
@@ -130,281 +141,103 @@
 							`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`,
 							`https://unpkg.com/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`
 						];
+
 			for (const url of urls) {
 				try {
 					const res = await fetch(url);
 					if (res.ok) return await res.json();
-				} catch {
-					// try next CDN
+				} catch (e) {
+					/* ignore */
 				}
 			}
 			return null;
 		}
 
-		const charDataResults = await Promise.all(
-			chars.map(async (char) => {
-				const code = char.codePointAt(0)!;
-				if (!isKanjiKana(char)) return { char, data: null as any };
-				const charData = await fetchCharData(char, code);
-				if (!charData) console.warn('All CDNs failed for char:', char);
-				return { char, data: charData as any };
-			})
-		);
+		const theme = document.documentElement.getAttribute('data-theme') || 'light';
+		const strokeColor = theme === 'dark' ? '#ffffff' : '#1a1a1a';
+		const outlineColor = theme === 'dark' ? '#333333' : '#f0f0f0';
 
-		if (iteration !== setupIteration) return;
-		if (!hanziContainer) return;
-
-		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-		const tempWriters: { writer: HanziWriterInstance; box: HTMLDivElement; char: string }[] = [];
-
-		// Wrap in a flex container so sequential boxes are centered
-		hanziContainer.style.display = 'flex';
-		hanziContainer.style.flexWrap = useSequential ? 'nowrap' : 'wrap';
-		hanziContainer.style.justifyContent = 'center';
-		hanziContainer.style.gap = `${gap}px`;
-
-		for (let idx = 0; idx < charDataResults.length; idx++) {
-			const { char, data: charData } = charDataResults[idx] as { char: string; data: any };
-
+		for (const char of writableChars) {
 			const box = document.createElement('div');
 			box.style.width = `${boxSize}px`;
 			box.style.height = `${boxSize}px`;
-			box.style.display = useSequential && idx !== 0 ? 'none' : 'flex';
-			box.style.alignItems = 'center';
-			box.style.justifyContent = 'center';
-			box.style.fontSize = `${boxSize * 0.6}px`;
-			box.style.color = 'var(--sumi)';
-			box.style.position = 'relative';
-			box.style.background = 'var(--ink-100)';
-			box.style.border = '2px dashed var(--ink-200)';
-			box.style.borderRadius = '20px';
-			box.style.overflow = 'hidden';
-			box.style.cursor = 'crosshair';
-			box.style.flexShrink = '0';
+			box.style.background = 'transparent';
+			box.style.display = useSequential ? 'none' : 'block';
+			hanziContainer?.appendChild(box);
 
-			// Grid lines
-			const hLine = document.createElement('div');
-			hLine.style.cssText = `position:absolute;top:50%;left:0;right:0;height:1px;background:var(--ink-300);pointer-events:none;`;
-			const vLine = document.createElement('div');
-			vLine.style.cssText = `position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink-300);pointer-events:none;`;
-			box.appendChild(hLine);
-			box.appendChild(vLine);
+			const charData = await fetchCharData(char, char.codePointAt(0)!);
 
-			if (charData) {
-				const writerContainer = document.createElement('div');
-				writerContainer.style.cssText = `width:100%;height:100%;position:absolute;top:0;left:0;`;
-				box.appendChild(writerContainer);
+			const writer = HanziWriter.create(box, char, {
+				width: boxSize,
+				height: boxSize,
+				padding: 20,
+				showOutline: showGuide,
+				strokeAnimationSpeed: 1.5,
+				delayBetweenStrokes: 100,
+				strokeColor,
+				outlineColor,
+				charDataLoader: () => charData
+			});
 
-				const writer = HanziWriter.create(writerContainer, char, {
-					width: boxSize,
-					height: boxSize,
-					padding: boxSize * 0.1,
-					strokeColor: '#BC002D',
-					highlightColor: '#FF6B6B',
-					drawingColor: isDark ? '#FFFFFF' : '#2C2C2C',
-					showOutline: true,
-					outlineColor: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.1)',
-					drawingWidth: boxSize * 0.08,
-					charDataLoader: () => Promise.resolve(charData)
-				});
-				tempWriters.push({ writer, box, char });
-			} else {
-				// Non-writable or CDN failed: show char as text
-				const textNode = document.createElement('span');
-				textNode.textContent = char;
-				textNode.className = 'jp';
-				textNode.style.zIndex = '1';
-				box.appendChild(textNode);
-				// Push a placeholder so index alignment is maintained
-				tempWriters.push({ writer: null as any, box, char });
-			}
-
-			hanziContainer.appendChild(box);
+			writers.push({ writer, box, char });
 		}
 
-		writers = tempWriters;
-		loadingWriters = false;
-		startQuizSequence();
+		if (iteration === setupIteration) {
+			loadingWriters = false;
+			startQuiz();
+		}
 	}
 
-	function updateCharProgress() {
-		if (!sequential) return;
-		// Update visual progress dots — injected by the Svelte template via bind
-		charProgressEl?.querySelectorAll('.char-dot').forEach((dot, idx) => {
-			const el = dot as HTMLElement;
-			if (idx < currentQuizIndex) {
-				el.dataset.state = 'done';
-			} else if (idx === currentQuizIndex) {
-				el.dataset.state = 'active';
-			} else {
-				el.dataset.state = 'pending';
-			}
-		});
-	}
+	function startQuiz() {
+		if (writers.length === 0) return;
 
-	let charProgressEl = $state<HTMLDivElement | null>(null);
+		if (sequential) {
+			writers.forEach((w, idx) => {
+				w.box.style.display = idx === currentQuizIndex ? 'block' : 'none';
+			});
+		}
 
-	// Derived list of writable chars for progress dots
-	const writableChars = $derived(card ? (Array.from(card.jp) as string[]).filter(isKanjiKana) : []);
-
-	function startQuizSequence() {
-		writers.forEach((w) => w.box && (w.box.style.borderColor = 'var(--ink-200)'));
-
-		if (currentQuizIndex < writers.length) {
-			const current = writers[currentQuizIndex];
-
-			// In sequential mode: show only current box, hide others
-			if (sequential) {
-				writers.forEach((w, idx) => {
-					if (w.box) w.box.style.display = idx === currentQuizIndex ? 'flex' : 'none';
-				});
-			}
-
-			current.box.style.borderColor = 'var(--hinomaru-red)';
-			updateCharProgress();
-
-			if (!current.writer) {
-				// Non-writable char — skip automatically
-				currentQuizIndex++;
-				startQuizSequence();
-				return;
-			}
-
+		const current = writers[currentQuizIndex];
+		if (current) {
 			current.writer.quiz({
 				onComplete: () => {
-					current.box.style.borderColor = 'var(--success)';
-					currentQuizIndex++;
-					updateCharProgress();
-					playCorrect();
-					if (sequential && currentQuizIndex < writers.length) {
-						// Brief pause before showing next char
-						setTimeout(() => startQuizSequence(), 300);
+					if (currentQuizIndex < writers.length - 1) {
+						currentQuizIndex++;
+						startQuiz();
 					} else {
-						startQuizSequence();
+						checked = true;
+						playCorrect();
 					}
 				}
 			});
-		} else {
-			checkAnswer();
 		}
 	}
-
-	function clearCanvas() {
-		if (currentQuizIndex < writers.length) {
-			const current = writers[currentQuizIndex];
-			if (!current.writer) return;
-			current.writer.cancelQuiz();
-			requestAnimationFrame(() => {
-				current.writer.quiz({
-					onComplete: () => {
-						current.box.style.borderColor = 'var(--success)';
-						currentQuizIndex++;
-						updateCharProgress();
-						if (sequential && currentQuizIndex < writers.length) {
-							setTimeout(() => startQuizSequence(), 300);
-						} else {
-							startQuizSequence();
-						}
-					}
-				});
-			});
-		}
-	}
-
-	onDestroy(() => {
-		setupIteration++;
-		if (hanziContainer) hanziContainer.innerHTML = '';
-		writers = [];
-	});
 
 	function toggleGuide() {
 		showGuide = !showGuide;
 		writers.forEach((w) => {
-			if (!w.writer) return;
 			if (showGuide) w.writer.showOutline();
 			else w.writer.hideOutline();
 		});
 	}
 
-	function checkAnswer() {
-		checked = true;
-		showGuide = true;
-		writers.forEach((w) => w.writer?.showOutline());
-	}
-
-	async function next(gotIt: boolean) {
-		if (gotIt) {
-			correctCount++;
-			playCorrect();
+	async function next() {
+		if (i === quizCards.length - 1) {
+			const params = new URLSearchParams({
+				correct: String(correctCount),
+				total: String(quizCards.length),
+				mode: 'write'
+			});
+			saveSession(correctCount, quizCards.length);
+			showAnticipation = true;
+			setTimeout(() => {
+				goto(`/deck/${data.deck.id}/summary?${params}`);
+			}, 1800);
 		} else {
-			quizCards = [...quizCards, quizCards[i]];
-			playWrong();
-		}
-
-		updateCardProgress(card, gotIt, struggled);
-
-		if (gotIt) {
-			if (i >= quizCards.length - 1) {
-				const params = new URLSearchParams({
-					correct: String(correctCount),
-					total: String(data.cards.length),
-					mode: 'write'
-				});
-				if (cardEl) {
-					animate(cardEl, { opacity: [1, 0], y: [0, -20] }, { duration: 0.25, ease: 'easeIn' });
-				}
-				await saveSession(correctCount, data.cards.length);
-				showAnticipation = true;
-				setTimeout(() => {
-					goto(`/deck/${data.deck.id}/summary?${params}`);
-				}, 1800);
-			} else {
-				if (cardEl) {
-					await animate(cardEl, { opacity: [1, 0], x: [0, -40] }, { duration: 0.2, ease: 'easeIn' })
-						.finished;
-					i++;
-					struggled = false;
-					await animate(
-						cardEl,
-						{ opacity: [0, 1], x: [40, 0] },
-						{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-					);
-				} else {
-					i++;
-					struggled = false;
-				}
-			}
-		} else {
+			i++;
 			checked = false;
-			struggled = true;
-			setupWriters();
-			if (cardEl) {
-				animate(cardEl, { scale: [1, 0.98, 1] }, { duration: 0.3 });
-			}
+			currentQuizIndex = 0;
 		}
-	}
-
-	async function updateCardProgress(
-		c: { id: string; progress?: SRSState[] },
-		gotIt: boolean,
-		hadDifficulty: boolean = false
-	) {
-		const {
-			data: { user }
-		} = await supabase.auth.getUser();
-		if (!user) return;
-
-		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : undefined;
-		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
-		const nextState = calculateNextReview(quality, currentProgress);
-
-		await supabase.from('progress').upsert({
-			user_id: user.id,
-			card_id: c.id,
-			learned: true,
-			...nextState,
-			last_seen: new Date().toISOString()
-		});
 	}
 
 	async function saveSession(c: number, total: number) {
@@ -421,136 +254,101 @@
 		});
 		await updateStreak(supabase, user.id);
 	}
-
-	function playAudio() {
-		speakJapanese(card?.jp ?? '');
-	}
 </script>
 
-<div class="write-page">
-	<SessionNav
-		progress={pct}
-		current={i + 1}
-		total={quizCards.length}
-		onClose={() => goto(`/deck/${data.deck.id}`)}
-	/>
+<div class="session-layout premium-bg">
+	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+		<button class="close-btn" onclick={() => goto(`/deck/${data.deck.id}`)}>
+			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+		</button>
 
-	{#if quizCards.length === 0}
-		<div class="empty-state">
-			<Icon icon={InboxIcon} size={48} color="var(--fg-tertiary)" strokeWidth={1.5} />
-			<p>{t('home.empty', $locale)}</p>
-			<a href="/deck/{data.deck.id}" class="hm-btn hm-btn-dark" style="text-decoration:none;">
-				{t('deck.back', $locale)}
-			</a>
+		<div class="header-progress">
+			{i + 1} / {quizCards.length}
 		</div>
-	{:else if card}
-		<div class="card-wrapper" bind:this={cardEl}>
-			<!-- Prompt -->
-			<div class="prompt-row">
-				<div class="prompt-group">
-					<div class="prompt-label">{t('session.writeThis', $locale)}</div>
-					<div class="prompt-meaning">
-						{$locale === 'es' ? card.es : card.en}
-					</div>
-					{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-						<div class="prompt-romaji">{card.romaji}</div>
-					{/if}
-				</div>
-				<button onclick={playAudio} class="audio-btn" aria-label="Play pronunciation">
-					<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-				</button>
-			</div>
 
-			<!-- Writing area -->
-			<div class="canvas-card">
-				<!-- Toolbar -->
-				<div class="canvas-toolbar">
-					{#if sequential && writableChars.length > 0}
-						<div class="char-progress" bind:this={charProgressEl}>
-							{#each writableChars as ch, idx (idx)}
-								<div
-									class="char-dot"
-									data-state={idx < currentQuizIndex
-										? 'done'
-										: idx === currentQuizIndex
-											? 'active'
-											: 'pending'}
-								>
-									<span class="char-dot-label jp">{ch}</span>
-								</div>
-							{/each}
+		<button class="lang-btn">
+			<Icon icon={TranslateIcon} size={24} color="currentColor" />
+		</button>
+	</div>
+
+	<div class="session-container">
+		{#if quizCards.length === 0}
+			<SessionEmptyState 
+				totalCards={data.totalCards} 
+				learnedCount={data.learnedCount}
+				sessionCount={quizCards.length} 
+				deckId={data.deck.id} 
+				modeLabel={t('mode.write.title', $locale)}
+			/>
+		{:else if card}
+			<div class="write-viewer">
+				<div class="card-face minimal-card">
+					<div class="card-tag">{$locale === 'es' ? (data.deck?.kind_es ?? data.deck?.kind) : data.deck?.kind}</div>
+
+					<button
+						onclick={() => speakJapanese(card.jp)}
+						aria-label="Play pronunciation"
+						class="audio-pill normal"
+						style="margin: 0 auto;"
+					>
+						<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+					</button>
+
+					<div class="meaning-label">{t('session.whatMean', $locale)}</div>
+					<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
+					
+					{#if card.example}
+						<div class="example-box">
+							<div class="example-jp jp">{card.example}</div>
+							<div class="example-en">{$locale === 'es' ? card.example_es : card.example_en}</div>
 						</div>
-					{:else}
-						<div></div>
 					{/if}
 
-					<div class="toolbar-actions">
-						<button onclick={toggleGuide} class="toolbar-btn" aria-label="Toggle guide">
-							<Icon
-								icon={showGuide ? EyeIcon : ViewOffIcon}
-								size={18}
-								strokeWidth={1.8}
-								color="var(--fg-secondary)"
-							/>
-						</button>
-						<button onclick={clearCanvas} class="toolbar-btn" aria-label="Clear">
-							<Icon icon={CleanIcon} size={18} strokeWidth={1.8} color="var(--fg-secondary)" />
-						</button>
-					</div>
+					<div class="card-hint">{t('session.writeThis', $locale)}</div>
 				</div>
 
-				{#if loadingWriters}
-					<div class="loading-state">
-						<DotLoader size={7} />
-					</div>
-				{/if}
-
-				<div bind:this={hanziContainer} class="hanzi-container"></div>
-
-				<!-- Example sentence after check -->
-				{#if checked && card.example}
-					<div class="example-box">
-						<div class="example-inner">
-							<div class="example-text">
-								<div class="jp example-jp">{card.example}</div>
-								{#if $showRomaji && ['N5', 'N4'].includes(data.deck.level)}
-									<div class="example-romaji">
-										{card.example_romaji || card.extra?.example_romaji || ''}
+				<div class="canvas-section">
+					<div class="canvas-header">
+						{#if writableChars.length > 1}
+							<div class="char-progress">
+								{#each writableChars as ch, idx (idx)}
+									<div class="char-dot" class:active={idx === currentQuizIndex} class:done={idx < currentQuizIndex}>
+										{ch}
 									</div>
-								{/if}
-								<div class="example-translation">
-									{$locale === 'es' ? card.example_es : card.example_en}
-								</div>
+								{/each}
 							</div>
-							<button
-								onclick={() => speakJapanese(card.example)}
-								class="example-audio-btn"
-								aria-label="Play example"
-							>
-								<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-							</button>
-						</div>
+						{/if}
+						
+						<button class="tool-btn" onclick={toggleGuide} title={showGuide ? t('session.hideGuide', $locale) : t('session.showGuide', $locale)}>
+							<Icon icon={showGuide ? ViewOffIcon : EyeIcon} size={20} color="currentColor" />
+						</button>
 					</div>
-				{/if}
-			</div>
-		</div>
 
-		<StickyFooter>
-			{#if !checked}
-				<button class="hm-btn hm-btn-secondary" style="flex:1;opacity:0.45;pointer-events:none;">
-					{t('session.finishDrawing', $locale)}
+					<div class="canvas-wrapper" class:loading={loadingWriters}>
+						<div bind:this={hanziContainer} class="hanzi-container"></div>
+						{#if loadingWriters}
+							<div class="loader-overlay" transition:fadeIn>
+								<DotLoader />
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+		{/if}
+	</div>
+
+	{#if card && !showAnticipation}
+		<div class="premium-footer">
+			{#if checked}
+				<button class="action-btn-primary full" onclick={next}>
+					{t('session.next', $locale)}
 				</button>
 			{:else}
-				<button class="hm-btn hm-btn-secondary" onclick={() => next(false)} style="flex:1;">
-					<Icon icon={Cancel01Icon} size={18} strokeWidth={2} />
-					{t('session.again', $locale)}
-				</button>
-				<button class="hm-btn hm-btn-primary" onclick={() => next(true)} style="flex:1;">
-					<Icon icon={CheckmarkCircle01Icon} size={18} strokeWidth={2} />
-					{t('session.gotIt', $locale)}
-				</button>
+				<div class="footer-hint">
+					{t('session.finishDrawing', $locale)}
+				</div>
 			{/if}
-		</StickyFooter>
+		</div>
 	{/if}
 </div>
 
@@ -559,272 +357,220 @@
 {/if}
 
 <style>
-	.write-page {
-		display: flex;
-		flex-direction: column;
+	.premium-bg {
+		background-color: var(--bg-page);
 		min-height: 100dvh;
-		background: var(--paper);
 	}
 
-	/* ── Empty state ── */
-	.empty-state {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 16px;
-		padding: 40px;
-		text-align: center;
-		color: var(--fg-secondary);
-	}
-
-	/* ── Card wrapper ── */
-	.card-wrapper {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 16px 20px 140px;
-		gap: 20px;
-		max-width: 600px;
-		margin: 0 auto;
-		width: 100%;
-		box-sizing: border-box;
-	}
-
-	/* ── Prompt row ── */
-	.prompt-row {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		gap: 16px;
-	}
-
-	.prompt-group {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.prompt-label {
-		font-size: 11px;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--fg-tertiary);
-	}
-
-	.prompt-meaning {
-		font-size: 28px;
-		font-weight: 700;
-		color: var(--sumi);
-		line-height: 1.1;
-		letter-spacing: -0.02em;
-	}
-
-	.prompt-romaji {
-		font-size: 14px;
-		color: var(--hinomaru-red);
-		margin-top: 2px;
-		font-weight: 500;
-	}
-
-	.audio-btn {
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		font-size: 18px;
-		box-shadow: var(--shadow-sm);
-		transition: transform 100ms ease;
-		flex-shrink: 0;
-		margin-top: 4px;
-	}
-	.audio-btn:active {
-		transform: scale(0.9);
-	}
-
-	/* ── Canvas card ── */
-	.canvas-card {
-		width: 100%;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: 24px;
-		padding: 16px;
-		box-sizing: border-box;
-		box-shadow: var(--shadow-sm);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 16px;
-		min-height: 280px;
-	}
-
-	/* ── Toolbar ── */
-	.canvas-toolbar {
-		width: 100%;
+	.premium-header-minimal {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 8px;
+		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
+		background: var(--bg-surface);
+		border-bottom: 1px solid var(--ink-200);
 	}
 
-	.toolbar-actions {
+	.header-progress {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--fg-primary);
+	}
+
+	.close-btn, .lang-btn {
+		color: var(--fg-secondary);
+		background: none;
+		border: none;
+		padding: 8px;
+		cursor: pointer;
+	}
+
+	.write-viewer {
 		display: flex;
-		gap: 8px;
+		flex-direction: column;
+		gap: 24px;
+		width: 100%;
+		max-width: 440px;
+		margin: 0 auto;
+		padding: 24px;
 	}
 
-	.toolbar-btn {
-		width: 40px;
-		height: 40px;
-		border-radius: 12px;
-		background: var(--ink-100);
-		border: 1px solid var(--ink-200);
+	.minimal-card {
+		background: var(--bg-surface);
+		border-radius: 40px;
+		padding: 40px 32px;
+		text-align: center;
+		box-shadow: var(--shadow-md);
+		position: relative;
+		border: 1px solid var(--ink-100);
+	}
+
+	.card-tag {
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		margin-bottom: 24px;
+	}
+
+	.audio-pill {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-surface);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		cursor: pointer;
-		transition: background 150ms ease;
-	}
-	@media (hover: hover) {
-		.toolbar-btn:hover {
-			background: var(--ink-200);
-		}
-	}
-	.toolbar-btn:active {
-		background: var(--ink-300);
+		color: var(--fg-secondary);
+		transition: all 0.2s;
 	}
 
-	/* ── Character progress (sequential mode) ── */
+	.meaning-label {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-top: 24px;
+		margin-bottom: 8px;
+	}
+
+	.meaning-text {
+		font-size: 32px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		line-height: 1.2;
+	}
+
+	.example-box {
+		margin-top: 20px;
+		padding: 16px;
+		background: var(--bg-muted);
+		border-radius: 20px;
+	}
+
+	.example-jp { font-size: 16px; color: var(--fg-primary); font-weight: 600; }
+	.example-en { font-size: 13px; color: var(--fg-secondary); margin-top: 4px; }
+
+	.card-hint {
+		margin-top: 24px;
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.canvas-section {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.canvas-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 8px;
+	}
+
 	.char-progress {
 		display: flex;
 		gap: 8px;
-		align-items: center;
-		flex-wrap: wrap;
 	}
 
 	.char-dot {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border-radius: 10px;
-		background: var(--ink-100);
-		border: 1.5px solid var(--ink-200);
-		transition: all 200ms ease;
-	}
-
-	.char-dot[data-state='active'] {
-		background: rgba(188, 0, 45, 0.08);
-		border-color: var(--hinomaru-red);
-	}
-
-	.char-dot[data-state='done'] {
-		background: var(--success-wash);
-		border-color: var(--success);
-	}
-
-	.char-dot-label {
-		font-size: 16px;
-		color: var(--fg-secondary);
-		line-height: 1;
-	}
-
-	.char-dot[data-state='active'] .char-dot-label {
-		color: var(--hinomaru-red);
-		font-weight: 700;
-	}
-
-	.char-dot[data-state='done'] .char-dot-label {
-		color: var(--success);
-	}
-
-	/* ── Loading ── */
-	.loading-state {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin: auto;
-	}
-
-	/* ── Hanzi container ── */
-	.hanzi-container {
-		touch-action: none;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 12px;
-	}
-
-	/* ── Example box ── */
-	.example-box {
-		width: 100%;
-		padding: 14px 16px;
-		border-radius: 16px;
-		background: var(--ink-100);
-		border: 1px solid var(--ink-200);
-	}
-
-	.example-inner {
-		display: flex;
-		align-items: flex-start;
-		gap: 10px;
-	}
-
-	.example-text {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 3px;
-	}
-
-	.example-jp {
-		font-size: 15px;
-		line-height: 1.4;
-		color: var(--sumi);
-	}
-
-	.example-romaji {
-		font-size: 11px;
-		color: var(--hinomaru-red);
-		opacity: 0.85;
-		font-weight: 600;
-	}
-
-	.example-translation {
-		font-size: 12px;
-		color: var(--fg-secondary);
-	}
-
-	.example-audio-btn {
-		width: 30px;
-		height: 30px;
-		border-radius: 50%;
-		border: 1px solid var(--ink-200);
+		width: 32px;
+		height: 32px;
+		border-radius: 8px;
 		background: var(--bg-surface);
-		cursor: pointer;
+		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 12px;
-		flex-shrink: 0;
+		font-size: 14px;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 	}
 
-	/* ── Footer buttons ── */
-	:global(.hm-btn) {
+	.char-dot.active {
+		border-color: var(--hinomaru-red);
+		color: var(--hinomaru-red);
+	}
+
+	.char-dot.done {
+		background: var(--success-wash);
+		border-color: var(--success);
+		color: var(--success);
+	}
+
+	.tool-btn {
+		width: 40px;
+		height: 40px;
+		border-radius: 12px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		color: var(--fg-secondary);
+	}
+
+	.canvas-wrapper {
+		position: relative;
+		background: var(--bg-surface);
+		border-radius: 40px;
+		border: 1.5px solid var(--ink-200);
+		padding: 32px;
+		min-height: 320px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.hanzi-container {
+		display: flex;
+		gap: 16px;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	.loader-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--bg-surface);
+		border-radius: 40px;
+		z-index: 10;
+	}
+
+	.premium-footer {
+		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
+	}
+
+	.action-btn-primary {
+		width: 100%;
+		height: 60px;
+		border-radius: 30px;
+		background: var(--hinomaru-red);
+		color: #fff;
+		border: none;
+		font-size: 17px;
+		font-weight: 800;
+		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
+	}
+
+	.footer-hint {
+		text-align: center;
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 </style>

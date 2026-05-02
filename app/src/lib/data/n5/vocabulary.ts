@@ -10,6 +10,7 @@ export const vocabulary: CardData[] = [
 		en: 'Good morning (polite)',
 		es: 'Buenos días (formal)',
 		example: 'おはようございます、田中さん。',
+		example_romaji: 'Ohayou gozaimasu, Tanaka-san.',
 		example_en: 'Good morning, Mr. Tanaka.',
 		example_es: 'Buenos días, Sr. Tanaka.',
 		category: 'Greetings',
@@ -24,6 +25,7 @@ export const vocabulary: CardData[] = [
 		en: 'Hello / Good afternoon',
 		es: 'Hola / Buenas tardes',
 		example: 'こんにちは！',
+		example_romaji: 'Konnichiwa!',
 		example_en: 'Hello!',
 		example_es: '¡Hola!',
 		sort_order: 2
@@ -34,6 +36,7 @@ export const vocabulary: CardData[] = [
 		en: 'Good evening',
 		es: 'Buenas noches (saludo)',
 		example: 'こんばんは、元気ですか。',
+		example_romaji: 'Konbanwa, genki desu ka.',
 		example_en: 'Good evening, how are you?',
 		example_es: 'Buenas noches, ¿cómo estás?',
 		sort_order: 3
@@ -44,6 +47,7 @@ export const vocabulary: CardData[] = [
 		en: 'Goodbye',
 		es: 'Adiós',
 		example: 'じゃ、さようなら。',
+		example_romaji: 'Ja, sayounara.',
 		example_en: 'Well, goodbye.',
 		example_es: 'Bueno, adiós.',
 		sort_order: 4
@@ -54,6 +58,7 @@ export const vocabulary: CardData[] = [
 		en: 'Thank you (polite)',
 		es: 'Muchas gracias (formal)',
 		example: 'ありがとうございます！',
+		example_romaji: 'Arigatou gozaimasu!',
 		example_en: 'Thank you very much!',
 		example_es: '¡Muchas gracias!',
 		sort_order: 5
@@ -64,6 +69,7 @@ export const vocabulary: CardData[] = [
 		en: 'Excuse me / Sorry',
 		es: 'Perdón / Disculpe',
 		example: 'すみません、どこですか。',
+		example_romaji: 'Sumimasen, doko desu ka.',
 		example_en: 'Excuse me, where is it?',
 		example_es: 'Disculpe, ¿dónde está?',
 		sort_order: 6
@@ -74,6 +80,7 @@ export const vocabulary: CardData[] = [
 		en: 'No',
 		es: 'No',
 		example: 'いいえ、わかりません。',
+		example_romaji: 'Iie, wakarimasen.',
 		example_en: "No, I don't understand.",
 		example_es: 'No, no entiendo.',
 		sort_order: 7
@@ -84,6 +91,7 @@ export const vocabulary: CardData[] = [
 		en: 'Yes',
 		es: 'Sí',
 		example: 'はい、そうです。',
+		example_romaji: 'Hai, sou desu.',
 		example_en: 'Yes, that is right.',
 		example_es: 'Sí, eso es correcto.',
 		sort_order: 8
@@ -94,6 +102,7 @@ export const vocabulary: CardData[] = [
 		en: 'I humbly receive (before eating)',
 		es: 'Gracias por la comida (antes de comer)',
 		example: 'いただきます！',
+		example_romaji: 'Itadakimasu!',
 		example_en: "Let's eat! (said before meals)",
 		example_es: '¡Buen provecho! (antes de comer)',
 		sort_order: 9

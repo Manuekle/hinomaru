@@ -5,10 +5,7 @@
 export function kanaToRomaji(kana: string): string {
 	if (!kana) return '';
 
-	// If the string contains Kanji, we can't reliably convert it to Romaji
-	// without a proper dictionary/parser. Return empty to avoid "broken" mixed output.
-	const hasKanji = /[\u4e00-\u9faf]/.test(kana);
-	if (hasKanji) return '';
+	// Mixed text handling: process kana and pass through other characters (Kanji, etc.)
 
 	const map: Record<string, string> = {
 		あ: 'a',

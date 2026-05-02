@@ -67,7 +67,7 @@
 
 	<div style="position:relative;max-width:420px;width:100%;text-align:center;">
 		<!-- Label -->
-		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="summary-label" style="margin-bottom:16px;">
+		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="summary-label" style="margin-bottom:16px; font-weight: 800;">
 			{t('summary.complete', $locale)}
 		</div>
 
@@ -92,17 +92,11 @@
 			use:staggerChildren={{ delay: 0.55, stagger: 0.1, y: 10 }}
 			class="summary-stats-list"
 		>
-			<div class="summary-stat-item">
-				<span class="summary-stat-key">{t('summary.deck', $locale)}</span>
-				<span class="summary-stat-val">
-					{$locale === 'es' ? data.deck?.title_es : data.deck?.title_en}
-				</span>
-			</div>
-			<div class="summary-stat-item">
+			<div class="summary-stat-item centered">
 				<span class="summary-stat-key">{t('summary.xp', $locale)}</span>
 				<span class="summary-stat-val xp">+{displayXP} XP</span>
 			</div>
-			<div class="summary-stat-item">
+			<div class="summary-stat-item centered">
 				<span class="summary-stat-key">{t('summary.accuracy', $locale)}</span>
 				<span class="summary-stat-val" style="color:{pct >= 70 ? 'var(--success)' : 'var(--hinomaru-red)'};">
 					{pct}%

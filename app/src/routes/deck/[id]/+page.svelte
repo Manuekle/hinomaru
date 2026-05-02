@@ -127,7 +127,7 @@
 	<!-- Progress bar -->
 	<div use:fadeUp={{ delay: 0.2, y: 8 }} style="margin-top:28px;">
 		<div class="hm-progress" style="height:6px;">
-			<div class="hm-progress-bar" style="width:{pct}%;height:6px;"></div>
+			<div class="hm-progress-bar" style="width:{pct}%;height:6px; box-shadow: 0 0 12px color-mix(in srgb, var(--hinomaru-red) 40%, transparent);"></div>
 		</div>
 		<div style="display:flex;justify-content:space-between;margin-top:10px;" class="label-meta">
 			<span>{t('deck.learnedN', $locale, { n: deck.learned ?? 0 })}</span>
