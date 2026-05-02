@@ -68,18 +68,27 @@
 		example_kana?: string;
 		example_romaji?: string;
 	}) {
+		if (!word?.jp || !word?.kana || !word?.en || !word?.es) {
+			console.error('save vocab: missing required field', word);
+			svileo.error({ title: $locale === 'es' ? 'Datos incompletos' : 'Missing word data' });
+			return;
+		}
 		if (savedVocab.has(word.jp) || savingVocab.has(word.jp) || !supabase) return;
 		savingVocab = new Set([...savingVocab, word.jp]);
 		try {
 			const {
 				data: { user }
 			} = await supabase.auth.getUser();
-			if (!user) return;
+			if (!user) {
+				svileo.error({ title: $locale === 'es' ? 'Inicia sesión' : 'Please sign in' });
+				return;
+			}
+			const romaji = word.romaji || kanaToRomaji(word.kana) || word.kana;
 			const { error } = await supabase.from('user_saved_words').insert({
 				user_id: user.id,
 				jp: word.jp,
 				kana: word.kana,
-				romaji: word.romaji ?? null,
+				romaji,
 				en: word.en,
 				es: word.es,
 				example: word.example ?? null,
@@ -91,12 +100,18 @@
 			if (error) {
 				if (error.code === '23505') {
 					savedVocab = new Set([...savedVocab, word.jp]);
+					svileo.info({ title: $locale === 'es' ? 'Ya está en tu vocabulario' : 'Already in your vocabulary' });
 				} else {
-					svileo.error({ title: 'Error' });
+					console.error('save vocab failed:', { code: error.code, message: error.message, details: error.details, hint: error.hint });
+					svileo.error({ title: $locale === 'es' ? 'Error al guardar' : 'Save failed' });
 				}
 			} else {
 				savedVocab = new Set([...savedVocab, word.jp]);
+				svileo.success({ title: $locale === 'es' ? 'Guardado' : 'Saved' });
 			}
+		} catch (e) {
+			console.error('save vocab exception:', e);
+			svileo.error({ title: $locale === 'es' ? 'Error al guardar' : 'Save failed' });
 		} finally {
 			savingVocab = new Set([...savingVocab].filter((v) => v !== word.jp));
 		}

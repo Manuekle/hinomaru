@@ -135,6 +135,7 @@
 
 	async function startRecording() {
 		if (phase !== 'choice' || !speechOk) return;
+		if (isRecording || recognizer.active) return;
 		speechError = null;
 		liveTranscript = '';
 		isRecording = true;
@@ -156,7 +157,8 @@
 	}
 
 	function stopRecording() {
-		if (isRecording) recognizer.stop();
+		recognizer.stop();
+		isRecording = false;
 	}
 
 	function checkSpokenAnswer(spoken: string) {
@@ -200,8 +202,8 @@
 
 	import { onDestroy } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
-	beforeNavigate(() => recognizer.stop());
-	onDestroy(() => recognizer.stop());
+	beforeNavigate(() => recognizer.abort());
+	onDestroy(() => recognizer.abort());
 
 	const speechOk = $derived(speechStatus.ok);
 	const speechWarn = $derived.by(() => {
@@ -360,18 +362,28 @@
 										onmouseup={stopRecording}
 										ontouchstart={startRecording}
 										ontouchend={stopRecording}
+										aria-pressed={isRecording}
+										aria-label={isRecording ? ($locale === 'es' ? 'Soltar para detener' : 'Release to stop') : ($locale === 'es' ? 'Mantener para hablar' : 'Hold to speak')}
 									>
 										{#if isRecording}
 											<span class="rec-dot"></span>
-											{liveTranscript || '...'}
+											<span class="rec-text">{liveTranscript || ($locale === 'es' ? 'Escuchando…' : 'Listening…')}</span>
 										{:else}
 											<Icon icon={Mic01Icon} size={24} color="currentColor" />
-											{$locale === 'es' ? 'Hablar' : 'Speak'}
+											<span>{$locale === 'es' ? 'Hablar' : 'Speak'}</span>
 										{/if}
 									</button>
 
+									{#if isRecording}
+										<div class="mic-wave" aria-hidden="true">
+											{#each Array(5) as _, idx (idx)}
+												<span style="animation-delay:{idx * 0.1}s"></span>
+											{/each}
+										</div>
+									{/if}
+
 									{#if speechError}
-										<p class="error-text" style="margin-top:12px;">{speechError}</p>
+										<p class="error-text" style="margin-top:12px;" role="alert">{speechError}</p>
 									{/if}
 								</div>
 							{:else}
@@ -579,6 +591,35 @@
 		border-radius: 50%; background: var(--hinomaru-red);
 		flex-shrink: 0;
 		animation: pulse-btn 0.7s infinite alternate;
+	}
+
+	.rec-text {
+		max-width: 180px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.mic-wave {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 4px;
+		height: 24px;
+		margin-top: 12px;
+	}
+	.mic-wave span {
+		display: block;
+		width: 4px;
+		height: 100%;
+		background: var(--hinomaru-red);
+		border-radius: 2px;
+		animation: mic-wave-bounce 0.9s ease-in-out infinite;
+		transform-origin: center;
+	}
+	@keyframes mic-wave-bounce {
+		0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+		50% { transform: scaleY(1); opacity: 1; }
 	}
 	@keyframes pulse-btn { from { opacity: 1; } to { opacity: 0.5; } }
 
