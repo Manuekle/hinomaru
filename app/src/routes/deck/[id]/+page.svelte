@@ -61,13 +61,6 @@
 			color: '#34c759'
 		},
 		{
-			id: 'exam',
-			titleKey: 'mode.exam.title',
-			descKey: 'mode.exam.desc',
-			icon: DocumentValidationIcon,
-			color: '#ff3b30'
-		},
-		{
 			id: 'speaking',
 			titleKey: 'mode.speaking.title',
 			descKey: 'mode.speaking.desc',
@@ -76,18 +69,6 @@
 		}
 	];
 
-	let showConfirmModal = $state(false);
-	let pendingUrl = $state<string | null>(null);
-
-	function openConfirm(url: string) {
-		pendingUrl = url;
-		showConfirmModal = true;
-	}
-
-	function handleConfirm() {
-		if (pendingUrl) goto(pendingUrl);
-		showConfirmModal = false;
-	}
 </script>
 
 <div
@@ -127,7 +108,7 @@
 	<!-- Progress bar -->
 	<div use:fadeUp={{ delay: 0.2, y: 8 }} style="margin-top:28px;">
 		<div class="hm-progress" style="height:6px;">
-			<div class="hm-progress-bar" style="width:{pct}%;height:6px; box-shadow: 0 0 12px color-mix(in srgb, var(--hinomaru-red) 40%, transparent);"></div>
+			<div class="hm-progress-bar" style="width:{pct}%;height:6px; box-shadow: 0 0 15px rgba(188, 0, 45, 0.4), 0 0 5px rgba(188, 0, 45, 0.6);"></div>
 		</div>
 		<div style="display:flex;justify-content:space-between;margin-top:10px;" class="label-meta">
 			<span>{t('deck.learnedN', $locale, { n: deck.learned ?? 0 })}</span>
@@ -143,11 +124,7 @@
 				class="row"
 				onclick={() => {
 					const url = mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`;
-					if (mode.id === 'exam') {
-						openConfirm(url);
-					} else {
-						goto(url);
-					}
+					goto(url);
 				}}
 			>
 				<div class="row-icon-box">
@@ -168,22 +145,6 @@
 		{/each}
 	</div>
 </div>
-
-{#snippet confirmIcon()}
-	<Icon icon={AlertCircleIcon} size={32} color="var(--hinomaru-red)" />
-{/snippet}
-
-<ResponsiveModal
-	bind:open={showConfirmModal}
-	title={t('exam.start_confirm_title', $locale) || 'Ready to start?'}
-	description={t('exam.start_confirm', $locale)}
-	icon={confirmIcon}
->
-	{#snippet actions()}
-		<button class="modal-btn-cancel" onclick={() => (showConfirmModal = false)}>{t('common.cancel', $locale)}</button>
-		<button class="modal-btn-confirm" onclick={handleConfirm}>{t('exam.start_now', $locale)}</button>
-	{/snippet}
-</ResponsiveModal>
 
 <style>
 	.back-link {

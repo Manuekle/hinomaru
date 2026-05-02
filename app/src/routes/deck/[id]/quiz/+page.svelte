@@ -4,7 +4,7 @@
 		VolumeHighIcon, 
 		Cancel01Icon, 
 		TranslateIcon,
-		Clock01Icon
+		CheckmarkCircle01Icon
 	} from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
@@ -20,6 +20,7 @@
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn } from '$lib/motion';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
@@ -41,12 +42,6 @@
 	// Timer
 	let elapsed = $state(0);
 	let timerInterval: any;
-
-	const formatTime = (s: number) => {
-		const m = Math.floor(s / 60);
-		const sec = s % 60;
-		return m > 0 ? `${m}:${sec.toString().padStart(2, '0')}` : `${sec}s`;
-	};
 
 	onMount(() => {
 		timerInterval = setInterval(() => elapsed++, 1000);
@@ -154,7 +149,12 @@
 			{queue.index + 1} / {queue.total}
 		</div>
 
-		<button class="lang-btn">
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
 			<Icon icon={TranslateIcon} size={24} color="currentColor" />
 		</button>
 	</div>
@@ -191,8 +191,8 @@
 					<div class="card-hint">{t('session.whatMean', $locale)}</div>
 				</div>
 
-				<div class="options-grid">
-					{#each options as opt (opt)}
+				<div class="options-list">
+					{#each options as opt, idx (idx)}
 						{@const isThisCorrect = opt === ($locale === 'es' ? card.es : card.en)}
 						{@const isThisPicked = opt === picked}
 						<button
@@ -203,51 +203,53 @@
 							class:is-dimmed={picked && !isThisCorrect && !isThisPicked}
 							disabled={!!picked}
 						>
-							{opt}
+							<div class="opt-marker">
+								{#if picked && isThisCorrect}
+									<Icon icon={CheckmarkCircle01Icon} size={16} color="white" />
+								{:else if picked && isThisPicked && !isThisCorrect}
+									<Icon icon={Cancel01Icon} size={16} color="white" />
+								{:else}
+									{String.fromCharCode(65 + idx)}
+								{/if}
+							</div>
+							<span class="opt-text">{opt}</span>
 						</button>
 					{/each}
 				</div>
 
 				{#if picked}
 					<div
-						class="feedback-box"
-						class:correct={isCorrect}
-						class:wrong={!isCorrect}
-						use:fadeUp={{ y: 10 }}
+						class="feedback-premium-bar"
+						class:is-correct={isCorrect}
+						use:fadeUp={{ y: 15 }}
 					>
-						<div class="feedback-header">
-							<div class="feedback-status">
-								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-							</div>
+						<div class="feedback-icon-wrap">
+							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={22} color="currentColor" />
 						</div>
-
-						{#if card.example}
-							<div class="example-section">
-								<div class="example-content">
-									<div class="example-text jp">{card.example}</div>
-									{#if $showRomaji && ['N5', 'N4', 'Survival'].includes(data.deck.level)}
-										<div class="example-romaji">
-											{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example)}
-										</div>
-									{/if}
-									<div class="example-translation">
-										{$locale === 'es' ? card.example_es : card.example_en}
-									</div>
-								</div>
-							</div>
-						{/if}
+						<div class="feedback-text-side">
+							<span class="feedback-title">
+								{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
+							</span>
+						</div>
 					</div>
+
+					{#if !isCorrect && card.example}
+						<div class="example-box compact" use:fadeIn>
+							<div class="example-jp jp">{card.example}</div>
+							<div class="example-en">{$locale === 'es' ? card.example_es : card.example_en}</div>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		{/if}
 	</div>
 
 	{#if picked && !showAnticipation}
-		<div class="premium-footer">
-			<button class="action-btn-primary full" onclick={next}>
+		<StickyFooter>
+			<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
 				{t('session.next', $locale)}
 			</button>
-		</div>
+		</StickyFooter>
 	{/if}
 </div>
 
@@ -284,6 +286,11 @@
 		border: none;
 		padding: 8px;
 		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
 	}
 
 	.quiz-viewer {
@@ -291,7 +298,7 @@
 		flex-direction: column;
 		gap: 24px;
 		width: 100%;
-		max-width: 440px;
+		max-width: 520px;
 		margin: 0 auto;
 		padding: 24px;
 	}
@@ -352,39 +359,41 @@
 		letter-spacing: 0.05em;
 	}
 
-	.options-grid {
+	.options-list {
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
 	}
 
 	.option-item {
+		display: flex;
+		align-items: center;
+		gap: 16px;
 		padding: 20px;
-		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		border-radius: 20px;
-		font-size: 16px;
-		font-weight: 700;
-		color: var(--fg-primary);
+		background: var(--bg-surface);
 		cursor: pointer;
-		text-align: center;
+		text-align: left;
 		transition: all 0.2s;
+		width: 100%;
 	}
 
-	.option-item:hover:not(:disabled) {
+	.option-item:not(:disabled):hover {
 		border-color: var(--hinomaru-red);
-		transform: translateY(-1px);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-sm);
 	}
 
 	.option-item.is-correct {
-		background: var(--success-wash);
-		border-color: var(--success);
+		border-color: var(--success) !important;
+		background: var(--success-wash) !important;
 		color: var(--success);
 	}
 
 	.option-item.is-wrong {
-		background: var(--hinomaru-red-wash);
-		border-color: var(--hinomaru-red);
+		border-color: var(--hinomaru-red) !important;
+		background: var(--hinomaru-red-wash) !important;
 		color: var(--hinomaru-red);
 	}
 
@@ -392,41 +401,67 @@
 		opacity: 0.4;
 	}
 
-	.feedback-box {
-		padding: 24px;
-		border-radius: 24px;
-		background: var(--bg-surface);
-		box-shadow: var(--shadow-sm);
-		border: 1px solid var(--ink-100);
-	}
-
-	.feedback-status { font-weight: 800; font-size: 18px; }
-	.correct .feedback-status { color: var(--success); }
-	.wrong .feedback-status { color: var(--hinomaru-red); }
-
-	.example-section {
-		margin-top: 16px;
-		padding-top: 16px;
-		border-top: 1px solid var(--ink-100);
-	}
-
-	.example-text { font-size: 17px; color: var(--fg-primary); font-weight: 600; }
-	.example-romaji { font-size: 13px; color: var(--hinomaru-red); margin-top: 4px; }
-	.example-translation { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
-
-	.premium-footer {
-		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
-	}
-
-	.action-btn-primary {
-		width: 100%;
-		height: 60px;
-		border-radius: 30px;
-		background: var(--hinomaru-red);
-		color: #fff;
-		border: none;
-		font-size: 17px;
+	.opt-marker {
+		width: 36px;
+		height: 36px;
+		border-radius: 10px;
+		background: var(--bg-muted);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
 		font-weight: 800;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
+		color: var(--fg-tertiary);
+		flex-shrink: 0;
 	}
+
+	.option-item.is-correct .opt-marker { background: var(--success); color: white; }
+	.option-item.is-wrong .opt-marker { background: var(--hinomaru-red); color: white; }
+
+	.opt-text {
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.feedback-premium-bar {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 16px 20px;
+		border-radius: 20px;
+		margin-top: 12px;
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red-ink);
+		border: 1.5px solid rgba(188, 0, 45, 0.1);
+	}
+
+	.feedback-premium-bar.is-correct {
+		background: var(--success-wash);
+		color: var(--success-ink);
+		border-color: rgba(46, 125, 91, 0.1);
+	}
+
+	.feedback-icon-wrap {
+		width: 44px;
+		height: 44px;
+		border-radius: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.5);
+		flex-shrink: 0;
+	}
+
+	.feedback-title { font-size: 16px; font-weight: 800; }
+
+	.example-box.compact {
+		margin-top: 12px;
+		padding: 16px;
+		background: var(--bg-muted);
+		border-radius: 20px;
+		text-align: center;
+	}
+
+	.example-jp { font-size: 16px; color: var(--fg-primary); font-weight: 600; }
+	.example-en { font-size: 13px; color: var(--fg-secondary); margin-top: 4px; }
 </style>

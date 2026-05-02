@@ -5,7 +5,8 @@
 		Cancel01Icon, 
 		CheckmarkCircle01Icon,
 		TranslateIcon,
-		Clock01Icon
+		Clock01Icon,
+		ArrowRight01Icon
 	} from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
@@ -18,9 +19,9 @@
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
@@ -161,7 +162,12 @@
 			{queue.index + 1} / {queue.total}
 		</div>
 
-		<button class="lang-btn">
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
 			<Icon icon={TranslateIcon} size={24} color="currentColor" />
 		</button>
 	</div>
@@ -256,21 +262,21 @@
 	</div>
 
 	{#if !showAnticipation}
-		<div class="premium-footer">
+		<StickyFooter>
 			{#if submitted}
-				<button class="action-btn-primary full" onclick={next}>
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
 					{t('session.next', $locale)}
 				</button>
 			{:else}
 				<button 
-					class="action-btn-primary full" 
+					class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" 
 					onclick={submit}
 					disabled={!answer.trim()}
 				>
 					{t('session.check', $locale)}
 				</button>
 			{/if}
-		</div>
+		</StickyFooter>
 	{/if}
 </div>
 
@@ -282,6 +288,8 @@
 	.premium-bg {
 		background-color: var(--bg-page);
 		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.premium-header-minimal {
@@ -305,6 +313,11 @@
 		border: none;
 		padding: 8px;
 		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
 	}
 
 	.type-viewer {
@@ -312,7 +325,7 @@
 		flex-direction: column;
 		gap: 24px;
 		width: 100%;
-		max-width: 440px;
+		max-width: 520px;
 		margin: 0 auto;
 		padding: 24px;
 	}
@@ -381,21 +394,30 @@
 
 	.type-input {
 		width: 100%;
-		padding: 20px;
+		padding: 24px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
-		border-radius: 20px;
-		font-size: 20px;
+		border-radius: 24px;
+		font-size: 24px;
 		font-weight: 700;
 		color: var(--fg-primary);
 		text-align: center;
-		transition: all 0.2s;
+		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.type-input::placeholder {
+		font-weight: 500;
+		font-size: 18px;
+		color: var(--fg-tertiary);
+		opacity: 0.6;
 	}
 
 	.type-input:focus {
 		outline: none;
 		border-color: var(--hinomaru-red);
-		box-shadow: 0 0 0 4px var(--hinomaru-red-wash);
+		box-shadow: 0 0 0 4px var(--hinomaru-red-wash), var(--shadow-md);
+		transform: scale(1.01);
 	}
 
 	.type-input.is-correct {
@@ -434,20 +456,4 @@
 	.example-text { font-size: 17px; color: var(--fg-primary); font-weight: 600; }
 	.example-romaji { font-size: 13px; color: var(--hinomaru-red); margin-top: 4px; }
 	.example-translation { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
-
-	.premium-footer {
-		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
-	}
-
-	.action-btn-primary {
-		width: 100%;
-		height: 60px;
-		border-radius: 30px;
-		background: var(--hinomaru-red);
-		color: #fff;
-		border: none;
-		font-size: 17px;
-		font-weight: 800;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
-	}
 </style>

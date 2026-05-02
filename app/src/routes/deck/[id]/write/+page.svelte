@@ -62,9 +62,22 @@
 		return m > 0 ? `${m}:${sec.toString().padStart(2, '0')}` : `${sec}s`;
 	};
 
+	let resizeObserver: ResizeObserver | null = null;
+
 	onMount(() => {
 		timerInterval = setInterval(() => elapsed++, 1000);
-		return () => clearInterval(timerInterval);
+		
+		resizeObserver = new ResizeObserver(() => {
+			if (card && hanziContainer && !loadingWriters) {
+				setupWriters();
+			}
+		});
+		if (hanziContainer) resizeObserver.observe(hanziContainer);
+
+		return () => {
+			clearInterval(timerInterval);
+			resizeObserver?.disconnect();
+		};
 	});
 
 	let checked = $state(false);
@@ -120,14 +133,14 @@
 
 		const useSequential = writableChars.length > 2;
 
-		const containerWidth = hanziContainer?.clientWidth || 320;
-		const gap = 12;
+		const containerWidth = hanziContainer?.getBoundingClientRect().width || 320;
+		const gap = 16;
 		let boxSize: number;
 
 		if (useSequential || writableChars.length === 1) {
-			boxSize = Math.min(280, containerWidth - 16);
+			boxSize = Math.min(containerWidth, 260);
 		} else {
-			boxSize = Math.min(180, (containerWidth - gap) / 2);
+			boxSize = Math.min((containerWidth - gap) / 2, 180);
 		}
 
 		async function fetchCharData(char: string, code: number): Promise<unknown> {
@@ -154,8 +167,8 @@
 		}
 
 		const theme = document.documentElement.getAttribute('data-theme') || 'light';
-		const strokeColor = theme === 'dark' ? '#ffffff' : '#1a1a1a';
-		const outlineColor = theme === 'dark' ? '#333333' : '#f0f0f0';
+		const strokeColor = theme === 'dark' ? '#ff0033' : '#bc002d';
+		const outlineColor = theme === 'dark' ? '#444444' : '#f0f0f0';
 
 		for (const char of writableChars) {
 			const box = document.createElement('div');
@@ -266,7 +279,12 @@
 			{i + 1} / {quizCards.length}
 		</div>
 
-		<button class="lang-btn">
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
 			<Icon icon={TranslateIcon} size={24} color="currentColor" />
 		</button>
 	</div>
@@ -338,17 +356,17 @@
 	</div>
 
 	{#if card && !showAnticipation}
-		<div class="premium-footer">
+		<StickyFooter>
 			{#if checked}
-				<button class="action-btn-primary full" onclick={next}>
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
 					{t('session.next', $locale)}
 				</button>
 			{:else}
-				<div class="footer-hint">
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" disabled>
 					{t('session.finishDrawing', $locale)}
-				</div>
+				</button>
 			{/if}
-		</div>
+		</StickyFooter>
 	{/if}
 </div>
 
@@ -360,6 +378,8 @@
 	.premium-bg {
 		background-color: var(--bg-page);
 		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.premium-header-minimal {
@@ -383,40 +403,45 @@
 		border: none;
 		padding: 8px;
 		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
 	}
 
 	.write-viewer {
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: 16px;
 		width: 100%;
-		max-width: 440px;
+		max-width: 520px;
 		margin: 0 auto;
 		padding: 24px;
 	}
 
 	.minimal-card {
 		background: var(--bg-surface);
-		border-radius: 40px;
-		padding: 40px 32px;
+		border-radius: 32px;
+		padding: 24px 20px;
 		text-align: center;
-		box-shadow: var(--shadow-md);
+		box-shadow: var(--shadow-sm);
 		position: relative;
 		border: 1px solid var(--ink-100);
 	}
 
 	.card-tag {
-		font-size: 11px;
+		font-size: 10px;
 		font-weight: 800;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
-		margin-bottom: 24px;
+		margin-bottom: 12px;
 	}
 
 	.audio-pill {
-		width: 48px;
-		height: 48px;
+		width: 40px;
+		height: 40px;
 		border-radius: 50%;
 		border: 1.5px solid var(--ink-200);
 		background: var(--bg-surface);
@@ -428,35 +453,35 @@
 	}
 
 	.meaning-label {
-		font-size: 13px;
+		font-size: 11px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		margin-top: 24px;
-		margin-bottom: 8px;
+		margin-top: 16px;
+		margin-bottom: 4px;
 	}
 
 	.meaning-text {
-		font-size: 32px;
+		font-size: 24px;
 		font-weight: 800;
 		color: var(--hinomaru-red);
 		line-height: 1.2;
 	}
 
 	.example-box {
-		margin-top: 20px;
-		padding: 16px;
+		margin-top: 12px;
+		padding: 12px;
 		background: var(--bg-muted);
-		border-radius: 20px;
+		border-radius: 16px;
 	}
 
-	.example-jp { font-size: 16px; color: var(--fg-primary); font-weight: 600; }
-	.example-en { font-size: 13px; color: var(--fg-secondary); margin-top: 4px; }
+	.example-jp { font-size: 14px; color: var(--fg-primary); font-weight: 600; }
+	.example-en { font-size: 12px; color: var(--fg-secondary); margin-top: 2px; }
 
 	.card-hint {
-		margin-top: 24px;
-		font-size: 13px;
+		margin-top: 16px;
+		font-size: 11px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
@@ -521,14 +546,15 @@
 	.canvas-wrapper {
 		position: relative;
 		background: var(--bg-surface);
-		border-radius: 40px;
+		border-radius: 32px;
 		border: 1.5px solid var(--ink-200);
-		padding: 32px;
-		min-height: 320px;
+		padding: 24px;
+		min-height: 280px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		box-shadow: var(--shadow-sm);
+		overflow: hidden;
 	}
 
 	.hanzi-container {
@@ -536,6 +562,7 @@
 		gap: 16px;
 		justify-content: center;
 		flex-wrap: wrap;
+		width: 100%;
 	}
 
 	.loader-overlay {
@@ -549,23 +576,8 @@
 		z-index: 10;
 	}
 
-	.premium-footer {
-		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
-	}
-
-	.action-btn-primary {
-		width: 100%;
-		height: 60px;
-		border-radius: 30px;
-		background: var(--hinomaru-red);
-		color: #fff;
-		border: none;
-		font-size: 17px;
-		font-weight: 800;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
-	}
-
 	.footer-hint {
+		flex: 1;
 		text-align: center;
 		font-size: 14px;
 		font-weight: 700;

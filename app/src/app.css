@@ -177,7 +177,7 @@
 	--fg-tertiary: var(--ink-600);
 	--fg-inverse: #ffffff;
 	--hinomaru-red-wash: rgba(188, 0, 45, 0.2);
-	--hinomaru-red-ink: #ff6b8b;
+	--hinomaru-red-ink: #d80034;
 	--success-wash: rgba(46, 125, 91, 0.2);
 	--warning-wash: rgba(168, 116, 26, 0.2);
 	--bg-header: color-mix(in srgb, var(--washi) 85%, transparent);

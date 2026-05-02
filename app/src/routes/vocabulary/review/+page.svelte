@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Cancel01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
@@ -14,10 +14,10 @@
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { addXP } from '$lib/utils/gamification';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
-	import SessionNav from '$lib/components/SessionNav.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
 	import Confetti from '$lib/components/Confetti.svelte';
+	import { fadeIn } from '$lib/motion';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -43,8 +43,9 @@
 			);
 		}
 	});
-	function speak(text: string) {
-		speakJapanese(text);
+
+	function speak(text: string, slow = false) {
+		speakJapanese(text, undefined, slow ? 0.7 : 1);
 	}
 
 	async function updateWordProgress(w: any, gotIt: boolean, hadDifficulty: boolean = false) {
@@ -138,11 +139,10 @@
 
 	function getFontSize(text: string) {
 		const len = text?.length || 0;
-		if (len <= 3) return '96px';
-		if (len <= 5) return '72px';
-		if (len <= 8) return '56px';
-		if (len <= 11) return '42px';
-		return '32px';
+		if (len <= 4) return 'var(--fs-display)';
+		if (len <= 6) return 'var(--fs-2xl)';
+		if (len <= 10) return 'var(--fs-xl)';
+		return 'var(--fs-lg)';
 	}
 </script>
 
@@ -152,178 +152,395 @@
 
 <Confetti bind:this={confettiRef} />
 
-<div style="display:flex;flex-direction:column;min-height:100dvh;background:var(--paper);">
-	<SessionNav
-		progress={pct}
-		current={i + 1}
-		total={words.length}
-		showRomajiToggle={true}
-		onClose={() => goto('/vocabulary')}
-	/>
+<div class="session-layout premium-bg">
+	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+		<button class="close-btn" onclick={() => goto('/vocabulary')}>
+			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+		</button>
 
-	{#if words.length === 0}
-		<div
-			style="min-height:100dvh;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;"
-		>
-			<div style="font-size:48px;margin-bottom:16px;">✨</div>
-			<h2 style="font-size:24px;font-weight:800;margin:0 0 8px;">{t('home.complete', $locale)}</h2>
-			<p style="color:var(--fg-secondary);margin-bottom:24px;">{t('summary.all', $locale)}</p>
-			<a href="/vocabulary" class="hm-btn hm-btn-dark">{t('deck.back', $locale)}</a>
+		<div class="header-progress">
+			{i + 1} / {words.length}
 		</div>
-	{:else if word}
-		<div
-			style="flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 24px 140px;gap:32px;max-width:600px;margin:0 auto;width:100%;box-sizing:border-box;"
-		>
-			<!-- Card with 3D flip -->
-			<div
-				bind:this={cardEl}
-				class="card-scene"
-				style="width:100%;max-width:360px;aspect-ratio:3/4;"
-				onclick={() => (flipped = !flipped)}
-				role="button"
-				tabindex="0"
-				onkeydown={(e) => e.key === ' ' && (flipped = !flipped)}
-			>
-				<div 
-					class="card-body" 
-					class:flipped
-					style="--cat-color: var(--cat-{meta?.category?.toLowerCase() || 'general'})"
-				>
-					<!-- Front -->
-					<div class="card-face">
-						<div style="position:absolute;top:24px;left:24px;" class="label-meta">
-							{($locale === 'es' ? word.category_es : word.category) || t('nav.vocabulary', $locale)}
-						</div>
-						<div 
-							class="jp" 
-							style="font-size: {getFontSize(word.jp)}; line-height: 1.1; text-align: center; padding: 0 16px; width: 100%; box-sizing: border-box; word-break: break-word;"
-						>
-							{word.jp}
-						</div>
-						<button
-							onclick={(e) => {
-								e.stopPropagation();
-								speak(word.jp);
-							}}
-							class="audio-btn"
-						>
-							<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
-						</button>
-						<div style="margin-top:16px;font-size:12px;color:var(--fg-tertiary);">
-							{t('session.flip', $locale)}
-						</div>
-					</div>
 
-					<!-- Back -->
-					<div class="card-face back">
-						<div
-							style="font-size:36px;font-weight:700;letter-spacing:-0.02em;color:var(--sumi);line-height:1;"
-						>
-							{$locale === 'es' ? word.es : word.en}
-						</div>
-						{#if $showRomaji}
-							<div class="romaji" style="margin-top:8px; font-size:16px; font-weight:600; color:var(--hinomaru-red);">{word.romaji || kanaToRomaji(word.kana)}</div>
-						{/if}
-						<div
-							style="margin-top:20px;padding-top:20px;border-top:1px solid var(--ink-200);width:90%;text-align:center;position:relative;"
-						>
-							<div style="display:flex;align-items:center;justify-content:center;gap:8px;">
-								<div class="jp" style="font-size:17px;line-height:1.4;">{word.kana}</div>
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
+			<Icon icon={TranslateIcon} size={24} color="currentColor" />
+		</button>
+	</div>
+
+	<div class="session-container">
+		{#if words.length === 0}
+			<div class="empty-state-wrapper" use:fadeIn>
+				<div class="empty-emoji">✨</div>
+				<h2 class="empty-title">{t('home.complete', $locale)}</h2>
+				<p class="empty-desc">{t('summary.all', $locale)}</p>
+				<button class="hm-btn hm-btn-primary hm-btn-lg" onclick={() => goto('/vocabulary')}>
+					{t('deck.back', $locale)}
+				</button>
+			</div>
+		{:else if word}
+			<div class="card-stack-center">
+				<div
+					role="button"
+					tabindex="0"
+					bind:this={cardEl}
+					class="card-scene"
+					onclick={() => (flipped = !flipped)}
+					onkeydown={(e) => e.key === ' ' && (flipped = !flipped)}
+				>
+					<div class="card-body" class:flipped>
+						<!-- Front -->
+						<div class="card-face card-front">
+							<div class="card-tag">{($locale === 'es' ? word.category_es : word.category) || t('nav.vocabulary', $locale)}</div>
+							
+							<div class="jp word-text" style="font-size:{getFontSize(word.jp)};">
+								{word.jp}
+							</div>
+
+							<div class="audio-controls">
 								<button
-									onclick={(e) => {
-										e.stopPropagation();
-										speak(word.kana);
-									}}
-									class="audio-btn audio-btn-sm"
+									onclick={(e) => { e.stopPropagation(); speak(word.jp); }}
+									class="audio-pill normal"
 								>
-									<Icon icon={VolumeHighIcon} size={18} color="currentColor" strokeWidth={1.5} />
+									<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+								</button>
+								<button
+									onclick={(e) => { e.stopPropagation(); speak(word.jp, true); }}
+									class="audio-pill slow"
+								>
+									<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+									<span class="slow-label">0.7x</span>
 								</button>
 							</div>
 
-							{#if word.pos}
-								<div style="font-size:11px;color:var(--fg-tertiary);margin-top:6px;font-style:italic;">
-									{word.pos_es || word.pos}
-								</div>
-							{/if}
+							<div class="tap-label">{t('session.flip', $locale)}</div>
+						</div>
 
-							{#if word.example}
-								<div style="margin-top:16px;font-size:13px;color:var(--fg-secondary);line-height:1.4;">
-									<div class="jp" style="margin-bottom:4px;color:var(--sumi);">{word.example}</div>
-									{#if $showRomaji}
-										<div style="font-size:11px;color:var(--hinomaru-red-ink);opacity:0.8;margin-top:2px;margin-bottom:4px;font-weight:600;letter-spacing:0.02em;">
-											{word.example_romaji || word.extra?.example_romaji || kanaToRomaji(word.example_kana || word.example)}
+						<!-- Back -->
+						<div class="card-face card-back">
+							<div class="back-content">
+								<div class="meaning-large">
+									{$locale === 'es' ? word.es : word.en}
+								</div>
+
+								<div class="romaji-red">
+									{word.romaji || kanaToRomaji(word.kana)}
+								</div>
+
+								<div class="divider"></div>
+
+								<div class="details-section">
+									<div class="kana-row">
+										<div class="jp kana-text">{word.kana}</div>
+										<button
+											onclick={(e) => { e.stopPropagation(); speak(word.kana); }}
+											class="mini-audio"
+										>
+											<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
+										</button>
+									</div>
+
+									{#if word.pos}
+										<div class="pos-tag">{word.pos_es || word.pos}</div>
+									{/if}
+
+									{#if word.example}
+										<div class="example-section">
+											<div class="example-jp jp">
+												{word.example}
+												<button
+													onclick={(e) => { e.stopPropagation(); speak(word.example); }}
+													class="mini-audio"
+												>
+													<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
+												</button>
+											</div>
+											{#if $showRomaji}
+												<div class="example-romaji">
+													{word.example_romaji || word.extra?.example_romaji || kanaToRomaji(word.example_kana || word.example)}
+												</div>
+											{/if}
+											<div class="example-translation">
+												{$locale === 'es' ? word.example_es : word.example_en}
+											</div>
 										</div>
 									{/if}
-									<div>{$locale === 'es' ? word.example_es : word.example_en}</div>
 								</div>
-							{/if}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+		{/if}
+	</div>
 
-			<StickyFooter>
-				{#if flipped}
-					<button
-						class="hm-btn hm-btn-secondary touch-action-manip"
-						onclick={retry}
-						style="flex:1;"
-					>
-						✕ {t('session.again', $locale)}
-					</button>
-				{/if}
-				<button
-					class="hm-btn hm-btn-primary {flipped ? '' : 'hm-btn-full'} touch-action-manip flash-primary-btn"
-					onclick={() => (flipped ? next(true) : (flipped = true))}
-					style="flex:1;"
-				>
-					{flipped ? `✓ ${t('session.gotIt', $locale)}` : t('session.flip', $locale)}
+	{#if word && !finished}
+		<StickyFooter>
+			{#if !flipped}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => (flipped = true)}>
+					{t('session.flip', $locale)}
 				</button>
-			</StickyFooter>
-		</div>
+			{:else}
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={retry}>
+					{t('session.again', $locale)}
+				</button>
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => next(true)}>
+					{t('session.gotIt', $locale)}
+				</button>
+			{/if}
+		</StickyFooter>
 	{/if}
 </div>
 
 <style>
-	@media (hover: hover) {
-		.flash-primary-btn:hover {
-			box-shadow: 0 4px 20px rgba(188, 0, 45, 0.3);
-		}
+	.premium-bg {
+		background-color: var(--bg-page);
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
 	}
 
-	.audio-btn {
-		margin-top: 20px;
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		border: 1px solid var(--ink-200);
+	.premium-header-minimal {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
 		background: var(--bg-surface);
+		border-bottom: 1px solid var(--ink-200);
+	}
+
+	.header-progress {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--fg-primary);
+	}
+
+	.close-btn, .lang-btn {
+		color: var(--fg-secondary);
+		background: none;
+		border: none;
+		padding: 8px;
 		cursor: pointer;
-		display: inline-flex;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
+	}
+
+	.card-stack-center {
+		flex: 1;
+		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 18px;
-		touch-action: manipulation;
-		-webkit-tap-highlight-color: transparent;
-		transition: background 150ms ease;
+		padding: 24px;
 	}
 
-	.audio-btn:hover,
-	.audio-btn:active {
-		background: var(--ink-100);
+	.card-scene {
+		width: 100%;
+		max-width: 520px;
+		aspect-ratio: 3/4.2;
+		perspective: 1500px;
+		cursor: pointer;
+		background: none;
+		border: none;
+		padding: 0;
+		display: block;
+		text-align: left;
+		font: inherit;
 	}
 
-	.audio-btn-sm {
-		margin-top: 0;
-		width: 28px;
-		height: 28px;
-		border: 1px solid var(--ink-100);
-		font-size: 12px;
-		color: var(--fg-tertiary);
-		flex-shrink: 0;
+	.card-body {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+		transform-style: preserve-3d;
+	}
+
+	.card-body.flipped {
+		transform: rotateY(180deg);
 	}
 
 	.card-face {
+		position: absolute;
+		inset: 0;
+		backface-visibility: hidden;
+		background: var(--bg-surface);
+		border-radius: 40px;
+		box-shadow: var(--shadow-lg);
+		display: flex;
+		flex-direction: column;
+		padding: 48px 32px;
 		overflow: hidden;
+		border: 1px solid var(--ink-100);
 	}
+
+	.card-front {
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.card-back {
+		transform: rotateY(180deg);
+		justify-content: center;
+	}
+
+	.card-tag {
+		font-size: 12px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.15em;
+	}
+
+	.word-text {
+		color: var(--fg-primary);
+		line-height: 1.1;
+		text-align: center;
+		font-weight: 700;
+		margin: auto 0;
+	}
+
+	.audio-controls {
+		display: flex;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
+
+	.audio-pill {
+		width: 52px;
+		height: 52px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-surface);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-secondary);
+		transition: all 0.2s;
+		position: relative;
+	}
+
+	.audio-pill.slow {
+		border-color: var(--hinomaru-red);
+		color: var(--hinomaru-red);
+	}
+
+	.slow-label {
+		position: absolute;
+		font-size: 9px;
+		font-weight: 800;
+		background: var(--bg-surface);
+		color: var(--hinomaru-red);
+		padding: 0 4px;
+		top: -4px;
+	}
+
+	.tap-label {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+	}
+
+	.back-content {
+		text-align: center;
+	}
+
+	.meaning-large {
+		font-size: 40px;
+		font-weight: 900;
+		color: var(--fg-primary);
+		line-height: 1.1;
+	}
+
+	.romaji-red {
+		margin-top: 12px;
+		font-size: 20px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+	}
+
+	.divider {
+		height: 1.5px;
+		background: var(--ink-100);
+		margin: 24px 0;
+	}
+
+	.kana-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 4px;
+	}
+
+	.kana-text {
+		font-size: 18px;
+		font-weight: 600;
+		color: var(--fg-primary);
+	}
+
+	.pos-tag {
+		font-size: 11px;
+		color: var(--fg-tertiary);
+		font-style: italic;
+		margin-bottom: 16px;
+	}
+
+	.example-section {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.example-jp {
+		font-size: 18px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
+
+	.mini-audio {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		border: 1px solid var(--ink-200);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-tertiary);
+	}
+
+	.example-romaji {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+	}
+
+	.example-translation {
+		font-size: 14px;
+		color: var(--fg-secondary);
+	}
+
+	.empty-state-wrapper {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 24px;
+		text-align: center;
+	}
+
+	.empty-emoji { font-size: 48px; margin-bottom: 16px; }
+	.empty-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+	.empty-desc { color: var(--fg-secondary); margin-bottom: 32px; }
 </style>

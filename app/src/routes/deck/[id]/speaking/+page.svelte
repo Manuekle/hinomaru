@@ -5,7 +5,8 @@
 		Mic01Icon, 
 		Tick02Icon, 
 		Cancel01Icon,
-		TranslateIcon
+		TranslateIcon,
+		ArrowRight01Icon
 	} from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { locale } from '$lib/stores/locale';
@@ -19,6 +20,7 @@
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
@@ -173,7 +175,12 @@
 			{queue.index + 1} / {queue.total}
 		</div>
 
-		<button class="lang-btn">
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
 			<Icon icon={TranslateIcon} size={24} color="currentColor" />
 		</button>
 	</div>
@@ -261,11 +268,11 @@
 	</div>
 
 	{#if submitted && !showAnticipation}
-		<div class="premium-footer">
-			<button class="action-btn-primary full" onclick={next}>
+		<StickyFooter>
+			<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
 				{t('session.next', $locale)}
 			</button>
-		</div>
+		</StickyFooter>
 	{/if}
 </div>
 
@@ -302,6 +309,11 @@
 		border: none;
 		padding: 8px;
 		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
 	}
 
 	.speaking-viewer {
@@ -309,7 +321,7 @@
 		flex-direction: column;
 		gap: 32px;
 		width: 100%;
-		max-width: 440px;
+		max-width: 520px;
 		margin: 0 auto;
 		padding: 24px;
 	}
@@ -447,20 +459,4 @@
 	.wrong .feedback-status { color: var(--hinomaru-red); }
 
 	.correct-answer { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
-
-	.premium-footer {
-		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
-	}
-
-	.action-btn-primary {
-		width: 100%;
-		height: 60px;
-		border-radius: 30px;
-		background: var(--hinomaru-red);
-		color: #fff;
-		border: none;
-		font-size: 17px;
-		font-weight: 800;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
-	}
 </style>

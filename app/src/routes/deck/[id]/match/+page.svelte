@@ -11,7 +11,7 @@
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { Award01Icon, VolumeHighIcon, Clock01Icon, Cancel01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
+	import { Award01Icon, VolumeHighIcon, Clock01Icon, Cancel01Icon, TranslateIcon, ArrowReloadHorizontalIcon, CheckmarkCircle01Icon } from '@hugeicons/core-free-icons';
 	import { fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
@@ -180,7 +180,12 @@
 			{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}
 		</div>
 
-		<button class="lang-btn">
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
 			<Icon icon={TranslateIcon} size={24} color="currentColor" />
 		</button>
 	</div>
@@ -237,14 +242,15 @@
 					<h2 class="well-done">{t('session.wellDone', $locale)}</h2>
 					<div class="finish-time">{formatTime(finalTime)}</div>
 					<p class="finish-desc">{allCards.length} {t('home.cards', $locale)} completadas</p>
-					<div class="finish-actions">
-						<button class="action-btn-secondary" style="flex:1;" onclick={() => location.reload()}>
-							↺ {t('session.again', $locale)}
+					
+					<StickyFooter>
+						<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => location.reload()}>
+							{t('session.again', $locale)}
 						</button>
-						<button class="action-btn-primary" style="flex:1;" onclick={goBack}>
+						<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={goBack}>
 							{t('session.finish', $locale)}
 						</button>
-					</div>
+					</StickyFooter>
 				</div>
 			</div>
 		{/if}
@@ -282,6 +288,11 @@
 		border: none;
 		padding: 8px;
 		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
 	}
 
 	.game-area {
@@ -420,29 +431,6 @@
 	}
 
 	.finish-desc { color: var(--fg-secondary); font-size: 16px; margin-bottom: 32px; }
-
-	.finish-actions { display: flex; gap: 12px; }
-
-	.action-btn-primary {
-		height: 60px;
-		border-radius: 30px;
-		background: var(--hinomaru-red);
-		color: #fff;
-		border: none;
-		font-size: 17px;
-		font-weight: 800;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
-	}
-
-	.action-btn-secondary {
-		height: 60px;
-		border-radius: 30px;
-		background: var(--bg-surface);
-		color: var(--fg-primary);
-		border: 1.5px solid var(--ink-200);
-		font-size: 17px;
-		font-weight: 800;
-	}
 
 	@keyframes shake {
 		10%, 90% { transform: translate3d(-1px, 0, 0); }

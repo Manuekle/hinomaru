@@ -21,6 +21,7 @@
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn } from '$lib/motion';
 	import type { PageData } from './$types';
 
@@ -138,10 +139,10 @@
 
 	function getFontSize(text: string) {
 		const len = text?.length || 0;
-		if (len <= 4) return '80px';
-		if (len <= 6) return '64px';
-		if (len <= 10) return '48px';
-		return '36px';
+		if (len <= 4) return 'var(--fs-display)';
+		if (len <= 6) return 'var(--fs-2xl)';
+		if (len <= 10) return 'var(--fs-xl)';
+		return 'var(--fs-lg)';
 	}
 </script>
 
@@ -155,7 +156,12 @@
 			{queue.index + 1} / {queue.total}
 		</div>
 
-		<button class="lang-btn">
+		<button 
+			class="lang-btn" 
+			class:active={$showRomaji}
+			onclick={() => ($showRomaji = !$showRomaji)}
+			title="Toggle Romaji"
+		>
 			<Icon icon={TranslateIcon} size={24} color="currentColor" />
 		</button>
 	</div>
@@ -250,22 +256,20 @@
 	</div>
 
 	{#if card && !showAnticipation}
-		<div class="premium-footer">
+		<StickyFooter>
 			{#if !flipped}
-				<button class="action-btn-primary full" onclick={() => (flipped = true)}>
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => (flipped = true)}>
 					{t('session.flip', $locale)}
 				</button>
 			{:else}
-				<button class="action-btn-secondary" onclick={retry}>
-					<Icon icon={Cancel01Icon} size={20} color="currentColor" />
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={retry}>
 					{t('session.again', $locale)}
 				</button>
-				<button class="action-btn-primary" onclick={() => next(true)}>
-					<Icon icon={CheckmarkCircle01Icon} size={20} color="currentColor" />
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => next(true)}>
 					{t('session.gotIt', $locale)}
 				</button>
 			{/if}
-		</div>
+		</StickyFooter>
 	{/if}
 </div>
 
@@ -302,6 +306,11 @@
 		border: none;
 		padding: 8px;
 		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.lang-btn.active {
+		color: var(--hinomaru-red);
 	}
 
 	.card-stack-center {
@@ -314,10 +323,16 @@
 
 	.card-scene {
 		width: 100%;
-		max-width: 440px;
+		max-width: 520px;
 		aspect-ratio: 3/4.2;
 		perspective: 1500px;
 		cursor: pointer;
+		background: none;
+		border: none;
+		padding: 0;
+		display: block;
+		text-align: left;
+		font: inherit;
 	}
 
 	.card-body {
@@ -476,46 +491,13 @@
 		color: var(--fg-secondary);
 	}
 
-	/* Footer styling */
-	.premium-footer {
-		display: flex;
-		gap: 16px;
-		padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
-		background: transparent;
+	.btn-text {
+		margin-left: 8px;
 	}
 
-	.action-btn-primary {
-		flex: 1;
-		height: 60px;
-		border-radius: 30px;
-		background: var(--hinomaru-red);
-		color: #fff;
-		border: none;
-		font-size: 17px;
-		font-weight: 800;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.25);
-	}
-
-	.action-btn-secondary {
-		flex: 1;
-		height: 60px;
-		border-radius: 30px;
-		background: var(--bg-surface);
-		color: var(--fg-primary);
-		border: 1.5px solid var(--ink-200);
-		font-size: 17px;
-		font-weight: 800;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-	}
-
-	.action-btn-primary.full {
-		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
+	@media (max-width: 400px) {
+		.btn-text {
+			display: none;
+		}
 	}
 </style>
