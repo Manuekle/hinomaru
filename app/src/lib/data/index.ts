@@ -21,10 +21,10 @@ import { hotelPhrases } from './survival/hotel';
 import { healthPhrases } from './survival/health';
 
 export const DECKS: DeckDef[] = [
-	// ── Introduction ──────────────────────────────────────────────────────────
+	// ── N5 ────────────────────────────────────────────────────────────────────
 	{
-		id: 'survival-intro',
-		level: 'Survival',
+		id: 'n5-intro',
+		level: 'N5',
 		kind: 'Vocabulary',
 		kind_es: 'Supervivencia',
 		title_en: 'Self-Introduction',
@@ -101,7 +101,6 @@ export const DECKS: DeckDef[] = [
 		cards: healthPhrases
 	},
 
-	// ── N5 ────────────────────────────────────────────────────────────────────
 	{
 		id: 'n5-hiragana',
 		level: 'N5',
