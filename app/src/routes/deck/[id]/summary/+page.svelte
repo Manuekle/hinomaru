@@ -18,6 +18,7 @@
 
 	const correct = $derived(Number($page.url.searchParams.get('correct') ?? 0));
 	const total = $derived(Number($page.url.searchParams.get('total') ?? 0));
+	const mode = $derived($page.url.searchParams.get('mode') ?? '');
 	const pct = $derived(total > 0 ? Math.round((correct / total) * 100) : 0);
 
 	const message = $derived(
@@ -47,11 +48,13 @@
 			await invalidateAll();
 		}
 
-		if (pct >= 70) {
-			setTimeout(() => {
+		setTimeout(() => {
+			if (pct >= 70) {
 				svileo.success({ title: t('summary.complete', $locale) });
-			}, 1000);
-		}
+			} else if (total > 0) {
+				svileo.info({ title: t('summary.retry', $locale) });
+			}
+		}, 1000);
 	});
 </script>
 
@@ -105,6 +108,11 @@
 		</div>
 
 		<StickyFooter>
+			{#if mode && data?.deck?.id}
+				<a href={`/deck/${data.deck.id}/${mode}`} class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg">
+					{t('session.again', $locale)}
+				</a>
+			{/if}
 			<a href="/" class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg summary-back-btn">
 				{t('summary.back', $locale)}
 			</a>
@@ -133,6 +141,12 @@
 		50% {
 			transform: translate(-50%, -50%) scale(1.06);
 			opacity: 0.09;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		:global([style*="animation: pulse-bg"]) {
+			animation: none !important;
 		}
 	}
 </style>

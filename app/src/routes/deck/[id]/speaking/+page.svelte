@@ -36,6 +36,8 @@
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 	let error = $state<string | null>(null);
+	let supported = $state(true);
+	let lastErrorCode = $state<string | null>(null);
 
 	const card = $derived(queue.current);
 
@@ -43,54 +45,60 @@
 
 	onMount(() => {
 		const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-		if (SpeechRecognition) {
-			recognition = new SpeechRecognition();
-			recognition.lang = 'ja-JP';
-			recognition.interimResults = false;
-			recognition.maxAlternatives = 1;
-
-			recognition.onresult = (event: any) => {
-				transcript = event.results[0][0].transcript;
-				isRecording = false;
-				submit();
-			};
-
-			recognition.onerror = (event: any) => {
-				console.error('Speech recognition error', event.error);
-				isRecording = false;
-				if (event.error === 'no-speech') {
-					error = t('speaking.noSpeech', $locale);
-				} else {
-					error = t('speaking.unavailable', $locale);
-				}
-			};
-
-			recognition.onend = () => {
-				isRecording = false;
-			};
+		if (!SpeechRecognition) {
+			supported = false;
+			return;
 		}
+		recognition = new SpeechRecognition();
+		recognition.lang = 'ja-JP';
+		recognition.interimResults = false;
+		recognition.maxAlternatives = 1;
+
+		recognition.onresult = (event: any) => {
+			transcript = event.results[0][0].transcript;
+			isRecording = false;
+			submit();
+		};
+
+		recognition.onerror = (event: any) => {
+			console.error('Speech recognition error', event.error);
+			isRecording = false;
+			lastErrorCode = event.error;
+			if (event.error === 'no-speech') {
+				error = t('speaking.noSpeech', $locale);
+			} else {
+				error = t('speaking.unavailable', $locale);
+			}
+		};
+
+		recognition.onend = () => {
+			isRecording = false;
+		};
 	});
 
 	function toggleRecording() {
+		if (!supported || !recognition) return;
 		if (isRecording) {
-			recognition.stop();
-		} else {
-			error = null;
-			transcript = '';
-			submitted = false;
-			try {
-				recognition.start();
-				isRecording = true;
-			} catch (e) {
-				error = t('speaking.unavailable', $locale);
-			}
+			try { recognition.stop(); } catch { /* ignore */ }
+			isRecording = false;
+			return;
+		}
+		error = null;
+		lastErrorCode = null;
+		transcript = '';
+		submitted = false;
+		try {
+			recognition.start();
+			isRecording = true;
+		} catch (e) {
+			isRecording = false;
+			error = t('speaking.unavailable', $locale);
 		}
 	}
 
 	const isCorrect = $derived.by(() => {
 		if (!card || !transcript) return false;
-		// Normalize: remove punctuation and spaces
-		const normalize = (s: string) => s.replace(/[、。！？\s]/g, '');
+		const normalize = (s: string) => s.normalize('NFKC').replace(/[、。！？.,\s]/g, '').toLowerCase();
 		const user = normalize(transcript);
 		const target = normalize(card.jp);
 		return user === target;
@@ -102,6 +110,7 @@
 			correct++;
 			playCorrect();
 		} else {
+			struggled = true;
 			playWrong();
 		}
 	}
@@ -137,6 +146,7 @@
 		} else {
 			submitted = false;
 			transcript = '';
+			struggled = false;
 			queue.advance();
 		}
 	}
@@ -217,32 +227,48 @@
 					</div>
 				</div>
 
-				<!-- Mic + feedback below card -->
-				<div class="mic-area">
-					<button
-						class="mic-btn"
-						class:is-recording={isRecording}
-						onclick={toggleRecording}
-						disabled={submitted}
-						aria-label={isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
-					>
-						<div class="mic-ring"></div>
-						<Icon icon={isRecording ? Tick02Icon : Mic01Icon} size={30} color="currentColor" />
-					</button>
-					<div class="mic-label" aria-hidden="true">
-						{isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
+				{#if !supported}
+					<div class="error-msg" use:fadeIn>
+						{$locale === 'es'
+							? 'Reconocimiento de voz no disponible en este navegador. Usa Chrome o Edge.'
+							: 'Speech recognition not supported in this browser. Try Chrome or Edge.'}
 					</div>
-				</div>
-
-				{#if transcript}
-					<div class="transcript-box" use:fadeUp={{ y: 8 }}>
-						<span class="transcript-label">{t('speaking.heard', $locale)}</span>
-						<div class="transcript-text jp">{transcript}</div>
+				{:else}
+					<!-- Mic + feedback below card -->
+					<div class="mic-area">
+						<button
+							class="mic-btn"
+							class:is-recording={isRecording}
+							onclick={toggleRecording}
+							disabled={submitted}
+							aria-label={isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
+							aria-pressed={isRecording}
+						>
+							<div class="mic-ring"></div>
+							<Icon icon={isRecording ? Tick02Icon : Mic01Icon} size={30} color="currentColor" />
+						</button>
+						<div class="mic-label" aria-hidden="true">
+							{isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
+						</div>
 					</div>
 				{/if}
 
+				<div class="transcript-box" aria-live="polite" class:empty={!transcript}>
+					{#if transcript}
+						<span class="transcript-label">{t('speaking.heard', $locale)}</span>
+						<div class="transcript-text jp">{transcript}</div>
+					{/if}
+				</div>
+
 				{#if error}
-					<div class="error-msg" use:fadeIn>{error}</div>
+					<div class="error-msg" use:fadeIn>
+						{error}
+						{#if lastErrorCode === 'no-speech' && !submitted}
+							<button class="retry-btn" onclick={toggleRecording}>
+								{$locale === 'es' ? 'Intentar de nuevo' : 'Try again'}
+							</button>
+						{/if}
+					</div>
 				{/if}
 
 				{#if submitted}
@@ -494,7 +520,32 @@
 
 	.transcript-text { font-size: 22px; font-weight: 700; color: var(--fg-primary); }
 
-	.error-msg { font-size: 14px; font-weight: 600; color: var(--hinomaru-red); }
+	.error-msg {
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--hinomaru-red);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		text-align: center;
+	}
+
+	.retry-btn {
+		padding: 8px 18px;
+		border-radius: 12px;
+		border: 1.5px solid var(--hinomaru-red);
+		background: var(--bg-surface);
+		color: var(--hinomaru-red);
+		font-size: 13px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.transcript-box.empty {
+		visibility: hidden;
+		min-height: 56px;
+	}
 
 	.feedback-row {
 		display: flex;

@@ -6,6 +6,7 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect } from '$lib/utils/sounds';
+	import { kanaToRomaji } from '$lib/utils/romaji';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
@@ -73,10 +74,14 @@
 		return () => {
 			clearInterval(timerInterval);
 			resizeObserver?.disconnect();
+			writers.forEach((w) => {
+				try { w.writer.cancelQuiz?.(); } catch { /* ignore */ }
+			});
 		};
 	});
 
 	let checked = $state(false);
+	let strokeError = $state(false);
 	let showGuide = $state(true);
 
 	let hanziContainer = $state<HTMLDivElement | null>(null);
@@ -102,6 +107,7 @@
 	$effect(() => {
 		if (i >= 0 && card && hanziContainer) {
 			checked = false;
+			strokeError = false;
 			showGuide = true;
 			setupWriters();
 		}
@@ -195,9 +201,14 @@
 		if (iteration === setupIteration) {
 			loadingWriters = false;
 			if (writers.length === 0) {
-				checked = true;
-				playCorrect();
+				if (writableChars.length === 0) {
+					checked = true;
+					playCorrect();
+				} else {
+					strokeError = true;
+				}
 			} else {
+				strokeError = false;
 				startQuiz();
 			}
 		}
@@ -230,13 +241,32 @@
 
 	function toggleGuide() {
 		showGuide = !showGuide;
+		if (!checked) struggled = true;
 		writers.forEach((w) => {
 			if (showGuide) w.writer.showOutline();
 			else w.writer.hideOutline();
 		});
 	}
 
+	async function persistProgress(c: any, gotIt: boolean, hadDifficulty: boolean) {
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user || !c) return;
+		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
+		const nextState = calculateNextReview(quality, currentProgress);
+		await supabase.from('progress').upsert({
+			user_id: user.id,
+			card_id: c.id,
+			learned: true,
+			...nextState,
+			last_seen: new Date().toISOString()
+		});
+	}
+
 	async function next() {
+		const gotIt = checked;
+		if (gotIt && !struggled) correctCount++;
+		persistProgress(card, gotIt, struggled);
 		if (i === quizCards.length - 1) {
 			const params = new URLSearchParams({
 				correct: String(correctCount),
@@ -251,6 +281,7 @@
 		} else {
 			i++;
 			checked = false;
+			struggled = false;
 			currentQuizIndex = 0;
 		}
 	}
@@ -319,9 +350,10 @@
 						<div class="example-box">
 							<div class="jp" style="font-size:13px;font-weight:600;color:var(--fg-primary);">{card.example}</div>
 							{#if $showRomaji}
-								<div class="romaji" style="font-size:11px; margin-top:2px; margin-bottom: 2px;">
-									{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}
-								</div>
+								{@const exRom = card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example || '')}
+								{#if exRom}
+									<div class="romaji" style="font-size:11px; margin-top:2px; margin-bottom: 2px;">{exRom}</div>
+								{/if}
 							{/if}
 							<div style="font-size:12px;color:var(--fg-secondary);margin-top:2px;">{$locale === 'es' ? card.example_es : card.example_en}</div>
 						</div>
@@ -350,6 +382,13 @@
 						{#if loadingWriters}
 							<div class="loader-overlay">
 								<DotLoader />
+							</div>
+						{:else if strokeError}
+							<div class="stroke-error">
+								<p>{$locale === 'es' ? 'No se pudieron cargar los trazos. Verifica tu conexión.' : 'Could not load stroke data. Check your connection.'}</p>
+								<button class="hm-btn hm-btn-secondary" onclick={() => setupWriters()}>
+									{$locale === 'es' ? 'Reintentar' : 'Retry'}
+								</button>
 							</div>
 						{/if}
 					</div>
@@ -579,6 +618,20 @@
 		justify-content: center;
 		flex-wrap: wrap;
 		width: 100%;
+	}
+
+	.stroke-error {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		padding: 16px;
+		text-align: center;
+		font-size: 14px;
+		color: var(--fg-secondary);
 	}
 
 	.loader-overlay {

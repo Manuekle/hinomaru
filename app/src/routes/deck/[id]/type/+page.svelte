@@ -77,6 +77,7 @@
 			correct++;
 			playCorrect();
 		} else {
+			struggled = true;
 			playWrong();
 		}
 	}
@@ -112,6 +113,7 @@
 		} else {
 			submitted = false;
 			answer = '';
+			struggled = false;
 			queue.advance();
 		}
 	}
@@ -219,8 +221,11 @@
 						{#if card.example}
 							<div class="example-section">
 								<div class="example-text jp">{card.example}</div>
-								{#if $showRomaji && card.romaji}
-									<div class="example-romaji">{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}</div>
+								{#if $showRomaji}
+									{@const exRom = card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example || '')}
+									{#if exRom}
+										<div class="example-romaji">{exRom}</div>
+									{/if}
 								{/if}
 								<div class="example-translation">{$locale === 'es' ? card.example_es : card.example_en}</div>
 							</div>

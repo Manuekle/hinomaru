@@ -333,8 +333,9 @@
 		width: 100%;
 		height: 100%;
 		flex: 1;
-		transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.64, 1);
+		transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 		transform-style: preserve-3d;
+		will-change: transform;
 	}
 
 	.card-body.flipped { transform: rotateY(180deg); }

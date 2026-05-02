@@ -163,6 +163,24 @@
 		goto(`/deck/${data.deck.id}`);
 	}
 
+	function restart() {
+		matchedIds.clear();
+		wrongKeys.clear();
+		wrongCounts.clear();
+		selectedKey = null;
+		currentIndex = 0;
+		elapsed = 0;
+		finalTime = 0;
+		finished = false;
+		transitioning = false;
+		sessionCards = [...allCards].sort(() => Math.random() - 0.5);
+		loadNextSet();
+		if (timerInterval) clearInterval(timerInterval);
+		timerInterval = setInterval(() => {
+			if (!finished) elapsed++;
+		}, 1000);
+	}
+
 	const formatTime = (s: number) => {
 		const m = Math.floor(s / 60);
 		const sec = s % 60;
@@ -215,6 +233,7 @@
 							class:jp-card={item.type === 'jp'}
 							onclick={() => select(item)}
 							disabled={isMatched || transitioning}
+							aria-label={item.type === 'jp' ? `Japanese: ${item.text}` : `Meaning: ${item.text}`}
 						>
 							{#if !isMatched}
 								<div class="card-inner">
@@ -241,7 +260,7 @@
 					<p class="finish-desc">{allCards.length} {t('home.cards', $locale)} completadas</p>
 					
 					<StickyFooter>
-						<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => location.reload()}>
+						<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={restart}>
 							{t('session.again', $locale)}
 						</button>
 						<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={goBack}>
@@ -308,6 +327,12 @@
 		gap: 10px;
 		width: 100%;
 		max-width: 520px;
+	}
+
+	@media (max-width: 380px) {
+		.match-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.match-card {

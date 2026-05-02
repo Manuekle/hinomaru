@@ -76,6 +76,7 @@ import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 			correct++;
 			playCorrect();
 		} else {
+			struggled = true;
 			playWrong();
 		}
 	}
@@ -385,7 +386,7 @@ import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 		transform: none !important;
 	}
 
-	.option-item.is-dimmed { opacity: 0.38; }
+	.option-item.is-dimmed { opacity: 0.55; filter: grayscale(0.4); }
 
 	.opt-marker {
 		width: 28px;
