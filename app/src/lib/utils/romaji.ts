@@ -1,11 +1,39 @@
 /**
  * Simple Kana to Romaji converter for Hinomaru.
- * Handles basic hiragana/katakana.
+ * Handles basic hiragana/katakana. Non-kana (kanji, etc) are dropped, NOT passed through —
+ * passing through caused mixed kanji+romaji output in the UI.
  */
+
+const KANA_RE = /[぀-ゟ゠-ヿ]/;
+const KANJI_RE = /[㐀-䶿一-鿿]/;
+const ROMAJI_OK_RE = /^[\sA-Za-z0-9'\-.,!?ōūāīēâîûêôãõ]+$/i;
+
+/**
+ * Returns true if string is plausibly clean romaji (latin only, no kana/kanji).
+ */
+export function isCleanRomaji(s: string | null | undefined): boolean {
+	if (!s) return false;
+	if (KANA_RE.test(s) || KANJI_RE.test(s)) return false;
+	return ROMAJI_OK_RE.test(s);
+}
+
+/**
+ * Returns a safe romaji string for display.
+ * - If `provided` is clean romaji → return it.
+ * - Else if `kana` source is provided → convert it.
+ * - Else return ''.
+ */
+export function safeRomaji(provided: string | null | undefined, kana?: string | null): string {
+	if (isCleanRomaji(provided ?? '')) return (provided ?? '').trim();
+	if (kana && !KANJI_RE.test(kana)) {
+		const out = kanaToRomaji(kana);
+		return isCleanRomaji(out) ? out : '';
+	}
+	return '';
+}
+
 export function kanaToRomaji(kana: string): string {
 	if (!kana) return '';
-
-	// Mixed text handling: process kana and pass through other characters (Kanji, etc.)
 
 	const map: Record<string, string> = {
 		あ: 'a',
@@ -168,7 +196,13 @@ export function kanaToRomaji(kana: string): string {
 				// Choonpu - long vowel
 				i++;
 			} else {
-				result += map[char1] || char1;
+				const mapped = map[char1];
+				if (mapped) {
+					result += mapped;
+				} else if (/[A-Za-z0-9\s'\-.,!?]/.test(char1)) {
+					result += char1;
+				}
+				// drop kanji and other non-kana, non-latin chars
 				i++;
 			}
 		}

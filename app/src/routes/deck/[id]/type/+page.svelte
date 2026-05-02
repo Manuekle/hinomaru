@@ -14,7 +14,7 @@
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import { kanaToRomaji } from '$lib/utils/romaji';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
@@ -188,8 +188,9 @@
 						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 					</button>
 					<div class="jp word-big">{card.jp}</div>
-					{#if $showRomaji && card.romaji}
-						<div class="romaji-line">{card.romaji}</div>
+					{#if $showRomaji}
+						{@const rom = safeRomaji(card.romaji, card.jp)}
+						{#if rom}<div class="romaji-line">{rom}</div>{/if}
 					{/if}
 				</div>
 
@@ -222,7 +223,7 @@
 							<div class="example-section">
 								<div class="example-text jp">{card.example}</div>
 								{#if $showRomaji}
-									{@const exRom = card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example || '')}
+									{@const exRom = safeRomaji(card.example_romaji || card.extra?.example_romaji, card.example_kana)}
 									{#if exRom}
 										<div class="example-romaji">{exRom}</div>
 									{/if}

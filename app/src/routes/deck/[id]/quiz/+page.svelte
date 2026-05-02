@@ -15,6 +15,7 @@
 	import { fadeUp } from '$lib/motion';
 	import { t } from '$lib/i18n';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import { updateStreak } from '$lib/utils/updateStreak';
 import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
@@ -175,8 +176,9 @@ import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 					</button>
 					<div class="jp word-big">{card.jp}</div>
-					{#if $showRomaji && card.romaji}
-						<div class="romaji-line">{card.romaji}</div>
+					{#if $showRomaji}
+						{@const rom = safeRomaji(card.romaji, card.jp)}
+						{#if rom}<div class="romaji-line">{rom}</div>{/if}
 					{/if}
 				</div>
 

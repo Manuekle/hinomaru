@@ -6,7 +6,7 @@
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect } from '$lib/utils/sounds';
-	import { kanaToRomaji } from '$lib/utils/romaji';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
@@ -121,6 +121,10 @@
 		writers = [];
 		currentQuizIndex = 0;
 
+		// Snapshot chars at call-time. Card may advance during async work; without snapshot
+		// `writableChars` re-derives mid-flight and we'd render the wrong character.
+		const chars = [...writableChars];
+
 		let HanziWriter;
 		try {
 			const hwModule = await import('hanzi-writer');
@@ -133,13 +137,13 @@
 
 		if (iteration !== setupIteration) return;
 
-		const useSequential = writableChars.length > 2;
+		const useSequential = chars.length > 2;
 
 		const containerWidth = hanziContainer?.getBoundingClientRect().width || 320;
 		const gap = 16;
 		let boxSize: number;
 
-		if (useSequential || writableChars.length === 1) {
+		if (useSequential || chars.length === 1) {
 			boxSize = Math.min(containerWidth, 260);
 		} else {
 			boxSize = Math.min((containerWidth - gap) / 2, 180);
@@ -172,9 +176,22 @@
 		const strokeColor = theme === 'dark' ? '#ff0033' : '#bc002d';
 		const outlineColor = theme === 'dark' ? '#444444' : '#f0f0f0';
 
-		for (const char of writableChars) {
-			const charData = await fetchCharData(char, char.codePointAt(0)!);
-			if (!charData) continue;
+		const charDataResults = await Promise.all(
+			chars.map((c) => fetchCharData(c, c.codePointAt(0)!))
+		);
+
+		if (iteration !== setupIteration) return;
+
+		// If ANY char failed to load, abort — partial writers misalign with UI dots.
+		if (chars.length > 0 && charDataResults.some((d) => !d)) {
+			loadingWriters = false;
+			strokeError = true;
+			return;
+		}
+
+		for (let idx = 0; idx < chars.length; idx++) {
+			const char = chars[idx];
+			const charData = charDataResults[idx];
 
 			const box = document.createElement('div');
 			box.style.width = `${boxSize}px`;
@@ -201,7 +218,7 @@
 		if (iteration === setupIteration) {
 			loadingWriters = false;
 			if (writers.length === 0) {
-				if (writableChars.length === 0) {
+				if (chars.length === 0) {
 					checked = true;
 					playCorrect();
 				} else {
@@ -342,15 +359,18 @@
 						</button>
 					</div>
 
-					{#if $showRomaji && card.romaji}
-						<div class="romaji" style="margin-top:-10px; margin-bottom: 4px;">{card.romaji}</div>
+					{#if $showRomaji}
+						{@const rom = safeRomaji(card.romaji, card.jp)}
+						{#if rom}
+							<div class="romaji" style="margin-top:-10px; margin-bottom: 4px;">{rom}</div>
+						{/if}
 					{/if}
 
 					{#if card.example}
 						<div class="example-box">
 							<div class="jp" style="font-size:13px;font-weight:600;color:var(--fg-primary);">{card.example}</div>
 							{#if $showRomaji}
-								{@const exRom = card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example || '')}
+								{@const exRom = safeRomaji(card.example_romaji || card.extra?.example_romaji, card.example_kana)}
 								{#if exRom}
 									<div class="romaji" style="font-size:11px; margin-top:2px; margin-bottom: 2px;">{exRom}</div>
 								{/if}
@@ -362,11 +382,11 @@
 
 				<div class="canvas-section">
 					<div class="canvas-header">
-						{#if writableChars.length > 1}
+						{#if writers.length > 1}
 							<div class="char-progress">
-								{#each writableChars as ch, idx (idx)}
+								{#each writers as w, idx (idx)}
 									<div class="char-dot" class:active={idx === currentQuizIndex} class:done={idx < currentQuizIndex}>
-										{ch}
+										{w.char}
 									</div>
 								{/each}
 							</div>

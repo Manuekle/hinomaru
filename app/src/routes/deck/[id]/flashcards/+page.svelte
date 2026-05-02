@@ -17,7 +17,7 @@
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import { kanaToRomaji } from '$lib/utils/romaji';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
@@ -38,6 +38,9 @@
 	const cards = $derived(queue.cards);
 	const i = $derived(queue.index);
 	const card = $derived(queue.current);
+
+	const rom = $derived(card ? safeRomaji(card.romaji, card.jp) : '');
+	const exRom = $derived(card?.example ? safeRomaji(card.example_romaji || card.extra?.example_romaji, card.example_kana || card.example) : '');
 
 	onMount(() => {
 		if (cardEl) {
@@ -189,7 +192,7 @@
 					<div class="card-body" class:flipped>
 						<!-- Front -->
 						<div class="card-face card-front">
-
+							<span class="card-tag">{data.deck.title || t('nav.vocabulary', $locale)}</span>
 
 							<div class="word-center">
 								<div class="jp word-text" style="font-size:{getFontSize(card.jp)};">{card.jp}</div>
@@ -219,7 +222,7 @@
 						<div class="card-face card-back">
 							<div class="back-scroll">
 								<div class="meaning-large">{$locale === 'es' ? card.es : card.en}</div>
-								<div class="romaji-red">{card.romaji}</div>
+								{#if rom}<div class="romaji-red">{rom}</div>{/if}
 
 								{#if card.example}
 									<div class="example-block">
@@ -230,7 +233,7 @@
 											</button>
 										</div>
 										{#if $showRomaji}
-											<div class="example-romaji">{card.example_romaji || card.extra?.example_romaji || kanaToRomaji(card.example_kana || card.example)}</div>
+											{#if exRom}<div class="example-romaji">{exRom}</div>{/if}
 										{/if}
 										<div class="example-translation">{$locale === 'es' ? card.example_es : card.example_en}</div>
 									</div>
@@ -333,7 +336,7 @@
 		width: 100%;
 		height: 100%;
 		flex: 1;
-		transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.64, 1);
 		transform-style: preserve-3d;
 		will-change: transform;
 	}
@@ -447,7 +450,6 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
 	}
 
 	.meaning-large {
@@ -459,7 +461,7 @@
 
 	.romaji-red {
 		margin-top: 10px;
-		font-size: clamp(16px, 4vw, 20px);
+		font-size: clamp(15px, 4vw, 19px);
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}

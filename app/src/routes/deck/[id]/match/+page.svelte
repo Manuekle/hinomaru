@@ -15,6 +15,7 @@
 	import { fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
 	import type { PageData } from './$types';
@@ -238,8 +239,9 @@
 							{#if !isMatched}
 								<div class="card-inner">
 									<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
-									{#if item.type === 'jp' && $showRomaji && item.romaji}
-										<div class="romaji-hint">{item.romaji}</div>
+									{#if item.type === 'jp' && $showRomaji}
+										{@const rom = safeRomaji(item.romaji, item.text)}
+										{#if rom}<div class="romaji-hint">{rom}</div>{/if}
 									{/if}
 								</div>
 							{:else}

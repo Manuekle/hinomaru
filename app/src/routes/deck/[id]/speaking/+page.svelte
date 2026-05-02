@@ -16,6 +16,7 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
@@ -214,8 +215,9 @@
 
 						<div class="word-center">
 							<div class="jp word-text" style="font-size:{card.jp.length <= 4 ? 'var(--fs-display)' : card.jp.length <= 6 ? 'var(--fs-2xl)' : card.jp.length <= 10 ? 'var(--fs-xl)' : 'var(--fs-lg)'};">{card.jp}</div>
-							{#if $showRomaji && card.romaji}
-								<div class="romaji-sub">{card.romaji}</div>
+							{#if $showRomaji}
+								{@const rom = safeRomaji(card.romaji, card.jp)}
+								{#if rom}<div class="romaji-sub">{rom}</div>{/if}
 							{/if}
 							<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
 						</div>
