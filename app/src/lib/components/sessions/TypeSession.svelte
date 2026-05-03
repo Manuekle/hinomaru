@@ -3,8 +3,9 @@
 	import {
 		VolumeHighIcon,
 		Cancel01Icon,
-		TranslateIcon
+		CheckmarkCircle01Icon
 	} from '@hugeicons/core-free-icons';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
@@ -112,15 +113,8 @@
 			<span class="session-index">{queue.index + 1} / {queue.total}</span>
 			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-
-		<button 
-			class="lang-btn" 
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		
+		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
 
 	<div class="session-container">
@@ -138,8 +132,9 @@
 					<button onclick={playAudio} class="audio-corner" aria-label="Play pronunciation">
 						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 					</button>
-					<div class="jp word-big">{card.jp}</div>
-					{#if $showRomaji}
+					<div class="jp word-big"><InteractiveText text={card.jp} /></div>
+					<div class="meaning-label">{$locale === 'es' ? card.es : card.en}</div>
+					{#if submitted}
 						{@const rom = safeRomaji(card.romaji, card.jp)}
 						{#if rom}<div class="romaji-line">{rom}</div>{/if}
 					{/if}
@@ -208,13 +203,22 @@
 	.header-progress { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
 	.session-index { font-size: 17px; font-weight: 900; color: var(--fg-primary); }
 	.total-label { font-size: 10px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; }
-	.close-btn, .lang-btn { color: var(--fg-secondary); background: none; border: none; padding: 8px; cursor: pointer; }
-	.lang-btn.active { color: var(--hinomaru-red); }
+	.close-btn { color: var(--fg-secondary); background: none; border: none; padding: 8px; cursor: pointer; }
 	.type-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; width: 100%; max-width: 480px; margin: 0 auto; padding: 20px 0 8px; }
 	.word-card { position: relative; background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 28px; box-shadow: 0 4px 24px rgba(26,26,26,0.08); padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 	.audio-corner { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--ink-200); background: var(--bg-muted); display: flex; align-items: center; justify-content: center; color: var(--fg-secondary); cursor: pointer; }
 	.word-big { font-size: 56px; font-weight: 800; color: var(--fg-primary); line-height: 1; }
+	.meaning-label { font-size: 16px; color: var(--fg-secondary); margin-top: 4px; }
 	.romaji-line { font-size: 18px; font-weight: 700; color: var(--hinomaru-red); }
+
+	:global(.word-big .word-link) {
+		color: inherit !important;
+		border-bottom: 2px solid var(--hinomaru-red-wash) !important;
+	}
+	:global(.word-big .word-link:hover) {
+		border-bottom-color: var(--hinomaru-red) !important;
+	}
+
 	.type-input { width: 100%; padding: 18px 20px; background: var(--bg-surface); border: 1.5px solid var(--ink-200); border-radius: 18px; font-size: 20px; font-weight: 700; color: var(--fg-primary); text-align: center; }
 	.type-input.is-correct { border-color: var(--success); background: var(--success-wash); color: var(--success); }
 	.type-input.is-wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }

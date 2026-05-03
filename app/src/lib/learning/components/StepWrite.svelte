@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { fadeUp } from '$lib/motion';
 	import { locale } from '$lib/stores/locale';
 	import { speakJapanese } from '$lib/utils/tts';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
 
@@ -48,19 +51,22 @@
 </script>
 
 <div class="step-layout">
-	<div class="step-header">
-		<div class="step-instruction">
-			{$locale === 'es' ? 'Escribe en romaji' : 'Type in romaji'}
-		</div>
-	</div>
-
 	<div class="step-content">
-		<div class="word-card">
-			<button class="speak-btn" onclick={() => speakJapanese(card.jp)} aria-label="Reproducir">
-				<Icon icon={VolumeHighIcon} size={22} color="var(--hinomaru-red)" />
-			</button>
-			<div class="word-jp">{card.jp}</div>
-			<div class="word-meaning">{$locale === 'es' ? card.es : card.en}</div>
+		<div class="prompt-card">
+			<div class="prompt-meta">
+				<span class="prompt-tag">{$locale === 'es' ? 'ESCRIBIR' : 'WRITE'}</span>
+				<button 
+					class="audio-mini" 
+					onclick={() => speakJapanese(card.jp)} 
+					aria-label="Reproducir"
+				>
+					<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+				</button>
+			</div>
+			<div class="jp word-text" style="font-size: {card.jp.length <= 4 ? 'var(--fs-display)' : 'var(--fs-2xl)'};">
+				<InteractiveText text={card.jp} />
+			</div>
+			<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
 		</div>
 
 		<input
@@ -68,9 +74,9 @@
 			bind:value
 			onkeydown={onKey}
 			disabled={locked}
-			class="write-input"
-			class:correct={locked && isCorrect}
-			class:wrong={locked && !isCorrect}
+			class="type-input"
+			class:is-correct={locked && isCorrect}
+			class:is-wrong={locked && !isCorrect}
 			placeholder="romaji…"
 			autocomplete="off"
 			autocapitalize="off"
@@ -78,20 +84,28 @@
 		/>
 
 		{#if locked && !isCorrect}
-			<div class="answer-hint" in:fade>
-				{$locale === 'es' ? 'Respuesta:' : 'Answer:'}
-				<strong>{card.romaji}</strong>
+			<div class="feedback-box wrong" in:fadeUp={{ y: 10 }}>
+				<div class="feedback-status">{$locale === 'es' ? 'Incorrecto' : 'Incorrect'}</div>
+				<div class="correct-answer">
+					{$locale === 'es' ? 'La respuesta era' : 'The answer was'}: <strong>{card.romaji}</strong>
+				</div>
+			</div>
+		{:else if locked && isCorrect}
+			<div class="feedback-box correct" in:fadeUp={{ y: 10 }}>
+				<div class="feedback-status">{$locale === 'es' ? '¡Correcto!' : 'Correct!'}</div>
 			</div>
 		{/if}
 	</div>
 
-	<div class="step-footer">
-		{#if !locked}
-			<button class="check-btn" disabled={!value.trim()} onclick={check}>
-				{$locale === 'es' ? 'Comprobar' : 'Check'}
-			</button>
-		{/if}
-	</div>
+	<StickyFooter>
+		<div class="footer-inner">
+			{#if !locked}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" disabled={!value.trim()} onclick={check}>
+					{$locale === 'es' ? 'Comprobar' : 'Check'}
+				</button>
+			{/if}
+		</div>
+	</StickyFooter>
 </div>
 
 <style>
@@ -100,125 +114,127 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		gap: 24px;
 	}
-	.step-header {
-		padding-bottom: 24px;
-		text-align: center;
-	}
-	.step-instruction {
-		font-size: 14px;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--fg-tertiary);
-	}
+
 	.step-content {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		gap: 24px;
+		gap: 18px;
 	}
-	.word-card {
+
+	.prompt-card {
 		width: 100%;
 		background: var(--bg-surface);
-		border-radius: 32px;
-		padding: 36px 24px;
+		border: 1px solid var(--ink-200);
+		border-radius: 28px;
+		box-shadow: 0 8px 32px rgba(26,26,26,0.06);
+		padding: 18px 22px 28px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 14px;
 		text-align: center;
-		position: relative;
 	}
-	.speak-btn {
-		position: absolute;
-		top: 12px;
-		right: 12px;
-		width: 44px;
-		height: 44px;
+
+	.prompt-meta {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+	}
+
+	.prompt-tag {
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 10px;
+		border-radius: 20px;
+	}
+
+	.audio-mini {
+		width: 32px;
+		height: 32px;
 		border-radius: 50%;
-		background: var(--ink-50);
-		border: none;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--fg-secondary);
 		cursor: pointer;
 	}
-	.speak-btn:active {
-		transform: scale(0.9);
+
+	.word-text {
+		color: var(--fg-primary);
+		line-height: 1.05;
+		font-weight: 800;
+		padding: 8px 0;
 	}
-	.word-jp {
-		font-family: var(--font-jp);
-		font-size: clamp(36px, 9vw, 52px);
-		font-weight: 700;
-		color: var(--sumi);
-	}
-	.word-meaning {
-		font-size: 14px;
-		color: var(--fg-secondary);
-		margin-top: 10px;
+
+	.meaning-sub {
+		font-size: clamp(15px, 3.5vw, 18px);
 		font-weight: 600;
+		color: var(--fg-secondary);
 	}
-	.write-input {
+
+	.type-input {
 		width: 100%;
-		padding: 20px 22px;
-		font-size: 19px;
-		font-weight: 700;
-		border: 2px solid var(--ink-100);
-		border-radius: 20px;
+		padding: 18px 20px;
 		background: var(--bg-surface);
-		color: var(--sumi);
-		outline: none;
-		transition: all 0.2s;
+		border: 1.5px solid var(--ink-200);
+		border-radius: 18px;
+		font-size: 20px;
+		font-weight: 700;
+		color: var(--fg-primary);
 		text-align: center;
+		transition: all 0.2s;
 	}
-	.write-input:focus {
+
+	.type-input:focus { border-color: var(--hinomaru-red); }
+
+	.type-input.is-correct { border-color: var(--success); background: var(--success-wash); color: var(--success); }
+
+	.type-input.is-wrong {
 		border-color: var(--hinomaru-red);
-	}
-	.write-input.correct {
-		border-color: var(--success);
-		background: color-mix(in srgb, var(--success) 8%, transparent);
-		color: var(--success);
-	}
-	.write-input.wrong {
-		border-color: var(--hinomaru-red);
-		background: color-mix(in srgb, var(--hinomaru-red) 8%, transparent);
+		background: var(--hinomaru-red-wash);
 		color: var(--hinomaru-red);
 		animation: shake 0.4s;
 	}
-	.answer-hint {
-		font-size: 14px;
-		color: var(--fg-secondary);
+
+	.feedback-box {
+		width: 100%;
+		padding: 16px 18px;
+		border-radius: 16px;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-surface);
 		text-align: center;
 	}
-	.answer-hint strong {
-		color: var(--hinomaru-red);
-		font-weight: 800;
+
+	.feedback-box.correct { border-color: var(--success); background: var(--success-wash); }
+
+	.feedback-box.wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
+
+	.feedback-status { font-weight: 800; font-size: 16px; }
+
+	.correct-answer { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+
+	:global(.word-text .word-link) {
+		color: inherit !important;
+		border-bottom: 2px solid var(--hinomaru-red-wash) !important;
 	}
-	.step-footer {
-		padding-top: 32px;
+	:global(.word-text .word-link:hover) {
+		border-bottom-color: var(--hinomaru-red) !important;
 	}
-	.check-btn {
-		width: 100%;
-		padding: 18px;
-		background: var(--hinomaru-red);
-		color: white;
-		font-size: 16px;
-		font-weight: 800;
-		border: none;
-		border-radius: 20px;
-		cursor: pointer;
-		box-shadow: 0 6px 0 color-mix(in srgb, var(--hinomaru-red) 60%, black);
-		transition: all 0.1s;
-	}
-	.check-btn:disabled {
-		background: var(--ink-100);
-		color: var(--fg-tertiary);
-		box-shadow: 0 6px 0 var(--ink-200);
-		cursor: default;
-	}
-	.check-btn:not(:disabled):active {
-		transform: translateY(3px);
-		box-shadow: 0 3px 0 color-mix(in srgb, var(--hinomaru-red) 60%, black);
-	}
+
+	.footer-inner { width: 100%; max-width: 480px; margin: 0 auto; }
+
 	@keyframes shake {
 		10%, 90% { transform: translate3d(-1px, 0, 0); }
 		20%, 80% { transform: translate3d(2px, 0, 0); }

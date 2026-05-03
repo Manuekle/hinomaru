@@ -3,8 +3,10 @@
 	import { fade } from 'svelte/transition';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { buildSentence, pickDistractors, type BuiltSentence } from '$lib/learning/sentenceBuilder';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, CheckmarkCircle01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
+	import { fadeUp } from '$lib/motion';
 
 	const props: {
 		card: any;
@@ -80,29 +82,21 @@
 
 {#if sentence && blankIndex >= 0}
 	<div class="step-layout">
-		<div class="step-header">
-			<div class="step-instruction">
-				{$locale === 'es' ? 'Completa la frase' : 'Complete the sentence'}
-			</div>
-		</div>
-
 		<div class="step-content">
-			<div class="sentence-box">
-				<button class="speak-btn" onclick={speakFull} aria-label="Reproducir">
-					<Icon icon={VolumeHighIcon} size={22} color="var(--hinomaru-red)" />
-				</button>
+			<div class="sentence-card">
+				<div class="prompt-meta">
+					<span class="prompt-tag">{$locale === 'es' ? 'COMPLETAR' : 'COMPLETE'}</span>
+					<button class="audio-mini" onclick={speakFull} aria-label="Reproducir">
+						<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+					</button>
+				</div>
 				
 				<div class="sentence-display">
-					{#each sentence.tokens as tok, i}
-						{#if i === blankIndex}
-							<div class="sentence-blank" class:filled={locked && picked === sentence.primaryToken}>
-								{locked && picked === sentence.primaryToken ? sentence.primaryToken : ''}
-							</div>
-						{:else}
-							<span class="sentence-tok">{tok}</span>
-						{/if}
-					{/each}
-					{#if sentence.suffix}<span class="sentence-tok">{sentence.suffix}</span>{/if}
+					<InteractiveText text={sentence.tokens.slice(0, blankIndex).join('')} />
+					<div class="sentence-blank" class:filled={locked && picked === sentence.primaryToken}>
+						{locked && picked === sentence.primaryToken ? sentence.primaryToken : ''}
+					</div>
+					<InteractiveText text={sentence.tokens.slice(blankIndex + 1).join('') + sentence.suffix} />
 				</div>
 
 				<div class="sentence-translation">
@@ -111,8 +105,8 @@
 			</div>
 
 			{#if props.retries >= 1 && !locked}
-				<div class="hint-card" in:fade>
-					<span class="hint-label">{$locale === 'es' ? 'Pista' : 'Hint'}</span>
+				<div class="hint-banner" in:fadeUp={{ y: 10 }}>
+					<span class="hint-tag">{$locale === 'es' ? 'PISTA' : 'HINT'}</span>
 					<span class="hint-text">
 						{$locale === 'es' ? sentence.primaryCard.es : sentence.primaryCard.en}
 					</span>
@@ -122,16 +116,27 @@
 
 		<div class="step-footer">
 			<div class="options-grid">
-				{#each options as opt (opt)}
+				{#each options as opt, idx (opt)}
+					{@const isThisCorrect = opt === sentence.primaryToken}
+					{@const isThisPicked = opt === picked}
 					<button
-						class="option-pill"
-						class:correct={locked && opt === sentence.primaryToken}
-						class:wrong={locked && wrongPick === opt}
-						class:dim={locked && picked !== opt && opt !== sentence.primaryToken}
+						class="option-item"
+						class:is-correct={locked && isThisPicked && isThisCorrect}
+						class:is-wrong={locked && isThisPicked && !isThisCorrect}
+						class:is-dimmed={locked && !isThisPicked}
 						disabled={locked}
 						onclick={() => pick(opt)}
 					>
-						{opt}
+						<div class="opt-marker">
+							{#if locked && isThisPicked && isThisCorrect}
+								<Icon icon={CheckmarkCircle01Icon} size={14} color="white" />
+							{:else if locked && isThisPicked && !isThisCorrect}
+								<Icon icon={Cancel01Icon} size={14} color="white" />
+							{:else}
+								{String.fromCharCode(65 + idx)}
+							{/if}
+						</div>
+						<span class="opt-text jp">{opt}</span>
 					</button>
 				{/each}
 			</div>
@@ -145,19 +150,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-	}
-
-	.step-header {
-		padding-bottom: 24px;
-		text-align: center;
-	}
-
-	.step-instruction {
-		font-size: 14px;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--fg-tertiary);
+		gap: 24px;
 	}
 
 	.step-content {
@@ -166,45 +159,60 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		gap: 32px;
-	}
-
-	.sentence-box {
-		width: 100%;
-		background: var(--bg-surface);
-		border-radius: 32px;
-		padding: 40px 24px;
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
 		gap: 20px;
 	}
 
-	.speak-btn {
-		position: absolute;
-		top: 12px;
-		right: 12px;
-		width: 44px;
-		height: 44px;
+	.sentence-card {
+		width: 100%;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 28px;
+		box-shadow: 0 8px 32px rgba(26,26,26,0.06);
+		padding: 18px 22px 28px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 18px;
+		text-align: center;
+	}
+
+	.prompt-meta {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+	}
+
+	.prompt-tag {
+		font-size: 10px;
+		font-weight: 800;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 10px;
+		border-radius: 20px;
+	}
+
+	.audio-mini {
+		width: 32px;
+		height: 32px;
 		border-radius: 50%;
-		background: var(--ink-50);
-		border: none;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--fg-secondary);
 		cursor: pointer;
-		transition: transform 0.2s;
 	}
-	.speak-btn:active { transform: scale(0.9); }
 
 	.sentence-display {
 		font-family: var(--font-jp);
-		font-size: clamp(24px, 7vw, 32px);
+		font-size: clamp(22px, 6vw, 28px);
 		font-weight: 700;
-		color: var(--sumi);
+		color: var(--fg-primary);
 		line-height: 1.6;
-		text-align: center;
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
@@ -213,55 +221,61 @@
 	}
 
 	.sentence-blank {
-		min-width: 60px;
-		height: 48px;
-		padding: 0 12px;
+		min-width: 64px;
+		height: 44px;
+		padding: 0 14px;
 		border-radius: 12px;
 		border: 2px dashed var(--hinomaru-red);
-		background: color-mix(in srgb, var(--hinomaru-red) 5%, transparent);
+		background: var(--hinomaru-red-wash);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: var(--hinomaru-red);
 		transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
+	
 	.sentence-blank.filled {
 		border-style: solid;
 		background: var(--hinomaru-red);
 		color: white;
-		box-shadow: 0 4px 12px color-mix(in srgb, var(--hinomaru-red) 30%, transparent);
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
 	}
 
 	.sentence-translation {
 		font-size: 15px;
 		color: var(--fg-secondary);
+		font-weight: 500;
 		font-style: italic;
-		opacity: 0.8;
 	}
 
-	.hint-card {
-		background: var(--ink-50);
-		padding: 12px 20px;
+	.hint-banner {
+		background: var(--bg-muted);
+		padding: 10px 16px;
 		border-radius: 16px;
 		display: flex;
 		align-items: center;
 		gap: 10px;
+		border: 1px solid var(--ink-200);
 	}
-	.hint-label {
-		font-size: 11px;
+
+	.hint-tag {
+		font-size: 10px;
 		font-weight: 900;
-		text-transform: uppercase;
 		color: var(--hinomaru-red);
-		opacity: 0.7;
+		background: white;
+		padding: 2px 8px;
+		border-radius: 6px;
+		border: 1px solid var(--ink-100);
 	}
+
 	.hint-text {
 		font-size: 14px;
 		font-weight: 700;
-		color: var(--sumi);
+		color: var(--fg-primary);
 	}
 
 	.step-footer {
-		padding-top: 32px;
+		padding-bottom: 24px;
 	}
 
 	.options-grid {
@@ -270,48 +284,53 @@
 		gap: 12px;
 	}
 
-	.option-pill {
-		padding: 18px 12px;
+	.option-item {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 12px 14px;
+		border: 1.5px solid var(--ink-200);
+		border-radius: 14px;
 		background: var(--bg-surface);
-		border: 2px solid var(--ink-100);
-		border-radius: 20px;
-		font-family: var(--font-jp);
-		font-size: 18px;
-		font-weight: 800;
-		color: var(--sumi);
 		cursor: pointer;
 		transition: all 0.2s;
+		box-shadow: 0 1px 4px rgba(26,26,26,0.04);
 	}
 
-	.option-pill:not(:disabled):active {
-		transform: translateY(2px);
+	.option-item:not(:disabled):hover {
 		border-color: var(--ink-300);
+		transform: translateY(-1px);
 	}
 
-	.option-pill.correct {
-		background: var(--success);
-		border-color: var(--success);
-		color: white;
-		box-shadow: 0 4px 12px color-mix(in srgb, var(--success) 30%, transparent);
-		transform: scale(1.05);
+	.option-item.is-correct { border-color: var(--success) !important; background: var(--success-wash) !important; }
+	.option-item.is-wrong { border-color: var(--hinomaru-red) !important; background: var(--hinomaru-red-wash) !important; }
+	.option-item.is-dimmed { opacity: 0.55; filter: grayscale(0.4); }
+
+	.opt-marker {
+		width: 24px;
+		height: 24px;
+		border-radius: 6px;
+		background: var(--bg-muted);
+		border: 1px solid var(--ink-200);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 10px;
+		font-weight: 900;
+		color: var(--fg-tertiary);
+		flex-shrink: 0;
 	}
 
-	.option-pill.wrong {
-		background: var(--hinomaru-red);
-		border-color: var(--hinomaru-red);
-		color: white;
-		animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-	}
+	.option-item.is-correct .opt-marker { background: var(--success); border-color: var(--success); color: white; }
+	.option-item.is-wrong .opt-marker { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
 
-	.option-pill.dim {
-		opacity: 0.3;
-		filter: grayscale(0.5);
-	}
+	.opt-text { font-size: 15px; font-weight: 700; color: var(--fg-primary); }
 
-	@keyframes shake {
-		10%, 90% { transform: translate3d(-1px, 0, 0); }
-		20%, 80% { transform: translate3d(2px, 0, 0); }
-		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-		40%, 60% { transform: translate3d(4px, 0, 0); }
+	:global(.sentence-display .word-link) {
+		color: inherit !important;
+		border-bottom: 2px solid var(--hinomaru-red-wash) !important;
+	}
+	:global(.sentence-display .word-link:hover) {
+		border-bottom-color: var(--hinomaru-red) !important;
 	}
 </style>

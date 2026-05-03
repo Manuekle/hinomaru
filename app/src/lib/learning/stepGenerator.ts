@@ -3,10 +3,10 @@ import type { Step, StepKind } from './engine';
 import { cardSupportsTemplate } from './sentenceBuilder';
 
 const POOL: Record<LessonType, StepKind[]> = {
-	learn: ['recognize', 'listen_select', 'fill_sentence', 'choose', 'build_sentence'],
-	practice: ['choose', 'translate_sentence', 'fill_sentence', 'match_pairs', 'build_sentence', 'listen_select'],
-	quiz: ['choose', 'fill_sentence', 'build_sentence', 'listen', 'write'],
-	review: ['translate_sentence', 'match_pairs', 'fill_sentence', 'build_sentence', 'choose'],
+	learn: ['recognize', 'listen_select', 'fill_sentence', 'build_sentence'],
+	practice: ['translate_sentence', 'fill_sentence', 'match_pairs', 'build_sentence', 'listen_select'],
+	quiz: ['fill_sentence', 'build_sentence', 'listen', 'write'],
+	review: ['translate_sentence', 'match_pairs', 'fill_sentence', 'build_sentence'],
 	speak: ['listen_select', 'speak', 'listen', 'speak']
 };
 

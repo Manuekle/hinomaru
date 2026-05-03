@@ -2,9 +2,9 @@
 	import Icon from '$lib/Icon.svelte';
 	import { 
 		VolumeHighIcon, 
-		Cancel01Icon, 
-		TranslateIcon
+		Cancel01Icon
 	} from '@hugeicons/core-free-icons';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -128,17 +128,11 @@
 		</button>
 
 		<div class="header-progress">
-			{queue.index + 1} / {queue.total}
+			<span class="session-index">{queue.index + 1} / {queue.total}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-
-		<button 
-			class="lang-btn" 
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		
+		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
 
 	<div class="session-container">
@@ -167,7 +161,12 @@
 							<span class="card-tag">{deck?.title || t('nav.vocabulary', $locale)}</span>
 
 							<div class="word-center">
-								<div class="jp word-text" style="font-size:{getFontSize(card.jp)};">{card.jp}</div>
+								<div class="jp card-text" style="font-size: {card.jp.length <= 4 ? 'var(--fs-display)' : 'var(--fs-3xl)'};">
+									<InteractiveText text={card.jp} />
+								</div>
+								{#if $showRomaji}
+									<div class="romaji-label" in:fade>{safeRomaji(card.romaji, card.jp)}</div>
+								{/if}
 								<div class="audio-row">
 									<button
 										onclick={(e) => { e.stopPropagation(); speak(card.jp); }}
@@ -264,12 +263,26 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
-	.close-btn, .lang-btn {
+	.close-btn {
 		color: var(--fg-secondary);
 		background: none;
 		border: none;
@@ -278,16 +291,13 @@
 		transition: all 0.2s;
 	}
 
-	.lang-btn.active {
-		color: var(--hinomaru-red);
-	}
-
 	.card-stack-center {
 		flex: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 24px 0 24px;
+		perspective: 1000px;
 	}
 
 	.card-scene {

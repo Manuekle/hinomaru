@@ -1,8 +1,18 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { safeRomaji } from '$lib/utils/romaji';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { 
+		VolumeHighIcon, 
+		CheckmarkCircle01Icon, 
+		Cancel01Icon,
+		ArrowRight02Icon
+	} from '@hugeicons/core-free-icons';
+	import { fade } from 'svelte/transition';
+	import { fadeUp } from '$lib/motion';
 
 	const props: {
 		card: any;
@@ -11,23 +21,27 @@
 	} = $props();
 
 	const card = $derived(props.card);
+	const targetJp = $derived(card.example || '');
+	const targetRomaji = $derived(card.example_romaji || '');
+	const promptText = $derived($locale === 'es' ? card.example_es : card.example_en);
+
+	let picked: string | null = $state(null);
+	let locked = $state(false);
+	let isCorrect = $state(false);
 
 	const options = $derived.by(() => {
-		const correct = card.example_es;
+		const correct = targetJp;
 		if (!correct) return [];
 		const set = new Set<string>([correct]);
 		for (const d of props.pool) {
 			if (set.size >= 4) break;
 			if (d.id === card.id) continue;
-			const v = d.example_es;
-			if (v && !set.has(v)) set.add(v);
+			if (d.example && !set.has(d.example)) set.add(d.example);
 		}
-		// Fallback: use es field if not enough examples
 		for (const d of props.pool) {
 			if (set.size >= 4) break;
 			if (d.id === card.id) continue;
-			const v = d.es;
-			if (v && !set.has(v)) set.add(v);
+			if (d.jp && !set.has(d.jp)) set.add(d.jp);
 		}
 		const arr = [...set];
 		for (let i = arr.length - 1; i > 0; i--) {
@@ -37,185 +51,154 @@
 		return arr;
 	});
 
-	let picked: string | null = $state(null);
-	let locked = $state(false);
+	function handleCheck() {
+		if (locked || !picked) return;
+		locked = true;
+		isCorrect = picked === targetJp;
+		if (isCorrect) speakJapanese(targetJp);
+	}
+
+	function handleContinue() {
+		props.onAnswer(isCorrect);
+	}
 
 	$effect(() => {
 		card;
 		picked = null;
 		locked = false;
+		isCorrect = false;
 	});
-
-	// Auto-skip if no example sentence available
-	$effect(() => {
-		if (!card.example || !card.example_es || options.length < 2) {
-			queueMicrotask(() => props.onAnswer(true));
-		}
-	});
-
-	function pick(opt: string) {
-		if (locked) return;
-		picked = opt;
-		locked = true;
-		const correct = opt === card.example_es;
-		setTimeout(() => props.onAnswer(correct), correct ? 700 : 900);
-	}
 </script>
 
-{#if card.example && card.example_es && options.length >= 2}
-	<div class="step-layout">
-		<div class="step-header">
-			<div class="step-instruction">
-				{$locale === 'es' ? 'Traduce la frase' : 'Translate the sentence'}
-			</div>
+<div class="step-layout">
+	<div class="step-content">
+		<div class="prompt-section">
+			<span class="prompt-tag">{$locale === 'es' ? 'TRADUCIR' : 'TRANSLATE'}</span>
+			<h2 class="prompt-text">{promptText}</h2>
 		</div>
 
-		<div class="step-content">
-			<div class="sentence-card">
+		<div class="options-grid">
+			{#each options as opt, idx (opt)}
+				{@const isThisCorrect = opt === targetJp}
+				{@const isThisPicked = opt === picked}
 				<button
-					class="speak-btn"
-					onclick={() => speakJapanese(card.example)}
-					aria-label="Reproducir"
+					class="option-card"
+					class:is-selected={isThisPicked}
+					class:is-correct={locked && isThisPicked && isThisCorrect}
+					class:is-wrong={locked && isThisPicked && !isThisCorrect}
+					class:is-dimmed={locked && !isThisPicked}
+					disabled={locked}
+					onclick={() => picked = opt}
 				>
-					<Icon icon={VolumeHighIcon} size={22} color="var(--hinomaru-red)" />
+					<div class="opt-indicator">{String.fromCharCode(65 + idx)}</div>
+					<div class="opt-body">
+						<div class="jp opt-jp">{opt}</div>
+						<div class="opt-romaji">{safeRomaji(undefined, opt)}</div>
+					</div>
 				</button>
-				<div class="sentence-jp">{card.example}</div>
-				{#if card.example_romaji}
-					<div class="sentence-rom">{card.example_romaji}</div>
-				{/if}
-			</div>
+			{/each}
 		</div>
 
-		<div class="step-footer">
-			<div class="options-grid">
-				{#each options as opt (opt)}
-					<button
-						class="option-pill"
-						class:correct={locked && opt === card.example_es}
-						class:wrong={locked && picked === opt && opt !== card.example_es}
-						class:dim={locked && picked !== opt && opt !== card.example_es}
-						disabled={locked}
-						onclick={() => pick(opt)}
-					>
-						{opt}
-					</button>
-				{/each}
+		{#if locked}
+			<div class="feedback-reveal" in:fadeUp={{ y: 12 }}>
+				<div class="feedback-card" class:correct={isCorrect} class:wrong={!isCorrect}>
+					<div class="feedback-header">
+						<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={20} color="currentColor" />
+						<span>{isCorrect ? ($locale === 'es' ? '¡Excelente!' : 'Excellent!') : ($locale === 'es' ? 'La respuesta correcta es:' : 'The correct answer is:')}</span>
+					</div>
+					<div class="jp feedback-jp"><InteractiveText text={targetJp} /></div>
+					<div class="feedback-rom">{targetRomaji}</div>
+				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
-{/if}
+
+	<StickyFooter>
+		<div class="footer-inner">
+			{#if !locked}
+				<button 
+					class="hm-btn hm-btn-primary hm-btn-lg hm-btn-full" 
+					disabled={!picked} 
+					onclick={handleCheck}
+				>
+					{$locale === 'es' ? 'Comprobar' : 'Check'}
+				</button>
+			{:else}
+				<button 
+					class="hm-btn hm-btn-lg hm-btn-full" 
+					class:hm-btn-primary={isCorrect}
+					class:hm-btn-secondary={!isCorrect}
+					onclick={handleContinue}
+				>
+					<span>{$locale === 'es' ? 'Continuar' : 'Continue'}</span>
+					<Icon icon={ArrowRight02Icon} size={20} color="currentColor" />
+				</button>
+			{/if}
+		</div>
+	</StickyFooter>
+</div>
 
 <style>
-	.step-layout {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		height: 100%;
+	.step-layout { flex: 1; display: flex; flex-direction: column; height: 100%; }
+	.step-content { flex: 1; display: flex; flex-direction: column; gap: 32px; padding-top: 20px; }
+
+	.prompt-section { text-align: center; }
+	.prompt-tag {
+		font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+		color: var(--hinomaru-red); background: var(--hinomaru-red-wash);
+		padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
 	}
-	.step-header {
-		padding-bottom: 24px;
-		text-align: center;
+	.prompt-text {
+		margin-top: 16px; font-size: 24px; font-weight: 800;
+		color: var(--fg-primary); line-height: 1.3;
 	}
-	.step-instruction {
-		font-size: 14px;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--fg-tertiary);
+
+	.options-grid { display: flex; flex-direction: column; gap: 12px; }
+
+	.option-card {
+		display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+		background: var(--bg-surface); border: 2px solid var(--ink-200);
+		border-radius: 20px; cursor: pointer; text-align: left;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 	}
-	.step-content {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
+
+	.option-card:not(:disabled):hover { border-color: var(--ink-300); transform: translateY(-1px); }
+	.option-card.is-selected { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
+	.option-card.is-correct { border-color: var(--success); background: var(--success-wash); }
+	.option-card.is-wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
+	.option-card.is-dimmed { opacity: 0.5; filter: grayscale(0.5); }
+
+	.opt-indicator {
+		width: 32px; height: 32px; border-radius: 10px;
+		background: var(--bg-muted); border: 1.5px solid var(--ink-200);
+		display: flex; align-items: center; justify-content: center;
+		font-size: 13px; font-weight: 900; color: var(--fg-tertiary);
+		flex-shrink: 0;
 	}
-	.sentence-card {
-		width: 100%;
-		background: var(--bg-surface);
-		border-radius: 32px;
-		padding: 40px 24px 32px;
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 12px;
-		text-align: center;
+	.is-selected .opt-indicator { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
+	.is-correct .opt-indicator { background: var(--success); border-color: var(--success); color: white; }
+
+	.opt-body { display: flex; flex-direction: column; gap: 2px; }
+	.opt-jp { font-size: 18px; font-weight: 700; color: var(--fg-primary); }
+	.opt-romaji { font-size: 12px; font-weight: 600; color: var(--hinomaru-red); opacity: 0.7; }
+
+	.feedback-reveal { margin-top: 8px; }
+	.feedback-card {
+		padding: 20px; border-radius: 24px; border: 2px solid var(--ink-200);
+		display: flex; flex-direction: column; gap: 8px; text-align: center;
 	}
-	.speak-btn {
-		position: absolute;
-		top: 12px;
-		right: 12px;
-		width: 44px;
-		height: 44px;
-		border-radius: 50%;
-		background: var(--ink-50);
-		border: none;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition: transform 0.2s;
-	}
-	.speak-btn:active { transform: scale(0.9); }
-	.sentence-jp {
-		font-family: var(--font-jp);
-		font-size: clamp(22px, 6vw, 30px);
-		font-weight: 700;
-		color: var(--sumi);
-		line-height: 1.5;
-	}
-	.sentence-rom {
-		font-size: 14px;
-		color: var(--fg-secondary);
-		font-weight: 500;
-	}
-	.step-footer {
-		padding-top: 32px;
-	}
-	.options-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 12px;
-	}
-	.option-pill {
-		padding: 16px 20px;
-		background: var(--bg-surface);
-		border: 2px solid var(--ink-100);
-		border-radius: 20px;
-		font-size: 14px;
-		font-weight: 700;
-		color: var(--sumi);
-		text-align: left;
-		cursor: pointer;
-		transition: all 0.2s;
-		line-height: 1.4;
-	}
-	.option-pill:not(:disabled):active {
-		transform: translateY(2px);
-		border-color: var(--ink-300);
-	}
-	.option-pill.correct {
-		background: var(--success);
-		border-color: var(--success);
-		color: white;
-		box-shadow: 0 4px 12px color-mix(in srgb, var(--success) 30%, transparent);
-		transform: scale(1.02);
-	}
-	.option-pill.wrong {
-		background: var(--hinomaru-red);
-		border-color: var(--hinomaru-red);
-		color: white;
-		animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-	}
-	.option-pill.dim {
-		opacity: 0.3;
-		filter: grayscale(0.5);
-	}
-	@keyframes shake {
-		10%, 90% { transform: translate3d(-1px, 0, 0); }
-		20%, 80% { transform: translate3d(2px, 0, 0); }
-		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-		40%, 60% { transform: translate3d(4px, 0, 0); }
+	.feedback-card.correct { border-color: var(--success); background: var(--success-wash); color: var(--success); }
+	.feedback-card.wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+
+	.feedback-header { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 800; }
+	.feedback-jp { font-size: 22px; font-weight: 800; }
+	.feedback-rom { font-size: 14px; font-weight: 600; opacity: 0.8; }
+
+	.footer-inner { width: 100%; max-width: 480px; margin: 0 auto; }
+
+	:global(.feedback-jp .word-link) {
+		color: inherit !important;
+		border-bottom: 2px solid currentColor !important;
 	}
 </style>

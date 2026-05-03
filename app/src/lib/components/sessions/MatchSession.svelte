@@ -9,7 +9,7 @@
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { Award01Icon, Cancel01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
+	import { Award01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import { fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { safeRomaji } from '$lib/utils/romaji';
@@ -178,17 +178,11 @@
 		</button>
 
 		<div class="header-progress">
-			{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}
+			<span class="session-index">{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-
-		<button 
-			class="lang-btn" 
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		
+		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
 
 	<div class="session-container">
@@ -220,7 +214,7 @@
 							{#if !isMatched}
 								<div class="card-inner">
 									<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
-									{#if item.type === 'jp' && $showRomaji}
+									{#if item.type === 'jp'}
 										{@const rom = safeRomaji(item.romaji, item.text)}
 										{#if rom}<div class="romaji-hint">{rom}</div>{/if}
 									{/if}
@@ -276,9 +270,23 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.close-btn, .lang-btn {

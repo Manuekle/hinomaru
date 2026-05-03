@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
 	import { speakJapanese } from '$lib/utils/tts';
+	import { safeRomaji } from '$lib/utils/romaji';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, CheckmarkCircle01Icon, Cancel01Icon, ArrowRight02Icon } from '@hugeicons/core-free-icons';
+	import { fadeUp } from '$lib/motion';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
 	const props: {
 		card: any;
@@ -11,14 +15,12 @@
 	} = $props();
 
 	const card = $derived(props.card);
-	const meaningKey = $derived($locale === 'es' ? 'es' : 'en');
-
 	const options = $derived.by(() => {
-		const target = card[meaningKey];
+		const target = card.jp;
 		const set = new Set<string>([target]);
 		for (const d of props.distractors) {
 			if (set.size >= 4) break;
-			const v = d[meaningKey];
+			const v = d.jp;
 			if (v && !set.has(v)) set.add(v);
 		}
 		const arr = [...set];
@@ -29,158 +31,196 @@
 		return arr;
 	});
 
+	let played = $state(false);
 	let picked: string | null = $state(null);
 	let locked = $state(false);
+	let isCorrect = $state(false);
 
 	$effect(() => {
 		card;
+		played = false;
 		picked = null;
 		locked = false;
-		setTimeout(() => speakJapanese(card.jp), 220);
+		isCorrect = false;
+		// Auto-play on mount after short delay
+		setTimeout(() => {
+			speakJapanese(card.jp);
+			played = true;
+		}, 300);
 	});
 
-	function pick(opt: string) {
-		if (locked) return;
+	function play() {
+		speakJapanese(card.jp);
+		played = true;
+	}
+
+	function handlePick(opt: string) {
+		if (locked || !played) return;
 		picked = opt;
 		locked = true;
-		const correct = opt === card[meaningKey];
-		setTimeout(() => props.onAnswer(correct), correct ? 600 : 800);
+		isCorrect = opt === card.jp;
+	}
+
+	function handleContinue() {
+		props.onAnswer(isCorrect);
 	}
 </script>
 
 <div class="step-layout">
-	<div class="step-header">
-		<div class="step-instruction">
-			{$locale === 'es' ? 'Escucha y elige el significado' : 'Listen and pick the meaning'}
-		</div>
-	</div>
-
 	<div class="step-content">
-		<button class="big-play" onclick={() => speakJapanese(card.jp)} aria-label="Reproducir">
-			<Icon icon={VolumeHighIcon} size={48} color="white" />
-		</button>
-		<div class="play-hint">
-			{$locale === 'es' ? 'Toca para reproducir' : 'Tap to play'}
-		</div>
-	</div>
-
-	<div class="step-footer">
-		<div class="options-grid">
-			{#each options as opt (opt)}
-				<button
-					class="option-pill"
-					class:correct={locked && opt === card[meaningKey]}
-					class:wrong={locked && picked === opt && opt !== card[meaningKey]}
-					class:dim={locked && picked !== opt && opt !== card[meaningKey]}
-					disabled={locked}
-					onclick={() => pick(opt)}
+		<div class="prompt-card">
+			<div class="prompt-meta">
+				<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHAR' : 'LISTEN'}</span>
+			</div>
+			
+			<div class="audio-section">
+				<button 
+					class="big-audio-btn" 
+					class:is-playing={played}
+					onclick={play} 
+					aria-label="Reproducir audio"
 				>
-					{opt}
+					<Icon icon={VolumeHighIcon} size={48} color="white" />
+				</button>
+				
+				{#if locked}
+					<div class="result-box" in:fadeUp={{ y: 10 }}>
+						<div class="result-jp"><InteractiveText text={card.jp} /></div>
+						<div class="result-rom">{safeRomaji(card.romaji, card.jp)}</div>
+					</div>
+				{:else}
+					<div class="play-hint">
+						{#if !played}
+							{$locale === 'es' ? 'Toca para escuchar' : 'Tap to listen'}
+						{:else}
+							{$locale === 'es' ? 'Toca para repetir' : 'Tap to replay'}
+						{/if}
+					</div>
+				{/if}
+			</div>
+		</div>
+
+		<div class="options-list">
+			{#each options as opt, idx (opt)}
+				{@const itIsCorrect = opt === card.jp}
+				{@const itIsPicked = opt === picked}
+				<button
+					class="option-item"
+					class:is-correct={locked && itIsPicked && itIsCorrect}
+					class:is-wrong={locked && itIsPicked && !itIsCorrect}
+					class:is-dimmed={locked && !itIsPicked}
+					disabled={locked || !played}
+					onclick={() => handlePick(opt)}
+				>
+					<div class="opt-marker">
+						{#if locked && itIsPicked && itIsCorrect}
+							<Icon icon={CheckmarkCircle01Icon} size={14} color="white" />
+						{:else if locked && itIsPicked && !itIsCorrect}
+							<Icon icon={Cancel01Icon} size={14} color="white" />
+						{:else}
+							{String.fromCharCode(65 + idx)}
+						{/if}
+					</div>
+					<div class="opt-content">
+						<span class="opt-text jp">{opt}</span>
+						<span class="opt-romaji">{safeRomaji(undefined, opt)}</span>
+					</div>
 				</button>
 			{/each}
 		</div>
 	</div>
+
+	<StickyFooter>
+		<div class="footer-inner">
+			{#if locked}
+				<button 
+					class="hm-btn hm-btn-lg hm-btn-full" 
+					class:hm-btn-primary={isCorrect}
+					class:hm-btn-secondary={!isCorrect}
+					onclick={handleContinue}
+				>
+					<span>{$locale === 'es' ? 'Continuar' : 'Continue'}</span>
+					<Icon icon={ArrowRight02Icon} size={20} color="currentColor" />
+				</button>
+			{/if}
+		</div>
+	</StickyFooter>
 </div>
 
 <style>
-	.step-layout {
-		flex: 1;
+	.step-layout { flex: 1; display: flex; flex-direction: column; height: 100%; gap: 24px; }
+	.step-content { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 24px; }
+
+	.prompt-card {
+		width: 100%;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 28px;
+		box-shadow: 0 8px 32px rgba(26,26,26,0.06);
+		padding: 18px 22px 32px;
 		display: flex;
 		flex-direction: column;
-		height: 100%;
-	}
-	.step-header {
-		padding-bottom: 24px;
+		align-items: center;
+		gap: 24px;
 		text-align: center;
 	}
-	.step-instruction {
-		font-size: 14px;
-		font-weight: 800;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--fg-tertiary);
+
+	.prompt-meta { display: flex; justify-content: flex-start; width: 100%; }
+	.prompt-tag {
+		font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+		color: var(--hinomaru-red); background: var(--hinomaru-red-wash);
+		padding: 4px 10px; border-radius: 20px;
 	}
-	.step-content {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 18px;
+
+	.audio-section { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+	.big-audio-btn {
+		width: 120px; height: 120px; border-radius: 50%;
+		background: linear-gradient(135deg, var(--hinomaru-red), #d4002f);
+		border: none; display: flex; align-items: center; justify-content: center;
+		cursor: pointer; box-shadow: 0 10px 32px rgba(188, 0, 45, 0.24);
+		transition: all 0.2s cubic-bezier(0.34, 1.5, 0.64, 1);
 	}
-	.big-play {
-		width: 160px;
-		height: 160px;
-		border-radius: 50%;
-		background: var(--hinomaru-red);
-		border: none;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		box-shadow:
-			0 10px 0 color-mix(in srgb, var(--hinomaru-red) 60%, black),
-			0 12px 32px color-mix(in srgb, var(--hinomaru-red) 30%, transparent);
-		transition: all 0.15s;
-	}
-	.big-play:active {
-		transform: translateY(5px);
-		box-shadow:
-			0 5px 0 color-mix(in srgb, var(--hinomaru-red) 60%, black),
-			0 6px 16px color-mix(in srgb, var(--hinomaru-red) 30%, transparent);
-	}
+	.big-audio-btn:active { transform: scale(0.94); }
+
 	.play-hint {
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		font-size: 12px; font-weight: 800; color: var(--fg-secondary);
+		text-transform: uppercase; letter-spacing: 0.08em;
 	}
-	.step-footer {
-		padding-top: 32px;
+
+	.result-box { display: flex; flex-direction: column; gap: 2px; }
+	.result-jp { font-size: 32px; font-weight: 800; color: var(--fg-primary); }
+	.result-rom { font-size: 16px; font-weight: 700; color: var(--hinomaru-red); }
+
+	.options-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+	
+	.option-item {
+		display: flex; align-items: center; gap: 12px; padding: 16px 16px;
+		border: 1.5px solid var(--ink-200); border-radius: 14px;
+		background: var(--bg-surface); cursor: pointer; text-align: left;
+		transition: all 0.2s; width: 100%; box-shadow: 0 1px 4px rgba(26,26,26,0.04);
 	}
-	.options-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 12px;
+	.option-item:not(:disabled):hover { border-color: var(--ink-300); transform: translateY(-1px); }
+	.option-item.is-correct { border-color: var(--success) !important; background: var(--success-wash) !important; }
+	.option-item.is-wrong { border-color: var(--hinomaru-red) !important; background: var(--hinomaru-red-wash) !important; }
+	.option-item.is-dimmed { opacity: 0.55; filter: grayscale(0.4); }
+
+	.opt-marker {
+		width: 28px; height: 28px; border-radius: 8px; background: var(--bg-muted);
+		border: 1px solid var(--ink-200); display: flex; align-items: center; justify-content: center;
+		font-size: 11px; font-weight: 900; color: var(--fg-tertiary);
 	}
-	.option-pill {
-		padding: 18px 20px;
-		background: var(--bg-surface);
-		border: 2px solid var(--ink-100);
-		border-radius: 20px;
-		font-size: 15px;
-		font-weight: 700;
-		color: var(--sumi);
-		text-align: left;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-	.option-pill:not(:disabled):active {
-		transform: translateY(2px);
-		border-color: var(--ink-300);
-	}
-	.option-pill.correct {
-		background: var(--success);
-		border-color: var(--success);
-		color: white;
-		box-shadow: 0 4px 12px color-mix(in srgb, var(--success) 30%, transparent);
-		transform: scale(1.02);
-	}
-	.option-pill.wrong {
-		background: var(--hinomaru-red);
-		border-color: var(--hinomaru-red);
-		color: white;
-		animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-	}
-	.option-pill.dim {
-		opacity: 0.3;
-		filter: grayscale(0.5);
-	}
-	@keyframes shake {
-		10%, 90% { transform: translate3d(-1px, 0, 0); }
-		20%, 80% { transform: translate3d(2px, 0, 0); }
-		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-		40%, 60% { transform: translate3d(4px, 0, 0); }
+	.is-correct .opt-marker { background: var(--success); border-color: var(--success); color: white; }
+	.is-wrong .opt-marker { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
+
+	.opt-content { display: flex; flex-direction: column; }
+	.opt-text { font-size: 16px; font-weight: 700; color: var(--fg-primary); }
+	.opt-romaji { font-size: 11px; font-weight: 600; color: var(--hinomaru-red); opacity: 0.8; }
+
+	.footer-inner { width: 100%; max-width: 480px; margin: 0 auto; }
+
+	:global(.result-jp .word-link) {
+		color: inherit !important;
+		border-bottom: 2px solid var(--hinomaru-red-wash) !important;
 	}
 </style>

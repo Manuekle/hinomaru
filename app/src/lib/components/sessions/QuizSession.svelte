@@ -3,9 +3,9 @@
 	import { 
 		VolumeHighIcon, 
 		Cancel01Icon, 
-		TranslateIcon,
 		CheckmarkCircle01Icon
 	} from '@hugeicons/core-free-icons';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
@@ -113,17 +113,11 @@
 		</button>
 
 		<div class="header-progress">
-			{queue.index + 1} / {queue.total}
+			<span class="session-index">{queue.index + 1} / {queue.total}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-
-		<button 
-			class="lang-btn" 
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		
+		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
 
 	<div class="session-container">
@@ -141,8 +135,8 @@
 					<button onclick={playAudio} class="audio-corner" aria-label="Play pronunciation">
 						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 					</button>
-					<div class="jp word-big">{card.jp}</div>
-					{#if $showRomaji}
+					<div class="jp word-big"><InteractiveText text={card.jp} /></div>
+					{#if picked}
 						{@const rom = safeRomaji(card.romaji, card.jp)}
 						{#if rom}<div class="romaji-line">{rom}</div>{/if}
 					{/if}
@@ -222,12 +216,26 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
-	.close-btn, .lang-btn {
+	.close-btn {
 		color: var(--fg-secondary);
 		background: none;
 		border: none;

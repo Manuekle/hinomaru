@@ -6,10 +6,9 @@
 		ViewOffIcon,
 		Cancel01Icon,
 		VolumeHighIcon,
-		TranslateIcon
+		CheckmarkCircle01Icon
 	} from '@hugeicons/core-free-icons';
 	import { locale } from '$lib/stores/locale';
-	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect } from '$lib/utils/sounds';
@@ -218,10 +217,8 @@
 			<span class="session-index">{i + 1} / {quizCards.length}</span>
 			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-
-		<button class="lang-btn" class:active={$showRomaji} onclick={() => ($showRomaji = !$showRomaji)}>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		
+		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
 
 	<div class="session-container">
@@ -236,7 +233,7 @@
 							<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 						</button>
 					</div>
-					{#if $showRomaji}
+					{#if checked}
 						{@const rom = safeRomaji(card.romaji, card.jp)}
 						{#if rom}<div class="romaji">{rom}</div>{/if}
 					{/if}

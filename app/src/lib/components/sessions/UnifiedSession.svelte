@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { showRomaji } from '$lib/stores/settings';
 	import { fadeIn } from '$lib/motion';
 	import { init, answer, isComplete, progressPct, accuracyPct, type EngineState } from '$lib/learning/engine';
@@ -12,7 +13,6 @@
 
 	// Step components
 	import StepRecognize from '$lib/learning/components/StepRecognize.svelte';
-	import StepChoose from '$lib/learning/components/StepChoose.svelte';
 	import StepListen from '$lib/learning/components/StepListen.svelte';
 	import StepListenSelect from '$lib/learning/components/StepListenSelect.svelte';
 	import StepSpeak from '$lib/learning/components/StepSpeak.svelte';
@@ -35,11 +35,20 @@
 	let engineState = $state<EngineState>(init(buildSteps(lessonType, cards)));
 	let stepKey = $state(0);
 	let showAnticipation = $state(false);
+	let canSpeak = $state(true);
 
 	$effect(() => {
 		engineState = init(buildSteps(lessonType, cards));
 		stepKey = 0;
 		showAnticipation = false;
+		canSpeak = true;
+	});
+
+	// Auto-skip speak tasks if user disabled them for the session
+	$effect(() => {
+		if (engineState.current?.kind === 'speak' && !canSpeak) {
+			onStepAnswer(true);
+		}
 	});
 
 	const currentStep = $derived(engineState.current);
@@ -82,17 +91,11 @@
 		</button>
 
 		<div class="header-progress">
-			{Math.min(stepsDone + 1, stepsTotal)} / {stepsTotal}
+			<span class="session-index">{Math.min(stepsDone + 1, stepsTotal)} / {stepsTotal}</span>
+			<span class="total-label">{t('home.cards', $locale, { n: cards.length })}</span>
 		</div>
-
-		<button
-			class="lang-btn"
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		
+		<div style="width: 44px;"></div> <!-- Spacer for balance -->
 	</div>
 
 	<!-- Step content -->
@@ -102,14 +105,12 @@
 				<div class="step-wrap">
 					{#if currentStep.kind === 'recognize'}
 						<StepRecognize card={currentCard} onAnswer={onStepAnswer} />
-					{:else if currentStep.kind === 'choose'}
-						<StepChoose card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen'}
 						<StepListen card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen_select'}
 						<StepListenSelect card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'speak'}
-						<StepSpeak card={currentCard} onAnswer={onStepAnswer} />
+						<StepSpeak card={currentCard} onAnswer={onStepAnswer} onDisableSpeak={() => canSpeak = false} />
 					{:else if currentStep.kind === 'write'}
 						<StepWrite card={currentCard} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'fill_sentence'}
@@ -150,9 +151,23 @@
 	}
 
 	.header-progress {
-		font-size: 18px;
-		font-weight: 800;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1.1;
+	}
+	.session-index {
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--fg-primary);
+		letter-spacing: -0.01em;
+	}
+	.total-label {
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.close-btn,
