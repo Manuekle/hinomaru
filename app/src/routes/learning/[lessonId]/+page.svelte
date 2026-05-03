@@ -5,8 +5,13 @@
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
-	import UnifiedSession from '$lib/components/sessions/UnifiedSession.svelte';
-	import type { EngineState } from '$lib/learning/engine';
+
+	import FlashcardSession from '$lib/components/sessions/FlashcardSession.svelte';
+	import QuizSession from '$lib/components/sessions/QuizSession.svelte';
+	import SpeakingSession from '$lib/components/sessions/SpeakingSession.svelte';
+	import MatchSession from '$lib/components/sessions/MatchSession.svelte';
+	import WriteSession from '$lib/components/sessions/WriteSession.svelte';
+
 	import type { PageData } from './$types';
 
 	const props: { data: PageData } = $props();
@@ -15,24 +20,24 @@
 	const cards = $derived(data.cards as any[]);
 	const supabase = createClient();
 
-	async function handleCardProgress(card: any, correct: boolean) {
+	async function handleCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
 
-		const currentProgress = card.progress && card.progress.length > 0 ? card.progress[0] : null;
-		const quality = mapPerformanceToQuality(correct, !correct);
+		const currentProgress = c.progress && c.progress.length > 0 ? c.progress[0] : null;
+		const quality = mapPerformanceToQuality(gotIt, hadDifficulty);
 		const nextState = calculateNextReview(quality, currentProgress);
 
 		await supabase.from('progress').upsert({
 			user_id: user.id,
-			card_id: card.id,
+			card_id: c.id,
 			learned: true,
 			...nextState,
 			last_seen: new Date().toISOString()
 		});
 	}
 
-	async function handleComplete(results: { correct: number; total: number; mistakes: number; state: EngineState }) {
+	async function handleComplete(results: { correct: number; total: number }) {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
 
@@ -41,8 +46,8 @@
 			lesson_id: lesson.id,
 			correct_count: results.correct,
 			total_steps: results.total,
-			mistakes_count: results.mistakes,
-			state: results.state as any,
+			mistakes_count: 0,
+			state: null,
 			completed_at: new Date().toISOString()
 		});
 
@@ -66,12 +71,14 @@
 				fromRoadmap: 'true'
 			});
 			goto(`/deck/${lesson.deckId}/summary?${params}`);
-		}, 2000);
+		}, 1000);
 	}
 
 	function handleExit() {
 		goto('/');
 	}
+
+	const deck = $derived({ id: lesson.deckId, title: $locale === 'es' ? lesson.title_es : lesson.title_en });
 </script>
 
 <svelte:head>
@@ -80,11 +87,52 @@
 	</title>
 </svelte:head>
 
-<UnifiedSession
-	{cards}
-	lessonType={lesson.type}
-	lessonTitle={$locale === 'es' ? lesson.title_es : lesson.title_en}
-	onCardProgress={handleCardProgress}
-	onComplete={handleComplete}
-	onExit={handleExit}
-/>
+{#if lesson.type === 'learn' || lesson.type === 'review'}
+	<FlashcardSession
+		{cards}
+		{deck}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={handleExit}
+	/>
+{:else if lesson.type === 'practice' || lesson.type === 'quiz'}
+	<QuizSession
+		{cards}
+		{deck}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={handleExit}
+	/>
+{:else if lesson.type === 'speak'}
+	<SpeakingSession
+		{cards}
+		{deck}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={handleExit}
+	/>
+{:else if lesson.type === 'match'}
+	<MatchSession
+		{cards}
+		{deck}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={handleExit}
+	/>
+{:else if lesson.type === 'write'}
+	<WriteSession
+		{cards}
+		{deck}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={handleExit}
+	/>
+{:else}
+	<FlashcardSession
+		{cards}
+		{deck}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={handleExit}
+	/>
+{/if}
