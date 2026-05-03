@@ -192,22 +192,10 @@
 					<button
 						onclick={() => {
 							activeLevel = level;
-							if (viewMode === 'roadmap') {
-								const el = document.querySelector(`[data-level-section="${level}"]`);
-								if (el) {
-									const offset = 80;
-									const bodyRect = document.body.getBoundingClientRect().top;
-									const elementRect = el.getBoundingClientRect().top;
-									const elementPosition = elementRect - bodyRect;
-									const offsetPosition = elementPosition - offset;
-									window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-								}
-							} else {
-								viewMode = 'grid';
-							}
+							viewMode = 'grid';
 						}}
 						class="level-pill"
-						class:active={(viewMode === 'grid' || viewMode === 'roadmap') && activeLevel === level}
+						class:active={viewMode === 'grid' && activeLevel === level}
 						data-level-pill={level}
 					>
 						{level}

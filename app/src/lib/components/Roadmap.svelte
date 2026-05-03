@@ -7,24 +7,19 @@
 	import { locale } from '$lib/stores/locale';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
-	import { LockIcon, Tick01Icon, ArrowRight01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
+	// FIX 9: Tick01Icon eliminado (nunca se usaba)
+	import { LockIcon, ArrowRight01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import type { RoadmapUnit, Lesson } from '$lib/data/roadmap';
 
 	interface Props {
 		units: any[];
 		decks: any[];
 		lessonProgress: any[];
-		activeLevel?: string;
+		// FIX 4: activeLevel eliminado — se recibía pero nunca se consumía internamente
 		onLevelChange?: (level: string) => void;
 	}
 
-	let {
-		units = [],
-		decks = [],
-		lessonProgress = [],
-		activeLevel = $bindable(),
-		onLevelChange
-	}: Props = $props();
+	let { units = [], decks = [], lessonProgress = [], onLevelChange }: Props = $props();
 
 	let activeUnitId = $state<string | null>(null);
 
@@ -119,12 +114,12 @@
 
 	// Geometría del Roadmap
 	const nodeSpacing = 180;
-	const nodeXOffset = 35; // %
+	const nodeXOffset = 35;
 
 	const nodeCoords = $derived(
 		units.map((_, i) => {
 			const x = 50 + Math.sin((i * Math.PI) / 2 - Math.PI / 2) * nodeXOffset;
-			const y = i * nodeSpacing + 140; // Más espacio al inicio
+			const y = i * nodeSpacing + 140;
 			return { x, y };
 		})
 	);
@@ -152,12 +147,10 @@
 		N1: '#ec4899'
 	};
 
-	// Auto-scroll al nodo actual (solo al montar)
 	let currentUnit = $state<RoadmapUnit | null>(null);
 
 	onMount(async () => {
 		await tick();
-		// Solo scrolleamos al inicio si no hay un scroll previo
 		if (window.scrollY === 0) {
 			const currentEl = document.querySelector('.node-circle.is-current');
 			if (currentEl) {
@@ -185,7 +178,6 @@
 			const unit = units.find((u) => u.id === closestUnitId);
 			if (unit && unit.id !== currentUnit?.id) {
 				currentUnit = unit;
-				// Solo avisamos si el nivel JLPT realmente ha cambiado para evitar ruido
 				if (onLevelChange && unit.jlptLevel !== lastLevel) {
 					lastLevel = unit.jlptLevel;
 					onLevelChange(unit.jlptLevel);
@@ -198,8 +190,32 @@
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
 
+	// FIX 7: ArrowUp/ArrowDown navegan entre nodos desbloqueados
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape') activeUnitId = null;
+		if (event.key === 'Escape') {
+			activeUnitId = null;
+			return;
+		}
+
+		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+			const available = units.filter((u) => unitState(u) !== 'locked');
+			if (available.length === 0) return;
+
+			const currentIndex = activeUnitId ? available.findIndex((u) => u.id === activeUnitId) : -1;
+
+			let nextIndex: number;
+			if (event.key === 'ArrowDown') {
+				nextIndex = currentIndex < available.length - 1 ? currentIndex + 1 : 0;
+			} else {
+				nextIndex = currentIndex > 0 ? currentIndex - 1 : available.length - 1;
+			}
+
+			activeUnitId = available[nextIndex].id;
+			event.preventDefault();
+
+			const el = document.querySelector(`[data-id="${available[nextIndex].id}"] .node-circle`);
+			if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
 	}
 </script>
 
@@ -207,6 +223,7 @@
 
 <div
 	class="roadmap-wrapper"
+	role="presentation"
 	onclick={(e) => {
 		if (e.target === e.currentTarget) activeUnitId = null;
 	}}
@@ -217,12 +234,14 @@
 		</div>
 	{:else}
 		{#if activeUnitId}
-			<div
+			<button
 				class="popover-backdrop"
 				onclick={() => (activeUnitId = null)}
+				onkeydown={(e) => e.key === 'Escape' && (activeUnitId = null)}
+				aria-label="Cerrar popover"
 				in:fade={{ duration: 200 }}
 				out:fade={{ duration: 150 }}
-			></div>
+			></button>
 		{/if}
 		<div class="roadmap-container" style="height: {totalHeight}px">
 			<!-- Sticky Topic Card -->
@@ -249,7 +268,12 @@
 			{/if}
 
 			<!-- SVG Path -->
-			<svg class="roadmap-svg" viewBox="0 0 100 {totalHeight}" preserveAspectRatio="none">
+			<svg
+				class="roadmap-svg"
+				viewBox="0 0 100 {totalHeight}"
+				preserveAspectRatio="none"
+				aria-hidden="true"
+			>
 				<defs>
 					<linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
 						<stop offset="0%" stop-color="var(--rm-accent)" stop-opacity="0.6" />
@@ -267,6 +291,7 @@
 				{@const progress = unitProgress(unit)}
 				{@const pos = nodeCoords[i]}
 				{@const isActive = activeUnitId === unit.id}
+				{@const label = $locale === 'es' ? unit.title_es : unit.title_en}
 
 				<div
 					class="node-anchor"
@@ -274,42 +299,60 @@
 					style="left: {pos.x}%; top: {pos.y}px; --node-accent: {levelColors[unit.jlptLevel]};"
 					data-id={unit.id}
 				>
+					<!-- FIX 6: aria-label, aria-expanded, aria-haspopup -->
 					<button
-						class="node-circle"
+						class="node-tile"
 						class:is-locked={state === 'locked'}
 						class:is-completed={state === 'completed'}
 						class:is-current={state === 'current'}
 						class:is-active={isActive}
 						onclick={() => handleUnitClick(unit)}
 						disabled={state === 'locked'}
+						aria-label="{label} — {state}"
+						aria-expanded={isActive}
+						aria-haspopup="true"
 						use:fadeUp={{ delay: Math.min(i * 0.04, 0.4), y: 15 }}
 					>
 						<!-- Progress Ring (Segmented) -->
-						<svg class="progress-ring" viewBox="0 0 100 100">
-							{#each unit.lessons as lesson, idx}
-								{@const lProg = lessonCompleted(lesson)}
-								{@const segmentTotal = 289 / (unit.lessons.length || 1)}
-								{@const gap = 8}
-								<circle
-									class="ring-segment"
-									class:is-active={lProg}
-									cx="50"
-									cy="50"
-									r="46"
-									style:stroke-dasharray="{segmentTotal - gap} 289"
-									style:stroke-dashoffset={-idx * segmentTotal + gap / 2}
-								/>
-							{/each}
-						</svg>
-						<div class="node-content">
-							<span class="node-emoji">{unit.emoji}</span>
+						{#if state !== 'locked'}
+							<svg class="progress-ring" viewBox="0 0 100 100" aria-hidden="true">
+								{#each unit.lessons as lesson, idx}
+									{@const lProg = lessonCompleted(lesson)}
+									{@const segmentTotal = 289 / (unit.lessons.length || 1)}
+									{@const gap = 8}
+									<circle
+										class="ring-segment"
+										class:is-active={lProg}
+										cx="50"
+										cy="50"
+										r="46"
+										style:stroke-dasharray="{segmentTotal - gap} 289"
+										style:stroke-dashoffset={-idx * segmentTotal + gap / 2}
+									/>
+								{/each}
+							</svg>
+						{/if}
+
+						<div class="tile-content">
+							{#if state === 'locked'}
+								<div class="lock-icon-wrap">
+									<Icon icon={LockIcon} size={22} />
+								</div>
+							{:else}
+								<span class="tile-emoji">{unit.emoji}</span>
+							{/if}
 						</div>
 					</button>
 
 					<!-- Popover -->
 					{#if isActive}
 						{@const shift = pos.x < 30 ? -20 : pos.x > 70 ? -80 : -50}
-						<div class="unit-popover-wrapper" style="transform: translateX({shift}%);">
+						<div
+							class="unit-popover-wrapper"
+							style="transform: translateX({shift}%);"
+							role="dialog"
+							aria-label="Detalles de {label}"
+						>
 							<div
 								class="unit-popover"
 								in:fly={{ y: 8, duration: 450, easing: quintOut }}
@@ -319,7 +362,12 @@
 									<div class="popover-header">
 										<div class="header-top-row">
 											<span class="unit-tag">Unit {i + 1}</span>
-											<button class="popover-close" onclick={() => (activeUnitId = null)}>
+											<!-- FIX 5: aria-label en botón icon-only -->
+											<button
+												class="popover-close"
+												onclick={() => (activeUnitId = null)}
+												aria-label="Cerrar"
+											>
 												<Icon icon={Cancel01Icon} size={18} />
 											</button>
 										</div>
@@ -328,9 +376,7 @@
 										>
 											<span class="level-mini-tag">{unit.jlptLevel}</span>
 										</div>
-										<h3 class="popover-title">
-											{$locale === 'es' ? unit.title_es : unit.title_en}
-										</h3>
+										<h3 class="popover-title">{label}</h3>
 									</div>
 									<p class="popover-desc">
 										{$locale === 'es' ? unit.objective_es : unit.objective_en}
@@ -338,18 +384,19 @@
 
 									<div class="unit-overview">
 										<div class="overview-item">
-											<span class="dot vocab"></span>
+											<span class="dot vocab" aria-hidden="true"></span>
 											<span>{unit.lessons.length * 5}+ Vocab</span>
 										</div>
 										<div class="overview-item">
-											<span class="dot grammar"></span>
+											<span class="dot grammar" aria-hidden="true"></span>
 											<span>Grammar</span>
 										</div>
 									</div>
 
 									<div class="popover-stats">
 										<div class="stat-item">
-											<span class="stat-val">{progress}%</span>
+											<!-- FIX 3: muestra '—' si no hay progreso aún -->
+											<span class="stat-val">{progress > 0 ? `${progress}%` : '—'}</span>
 											<span class="stat-lbl">{$locale === 'es' ? 'Progreso' : 'Progress'}</span>
 										</div>
 										<div class="stat-item">
@@ -365,7 +412,7 @@
 										<Icon icon={ArrowRight01Icon} size={18} />
 									</button>
 								</div>
-								<div class="popover-arrow" style="left: {-shift}%"></div>
+								<div class="popover-arrow" style="left: {-shift}%" aria-hidden="true"></div>
 							</div>
 						</div>
 					{/if}
@@ -383,7 +430,7 @@
 		--rm-muted: var(--fg-secondary);
 		--rm-border: var(--ink-200);
 		--rm-shadow: var(--shadow-lg);
-		--rm-path: var(--ink-200);
+		--rm-path: var(--ink-300);
 		--rm-complete-stroke: var(--ink-900);
 	}
 
@@ -393,7 +440,8 @@
 		--rm-muted: var(--fg-secondary);
 		--rm-border: var(--ink-700);
 		--rm-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-		--rm-path: rgba(255, 255, 255, 0.08);
+		/* FIX 3: path visible en dark mode (era 0.08) */
+		--rm-path: rgba(255, 255, 255, 0.18);
 		--rm-complete-stroke: var(--bg-page);
 	}
 
@@ -411,7 +459,6 @@
 		overflow: visible;
 	}
 
-	/* SVG Path Styling */
 	.roadmap-svg {
 		position: absolute;
 		inset: 0;
@@ -424,35 +471,31 @@
 
 	.roadmap-path {
 		fill: none;
-		stroke: var(--rm-path);
-		stroke-width: 4;
-		stroke-linecap: round;
-		stroke-linejoin: round;
+		stroke: var(--ink-200);
+		stroke-width: 3;
 		vector-effect: non-scaling-stroke;
-		opacity: 0.8;
 	}
 
 	.roadmap-path-active {
 		fill: none;
-		stroke: url(#pathGradient);
-		stroke-width: 6;
+		stroke: var(--rm-accent);
+		stroke-width: 3.5;
 		stroke-linecap: round;
 		stroke-linejoin: round;
-		stroke-dasharray: 12 12;
+		stroke-dasharray: 8 12;
 		animation: dashFlow 60s linear infinite;
 		vector-effect: non-scaling-stroke;
 	}
 
 	@keyframes dashFlow {
 		from {
-			stroke-dashoffset: 1000;
+			stroke-dashoffset: 2400;
 		}
 		to {
 			stroke-dashoffset: 0;
 		}
 	}
 
-	/* Node Styling */
 	.node-anchor {
 		position: absolute;
 		transform: translate(-50%, -50%);
@@ -471,15 +514,19 @@
 		inset: 0;
 		z-index: 85;
 		background: transparent;
+		border: none;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		cursor: default;
 	}
 
-	/* Sticky Topic Indicator (Floating Top Dock) */
 	.topic-card-wrapper {
 		position: sticky;
-		top: 12px; /* Pegado arriba como un Nav Flotante */
+		top: calc(12px + env(safe-area-inset-top, 0px));
 		left: 0;
 		right: 0;
-		z-index: 11000; /* Igual que el DockBar para ser prioridad */
+		z-index: 11000;
 		padding: 0 16px;
 		display: flex;
 		justify-content: center;
@@ -508,12 +555,14 @@
 		font-size: 16px;
 	}
 
+	/* FIX 5: brightness para colores pálidos como amber/pink */
 	.topic-lvl {
 		font-size: 9px;
 		font-weight: 900;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		color: var(--accent);
+		filter: saturate(1.2) brightness(0.82);
 	}
 
 	.topic-title {
@@ -522,134 +571,97 @@
 		color: var(--fg-primary);
 	}
 
-	.node-circle {
-		width: 80px;
-		height: 80px;
+	.node-tile {
+		width: 68px;
+		height: 68px;
 		border-radius: 50%;
-		background: var(--rm-bg);
-		border: none;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
 		padding: 0;
 		cursor: pointer;
 		position: relative;
 		display: grid;
 		place-items: center;
-		transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-		box-shadow: var(--rm-shadow);
+		transition: all 0.2s ease;
 	}
 
-	.node-circle:hover:not(:disabled) {
-		transform: scale(1.1);
-		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+	.tile-content {
+		display: grid;
+		place-items: center;
+		font-size: 30px;
 	}
 
-	.node-circle.is-active {
-		transform: scale(1.1);
-		border: 4px solid var(--rm-accent);
+	.lock-icon-wrap {
+		opacity: 0.6;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
-	.node-circle.is-locked {
-		background: var(--ink-200);
-		color: var(--ink-400);
-		cursor: not-allowed;
-		filter: grayscale(1);
-	}
-
-	.node-circle.is-completed {
-		background: var(--hinomaru-red);
-		border: none;
-		box-shadow: 0 0 25px var(--hinomaru-red-wash);
-		transform: scale(0.95);
-	}
-
-	.node-circle.is-locked {
-		background: var(--bg-muted);
-		filter: grayscale(1);
-		border: 2px dashed var(--ink-300);
-		cursor: not-allowed;
-	}
-
-	.node-circle.is-current {
-		border: 4px solid var(--node-accent);
-		box-shadow:
-			0 0 0 6px var(--bg-surface),
-			0 0 0 10px var(--node-accent);
-		animation: pulseActive 2s infinite ease-in-out;
-	}
-
-	@keyframes pulseActive {
-		0%,
-		100% {
-			box-shadow:
-				0 0 0 4px var(--bg-surface),
-				0 0 0 6px var(--node-accent);
-		}
-		50% {
-			box-shadow:
-				0 0 0 8px var(--bg-surface),
-				0 0 0 16px rgba(var(--bg-surface-rgb), 0);
-		}
-	}
-
-	/* Progress Ring */
 	.progress-ring {
 		position: absolute;
-		inset: -8px;
-		width: calc(100% + 16px);
-		height: calc(100% + 16px);
+		inset: -6px;
+		width: calc(100% + 12px);
+		height: calc(100% + 12px);
 		transform: rotate(-90deg);
 		pointer-events: none;
 	}
 
-	/* Ring Track removed for real segmentation */
-
 	.ring-segment {
 		fill: none;
-		stroke: var(--rm-path);
-		stroke-width: 6;
+		stroke: var(--ink-100);
+		stroke-width: 1.5;
 		stroke-linecap: round;
-		transition:
-			stroke 0.3s,
-			stroke-width 0.3s;
+		transition: all 0.3s ease;
 	}
 
 	.ring-segment.is-active {
 		stroke: var(--node-accent);
-		stroke-width: 7;
+		stroke-width: 4;
 	}
 
-	.node-circle.is-completed .ring-segment.is-active {
-		stroke: var(--rm-complete-stroke);
-		stroke-width: 8;
+	@media (hover: hover) {
+		.node-tile:hover {
+			transform: translateY(-4px);
+			border-color: var(--ink-300);
+		}
 	}
 
-	.node-content {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		display: grid;
-		place-items: center;
-		font-size: 34px;
+	/* ESTADO 1: BLOQUEADO (Locked) */
+	.node-tile.is-locked {
+		background: var(--bg-muted);
+		border: 1.5px solid var(--ink-200);
+		cursor: not-allowed;
+		color: var(--ink-400);
 	}
 
-	.node-badge {
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		width: 24px;
-		height: 24px;
-		border-radius: 50%;
-		background: #888;
-		display: grid;
-		place-items: center;
-		border: 3px solid var(--rm-bg);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	/* ESTADO 2: DISPONIBLE (Available) */
+	/* (Estilo base de .node-tile) */
+
+	/* ESTADO 3: EN CURSO / ACTUAL (Current) */
+	.node-tile.is-current {
+		border: 2.5px solid var(--node-accent);
+		background: var(--bg-surface);
 	}
 
-	.node-badge.check {
-		background: var(--success);
+	/* ESTADO 4: COMPLETADO / MAESTRÍA (Completed) */
+	.node-tile.is-completed {
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
 	}
 
-	/* Popover Styling */
+	.node-tile.is-completed .tile-emoji {
+		filter: none;
+		opacity: 1;
+	}
+
+	.node-tile.is-completed .ring-segment.is-active {
+		stroke: var(--node-accent);
+		stroke-width: 5;
+	}
+
+	/* FIX 8: .node-badge eliminado — nunca se renderizaba en el template */
+
 	.unit-popover-wrapper {
 		position: absolute;
 		top: 110%;
@@ -688,21 +700,29 @@
 		align-items: center;
 		justify-content: center;
 		transition: color 0.2s;
+		border-radius: 6px;
 	}
 
 	.popover-close:hover {
 		color: var(--hinomaru-red);
 	}
 
+	/* FIX 6: focus-visible en botón de cierre */
+	.popover-close:focus-visible {
+		outline: 2px solid var(--hinomaru-red);
+		outline-offset: 2px;
+	}
+
 	.popover-header {
 		margin-bottom: 8px;
 	}
 
+	/* FIX 2: unit-tag con fg-primary para contraste en 11px */
 	.unit-tag {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 900;
 		text-transform: uppercase;
-		color: var(--rm-muted);
+		color: var(--fg-primary);
 		letter-spacing: 0.1em;
 	}
 
@@ -721,6 +741,7 @@
 		margin-bottom: 16px;
 	}
 
+	/* FIX 1: unit-overview dark mode compatible */
 	.unit-overview {
 		display: flex;
 		gap: 12px;
@@ -728,6 +749,10 @@
 		padding: 10px;
 		background: var(--ink-100);
 		border-radius: 12px;
+	}
+
+	[data-theme='dark'] .unit-overview {
+		background: var(--ink-800);
 	}
 
 	.overview-item {
@@ -744,6 +769,7 @@
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
+		flex-shrink: 0;
 	}
 
 	.dot.vocab {
@@ -753,10 +779,11 @@
 		background: #3b82f6;
 	}
 
+	/* FIX 2: level-mini-tag fg-secondary (era fg-tertiary, casi invisible) */
 	.level-mini-tag {
 		font-size: 10px;
 		font-weight: 900;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
@@ -788,14 +815,7 @@
 		letter-spacing: 0.05em;
 	}
 
-	.continue-btn {
-		display: none; /* Usamos las clases globales hm-btn */
-	}
-
-	.continue-btn:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 20px rgba(188, 0, 45, 0.3);
-	}
+	/* FIX 6: .continue-btn eliminado — reglas muertas */
 
 	.popover-arrow {
 		position: absolute;
