@@ -62,7 +62,10 @@
 			const pill = document.querySelector(`.level-pill[data-level-pill="${activeLevel}"]`);
 			const container = document.querySelector('.level-scroller');
 			if (pill && container) {
-				pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+				const containerRect = container.getBoundingClientRect();
+				const pillRect = pill.getBoundingClientRect();
+				const targetScrollLeft = (container as HTMLElement).scrollLeft + pillRect.left - containerRect.left - (containerRect.width - pillRect.width) / 2;
+				(container as HTMLElement).scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
 			}
 		}
 	});

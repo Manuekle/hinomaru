@@ -39,22 +39,9 @@
 		return 0;
 	}
 
-	function lessonProgressCalc(l: Lesson) {
-		const session = getLessonSession(l.id);
-		if (session?.completed_at) return { learned: 100, total: 100, pct: 100 };
-
-		const d = getDeck(l.deckId);
-		if (!d || !d.card_count) return { learned: 0, total: 0, pct: 0 };
-		const learned = d.learned ?? 0;
-		return {
-			learned,
-			total: d.card_count,
-			pct: Math.min(100, Math.round((learned / d.card_count) * 100))
-		};
-	}
-
+	// Completed = ONLY roadmap lesson_progress, never deck card progress
 	function lessonCompleted(l: Lesson): boolean {
-		return getLessonSession(l.id)?.completed_at || lessonProgressCalc(l).pct === 100;
+		return !!getLessonSession(l.id)?.completed_at;
 	}
 
 	function lessonAvailable(l: Lesson): boolean {
@@ -120,12 +107,13 @@
 	}
 
 	// Geometría del Roadmap
-	const nodeSpacing = 180;
-	const nodeXOffset = 35;
+	const nodeSpacing = 120;
+	const CURVE_OFFSETS = [-22, 5, 28, -10, 20, -28, 12, -18, 25, 0, -25, 15, 28, -8, -20, 10, 22, -15, -28, 18];
 
 	const nodeCoords = $derived(
 		units.map((_, i) => {
-			const x = 50 + Math.sin((i * Math.PI) / 2 - Math.PI / 2) * nodeXOffset;
+			const offset = CURVE_OFFSETS[i % CURVE_OFFSETS.length];
+			const x = 50 + offset;
 			const y = i * nodeSpacing + 140;
 			return { x, y };
 		})
@@ -159,7 +147,7 @@
 	onMount(async () => {
 		await tick();
 		if (window.scrollY === 0) {
-			const currentEl = document.querySelector('.node-circle.is-current');
+			const currentEl = document.querySelector('.node-tile.is-current');
 			if (currentEl) {
 				currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
@@ -219,7 +207,7 @@
 			activeUnitId = available[nextIndex].id;
 			event.preventDefault();
 
-			const el = document.querySelector(`[data-id="${available[nextIndex].id}"] .node-circle`);
+			const el = document.querySelector(`[data-id="${available[nextIndex].id}"] .node-tile`);
 			if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		}
 	}
@@ -441,6 +429,21 @@
 						</div>
 					{/if}
 				</div>
+
+				<!-- Level checkpoint banner between JLPT sections -->
+				{#if (unit as any).isLevelStart && i > 0}
+					{@const prevY = nodeCoords[i - 1].y}
+					{@const nextY = nodeCoords[i].y}
+					{@const midY = (prevY + nextY) / 2}
+					<div
+						class="level-checkpoint"
+						style="top: {midY}px;"
+					>
+						<span class="checkpoint-line"></span>
+						<span class="checkpoint-label">{(unit as any).jlptLevel}</span>
+						<span class="checkpoint-line"></span>
+					</div>
+				{/if}
 			{/each}
 		</div>
 	{/if}
@@ -601,7 +604,10 @@
 		position: relative;
 		display: grid;
 		place-items: center;
-		transition: all 0.2s ease;
+		transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease;
+		box-shadow:
+			0 4px 0 0 var(--ink-300),
+			0 6px 14px rgba(0, 0, 0, 0.10);
 	}
 
 	.tile-content {
@@ -641,10 +647,19 @@
 	}
 
 	@media (hover: hover) {
-		.node-tile:hover {
-			transform: translateY(-4px);
-			border-color: var(--ink-300);
+		.node-tile:not(.is-locked):hover {
+			transform: translateY(-3px);
+			box-shadow:
+				0 7px 0 0 var(--ink-300),
+				0 10px 20px rgba(0, 0, 0, 0.15);
 		}
+	}
+
+	.node-tile:not(.is-locked):active {
+		transform: translateY(3px);
+		box-shadow:
+			0 1px 0 0 var(--ink-300),
+			0 2px 6px rgba(0, 0, 0, 0.08);
 	}
 
 	.node-tile.is-locked {
@@ -652,16 +667,25 @@
 		border: 1.5px solid var(--ink-200);
 		cursor: not-allowed;
 		color: var(--ink-400);
+		box-shadow:
+			0 3px 0 0 var(--ink-200),
+			0 4px 8px rgba(0, 0, 0, 0.06);
 	}
 
 	.node-tile.is-current {
 		border: 2.5px solid var(--node-accent);
 		background: var(--bg-surface);
+		box-shadow:
+			0 4px 0 0 var(--node-accent),
+			0 6px 18px rgba(188, 0, 45, 0.22);
 	}
 
 	.node-tile.is-completed {
 		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
+		border: 1.5px solid #e8a52a;
+		box-shadow:
+			0 4px 0 0 #c87a10,
+			0 6px 14px rgba(237, 138, 25, 0.22);
 	}
 
 	.unit-popover-wrapper {
@@ -809,6 +833,38 @@
 		border-top: 1px solid var(--rm-border);
 		border-left: 1px solid var(--rm-border);
 		pointer-events: none;
+	}
+
+	.level-checkpoint {
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 5;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		pointer-events: none;
+		width: 80%;
+		max-width: 260px;
+	}
+
+	.checkpoint-line {
+		flex: 1;
+		height: 1px;
+		background: var(--ink-200);
+	}
+
+	.checkpoint-label {
+		font-size: 10px;
+		font-weight: 900;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--fg-tertiary);
+		background: var(--bg-page);
+		padding: 3px 10px;
+		border: 1px solid var(--ink-200);
+		border-radius: 99px;
+		white-space: nowrap;
 	}
 
 	.empty-state {
