@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { state = 'neutral', size = 28 }: { state?: 'neutral' | 'active' | 'completed'; size?: number } = $props();
+	let { state = 'neutral', size = 28, color }: { state?: 'neutral' | 'active' | 'completed'; size?: number; color?: string } = $props();
 
 	const fill = $derived(
 		state === 'completed' ? '#ED8A19'
@@ -17,7 +17,7 @@
 	style="flex-shrink:0; transition: fill 0.3s ease;"
 >
 	<path
-		fill={fill}
+		fill={color || fill}
 		d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
 		c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042
 		c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685

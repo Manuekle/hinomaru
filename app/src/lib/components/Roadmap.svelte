@@ -69,6 +69,15 @@
 	const currentIdx = $derived(flatLessons.findIndex((l) => !lessonCompleted(l)));
 	const currentUnitId = $derived(currentIdx !== -1 ? flatLessons[currentIdx]?.unitId : null);
 
+	function unitLessonStats(unit: RoadmapUnit) {
+		const valid = unit.lessons.filter(lessonAvailable);
+		const completed = valid.filter((l) => lessonCompleted(l)).length;
+		return {
+			current: Math.min(valid.length, completed + 1),
+			total: valid.length
+		};
+	}
+
 	function unitProgress(unit: RoadmapUnit) {
 		const valid = unit.lessons.filter(lessonAvailable);
 		if (valid.length === 0) return 0;
@@ -134,7 +143,7 @@
 	const totalHeight = $derived((units.length - 1) * nodeSpacing + 300);
 
 	const levelColors: Record<string, string> = {
-		Survival: 'var(--hinomaru-red)',
+		Survival: '#10b981',
 		N5: '#3b82f6',
 		N4: '#10b981',
 		N3: '#f59e0b',
@@ -296,7 +305,7 @@
 				<div
 					class="node-anchor"
 					class:is-active={isActive}
-					style="left: {pos.x}%; top: {pos.y}px; --node-accent: {levelColors[unit.jlptLevel]};"
+					style="left: {pos.x}%; top: {pos.y}px; --node-accent: {levelColors[unit.jlptLevel]}; --node-accent-wash: {levelColors[unit.jlptLevel]}20;"
 					data-id={unit.id}
 				>
 					<button
@@ -340,7 +349,7 @@
 											r="46"
 											style:stroke-dasharray="{fillLen} 289"
 											style:stroke-dashoffset={-idx * segmentTotal + gap / 2}
-											style:stroke={ringStroke}
+											style:stroke="var(--rm-progress-green)"
 										/>
 									{/if}
 								{/each}
@@ -353,13 +362,14 @@
 									<Icon icon={LockIcon} size={22} />
 								</div>
 							{:else}
-								<UnitIcon {iconState} size={28} />
+								<UnitIcon {iconState} size={28} color={state === 'current' ? 'white' : undefined} />
 							{/if}
 						</div>
 					</button>
 
 					<!-- Popover -->
 					{#if isActive}
+						{@const stats = unitLessonStats(unit)}
 						{@const shift = pos.x < 30 ? -20 : pos.x > 70 ? -80 : -50}
 						<div
 							class="unit-popover-wrapper"
@@ -373,58 +383,22 @@
 								out:fade={{ duration: 200 }}
 							>
 								<div class="popover-content">
-									<div class="popover-header">
-										<div class="header-top-row">
-											<span class="unit-tag">Unit {i + 1}</span>
-											<button
-												class="popover-close"
-												onclick={() => (activeUnitId = null)}
-												aria-label="Cerrar"
-											>
-												<Icon icon={Cancel01Icon} size={18} />
-											</button>
-										</div>
-										<div
-											style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:4px;"
-										>
-											<span class="level-mini-tag">{unit.jlptLevel}</span>
-										</div>
-										<h3 class="popover-title">{label}</h3>
-									</div>
-									<p class="popover-desc">
-										{$locale === 'es' ? unit.objective_es : unit.objective_en}
-									</p>
-
-									<div class="unit-overview">
-										<div class="overview-item">
-											<span class="dot vocab" aria-hidden="true"></span>
-											<span>{unit.lessons.length * 5}+ Vocab</span>
-										</div>
-										<div class="overview-item">
-											<span class="dot grammar" aria-hidden="true"></span>
-											<span>Grammar</span>
-										</div>
+									<h3 class="popover-title">{label}</h3>
+									<div class="popover-subtitle">
+										{$locale === 'es' 
+											? `Lección ${stats.current} de ${stats.total}` 
+											: `Lesson ${stats.current} of ${stats.total}`}
 									</div>
 
-									<div class="popover-stats">
-										<div class="stat-item">
-											<span class="stat-val">{progress > 0 ? `${progress}%` : '—'}</span>
-											<span class="stat-lbl">{$locale === 'es' ? 'Progreso' : 'Progress'}</span>
-										</div>
-										<div class="stat-item">
-											<span class="stat-val">{unit.lessons.length}</span>
-											<span class="stat-lbl">{$locale === 'es' ? 'Lecciones' : 'Lessons'}</span>
-										</div>
-									</div>
 									<button
-										class="hm-btn hm-btn-primary hm-btn-sm hm-btn-full"
+										class="hm-btn hm-btn-primary hm-btn-sm hm-btn-full popover-btn"
 										onclick={() => handleContinue(unit)}
 									>
-										<span>{$locale === 'es' ? 'Continuar' : 'Continue'}</span>
-										<Icon icon={ArrowRight01Icon} size={18} />
+										<span>{$locale === 'es' ? 'Empezar' : 'Start'}</span>
+										<span class="xp-badge">+15 XP</span>
 									</button>
+									<div class="popover-arrow" style="left: {-shift}%"></div>
 								</div>
-								<div class="popover-arrow" style="left: {-shift}%" aria-hidden="true"></div>
 							</div>
 						</div>
 					{/if}
@@ -453,6 +427,7 @@
 	:root {
 		--rm-bg: var(--bg-surface);
 		--rm-accent: var(--hinomaru-red);
+		--rm-progress-green: #10b981;
 		--rm-text: var(--fg-primary);
 		--rm-muted: var(--fg-secondary);
 		--rm-border: var(--ink-200);
@@ -556,21 +531,26 @@
 	}
 
 	.topic-card {
-		background: var(--bg-surface);
+		background: rgba(255, 255, 255, 0.85);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
-		border: 1px solid var(--rm-border);
+		border: 1px solid rgba(0, 0, 0, 0.05);
 		border-radius: 99px;
-		padding: 6px 20px;
+		padding: 8px 24px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 12px;
+		gap: 14px;
 		pointer-events: auto;
-		box-shadow: var(--rm-shadow);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		width: 100%;
-		max-width: 320px;
+		max-width: 360px;
+	}
+
+	:global([data-theme='dark']) .topic-card {
+		background: rgba(28, 28, 30, 0.85);
+		border-color: rgba(255, 255, 255, 0.1);
 	}
 
 	.topic-icon {
@@ -594,20 +574,18 @@
 	}
 
 	.node-tile {
-		width: 68px;
-		height: 68px;
+		width: 64px;
+		height: 64px;
 		border-radius: 50%;
 		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
+		border: 1px solid var(--ink-200);
 		padding: 0;
 		cursor: pointer;
 		position: relative;
 		display: grid;
 		place-items: center;
-		transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease;
-		box-shadow:
-			0 4px 0 0 var(--ink-300),
-			0 6px 14px rgba(0, 0, 0, 0.10);
+		transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 	}
 
 	.tile-content {
@@ -616,7 +594,7 @@
 	}
 
 	.lock-icon-wrap {
-		opacity: 0.6;
+		color: var(--ink-400);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -624,9 +602,9 @@
 
 	.progress-ring {
 		position: absolute;
-		inset: -6px;
-		width: calc(100% + 12px);
-		height: calc(100% + 12px);
+		inset: -8px;
+		width: calc(100% + 16px);
+		height: calc(100% + 16px);
 		transform: rotate(-90deg);
 		pointer-events: none;
 	}
@@ -634,16 +612,16 @@
 	.ring-segment {
 		fill: none;
 		stroke: var(--ink-100);
-		stroke-width: 1.5;
+		stroke-width: 3;
 		stroke-linecap: round;
 		transition: all 0.3s ease;
 	}
 
 	.ring-segment-fill {
 		fill: none;
-		stroke-width: 4;
+		stroke-width: 6;
 		stroke-linecap: round;
-		transition: stroke-dasharray 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+		transition: stroke-dasharray 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 
 	@media (hover: hover) {
@@ -663,29 +641,29 @@
 	}
 
 	.node-tile.is-locked {
-		background: var(--bg-muted);
-		border: 1.5px solid var(--ink-200);
+		background: var(--ink-50);
+		border-color: var(--ink-200);
 		cursor: not-allowed;
-		color: var(--ink-400);
-		box-shadow:
-			0 3px 0 0 var(--ink-200),
-			0 4px 8px rgba(0, 0, 0, 0.06);
+		box-shadow: none;
 	}
 
 	.node-tile.is-current {
-		border: 2.5px solid var(--node-accent);
-		background: var(--bg-surface);
-		box-shadow:
-			0 4px 0 0 var(--node-accent),
-			0 6px 18px rgba(188, 0, 45, 0.22);
+		border-color: var(--rm-progress-green);
+		background: var(--rm-progress-green);
+		box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15), 0 10px 24px rgba(0, 0, 0, 0.12);
+		animation: node-pulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.node-tile.is-completed {
 		background: var(--bg-surface);
-		border: 1.5px solid #e8a52a;
-		box-shadow:
-			0 4px 0 0 #c87a10,
-			0 6px 14px rgba(237, 138, 25, 0.22);
+		border-color: #e8a52a;
+		box-shadow: 0 0 0 4px rgba(232, 165, 42, 0.1);
+	}
+
+	@keyframes node-pulse {
+		0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.15), 0 10px 24px rgba(0, 0, 0, 0.12); }
+		70% { box-shadow: 0 0 0 10px transparent, 0 10px 24px rgba(0, 0, 0, 0.12); }
+		100% { box-shadow: 0 0 0 0 transparent, 0 10px 24px rgba(0, 0, 0, 0.12); }
 	}
 
 	.unit-popover-wrapper {
@@ -699,13 +677,22 @@
 
 	.unit-popover {
 		width: 100%;
-		background: var(--rm-bg);
-		border: 1px solid var(--rm-border);
+		background: rgba(255, 255, 255, 0.96);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(0, 0, 0, 0.08);
 		border-radius: 20px;
-		padding: 20px;
-		box-shadow: var(--rm-shadow);
+		padding: 16px;
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
 		pointer-events: auto;
 		transform-origin: top center;
+		text-align: center;
+	}
+
+	:global([data-theme='dark']) .unit-popover {
+		background: rgba(30, 30, 35, 0.98) !important;
+		border-color: rgba(255, 255, 255, 0.15) !important;
+		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
 	}
 
 	.header-top-row {
@@ -735,105 +722,62 @@
 		outline-offset: 2px;
 	}
 
-	.popover-header { margin-bottom: 8px; }
-
-	.unit-tag {
-		font-size: 11px;
-		font-weight: 900;
-		text-transform: uppercase;
-		color: var(--fg-primary);
-		letter-spacing: 0.1em;
-	}
-
 	.popover-title {
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: 800;
-		margin: 2px 0 0;
-		color: var(--rm-text);
+		color: var(--fg-primary);
 		line-height: 1.2;
+		margin-bottom: 4px;
 	}
 
-	.popover-desc {
-		font-size: 13px;
-		color: var(--rm-muted);
-		line-height: 1.4;
+	.popover-subtitle {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--fg-secondary);
 		margin-bottom: 16px;
 	}
 
-	.unit-overview {
+	.popover-btn {
+		height: 44px;
+		border-radius: 14px;
 		display: flex;
-		gap: 12px;
-		margin-bottom: 16px;
-		padding: 10px;
-		background: var(--ink-100);
-		border-radius: 12px;
-	}
-
-	[data-theme='dark'] .unit-overview { background: var(--ink-800); }
-
-	.overview-item {
-		display: flex;
+		justify-content: space-between;
 		align-items: center;
-		gap: 5px;
-		font-size: 11px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-		text-transform: uppercase;
+		padding: 0 16px;
+		background: var(--rm-progress-green);
+		color: white;
+		border: none;
+		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 	}
 
-	.dot {
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		flex-shrink: 0;
-	}
-	.dot.vocab { background: var(--hinomaru-red); }
-	.dot.grammar { background: #3b82f6; }
+	.popover-btn:active { transform: scale(0.97); }
 
-	.level-mini-tag {
+	.xp-badge {
 		font-size: 10px;
-		font-weight: 900;
-		color: var(--fg-secondary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.popover-stats {
-		display: flex;
-		gap: 20px;
-		margin-bottom: 16px;
-		padding-top: 12px;
-		border-top: 1px solid var(--rm-border);
-	}
-
-	.stat-item { display: flex; flex-direction: column; }
-
-	.stat-val {
-		font-size: 16px;
 		font-weight: 800;
-		color: var(--rm-text);
-	}
-
-	.stat-lbl {
-		font-size: 10px;
-		font-weight: 700;
-		text-transform: uppercase;
-		color: var(--rm-muted);
-		letter-spacing: 0.05em;
+		background: rgba(255, 255, 255, 0.2);
+		padding: 2px 8px;
+		border-radius: 8px;
 	}
 
 	.popover-arrow {
 		position: absolute;
-		top: -8px;
-		left: 50%;
+		top: -6px;
+		width: 12px;
+		height: 12px;
+		background: rgba(255, 255, 255, 0.96);
+		backdrop-filter: blur(12px);
 		transform: translateX(-50%) rotate(45deg);
-		width: 16px;
-		height: 16px;
-		background: var(--rm-bg);
-		border-top: 1px solid var(--rm-border);
-		border-left: 1px solid var(--rm-border);
-		pointer-events: none;
+		border-top: 1px solid rgba(0, 0, 0, 0.08);
+		border-left: 1px solid rgba(0, 0, 0, 0.08);
+		z-index: -1;
 	}
+
+	:global([data-theme='dark']) .popover-arrow {
+		background: rgba(30, 30, 35, 0.98) !important;
+		border-color: rgba(255, 255, 255, 0.15) !important;
+	}
+
 
 	.level-checkpoint {
 		position: absolute;
@@ -860,11 +804,12 @@
 		text-transform: uppercase;
 		letter-spacing: 0.12em;
 		color: var(--fg-tertiary);
-		background: var(--bg-page);
-		padding: 3px 10px;
+		background: var(--bg-surface);
+		padding: 4px 12px;
 		border: 1px solid var(--ink-200);
 		border-radius: 99px;
 		white-space: nowrap;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	.empty-state {
