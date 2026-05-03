@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
+	import { onMount, tick } from 'svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
@@ -8,8 +10,15 @@
 	import { LockIcon, Tick01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 	import type { RoadmapUnit, Lesson } from '$lib/data/roadmap';
 
-	// Props con Svelte 5 runes
-	const { decks = [], units = [], lessonProgress = [] } = $props();
+	interface Props {
+		units: any[];
+		decks: any[];
+		lessonProgress: any[];
+		activeLevel?: string;
+		onLevelChange?: (level: string) => void;
+	}
+
+	let { units = [], decks = [], lessonProgress = [], activeLevel = $bindable(), onLevelChange }: Props = $props();
 
 	let activeUnitId = $state<string | null>(null);
 
@@ -103,14 +112,13 @@
 	}
 
 	// Geometría del Roadmap
-	const nodeSpacing = 110;
+	const nodeSpacing = 180;
 	const nodeXOffset = 35; // %
 
 	const nodeCoords = $derived(
 		units.map((_, i) => {
-			// Usamos -Math.cos para empezar desde la izquierda (-1), pasar por el centro (0) y llegar a la derecha (1)
 			const x = 50 + Math.sin((i * Math.PI) / 2 - Math.PI / 2) * nodeXOffset;
-			const y = i * nodeSpacing + 50;
+			const y = i * nodeSpacing + 140; // Más espacio al inicio
 			return { x, y };
 		})
 	);
@@ -127,7 +135,62 @@
 		return d;
 	});
 
-	const totalHeight = $derived((units.length - 1) * nodeSpacing + 100);
+	const totalHeight = $derived((units.length - 1) * nodeSpacing + 300);
+
+	const levelColors: Record<string, string> = {
+		Survival: 'var(--hinomaru-red)',
+		N5: '#3b82f6',
+		N4: '#10b981',
+		N3: '#f59e0b',
+		N2: '#8b5cf6',
+		N1: '#ec4899'
+	};
+
+	// Auto-scroll al nodo actual (solo al montar)
+	let currentUnit = $state<RoadmapUnit | null>(null);
+
+	onMount(async () => {
+		await tick();
+		// Solo scrolleamos al inicio si no hay un scroll previo
+		if (window.scrollY === 0) {
+			const currentEl = document.querySelector('.node-circle.is-current');
+			if (currentEl) {
+				currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		}
+
+		let lastLevel = '';
+		const handleScroll = () => {
+			if (!units.length) return;
+			
+			const nodes = document.querySelectorAll('.node-anchor');
+			let closestUnitId = '';
+			let minDistance = Infinity;
+
+			nodes.forEach((node) => {
+				const rect = node.getBoundingClientRect();
+				const distance = Math.abs(rect.top - 200);
+				if (distance < minDistance) {
+					minDistance = distance;
+					closestUnitId = node.getAttribute('data-id') || '';
+				}
+			});
+
+			const unit = units.find(u => u.id === closestUnitId);
+			if (unit && unit.id !== currentUnit?.id) {
+				currentUnit = unit;
+				// Solo avisamos si el nivel JLPT realmente ha cambiado para evitar ruido
+				if (onLevelChange && unit.jlptLevel !== lastLevel) {
+					lastLevel = unit.jlptLevel;
+					onLevelChange(unit.jlptLevel);
+				}
+			}
+		};
+
+		window.addEventListener('scroll', handleScroll, { passive: true });
+		handleScroll();
+		return () => window.removeEventListener('scroll', handleScroll);
+	});
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') activeUnitId = null;
@@ -147,15 +210,28 @@
 			<p>{t('home.empty', $locale)}</p>
 		</div>
 	{:else}
-		<div 
-			class="roadmap-container" 
-			style="height: {totalHeight}px"
-			onclick={(e) => {
-				if (e.target === e.currentTarget) activeUnitId = null;
-			}}
-		>
-			<!-- SVG Path -->
-			<svg class="roadmap-svg" viewBox="0 0 100 {totalHeight}" preserveAspectRatio="none">
+			<div class="roadmap-container" style="height: {totalHeight}px">
+				<!-- Sticky Topic Card -->
+				{#if currentUnit}
+					<div class="topic-card-wrapper">
+						{#key currentUnit.id}
+							<div 
+								class="topic-card" 
+								in:fly={{ y: -10, duration: 400, easing: cubicOut }}
+								style="--accent: {levelColors[currentUnit.jlptLevel]}"
+							>
+								<div class="topic-icon">{currentUnit.emoji}</div>
+								<div class="topic-info">
+									<div class="topic-lvl">{$locale === 'es' ? currentUnit.section_es : currentUnit.section_en}</div>
+									<div class="topic-title">{$locale === 'es' ? currentUnit.title_es : currentUnit.title_en}</div>
+								</div>
+							</div>
+						{/key}
+					</div>
+				{/if}
+
+				<!-- SVG Path -->
+				<svg class="roadmap-svg" viewBox="0 0 100 {totalHeight}" preserveAspectRatio="none">
 				<defs>
 					<linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
 						<stop offset="0%" stop-color="var(--rm-accent)" stop-opacity="0.6" />
@@ -174,7 +250,13 @@
 				{@const pos = nodeCoords[i]}
 				{@const isActive = activeUnitId === unit.id}
 
-				<div class="node-anchor" class:is-active={isActive} style="left: {pos.x}%; top: {pos.y}px;">
+				<div 
+					class="node-anchor" 
+					class:is-active={isActive} 
+					style="left: {pos.x}%; top: {pos.y}px;"
+					data-id={unit.id}
+				>
+
 					<button
 						class="node-circle"
 						class:is-locked={state === 'locked'}
@@ -221,12 +303,27 @@
 							>
 								<div class="popover-content">
 									<div class="popover-header">
-										<span class="unit-tag">Unit {i + 1}</span>
+										<div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:4px;">
+											<span class="unit-tag">Unit {i + 1}</span>
+											<span class="level-mini-tag">{unit.jlptLevel}</span>
+										</div>
 										<h3 class="popover-title">{$locale === 'es' ? unit.title_es : unit.title_en}</h3>
 									</div>
 									<p class="popover-desc">
 										{$locale === 'es' ? unit.objective_es : unit.objective_en}
 									</p>
+
+									<div class="unit-overview">
+										<div class="overview-item">
+											<span class="dot vocab"></span>
+											<span>{unit.lessons.length * 5}+ Vocab</span>
+										</div>
+										<div class="overview-item">
+											<span class="dot grammar"></span>
+											<span>Grammar</span>
+										</div>
+									</div>
+									
 									<div class="popover-stats">
 										<div class="stat-item">
 											<span class="stat-val">{progress}%</span>
@@ -276,7 +373,7 @@
 		width: 100%;
 		max-width: 800px;
 		margin: 0 auto;
-		padding: 20px 0 40px;
+		padding: 0 0 120px;
 		position: relative;
 	}
 
@@ -341,6 +438,55 @@
 		z-index: 100;
 	}
 
+	/* Sticky Topic Indicator (Floating Top Dock) */
+	.topic-card-wrapper {
+		position: sticky;
+		top: 12px; /* Pegado arriba como un Nav Flotante */
+		left: 0;
+		right: 0;
+		z-index: 11000; /* Igual que el DockBar para ser prioridad */
+		padding: 0 16px;
+		display: flex;
+		justify-content: center;
+		pointer-events: none;
+	}
+
+	.topic-card {
+		background: rgba(var(--bg-surface-rgb, 255, 255, 255), 0.85);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid var(--rm-border);
+		border-radius: 99px;
+		padding: 6px 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		pointer-events: auto;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		width: 100%;
+		max-width: 320px;
+	}
+
+	.topic-icon {
+		font-size: 16px;
+	}
+
+	.topic-lvl {
+		font-size: 9px;
+		font-weight: 900;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.topic-title {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--fg-primary);
+	}
+
 	.node-circle {
 		width: 80px;
 		height: 80px;
@@ -371,6 +517,11 @@
 		color: var(--ink-400);
 		cursor: not-allowed;
 		filter: grayscale(1);
+	}
+
+	.node-circle.is-completed {
+		background: #22c55e;
+		box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 	}
 
 	.node-circle.is-current {
@@ -483,7 +634,43 @@
 		font-size: 13px;
 		color: var(--rm-muted);
 		line-height: 1.4;
-		margin: 0 0 16px;
+		margin-bottom: 16px;
+	}
+
+	.unit-overview {
+		display: flex;
+		gap: 12px;
+		margin-bottom: 16px;
+		padding: 10px;
+		background: var(--ink-100);
+		border-radius: 12px;
+	}
+
+	.overview-item {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+		text-transform: uppercase;
+	}
+
+	.dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+	}
+
+	.dot.vocab { background: var(--hinomaru-red); }
+	.dot.grammar { background: #3b82f6; }
+
+	.level-mini-tag {
+		font-size: 10px;
+		font-weight: 900;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.popover-stats {

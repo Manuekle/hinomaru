@@ -9,7 +9,7 @@
 	import Icon from '$lib/Icon.svelte';
 	import Roadmap from '$lib/components/Roadmap.svelte';
 	import { ROADMAPS } from '$lib/data/roadmap';
-	import { Settings02Icon, CheckmarkCircle01Icon, Grid02Icon, RouteIcon } from '@hugeicons/core-free-icons';
+	import { Settings02Icon, FireIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
 
@@ -37,21 +37,42 @@
 	const dailyGoal = $derived(data.dailyGoal ?? 5);
 
 	// Unificamos todas las unidades del roadmap en una sola lista continua
-	const allUnits = $derived([
-		...(ROADMAPS.Survival || []),
-		...(ROADMAPS.N5 || []),
-		...(ROADMAPS.N4 || []),
-		...(ROADMAPS.N3 || []),
-		...(ROADMAPS.N2 || []),
-		...(ROADMAPS.N1 || [])
-	]);
+	const allUnits = $derived.by(() => {
+		const levels = ['Survival', 'N5', 'N4', 'N3', 'N2', 'N1'];
+		let units: any[] = [];
+		
+		levels.forEach(lvl => {
+			const levelUnits = ROADMAPS[lvl] || [];
+			if (levelUnits.length > 0) {
+				// Marcamos la primera unidad de cada nivel para el Roadmap
+				const processed = levelUnits.map((u, idx) => ({
+					...u,
+					jlptLevel: lvl,
+					isLevelStart: idx === 0
+				}));
+				units = [...units, ...processed];
+			}
+		});
+		
+		return units;
+	});
+
+	$effect(() => {
+		if (activeLevel && viewMode === 'roadmap') {
+			const pill = document.querySelector(`.level-pill[data-level-pill="${activeLevel}"]`);
+			const container = document.querySelector('.level-scroller');
+			if (pill && container) {
+				pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+			}
+		}
+	});
 </script>
 
 {#if !data.user}
 	<Landing decks={data.decks} />
 {:else}
 	<div
-		style="max-width:800px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+		style="max-width:800px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 	>
 		<!-- Header -->
 		<div use:fadeUp={{ delay: 0, y: 10 }} class="dash-header">
@@ -158,6 +179,7 @@
 					onclick={() => viewMode = 'roadmap'}
 					class="level-pill"
 					class:active={viewMode === 'roadmap'}
+					data-level-pill="Roadmap"
 				>
 					Roadmap
 				</button>
@@ -170,10 +192,23 @@
 					<button
 						onclick={() => {
 							activeLevel = level;
-							viewMode = 'grid';
+							if (viewMode === 'roadmap') {
+								const el = document.querySelector(`[data-level-section="${level}"]`);
+								if (el) {
+									const offset = 80;
+									const bodyRect = document.body.getBoundingClientRect().top;
+									const elementRect = el.getBoundingClientRect().top;
+									const elementPosition = elementRect - bodyRect;
+									const offsetPosition = elementPosition - offset;
+									window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+								}
+							} else {
+								viewMode = 'grid';
+							}
 						}}
 						class="level-pill"
-						class:active={viewMode === 'grid' && activeLevel === level}
+						class:active={(viewMode === 'grid' || viewMode === 'roadmap') && activeLevel === level}
+						data-level-pill={level}
 					>
 						{level}
 					</button>
@@ -193,6 +228,10 @@
 					decks={data.decks} 
 					units={allUnits} 
 					lessonProgress={data.lessonProgress}
+					bind:activeLevel
+					onLevelChange={(lvl) => {
+						if (viewMode === 'roadmap') activeLevel = lvl;
+					}}
 				/>
 			</div>
 
