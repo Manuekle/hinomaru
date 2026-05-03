@@ -19,6 +19,8 @@
 	const correct = $derived(Number($page.url.searchParams.get('correct') ?? 0));
 	const total = $derived(Number($page.url.searchParams.get('total') ?? 0));
 	const mode = $derived($page.url.searchParams.get('mode') ?? '');
+	const fromRoadmap = $derived($page.url.searchParams.get('fromRoadmap') === 'true');
+	const lessonId = $derived($page.url.searchParams.get('lessonId') ?? '');
 	const pct = $derived(total > 0 ? Math.round((correct / total) * 100) : 0);
 
 	const message = $derived(
@@ -108,13 +110,15 @@
 		</div>
 
 		<StickyFooter>
-			{#if mode && data?.deck?.id}
-				<a href={`/deck/${data.deck.id}/${mode}`} class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg">
+			{#if mode && (lessonId || data?.deck?.id)}
+				{@const retryUrl = fromRoadmap ? `/learning/${lessonId}` : `/deck/${data.deck.id}/${mode}`}
+				<a href={retryUrl} class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg">
 					{t('session.again', $locale)}
 				</a>
 			{/if}
+			
 			<a href="/" class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg summary-back-btn">
-				{t('summary.back', $locale)}
+				{fromRoadmap ? t('summary.back', $locale) : t('summary.back', $locale)}
 			</a>
 		</StickyFooter>
 	</div>

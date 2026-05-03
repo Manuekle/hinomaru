@@ -44,27 +44,46 @@ interface BasicUnit {
 }
 
 function build(u: BasicUnit): RoadmapUnit {
-	const lessons: Lesson[] = u.decks.map((d) => ({
-		id: `${u.id}__${d.id}__learn`,
-		type: 'learn',
-		deckId: d.id,
-		title_es: d.title_es,
-		title_en: d.title_en,
-		goal_es: d.goal_es ?? `Aprende ${d.title_es.toLowerCase()}`,
-		goal_en: d.goal_en ?? `Learn ${d.title_en.toLowerCase()}`
-	}));
-	if (u.includeQuiz !== false && u.decks.length >= 1) {
-		const last = u.decks[u.decks.length - 1];
-		lessons.push({
-			id: `${u.id}__quiz`,
+	const primaryDeck = u.decks[0];
+	const lessons: Lesson[] = [
+		{
+			id: `${u.id}__learn`,
+			type: 'learn',
+			deckId: primaryDeck.id,
+			title_es: `Aprender: ${primaryDeck.title_es}`,
+			title_en: `Learn: ${primaryDeck.title_en}`,
+			goal_es: 'Introducción al vocabulario esencial.',
+			goal_en: 'Introduction to essential vocabulary.'
+		},
+		{
+			id: `${u.id}__practice`,
 			type: 'quiz',
-			deckId: last.id,
-			title_es: `Quiz: ${u.title_es}`,
-			title_en: `Quiz: ${u.title_en}`,
-			goal_es: 'Pon a prueba lo aprendido en esta unidad.',
-			goal_en: 'Test what you learned in this unit.'
-		});
-	}
+			deckId: primaryDeck.id,
+			title_es: `Práctica: ${u.title_es}`,
+			title_en: `Practice: ${u.title_en}`,
+			goal_es: 'Refuerza lo aprendido con ejercicios.',
+			goal_en: 'Reinforce what you learned with exercises.'
+		},
+		{
+			id: `${u.id}__speak`,
+			type: 'speak',
+			deckId: primaryDeck.id,
+			title_es: `Hablar: ${u.title_es}`,
+			title_en: `Speak: ${u.title_en}`,
+			goal_es: 'Mejora tu pronunciación y fluidez.',
+			goal_en: 'Improve your pronunciation and fluency.'
+		},
+		{
+			id: `${u.id}__mastery`,
+			type: 'quiz',
+			deckId: primaryDeck.id,
+			title_es: `Maestría: ${u.title_es}`,
+			title_en: `Mastery: ${u.title_en}`,
+			goal_es: 'Demuestra tu dominio total del tema.',
+			goal_en: 'Demonstrate your total mastery of the topic.'
+		}
+	];
+
 	return {
 		id: u.id,
 		section_en: u.section_en,

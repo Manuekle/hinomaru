@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+	import { quintOut, cubicOut } from 'svelte/easing';
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
-	import { LockIcon, Tick01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+	import { LockIcon, Tick01Icon, ArrowRight01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import type { RoadmapUnit, Lesson } from '$lib/data/roadmap';
 
 	interface Props {
@@ -18,7 +18,13 @@
 		onLevelChange?: (level: string) => void;
 	}
 
-	let { units = [], decks = [], lessonProgress = [], activeLevel = $bindable(), onLevelChange }: Props = $props();
+	let {
+		units = [],
+		decks = [],
+		lessonProgress = [],
+		activeLevel = $bindable(),
+		onLevelChange
+	}: Props = $props();
 
 	let activeUnitId = $state<string | null>(null);
 
@@ -162,7 +168,7 @@
 		let lastLevel = '';
 		const handleScroll = () => {
 			if (!units.length) return;
-			
+
 			const nodes = document.querySelectorAll('.node-anchor');
 			let closestUnitId = '';
 			let minDistance = Infinity;
@@ -176,7 +182,7 @@
 				}
 			});
 
-			const unit = units.find(u => u.id === closestUnitId);
+			const unit = units.find((u) => u.id === closestUnitId);
 			if (unit && unit.id !== currentUnit?.id) {
 				currentUnit = unit;
 				// Solo avisamos si el nivel JLPT realmente ha cambiado para evitar ruido
@@ -199,8 +205,8 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div 
-	class="roadmap-wrapper" 
+<div
+	class="roadmap-wrapper"
 	onclick={(e) => {
 		if (e.target === e.currentTarget) activeUnitId = null;
 	}}
@@ -210,28 +216,40 @@
 			<p>{t('home.empty', $locale)}</p>
 		</div>
 	{:else}
-			<div class="roadmap-container" style="height: {totalHeight}px">
-				<!-- Sticky Topic Card -->
-				{#if currentUnit}
-					<div class="topic-card-wrapper">
-						{#key currentUnit.id}
-							<div 
-								class="topic-card" 
-								in:fly={{ y: -10, duration: 400, easing: cubicOut }}
-								style="--accent: {levelColors[currentUnit.jlptLevel]}"
-							>
-								<div class="topic-icon">{currentUnit.emoji}</div>
-								<div class="topic-info">
-									<div class="topic-lvl">{$locale === 'es' ? currentUnit.section_es : currentUnit.section_en}</div>
-									<div class="topic-title">{$locale === 'es' ? currentUnit.title_es : currentUnit.title_en}</div>
+		{#if activeUnitId}
+			<div
+				class="popover-backdrop"
+				onclick={() => (activeUnitId = null)}
+				in:fade={{ duration: 200 }}
+				out:fade={{ duration: 150 }}
+			></div>
+		{/if}
+		<div class="roadmap-container" style="height: {totalHeight}px">
+			<!-- Sticky Topic Card -->
+			{#if currentUnit}
+				<div class="topic-card-wrapper">
+					{#key currentUnit.id}
+						<div
+							class="topic-card"
+							in:fly={{ y: -10, duration: 400, easing: cubicOut }}
+							style="--accent: {levelColors[currentUnit.jlptLevel]}"
+						>
+							<div class="topic-icon">{currentUnit.emoji}</div>
+							<div class="topic-info">
+								<div class="topic-lvl">
+									{$locale === 'es' ? currentUnit.section_es : currentUnit.section_en}
+								</div>
+								<div class="topic-title">
+									{$locale === 'es' ? currentUnit.title_es : currentUnit.title_en}
 								</div>
 							</div>
-						{/key}
-					</div>
-				{/if}
+						</div>
+					{/key}
+				</div>
+			{/if}
 
-				<!-- SVG Path -->
-				<svg class="roadmap-svg" viewBox="0 0 100 {totalHeight}" preserveAspectRatio="none">
+			<!-- SVG Path -->
+			<svg class="roadmap-svg" viewBox="0 0 100 {totalHeight}" preserveAspectRatio="none">
 				<defs>
 					<linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
 						<stop offset="0%" stop-color="var(--rm-accent)" stop-opacity="0.6" />
@@ -250,13 +268,12 @@
 				{@const pos = nodeCoords[i]}
 				{@const isActive = activeUnitId === unit.id}
 
-				<div 
-					class="node-anchor" 
-					class:is-active={isActive} 
-					style="left: {pos.x}%; top: {pos.y}px;"
+				<div
+					class="node-anchor"
+					class:is-active={isActive}
+					style="left: {pos.x}%; top: {pos.y}px; --node-accent: {levelColors[unit.jlptLevel]};"
 					data-id={unit.id}
 				>
-
 					<button
 						class="node-circle"
 						class:is-locked={state === 'locked'}
@@ -267,47 +284,53 @@
 						disabled={state === 'locked'}
 						use:fadeUp={{ delay: Math.min(i * 0.04, 0.4), y: 15 }}
 					>
-						<!-- Progress Ring -->
+						<!-- Progress Ring (Segmented) -->
 						<svg class="progress-ring" viewBox="0 0 100 100">
-							<circle class="ring-track" cx="50" cy="50" r="46" />
-							<circle
-								class="ring-fill"
-								cx="50"
-								cy="50"
-								r="46"
-								style="stroke-dasharray: {(progress / 100) * 289}, 289"
-							/>
+							{#each unit.lessons as lesson, idx}
+								{@const lProg = lessonCompleted(lesson)}
+								{@const segmentTotal = 289 / (unit.lessons.length || 1)}
+								{@const gap = 8}
+								<circle
+									class="ring-segment"
+									class:is-active={lProg}
+									cx="50"
+									cy="50"
+									r="46"
+									style:stroke-dasharray="{segmentTotal - gap} 289"
+									style:stroke-dashoffset={-idx * segmentTotal + gap / 2}
+								/>
+							{/each}
 						</svg>
-
 						<div class="node-content">
 							<span class="node-emoji">{unit.emoji}</span>
-							{#if state === 'locked'}
-								<div class="node-badge lock"><Icon icon={LockIcon} size={14} color="#fff" /></div>
-							{:else if state === 'completed'}
-								<div class="node-badge check"><Icon icon={Tick01Icon} size={14} color="#fff" /></div>
-							{/if}
 						</div>
 					</button>
 
 					<!-- Popover -->
 					{#if isActive}
 						{@const shift = pos.x < 30 ? -20 : pos.x > 70 ? -80 : -50}
-						<div 
-							class="unit-popover-wrapper" 
-							style="transform: translateX({shift}%);"
-						>
-							<div 
-								class="unit-popover" 
+						<div class="unit-popover-wrapper" style="transform: translateX({shift}%);">
+							<div
+								class="unit-popover"
 								in:fly={{ y: 8, duration: 450, easing: quintOut }}
 								out:fade={{ duration: 200 }}
 							>
 								<div class="popover-content">
 									<div class="popover-header">
-										<div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:4px;">
+										<div class="header-top-row">
 											<span class="unit-tag">Unit {i + 1}</span>
+											<button class="popover-close" onclick={() => (activeUnitId = null)}>
+												<Icon icon={Cancel01Icon} size={18} />
+											</button>
+										</div>
+										<div
+											style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:4px;"
+										>
 											<span class="level-mini-tag">{unit.jlptLevel}</span>
 										</div>
-										<h3 class="popover-title">{$locale === 'es' ? unit.title_es : unit.title_en}</h3>
+										<h3 class="popover-title">
+											{$locale === 'es' ? unit.title_es : unit.title_en}
+										</h3>
 									</div>
 									<p class="popover-desc">
 										{$locale === 'es' ? unit.objective_es : unit.objective_en}
@@ -323,7 +346,7 @@
 											<span>Grammar</span>
 										</div>
 									</div>
-									
+
 									<div class="popover-stats">
 										<div class="stat-item">
 											<span class="stat-val">{progress}%</span>
@@ -334,7 +357,10 @@
 											<span class="stat-lbl">{$locale === 'es' ? 'Lecciones' : 'Lessons'}</span>
 										</div>
 									</div>
-									<button class="hm-btn hm-btn-primary hm-btn-sm hm-btn-full" onclick={() => handleContinue(unit)}>
+									<button
+										class="hm-btn hm-btn-primary hm-btn-sm hm-btn-full"
+										onclick={() => handleContinue(unit)}
+									>
 										<span>{$locale === 'es' ? 'Continuar' : 'Continue'}</span>
 										<Icon icon={ArrowRight01Icon} size={18} />
 									</button>
@@ -358,15 +384,17 @@
 		--rm-border: var(--ink-200);
 		--rm-shadow: var(--shadow-lg);
 		--rm-path: var(--ink-200);
+		--rm-complete-stroke: var(--ink-900);
 	}
 
 	[data-theme='dark'] {
 		--rm-bg: var(--bg-surface);
 		--rm-text: var(--fg-primary);
 		--rm-muted: var(--fg-secondary);
-		--rm-border: var(--ink-300);
-		--rm-shadow: var(--shadow-lg);
-		--rm-path: rgba(255, 255, 255, 0.15);
+		--rm-border: var(--ink-700);
+		--rm-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+		--rm-path: rgba(255, 255, 255, 0.08);
+		--rm-complete-stroke: var(--bg-page);
 	}
 
 	.roadmap-wrapper {
@@ -438,6 +466,13 @@
 		z-index: 100;
 	}
 
+	.popover-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 85;
+		background: transparent;
+	}
+
 	/* Sticky Topic Indicator (Floating Top Dock) */
 	.topic-card-wrapper {
 		position: sticky;
@@ -452,7 +487,7 @@
 	}
 
 	.topic-card {
-		background: rgba(var(--bg-surface-rgb, 255, 255, 255), 0.85);
+		background: var(--bg-surface);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
 		border: 1px solid var(--rm-border);
@@ -463,7 +498,7 @@
 		justify-content: center;
 		gap: 12px;
 		pointer-events: auto;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+		box-shadow: var(--rm-shadow);
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		width: 100%;
 		max-width: 320px;
@@ -520,21 +555,38 @@
 	}
 
 	.node-circle.is-completed {
-		background: #22c55e;
-		box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+		background: var(--hinomaru-red);
+		border: none;
+		box-shadow: 0 0 25px var(--hinomaru-red-wash);
+		transform: scale(0.95);
+	}
+
+	.node-circle.is-locked {
+		background: var(--bg-muted);
+		filter: grayscale(1);
+		border: 2px dashed var(--ink-300);
+		cursor: not-allowed;
 	}
 
 	.node-circle.is-current {
+		border: 4px solid var(--node-accent);
+		box-shadow:
+			0 0 0 6px var(--bg-surface),
+			0 0 0 10px var(--node-accent);
 		animation: pulseActive 2s infinite ease-in-out;
 	}
 
 	@keyframes pulseActive {
 		0%,
 		100% {
-			box-shadow: 0 0 0 0 rgba(188, 0, 45, 0.4);
+			box-shadow:
+				0 0 0 4px var(--bg-surface),
+				0 0 0 6px var(--node-accent);
 		}
 		50% {
-			box-shadow: 0 0 0 15px rgba(188, 0, 45, 0);
+			box-shadow:
+				0 0 0 8px var(--bg-surface),
+				0 0 0 16px rgba(var(--bg-surface-rgb), 0);
 		}
 	}
 
@@ -548,18 +600,26 @@
 		pointer-events: none;
 	}
 
-	.ring-track {
+	/* Ring Track removed for real segmentation */
+
+	.ring-segment {
 		fill: none;
-		stroke: var(--rm-border);
-		stroke-width: 4;
+		stroke: var(--rm-path);
+		stroke-width: 6;
+		stroke-linecap: round;
+		transition:
+			stroke 0.3s,
+			stroke-width 0.3s;
 	}
 
-	.ring-fill {
-		fill: none;
-		stroke: var(--rm-accent);
-		stroke-width: 4;
-		stroke-linecap: round;
-		transition: stroke-dasharray 1s ease-out;
+	.ring-segment.is-active {
+		stroke: var(--node-accent);
+		stroke-width: 7;
+	}
+
+	.node-circle.is-completed .ring-segment.is-active {
+		stroke: var(--rm-complete-stroke);
+		stroke-width: 8;
 	}
 
 	.node-content {
@@ -586,7 +646,7 @@
 	}
 
 	.node-badge.check {
-		background: #22c55e;
+		background: var(--success);
 	}
 
 	/* Popover Styling */
@@ -608,6 +668,30 @@
 		box-shadow: var(--rm-shadow);
 		pointer-events: auto;
 		transform-origin: top center;
+	}
+
+	.header-top-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		margin-bottom: 4px;
+	}
+
+	.popover-close {
+		background: none;
+		border: none;
+		padding: 4px;
+		color: var(--fg-tertiary);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: color 0.2s;
+	}
+
+	.popover-close:hover {
+		color: var(--hinomaru-red);
 	}
 
 	.popover-header {
@@ -662,8 +746,12 @@
 		border-radius: 50%;
 	}
 
-	.dot.vocab { background: var(--hinomaru-red); }
-	.dot.grammar { background: #3b82f6; }
+	.dot.vocab {
+		background: var(--hinomaru-red);
+	}
+	.dot.grammar {
+		background: #3b82f6;
+	}
 
 	.level-mini-tag {
 		font-size: 10px;
