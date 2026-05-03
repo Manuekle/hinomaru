@@ -5,7 +5,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const today = new Date().toISOString().split('T')[0];
 
 	// Start all queries in parallel
-	const [decksRes, progressRes, streakRes, storyRes, wordRes, cardsRes] = await Promise.all([
+	const [decksRes, progressRes, streakRes, storyRes, wordRes, cardsRes, lessonProgressRes] = await Promise.all([
 		locals.supabase.from('decks').select('*').order('level', { ascending: true }),
 		user
 			? locals.supabase
@@ -25,7 +25,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 					.order('id')
 			: Promise.resolve({ data: [] }),
 		locals.supabase.from('daily_words').select('*').eq('publish_date', today).maybeSingle(),
-		locals.supabase.from('cards').select('deck_id')
+		locals.supabase.from('cards').select('deck_id'),
+		user
+			? locals.supabase.from('lesson_progress').select('*').eq('user_id', user.id)
+			: Promise.resolve({ data: [] })
 	]);
 
 	const decks = decksRes.data ?? [];
@@ -144,6 +147,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		todayWord,
 		wordSaved,
 		learnedToday,
-		dailyGoal
+		dailyGoal,
+		lessonProgress: lessonProgressRes.data ?? []
 	};
 };

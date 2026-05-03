@@ -28,7 +28,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Konnichiwa!',
 		example_en: 'Hello!',
 		example_es: '¡Hola!',
-		sort_order: 2
+		sort_order: 2,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'こんばんは',
@@ -39,7 +41,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Konbanwa, genki desu ka.',
 		example_en: 'Good evening, how are you?',
 		example_es: 'Buenas noches, ¿cómo estás?',
-		sort_order: 3
+		sort_order: 3,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'さようなら',
@@ -50,7 +54,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ja, sayounara.',
 		example_en: 'Well, goodbye.',
 		example_es: 'Bueno, adiós.',
-		sort_order: 4
+		sort_order: 4,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'ありがとうございます',
@@ -61,7 +67,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Arigatou gozaimasu!',
 		example_en: 'Thank you very much!',
 		example_es: '¡Muchas gracias!',
-		sort_order: 5
+		sort_order: 5,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'すみません',
@@ -72,7 +80,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Sumimasen, doko desu ka.',
 		example_en: 'Excuse me, where is it?',
 		example_es: 'Disculpe, ¿dónde está?',
-		sort_order: 6
+		sort_order: 6,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'いいえ',
@@ -83,7 +93,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Iie, wakarimasen.',
 		example_en: "No, I don't understand.",
 		example_es: 'No, no entiendo.',
-		sort_order: 7
+		sort_order: 7,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'はい',
@@ -94,7 +106,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Hai, sou desu.',
 		example_en: 'Yes, that is right.',
 		example_es: 'Sí, eso es correcto.',
-		sort_order: 8
+		sort_order: 8,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'いただきます',
@@ -105,7 +119,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Itadakimasu!',
 		example_en: "Let's eat! (said before meals)",
 		example_es: '¡Buen provecho! (antes de comer)',
-		sort_order: 9
+		sort_order: 9,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 	{
 		jp: 'ごちそうさまでした',
@@ -116,7 +132,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Gochisōsama deshi ta!',
 		example_en: 'Thank you for the meal!',
 		example_es: '¡Gracias por la comida!',
-		sort_order: 10
+		sort_order: 10,
+		category: 'Greetings',
+		category_es: 'Saludos'
 	},
 
 	// ── Pronombres / Pronouns ────────────────────────────────────────────────
@@ -144,7 +162,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Anata no namae wa?',
 		example_en: 'What is your name?',
 		example_es: '¿Cuál es tu nombre?',
-		sort_order: 12
+		sort_order: 12,
+		category: 'Pronouns',
+		category_es: 'Pronombres'
 	},
 	{
 		jp: 'かれ',
@@ -155,7 +175,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kare wa sensei desu.',
 		example_en: 'He is a teacher.',
 		example_es: 'Él es profesor.',
-		sort_order: 13
+		sort_order: 13,
+		category: 'Pronouns',
+		category_es: 'Pronombres'
 	},
 	{
 		jp: 'かのじょ',
@@ -166,7 +188,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kano ji yoha isha desu.',
 		example_en: 'She is a doctor.',
 		example_es: 'Ella es médica.',
-		sort_order: 14
+		sort_order: 14,
+		category: 'Pronouns',
+		category_es: 'Pronombres'
 	},
 	{
 		jp: 'わたしたち',
@@ -177,7 +201,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Watashi tachi wa nihongo o benkyō shi masu.',
 		example_en: 'We study Japanese.',
 		example_es: 'Nosotros estudiamos japonés.',
-		sort_order: 15
+		sort_order: 15,
+		category: 'Pronouns',
+		category_es: 'Pronombres'
 	},
 
 	// ── Palabras de pregunta / Question words ────────────────────────────────
@@ -387,7 +413,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ro kuji desu.',
 		example_en: "It's six o'clock.",
 		example_es: 'Son las seis.',
-		sort_order: 29
+		sort_order: 29,
+		category: 'Numbers',
+		category_es: 'Números'
 	},
 	{
 		jp: 'なな / しち',
@@ -398,7 +426,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Na na jū en desu.',
 		example_en: 'It is 70 yen.',
 		example_es: 'Son 70 yenes.',
-		sort_order: 30
+		sort_order: 30,
+		category: 'Numbers',
+		category_es: 'Números'
 	},
 	{
 		jp: 'はち',
@@ -409,7 +439,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Hatsu pyaku en desu.',
 		example_en: 'It is 800 yen.',
 		example_es: 'Son 800 yenes.',
-		sort_order: 31
+		sort_order: 31,
+		category: 'Numbers',
+		category_es: 'Números'
 	},
 	{
 		jp: 'きゅう / く',
@@ -420,7 +452,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kyūji desu.',
 		example_en: "It's nine o'clock.",
 		example_es: 'Son las nueve.',
-		sort_order: 32
+		sort_order: 32,
+		category: 'Numbers',
+		category_es: 'Números'
 	},
 	{
 		jp: 'じゅう',
@@ -431,7 +465,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Jutsu pummatte.',
 		example_en: 'Wait 10 minutes.',
 		example_es: 'Espera 10 minutos.',
-		sort_order: 33
+		sort_order: 33,
+		category: 'Numbers',
+		category_es: 'Números'
 	},
 
 	// ── Tiempo / Time ────────────────────────────────────────────────────────
@@ -1104,21 +1140,6 @@ export const vocabulary: CardData[] = [
 		sort_order: 83
 	},
 	{
-		jp: 'さかな',
-		romaji: 'sakana',
-		en: 'fish',
-		es: 'pez',
-		example: 'きんぎょはさかなです。',
-		example_romaji: 'Kin gyo wa sakana desu.',
-		example_en: 'A goldfish is a fish.',
-		example_es: 'Un pez dorado es un pez.',
-		category: 'Animals',
-		category_es: 'Animales',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 84
-	},
-	{
 		jp: 'うま',
 		romaji: 'uma',
 		en: 'horse',
@@ -1628,7 +1649,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kaisha de hataraki masu.',
 		example_en: 'I work at a company.',
 		example_es: 'Trabajo en una empresa.',
-		sort_order: 102
+		sort_order: 102,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'べんきょうする',
@@ -1639,7 +1662,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Nihongo o benkyō shi masu.',
 		example_en: 'I study Japanese.',
 		example_es: 'Estudio japonés.',
-		sort_order: 103
+		sort_order: 103,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'わかる',
@@ -1650,7 +1675,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ni hon go ga wakari masu.',
 		example_en: 'I understand Japanese.',
 		example_es: 'Entiendo japonés.',
-		sort_order: 104
+		sort_order: 104,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'ある',
@@ -1661,7 +1688,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Hon ga ari masu.',
 		example_en: 'There is a book.',
 		example_es: 'Hay un libro.',
-		sort_order: 105
+		sort_order: 105,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'いる',
@@ -1672,7 +1701,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Neko ga i masu.',
 		example_en: 'There is a cat.',
 		example_es: 'Hay un gato.',
-		sort_order: 106
+		sort_order: 106,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'あう',
@@ -1683,7 +1714,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Tomodachi ni ai masu.',
 		example_en: 'I meet a friend.',
 		example_es: 'Me encuentro con un amigo.',
-		sort_order: 107
+		sort_order: 107,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'おしえる',
@@ -1694,7 +1727,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Nihongo o oshie masu.',
 		example_en: 'I teach Japanese.',
 		example_es: 'Enseño japonés.',
-		sort_order: 108
+		sort_order: 108,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 	{
 		jp: 'きる',
@@ -1705,7 +1740,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Shatsu o ki masu.',
 		example_en: 'I put on a shirt.',
 		example_es: 'Me pongo una camisa.',
-		sort_order: 109
+		sort_order: 109,
+		category: 'Verbs',
+		category_es: 'Verbos'
 	},
 
 	// ── Adjetivos / Adjectives ───────────────────────────────────────────────
@@ -1718,7 +1755,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ōkii ie desu.',
 		example_en: 'It is a big house.',
 		example_es: 'Es una casa grande.',
-		sort_order: 110
+		sort_order: 110,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'ちいさい',
@@ -1729,7 +1768,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Chīsai neko desu.',
 		example_en: 'It is a small cat.',
 		example_es: 'Es un gato pequeño.',
-		sort_order: 111
+		sort_order: 111,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'あたらしい',
@@ -1740,7 +1781,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Atarashii kuruma desu.',
 		example_en: 'It is a new car.',
 		example_es: 'Es un coche nuevo.',
-		sort_order: 112
+		sort_order: 112,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'ふるい',
@@ -1751,7 +1794,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Furui hon desu.',
 		example_en: 'It is an old book.',
 		example_es: 'Es un libro viejo.',
-		sort_order: 113
+		sort_order: 113,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'たかい',
@@ -1762,7 +1807,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kono kaban wa takai desu.',
 		example_en: 'This bag is expensive.',
 		example_es: 'Esta bolsa es cara.',
-		sort_order: 114
+		sort_order: 114,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'やすい',
@@ -1773,7 +1820,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kono mise wa yasui desu.',
 		example_en: 'This store is cheap.',
 		example_es: 'Esta tienda es barata.',
-		sort_order: 115
+		sort_order: 115,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'あつい',
@@ -1784,7 +1833,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Natsu wa atsui desu.',
 		example_en: 'Summer is hot.',
 		example_es: 'El verano es caluroso.',
-		sort_order: 116
+		sort_order: 116,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'さむい',
@@ -1795,7 +1846,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Fuyu wa samui desu.',
 		example_en: 'Winter is cold.',
 		example_es: 'El invierno es frío.',
-		sort_order: 117
+		sort_order: 117,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'つめたい',
@@ -1806,7 +1859,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Mi zu ga tsumetai desu.',
 		example_en: 'The water is cold.',
 		example_es: 'El agua está fría.',
-		sort_order: 118
+		sort_order: 118,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'おいしい',
@@ -1817,7 +1872,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kono rāmen wa oishii desu.',
 		example_en: 'This ramen is delicious.',
 		example_es: 'Este ramen está delicioso.',
-		sort_order: 119
+		sort_order: 119,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'いい / よい',
@@ -1828,7 +1885,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ii tenki desu.',
 		example_en: 'The weather is good.',
 		example_es: 'El tiempo es bueno.',
-		sort_order: 120
+		sort_order: 120,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'わるい',
@@ -1839,7 +1898,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Tenki ga warui desu.',
 		example_en: 'The weather is bad.',
 		example_es: 'El tiempo es malo.',
-		sort_order: 121
+		sort_order: 121,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'むずかしい',
@@ -1850,7 +1911,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Nihongo wa muzukashii desu.',
 		example_en: 'Japanese is difficult.',
 		example_es: 'El japonés es difícil.',
-		sort_order: 122
+		sort_order: 122,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'やさしい',
@@ -1861,7 +1924,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kono mon dai wa yasashii desu.',
 		example_en: 'This problem is easy.',
 		example_es: 'Este problema es fácil.',
-		sort_order: 123
+		sort_order: 123,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'おもしろい',
@@ -1872,7 +1937,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kono hon wa omoshiroi desu.',
 		example_en: 'This book is interesting.',
 		example_es: 'Este libro es interesante.',
-		sort_order: 124
+		sort_order: 124,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'すき (な)',
@@ -1883,7 +1950,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Sushi ga suki desu.',
 		example_en: 'I like sushi.',
 		example_es: 'Me gusta el sushi.',
-		sort_order: 125
+		sort_order: 125,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'きらい (な)',
@@ -1894,7 +1963,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Mushi ga kirai desu.',
 		example_en: 'I dislike insects.',
 		example_es: 'No me gustan los insectos.',
-		sort_order: 126
+		sort_order: 126,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'げんき (な)',
@@ -1905,7 +1976,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Genki desu ka.',
 		example_en: 'Are you well?',
 		example_es: '¿Estás bien?',
-		sort_order: 127
+		sort_order: 127,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'しずか (な)',
@@ -1916,7 +1989,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kono heya wa shizuka desu.',
 		example_en: 'This room is quiet.',
 		example_es: 'Esta habitación es tranquila.',
-		sort_order: 128
+		sort_order: 128,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 	{
 		jp: 'にぎやか (な)',
@@ -1927,7 +2002,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Machi ga nigiyaka desu.',
 		example_en: 'The town is lively.',
 		example_es: 'La ciudad está animada.',
-		sort_order: 129
+		sort_order: 129,
+		category: 'Adjectives',
+		category_es: 'Adjetivos'
 	},
 
 	// ── Naturaleza / Nature ──────────────────────────────────────────────────
@@ -1940,7 +2017,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Yama ni nobori masu.',
 		example_en: 'I climb the mountain.',
 		example_es: 'Subo la montaña.',
-		sort_order: 130
+		sort_order: 130,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'かわ',
@@ -1951,7 +2030,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ka wa wa nagai desu.',
 		example_en: 'The river is long.',
 		example_es: 'El río es largo.',
-		sort_order: 131
+		sort_order: 131,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'うみ',
@@ -1962,7 +2043,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Umi de oyogi masu.',
 		example_en: 'I swim in the sea.',
 		example_es: 'Nado en el mar.',
-		sort_order: 132
+		sort_order: 132,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'そら',
@@ -1973,7 +2056,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Sora ga aoi desu.',
 		example_en: 'The sky is blue.',
 		example_es: 'El cielo es azul.',
-		sort_order: 133
+		sort_order: 133,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'あめ',
@@ -1984,7 +2069,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Ame ga furi masu.',
 		example_en: 'It rains.',
 		example_es: 'Llueve.',
-		sort_order: 134
+		sort_order: 134,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'ゆき',
@@ -1995,7 +2082,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Yuki ga furi masu.',
 		example_en: 'It snows.',
 		example_es: 'Nieva.',
-		sort_order: 135
+		sort_order: 135,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'はな',
@@ -2006,7 +2095,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Hana ga kirei desu.',
 		example_en: 'The flowers are beautiful.',
 		example_es: 'Las flores son hermosas.',
-		sort_order: 136
+		sort_order: 136,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 	{
 		jp: 'さくら',
@@ -2017,7 +2108,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Sakura ga saki masu.',
 		example_en: 'The cherry blossoms bloom.',
 		example_es: 'Florecen los cerezos.',
-		sort_order: 137
+		sort_order: 137,
+		category: 'Nature',
+		category_es: 'Naturaleza'
 	},
 
 	// ── Objetos / Objects ────────────────────────────────────────────────────
@@ -2030,7 +2123,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Hon o yomi masu.',
 		example_en: 'I read a book.',
 		example_es: 'Leo un libro.',
-		sort_order: 138
+		sort_order: 138,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'でんわ',
@@ -2041,7 +2136,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Denwa o shi masu.',
 		example_en: 'I make a phone call.',
 		example_es: 'Hago una llamada.',
-		sort_order: 139
+		sort_order: 139,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'けいたい',
@@ -2052,7 +2149,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kei tai ga ari masu.',
 		example_en: 'I have a cell phone.',
 		example_es: 'Tengo un celular.',
-		sort_order: 140
+		sort_order: 140,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'テレビ',
@@ -2063,7 +2162,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Terebi o mi masu.',
 		example_en: 'I watch television.',
 		example_es: 'Veo la televisión.',
-		sort_order: 141
+		sort_order: 141,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'かさ',
@@ -2074,7 +2175,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kasa o kashi masu.',
 		example_en: 'I lend an umbrella.',
 		example_es: 'Presto un paraguas.',
-		sort_order: 142
+		sort_order: 142,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'とけい',
@@ -2085,7 +2188,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Tokei o kai mashi ta.',
 		example_en: 'I bought a watch.',
 		example_es: 'Compré un reloj.',
-		sort_order: 143
+		sort_order: 143,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'おかね',
@@ -2096,7 +2201,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'O kane ga ari mase n.',
 		example_en: "I don't have money.",
 		example_es: 'No tengo dinero.',
-		sort_order: 144
+		sort_order: 144,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 	{
 		jp: 'かばん',
@@ -2107,7 +2214,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Kaban ni hon ga ari masu.',
 		example_en: 'There is a book in the bag.',
 		example_es: 'Hay un libro en la bolsa.',
-		sort_order: 145
+		sort_order: 145,
+		category: 'Objects',
+		category_es: 'Objetos'
 	},
 
 	// ── Estaciones / Seasons ─────────────────────────────────────────────────
@@ -2120,7 +2229,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Haru ga suki desu.',
 		example_en: 'I like spring.',
 		example_es: 'Me gusta la primavera.',
-		sort_order: 146
+		sort_order: 146,
+		category: 'Seasons',
+		category_es: 'Estaciones'
 	},
 	{
 		jp: 'なつ',
@@ -2131,7 +2242,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Natsu wa atsui desu.',
 		example_en: 'Summer is hot.',
 		example_es: 'El verano es caluroso.',
-		sort_order: 147
+		sort_order: 147,
+		category: 'Seasons',
+		category_es: 'Estaciones'
 	},
 	{
 		jp: 'あき',
@@ -2142,7 +2255,9 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Aki ni kōyō o mi masu.',
 		example_en: 'I view autumn leaves in fall.',
 		example_es: 'Veo las hojas de otoño en el otoño.',
-		sort_order: 148
+		sort_order: 148,
+		category: 'Seasons',
+		category_es: 'Estaciones'
 	},
 	{
 		jp: 'ふゆ',
@@ -2153,84 +2268,11 @@ export const vocabulary: CardData[] = [
 		example_romaji: 'Fuyu wa samui desu.',
 		example_en: 'Winter is cold.',
 		example_es: 'El invierno es frío.',
-		sort_order: 149
+		sort_order: 149,
+		category: 'Seasons',
+		category_es: 'Estaciones'
 	},
 	// ── Naturaleza / Nature ──────────────────────────────────────────────────
-	{
-		jp: 'やま',
-		romaji: 'yama',
-		en: 'mountain',
-		es: 'montaña',
-		example: 'ふじさんはたかいやまです。',
-		example_romaji: 'Fuji san wa takai yama desu.',
-		example_en: 'Mt. Fuji is a tall mountain.',
-		example_es: 'El monte Fuji es una montaña alta.',
-		category: 'Nature',
-		category_es: 'Naturaleza',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 87
-	},
-	{
-		jp: 'かわ',
-		romaji: 'kawa',
-		en: 'river',
-		es: 'río',
-		example: 'かわでおよぎます。',
-		example_romaji: 'Ka wa de oyogi masu.',
-		example_en: 'I swim in the river.',
-		example_es: 'Nado en el río.',
-		category: 'Nature',
-		category_es: 'Naturaleza',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 88
-	},
-	{
-		jp: 'うみ',
-		romaji: 'umi',
-		en: 'sea / ocean',
-		es: 'mar / océano',
-		example: 'うみはあおいです。',
-		example_romaji: 'Umi wa aoi desu.',
-		example_en: 'The sea is blue.',
-		example_es: 'El mar es azul.',
-		category: 'Nature',
-		category_es: 'Naturaleza',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 89
-	},
-	{
-		jp: 'そら',
-		romaji: 'sora',
-		en: 'sky',
-		es: 'cielo',
-		example: 'そらをとびたいです。',
-		example_romaji: 'Sora o tobi tai desu.',
-		example_en: 'I want to fly in the sky.',
-		example_es: 'Quiero volar en el cielo.',
-		category: 'Nature',
-		category_es: 'Naturaleza',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 90
-	},
-	{
-		jp: 'あめ',
-		romaji: 'ame',
-		en: 'rain',
-		es: 'lluvia',
-		example: 'あめがふっています。',
-		example_romaji: 'Ame ga futte i masu.',
-		example_en: "It's raining.",
-		example_es: 'Está lloviendo.',
-		category: 'Nature',
-		category_es: 'Naturaleza',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 91
-	},
 
 	// ── Cuerpo / Body ────────────────────────────────────────────────────────
 	{
@@ -2431,21 +2473,6 @@ export const vocabulary: CardData[] = [
 		sort_order: 104
 	},
 	{
-		jp: 'あめ',
-		romaji: 'ame',
-		en: 'rain',
-		es: 'lluvia',
-		example: 'あめがふっています。',
-		example_romaji: 'Ame ga futte i masu.',
-		example_en: 'It is raining.',
-		example_es: 'Está lloviendo.',
-		category: 'Weather',
-		category_es: 'Clima',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 105
-	},
-	{
 		jp: 'はれ',
 		romaji: 'hare',
 		en: 'sunny weather',
@@ -2460,95 +2487,5 @@ export const vocabulary: CardData[] = [
 		pos_es: 'sustantivo',
 		sort_order: 106
 	},
-	{
-		jp: 'ゆき',
-		romaji: 'yuki',
-		en: 'snow',
-		es: 'nieve',
-		example: 'ゆきがふりはじめました。',
-		example_romaji: 'Yuki ga furihajime mashi ta.',
-		example_en: 'It started to snow.',
-		example_es: 'Empezó a nevar.',
-		category: 'Weather',
-		category_es: 'Clima',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 107
-	},
 	// ── Colores / Colors ─────────────────────────────────────────────────────
-	{
-		jp: 'あか',
-		romaji: 'aka',
-		en: 'red',
-		es: 'rojo',
-		example: 'あかいはながさいています。',
-		example_romaji: 'Akai wa nagasa i te i masu.',
-		example_en: 'Red flowers are blooming.',
-		example_es: 'Están floreciendo flores rojas.',
-		category: 'Colors',
-		category_es: 'Colores',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 108
-	},
-	{
-		jp: 'あお',
-		romaji: 'ao',
-		en: 'blue',
-		es: 'azul',
-		example: 'あおい空がきれいです。',
-		example_romaji: 'Aoi sora ga kirei desu.',
-		example_en: 'The blue sky is beautiful.',
-		example_es: 'El cielo azul es hermoso.',
-		category: 'Colors',
-		category_es: 'Colores',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 109
-	},
-	{
-		jp: 'しろ',
-		romaji: 'shiro',
-		en: 'white',
-		es: 'blanco',
-		example: 'しろいいぬがいます。',
-		example_romaji: 'Shiroi inu ga i masu.',
-		example_en: 'There is a white dog.',
-		example_es: 'Hay un perro blanco.',
-		category: 'Colors',
-		category_es: 'Colores',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 110
-	},
-	{
-		jp: 'くろ',
-		romaji: 'kuro',
-		en: 'black',
-		es: 'negro',
-		example: 'くろいかばんをかいました。',
-		example_romaji: 'Kuroi kaban o kai mashi ta.',
-		example_en: 'I bought a black bag.',
-		example_es: 'Compré un bolso negro.',
-		category: 'Colors',
-		category_es: 'Colores',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 111
-	},
-	{
-		jp: 'きいろ',
-		romaji: 'kiiro',
-		en: 'yellow',
-		es: 'amarillo',
-		example: 'きいろいシャツをきています。',
-		example_romaji: 'Kiiroi shatsu o ki te i masu.',
-		example_en: 'I am wearing a yellow shirt.',
-		example_es: 'Llevo una camisa amarilla.',
-		category: 'Colors',
-		category_es: 'Colores',
-		pos: 'noun',
-		pos_es: 'sustantivo',
-		sort_order: 112
-	},
 ];

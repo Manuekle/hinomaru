@@ -1,305 +1,560 @@
 <script lang="ts">
+	import { fade } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
-	import { fadeUp, fadeIn } from '$lib/motion';
+	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
-	import { PlayIcon, LockIcon, Tick01Icon } from '@hugeicons/core-free-icons';
+	import { LockIcon, Tick01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+	import type { RoadmapUnit, Lesson } from '$lib/data/roadmap';
 
-	let { decks = [] } = $props();
+	// Props con Svelte 5 runes
+	const { decks = [], units = [], lessonProgress = [] } = $props();
 
-	// Define the roadmap structure (groups of decks)
-	const units = [
-		{
-			id: 'unit-1',
-			title_en: 'Foundations',
-			title_es: 'Fundamentos',
-			decks: ['n5-hiragana', 'n5-katakana']
-		},
-		{
-			id: 'unit-2',
-			title_en: 'First Contact',
-			title_es: 'Primer Contacto',
-			decks: ['n5-greetings', 'survival-intro']
-		},
-		{
-			id: 'unit-3',
-			title_en: 'Basics',
-			title_es: 'Lo Básico',
-			decks: ['n5-numbers', 'n5-family']
-		},
-		{
-			id: 'unit-4',
-			title_en: 'Daily Life',
-			title_es: 'Vida Diaria',
-			decks: ['n5-food', 'n5-colors']
-		},
-		{
-			id: 'unit-5',
-			title_en: 'The World',
-			title_es: 'El Mundo',
-			decks: ['n5-animals', 'n5-weather']
-		},
-		{
-			id: 'unit-6',
-			title_en: 'Actions',
-			title_es: 'Acciones',
-			decks: ['n5-verbs', 'n5-adjectives']
-		},
-		{
-			id: 'unit-7',
-			title_en: 'Exploration',
-			title_es: 'Exploración',
-			decks: ['n5-places', 'n5-grammar-intro']
-		}
-	];
+	let activeUnitId = $state<string | null>(null);
 
-	// Map deck IDs to full deck objects
-	const roadmapDecks = $derived(
-		units.flatMap((u) =>
-			u.decks.map((id) => {
-				const deck = decks.find((d: any) => d.id === id);
-				return { ...deck, unit: u };
-			})
-		).filter(d => d.id) // Filter out missing decks
-	);
-
-	function getOffset(index: number) {
-		const pattern = [0, 45, 75, 45, 0, -45, -75, -45];
-		return pattern[index % pattern.length];
+	// --- Lógica de Negocio ---
+	function getDeck(id: string) {
+		return decks.find((d: any) => d.id === id);
 	}
 
-	function isUnlocked(index: number, deck: any) {
-		if (index === 0) return true;
-		const prevDeck = roadmapDecks[index - 1];
-		return (prevDeck.learned ?? 0) >= (prevDeck.card_count || 1);
+	function getLessonSession(lessonId: string) {
+		return lessonProgress.find((p: any) => p.lesson_id === lessonId);
+	}
+
+	function lessonProgressCalc(l: Lesson) {
+		const session = getLessonSession(l.id);
+		if (session?.completed_at) return { learned: 100, total: 100, pct: 100 };
+
+		const d = getDeck(l.deckId);
+		if (!d || !d.card_count) return { learned: 0, total: 0, pct: 0 };
+		const learned = d.learned ?? 0;
+		return {
+			learned,
+			total: d.card_count,
+			pct: Math.min(100, Math.round((learned / d.card_count) * 100))
+		};
+	}
+
+	function lessonCompleted(l: Lesson): boolean {
+		return getLessonSession(l.id)?.completed_at || lessonProgressCalc(l).pct === 100;
+	}
+
+	function lessonAvailable(l: Lesson): boolean {
+		const d = getDeck(l.deckId);
+		return !!d && d.card_count > 0;
+	}
+
+	// Listado plano para calcular bloqueos en cascada
+	const flatLessons = $derived(
+		units.flatMap((u: RoadmapUnit) =>
+			u.lessons.filter(lessonAvailable).map((l: Lesson) => ({ ...l, unitId: u.id }))
+		)
+	);
+
+	const unlockedSet = $derived.by(() => {
+		const set = new Set<string>();
+		if (flatLessons.length === 0) return set;
+		set.add(flatLessons[0].id);
+		for (let i = 1; i < flatLessons.length; i++) {
+			if (lessonCompleted(flatLessons[i - 1])) set.add(flatLessons[i].id);
+		}
+		return set;
+	});
+
+	const currentIdx = $derived(flatLessons.findIndex((l) => !lessonCompleted(l)));
+	const currentUnitId = $derived(currentIdx !== -1 ? flatLessons[currentIdx]?.unitId : null);
+
+	function unitProgress(unit: RoadmapUnit) {
+		const valid = unit.lessons.filter(lessonAvailable);
+		if (valid.length === 0) return 0;
+		const done = valid.filter(lessonCompleted).length;
+		return Math.round((done / valid.length) * 100);
+	}
+
+	function unitState(unit: RoadmapUnit) {
+		const valid = unit.lessons.filter(lessonAvailable);
+		const allDone = valid.length > 0 && valid.every((l) => lessonCompleted(l));
+		const isCurrent = unit.id === currentUnitId;
+		const allLocked = valid.every((l) => !unlockedSet.has(l.id));
+
+		if (allDone) return 'completed';
+		if (isCurrent) return 'current';
+		if (allLocked) return 'locked';
+		return 'available';
+	}
+
+	function handleUnitClick(unit: RoadmapUnit) {
+		const state = unitState(unit);
+		if (state === 'locked') return;
+
+		if (activeUnitId === unit.id) {
+			activeUnitId = null;
+		} else {
+			activeUnitId = unit.id;
+		}
+	}
+
+	function handleContinue(unit: RoadmapUnit) {
+		const unitLessons = flatLessons.filter((l: any) => l.unitId === unit.id);
+		const next =
+			unitLessons.find((l: any) => !lessonCompleted(l)) || unitLessons[unitLessons.length - 1];
+		if (next) goto(`/learning/${next.id}`);
+	}
+
+	// Geometría del Roadmap
+	const nodeSpacing = 110;
+	const nodeXOffset = 35; // %
+
+	const nodeCoords = $derived(
+		units.map((_, i) => {
+			// Usamos -Math.cos para empezar desde la izquierda (-1), pasar por el centro (0) y llegar a la derecha (1)
+			const x = 50 + Math.sin((i * Math.PI) / 2 - Math.PI / 2) * nodeXOffset;
+			const y = i * nodeSpacing + 50;
+			return { x, y };
+		})
+	);
+
+	const pathData = $derived.by(() => {
+		if (nodeCoords.length < 2) return '';
+		let d = `M ${nodeCoords[0].x} ${nodeCoords[0].y}`;
+		for (let i = 0; i < nodeCoords.length - 1; i++) {
+			const start = nodeCoords[i];
+			const end = nodeCoords[i + 1];
+			const midY = (start.y + end.y) / 2;
+			d += ` C ${start.x} ${midY}, ${end.x} ${midY}, ${end.x} ${end.y}`;
+		}
+		return d;
+	});
+
+	const totalHeight = $derived((units.length - 1) * nodeSpacing + 100);
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') activeUnitId = null;
 	}
 </script>
 
-<div class="roadmap-container">
-	<div class="roadmap-path">
-		{#each roadmapDecks as deck, i (deck.id)}
-			{@const unlocked = isUnlocked(i, deck)}
-			{@const completed = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
-			{@const offset = getOffset(i)}
+<svelte:window onkeydown={handleKeydown} />
 
-			<div 
-				class="roadmap-node-wrap" 
-				style="transform: translateX({offset}px);"
-				use:fadeUp={{ delay: i * 0.05, y: 20 }}
-			>
-				{#if i > 0}
-					<div class="roadmap-line" class:line-active={unlocked}></div>
-				{/if}
+<div 
+	class="roadmap-wrapper" 
+	onclick={(e) => {
+		if (e.target === e.currentTarget) activeUnitId = null;
+	}}
+>
+	{#if units.length === 0}
+		<div class="empty-state" in:fade>
+			<p>{t('home.empty', $locale)}</p>
+		</div>
+	{:else}
+		<div 
+			class="roadmap-container" 
+			style="height: {totalHeight}px"
+			onclick={(e) => {
+				if (e.target === e.currentTarget) activeUnitId = null;
+			}}
+		>
+			<!-- SVG Path -->
+			<svg class="roadmap-svg" viewBox="0 0 100 {totalHeight}" preserveAspectRatio="none">
+				<defs>
+					<linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+						<stop offset="0%" stop-color="var(--rm-accent)" stop-opacity="0.6" />
+						<stop offset="50%" stop-color="var(--rm-accent)" stop-opacity="1" />
+						<stop offset="100%" stop-color="var(--rm-accent)" stop-opacity="0.6" />
+					</linearGradient>
+				</defs>
+				<path d={pathData} class="roadmap-path" />
+				<path d={pathData} class="roadmap-path-active" />
+			</svg>
 
-				<div class="node-content">
-					<a
-						href={unlocked ? `/deck/${deck.id}` : '#'}
-						class="roadmap-node"
-						class:node-locked={!unlocked}
-						class:node-completed={completed}
-						aria-label={deck.title_es}
+			<!-- Nodes -->
+			{#each units as unit, i (unit.id)}
+				{@const state = unitState(unit)}
+				{@const progress = unitProgress(unit)}
+				{@const pos = nodeCoords[i]}
+				{@const isActive = activeUnitId === unit.id}
+
+				<div class="node-anchor" class:is-active={isActive} style="left: {pos.x}%; top: {pos.y}px;">
+					<button
+						class="node-circle"
+						class:is-locked={state === 'locked'}
+						class:is-completed={state === 'completed'}
+						class:is-current={state === 'current'}
+						class:is-active={isActive}
+						onclick={() => handleUnitClick(unit)}
+						disabled={state === 'locked'}
+						use:fadeUp={{ delay: Math.min(i * 0.04, 0.4), y: 15 }}
 					>
-						<div class="node-inner">
-							{#if completed}
-								<Icon icon={Tick01Icon} size={28} color="white" variant="solid" />
-							{:else if !unlocked}
-								<Icon icon={LockIcon} size={24} color="var(--fg-tertiary)" />
-							{:else}
-								<span class="node-emoji">
-									{#if deck.id.includes('hiragana')}🇯🇵{/if}
-									{#if deck.id.includes('katakana')}🈁{/if}
-									{#if deck.id.includes('greetings')}👋{/if}
-									{#if deck.id.includes('intro')}👤{/if}
-									{#if deck.id.includes('numbers')}🔢{/if}
-									{#if deck.id.includes('family')}👨‍👩‍👧{/if}
-									{#if deck.id.includes('food')}🍜{/if}
-									{#if deck.id.includes('animals')}🐶{/if}
-									{#if deck.id.includes('colors')}🎨{/if}
-									{#if deck.id.includes('weather')}☀️{/if}
-									{#if deck.id.includes('verbs')}🏃{/if}
-									{#if deck.id.includes('adjectives')}🌟{/if}
-									{#if deck.id.includes('places')}🏫{/if}
-									{#if deck.id.includes('grammar')}📖{/if}
-								</span>
+						<!-- Progress Ring -->
+						<svg class="progress-ring" viewBox="0 0 100 100">
+							<circle class="ring-track" cx="50" cy="50" r="46" />
+							<circle
+								class="ring-fill"
+								cx="50"
+								cy="50"
+								r="46"
+								style="stroke-dasharray: {(progress / 100) * 289}, 289"
+							/>
+						</svg>
+
+						<div class="node-content">
+							<span class="node-emoji">{unit.emoji}</span>
+							{#if state === 'locked'}
+								<div class="node-badge lock"><Icon icon={LockIcon} size={14} color="#fff" /></div>
+							{:else if state === 'completed'}
+								<div class="node-badge check"><Icon icon={Tick01Icon} size={14} color="#fff" /></div>
 							{/if}
 						</div>
+					</button>
 
-						{#if unlocked && !completed}
-							<svg class="progress-ring" viewBox="0 0 100 100">
-								<circle
-									class="progress-ring-fill"
-									cx="50"
-									cy="50"
-									r="45"
-									style="stroke-dasharray: {2 * Math.PI * 45}; stroke-dashoffset: {2 * Math.PI * 45 * (1 - (deck.learned || 0) / (deck.card_count || 1))};"
-								/>
-							</svg>
-						{/if}
-					</a>
-					
-					<div class="node-label">
-						<span class="node-title">{$locale === 'es' ? deck.title_es : deck.title_en}</span>
-						{#if completed}
-							<span class="node-status">{t('home.complete', $locale)}</span>
-						{/if}
-					</div>
+					<!-- Popover -->
+					{#if isActive}
+						{@const shift = pos.x < 30 ? -20 : pos.x > 70 ? -80 : -50}
+						<div 
+							class="unit-popover-wrapper" 
+							style="transform: translateX({shift}%);"
+						>
+							<div 
+								class="unit-popover" 
+								in:fly={{ y: 8, duration: 450, easing: quintOut }}
+								out:fade={{ duration: 200 }}
+							>
+								<div class="popover-content">
+									<div class="popover-header">
+										<span class="unit-tag">Unit {i + 1}</span>
+										<h3 class="popover-title">{$locale === 'es' ? unit.title_es : unit.title_en}</h3>
+									</div>
+									<p class="popover-desc">
+										{$locale === 'es' ? unit.objective_es : unit.objective_en}
+									</p>
+									<div class="popover-stats">
+										<div class="stat-item">
+											<span class="stat-val">{progress}%</span>
+											<span class="stat-lbl">{$locale === 'es' ? 'Progreso' : 'Progress'}</span>
+										</div>
+										<div class="stat-item">
+											<span class="stat-val">{unit.lessons.length}</span>
+											<span class="stat-lbl">{$locale === 'es' ? 'Lecciones' : 'Lessons'}</span>
+										</div>
+									</div>
+									<button class="hm-btn hm-btn-primary hm-btn-sm hm-btn-full" onclick={() => handleContinue(unit)}>
+										<span>{$locale === 'es' ? 'Continuar' : 'Continue'}</span>
+										<Icon icon={ArrowRight01Icon} size={18} />
+									</button>
+								</div>
+								<div class="popover-arrow" style="left: {-shift}%"></div>
+							</div>
+						</div>
+					{/if}
 				</div>
-			</div>
-		{/each}
-	</div>
+			{/each}
+		</div>
+	{/if}
 </div>
 
 <style>
+	:root {
+		--rm-bg: var(--bg-surface);
+		--rm-accent: var(--hinomaru-red);
+		--rm-text: var(--fg-primary);
+		--rm-muted: var(--fg-secondary);
+		--rm-border: var(--ink-200);
+		--rm-shadow: var(--shadow-lg);
+		--rm-path: var(--ink-200);
+	}
+
+	[data-theme='dark'] {
+		--rm-bg: var(--bg-surface);
+		--rm-text: var(--fg-primary);
+		--rm-muted: var(--fg-secondary);
+		--rm-border: var(--ink-300);
+		--rm-shadow: var(--shadow-lg);
+		--rm-path: rgba(255, 255, 255, 0.15);
+	}
+
+	.roadmap-wrapper {
+		width: 100%;
+		max-width: 800px;
+		margin: 0 auto;
+		padding: 20px 0 40px;
+		position: relative;
+	}
+
 	.roadmap-container {
-		padding: 40px 0 120px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		overflow-x: hidden;
+		width: 100%;
+		position: relative;
+		overflow: visible;
+	}
+
+	/* SVG Path Styling */
+	.roadmap-svg {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 0;
+		overflow: visible;
 	}
 
 	.roadmap-path {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 60px;
-		width: 100%;
-		max-width: 400px;
-		position: relative;
+		fill: none;
+		stroke: var(--rm-path);
+		stroke-width: 4;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		vector-effect: non-scaling-stroke;
+		opacity: 0.8;
 	}
 
-	.roadmap-node-wrap {
-		position: relative;
-		display: flex;
-		justify-content: center;
-		width: 100%;
-		transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+	.roadmap-path-active {
+		fill: none;
+		stroke: url(#pathGradient);
+		stroke-width: 6;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-dasharray: 12 12;
+		animation: dashFlow 60s linear infinite;
+		vector-effect: non-scaling-stroke;
 	}
 
-	.roadmap-line {
-		position: absolute;
-		bottom: 100%;
-		left: 50%;
-		width: 4px;
-		height: 60px;
-		background: var(--ink-100);
-		transform: translateX(-50%);
-		z-index: 1;
-	}
-
-	.line-active {
-		background: var(--hinomaru-red);
-		opacity: 0.3;
-	}
-
-	.node-content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 12px;
-		z-index: 2;
-	}
-
-	.roadmap-node {
-		width: 92px;
-		height: 92px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		position: relative;
-		text-decoration: none;
-		transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-		background: var(--bg-surface);
-		box-shadow: 0 10px 0 var(--ink-100), var(--shadow-lg);
-	}
-
-	@media (hover: hover) {
-		.roadmap-node:hover:not(.node-locked) {
-			transform: scale(1.05) translateY(-4px);
-			box-shadow: 0 14px 0 var(--ink-100), var(--shadow-xl);
+	@keyframes dashFlow {
+		from {
+			stroke-dashoffset: 1000;
+		}
+		to {
+			stroke-dashoffset: 0;
 		}
 	}
 
-	.roadmap-node:active:not(.node-locked) {
-		transform: translateY(6px);
-		box-shadow: 0 4px 0 var(--ink-100), var(--shadow-sm);
-	}
-
-	.node-inner {
-		width: 76px;
-		height: 76px;
-		border-radius: 50%;
-		background: var(--sumi);
+	/* Node Styling */
+	.node-anchor {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		z-index: 10;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		z-index: 2;
-		color: white;
-		border: 4px solid rgba(255, 255, 255, 0.1);
 	}
 
-	.node-locked .node-inner {
+	.node-anchor.is-active {
+		z-index: 100;
+	}
+
+	.node-circle {
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		background: var(--rm-bg);
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		position: relative;
+		display: grid;
+		place-items: center;
+		transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		box-shadow: var(--rm-shadow);
+	}
+
+	.node-circle:hover:not(:disabled) {
+		transform: scale(1.1);
+		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+	}
+
+	.node-circle.is-active {
+		transform: scale(1.1);
+		border: 4px solid var(--rm-accent);
+	}
+
+	.node-circle.is-locked {
 		background: var(--ink-200);
-		box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+		color: var(--ink-400);
+		cursor: not-allowed;
+		filter: grayscale(1);
 	}
 
-	.node-completed {
-		background: #ffc107;
-		box-shadow: 0 10px 0 #d39e00, var(--shadow-lg);
-	}
-	.node-completed .node-inner {
-		background: #ffc107;
-		border-color: rgba(255, 255, 255, 0.3);
+	.node-circle.is-current {
+		animation: pulseActive 2s infinite ease-in-out;
 	}
 
-	.node-emoji {
-		font-size: 32px;
+	@keyframes pulseActive {
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(188, 0, 45, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 15px rgba(188, 0, 45, 0);
+		}
 	}
 
+	/* Progress Ring */
 	.progress-ring {
 		position: absolute;
-		inset: -6px;
-		width: 96px;
-		height: 96px;
+		inset: -8px;
+		width: calc(100% + 16px);
+		height: calc(100% + 16px);
 		transform: rotate(-90deg);
 		pointer-events: none;
 	}
 
-	.progress-ring-fill {
+	.ring-track {
 		fill: none;
-		stroke: var(--hinomaru-red);
-		stroke-width: 6;
-		stroke-linecap: round;
-		transition: stroke-dashoffset 0.5s ease;
+		stroke: var(--rm-border);
+		stroke-width: 4;
 	}
 
-	.node-label {
-		text-align: center;
+	.ring-fill {
+		fill: none;
+		stroke: var(--rm-accent);
+		stroke-width: 4;
+		stroke-linecap: round;
+		transition: stroke-dasharray 1s ease-out;
+	}
+
+	.node-content {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		display: grid;
+		place-items: center;
+		font-size: 34px;
+	}
+
+	.node-badge {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: #888;
+		display: grid;
+		place-items: center;
+		border: 3px solid var(--rm-bg);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.node-badge.check {
+		background: #22c55e;
+	}
+
+	/* Popover Styling */
+	.unit-popover-wrapper {
+		position: absolute;
+		top: 110%;
+		left: 50%;
+		width: 240px;
+		z-index: 90;
+		pointer-events: none;
+	}
+
+	.unit-popover {
+		width: 100%;
+		background: var(--rm-bg);
+		border: 1px solid var(--rm-border);
+		border-radius: 20px;
+		padding: 20px;
+		box-shadow: var(--rm-shadow);
+		pointer-events: auto;
+		transform-origin: top center;
+	}
+
+	.popover-header {
+		margin-bottom: 8px;
+	}
+
+	.unit-tag {
+		font-size: 11px;
+		font-weight: 800;
+		text-transform: uppercase;
+		color: var(--rm-muted);
+		letter-spacing: 0.1em;
+	}
+
+	.popover-title {
+		font-size: 16px;
+		font-weight: 800;
+		margin: 2px 0 0;
+		color: var(--rm-text);
+		line-height: 1.2;
+	}
+
+	.popover-desc {
+		font-size: 13px;
+		color: var(--rm-muted);
+		line-height: 1.4;
+		margin: 0 0 16px;
+	}
+
+	.popover-stats {
+		display: flex;
+		gap: 20px;
+		margin-bottom: 16px;
+		padding-top: 12px;
+		border-top: 1px solid var(--rm-border);
+	}
+
+	.stat-item {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		width: 140px;
 	}
 
-	.node-title {
+	.stat-val {
+		font-size: 16px;
 		font-weight: 800;
-		font-size: 15px;
-		color: var(--sumi);
-		letter-spacing: -0.01em;
+		color: var(--rm-text);
 	}
 
-	.node-status {
-		font-size: 11px;
+	.stat-lbl {
+		font-size: 10px;
 		font-weight: 700;
 		text-transform: uppercase;
-		color: #ffc107;
+		color: var(--rm-muted);
 		letter-spacing: 0.05em;
-		margin-top: 2px;
 	}
 
-	.node-locked {
+	.continue-btn {
+		display: none; /* Usamos las clases globales hm-btn */
+	}
+
+	.continue-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(188, 0, 45, 0.3);
+	}
+
+	.popover-arrow {
+		position: absolute;
+		top: -8px;
+		left: 50%;
+		transform: translateX(-50%) rotate(45deg);
+		width: 16px;
+		height: 16px;
+		background: var(--rm-bg);
+		border-top: 1px solid var(--rm-border);
+		border-left: 1px solid var(--rm-border);
 		pointer-events: none;
-		opacity: 0.8;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 80px 20px;
+		color: var(--rm-muted);
+	}
+
+	@media (max-width: 600px) {
+		.roadmap-wrapper {
+			max-width: 100%;
+		}
+		.node-circle {
+			width: 64px;
+			height: 64px;
+		}
+		.node-content {
+			font-size: 28px;
+		}
+		.unit-popover {
+			width: calc(100vw - 40px);
+			max-width: 320px;
+		}
 	}
 </style>

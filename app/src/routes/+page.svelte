@@ -8,6 +8,7 @@
 	import WordOfTheDay from '$lib/components/WordOfTheDay.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import Roadmap from '$lib/components/Roadmap.svelte';
+	import { ROADMAPS } from '$lib/data/roadmap';
 	import { Settings02Icon, CheckmarkCircle01Icon, Grid02Icon, RouteIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import supportImg from '$lib/assets/support.png';
@@ -34,13 +35,23 @@
 	);
 	const learnedToday = $derived(data.learnedToday ?? 0);
 	const dailyGoal = $derived(data.dailyGoal ?? 5);
+
+	// Unificamos todas las unidades del roadmap en una sola lista continua
+	const allUnits = $derived([
+		...(ROADMAPS.Survival || []),
+		...(ROADMAPS.N5 || []),
+		...(ROADMAPS.N4 || []),
+		...(ROADMAPS.N3 || []),
+		...(ROADMAPS.N2 || []),
+		...(ROADMAPS.N1 || [])
+	]);
 </script>
 
 {#if !data.user}
 	<Landing decks={data.decks} />
 {:else}
 	<div
-		style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
+		style="max-width:800px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 	>
 		<!-- Header -->
 		<div use:fadeUp={{ delay: 0, y: 10 }} class="dash-header">
@@ -136,142 +147,126 @@
 			dailyGoal={dailyGoal}
 		/>
 
-		<!-- Level tabs -->
-
+		<!-- Navigation & Filters -->
 		<div
 			use:fadeIn={{ delay: 0.18 }}
-			style="display:flex; justify-content: space-between; align-items: center; margin-top: 32px; margin-bottom: 20px;"
+			class="nav-section"
 		>
-			<div
-				class="hide-scrollbar"
-				style="display:flex;gap:8px;overflow-x:auto;"
-			>
+			<div class="level-scroller hide-scrollbar">
+				<!-- Roadmap Tab -->
+				<button
+					onclick={() => viewMode = 'roadmap'}
+					class="level-pill"
+					class:active={viewMode === 'roadmap'}
+				>
+					Roadmap
+				</button>
+				
+				<!-- Separator -->
+				<div class="nav-divider"></div>
+
+				<!-- Level Tabs -->
 				{#each levels as level (level)}
 					<button
 						onclick={() => {
 							activeLevel = level;
+							viewMode = 'grid';
 						}}
-						class="touch-action-manip"
-						style="height:42px;padding:0 16px;border-radius:999px;
-						border:1px solid {activeLevel === level ? 'var(--sumi)' : 'var(--ink-200)'};
-						background:{activeLevel === level ? 'var(--sumi)' : 'var(--bg-surface)'};
-						color:{activeLevel === level ? 'var(--bg-surface)' : 'var(--sumi)'};
-						font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-ui);
-						white-space:nowrap;flex-shrink:0;transition:all 180ms ease;"
+						class="level-pill"
+						class:active={viewMode === 'grid' && activeLevel === level}
 					>
 						{level}
 					</button>
 				{/each}
 			</div>
-
-			<div style="display: flex; gap: 4px;">
-				<button 
-					onclick={() => viewMode = 'grid'}
-					class="view-mode-btn"
-					class:active={viewMode === 'grid'}
-				>
-					<Icon icon={Grid02Icon} size={18} color="currentColor" />
-				</button>
-				<button 
-					onclick={() => viewMode = 'roadmap'}
-					class="view-mode-btn"
-					class:active={viewMode === 'roadmap'}
-				>
-					<Icon icon={RouteIcon} size={18} color="currentColor" />
-				</button>
-			</div>
 		</div>
 
-		<div style="display:grid; grid-template-columns: 1fr;">
+		<div style="display:grid; grid-template-columns: 1fr; margin-top: 8px; position: relative;">
+			<!-- Vista Roadmap: Se mantiene viva para evitar recálculos de performance -->
+			<div 
+				style="grid-area: 1 / 1; transition: opacity 0.2s ease, visibility 0.2s;"
+				style:opacity={viewMode === 'roadmap' ? 1 : 0}
+				style:visibility={viewMode === 'roadmap' ? 'visible' : 'hidden'}
+				style:pointer-events={viewMode === 'roadmap' ? 'auto' : 'none'}
+			>
+				<Roadmap 
+					decks={data.decks} 
+					units={allUnits} 
+					lessonProgress={data.lessonProgress}
+				/>
+			</div>
+
+			<!-- Vista Grid -->
 			{#key activeLevel}
 				<div
-					in:fly={{ y: 20, duration: 300, delay: 200, easing: cubicOut }}
+					in:fly={{ y: 20, duration: 300, delay: 100, easing: cubicOut }}
 					out:fly={{ y: -20, duration: 200, easing: cubicIn }}
-					style="grid-area: 1 / 1; align-content: start;"
+					style="grid-area: 1 / 1; align-content: start; transition: opacity 0.2s ease, visibility 0.2s;"
+					style:opacity={viewMode === 'grid' ? 1 : 0}
+					style:visibility={viewMode === 'grid' ? 'visible' : 'hidden'}
+					style:pointer-events={viewMode === 'grid' ? 'auto' : 'none'}
 				>
-					{#if viewMode === 'roadmap' && activeLevel === 'N5'}
-						<Roadmap decks={data.decks} />
-					{:else}
-						<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
-							{#if filtered.length === 0}
-								<div
-									style="padding:40px;text-align:center;color:var(--fg-tertiary);border:1px dashed var(--ink-200);border-radius:24px;grid-column:1 / -1;"
-								>
-									{t('home.empty', $locale)}
-								</div>
-							{/if}
-							{#each filtered as deck (deck.id)}
-						{@const pct =
-							deck.card_count > 0 ? Math.round(((deck.learned ?? 0) / deck.card_count) * 100) : 0}
-						{@const complete = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
-						<a
-							href="/deck/{deck.id}"
-							class="deck-card"
-						>
+					<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+						{#if filtered.length === 0}
 							<div
-								style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"
+								style="padding:40px;text-align:center;color:var(--fg-tertiary);border:1px dashed var(--ink-200);border-radius:24px;grid-column:1 / -1;"
 							>
-								<div style="display:flex;gap:6px;align-items:center;">
-									<span class="hm-pill hm-pill-red">{deck.level}</span>
-									{#if deck.due > 0}
-										<span class="hm-pill" style="background:var(--sumi);color:var(--bg-surface);">
-											{deck.due}
-											{t('home.due', $locale)}
-										</span>
-									{/if}
-								</div>
-								<span style="font-size:12px;color:var(--fg-secondary);"
-									>{t('home.cards', $locale, { n: deck.card_count })}</span
+								{t('home.empty', $locale)}
+							</div>
+						{/if}
+						{#each filtered as deck (deck.id)}
+							{@const pct =
+								deck.card_count > 0 ? Math.round(((deck.learned ?? 0) / deck.card_count) * 100) : 0}
+							{@const complete = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
+							<a
+								href="/deck/{deck.id}"
+								class="deck-card"
+							>
+								<div
+									style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"
 								>
-							</div>
-							<div class="label-meta" style="margin-bottom:4px;">
-								{$locale === 'es' ? (deck.kind_es ?? deck.kind) : deck.kind}
-							</div>
-							<div style="font-size:20px;font-weight:600;letter-spacing:-0.01em;">
-								{$locale === 'es' ? deck.title_es : deck.title_en}
-							</div>
-							<div style="font-size:14px;color:var(--fg-secondary);margin-top:4px;line-height:1.5;">
-								{$locale === 'es' ? deck.desc_es : deck.desc_en}
-							</div>
-							<div style="margin-top:20px;">
-								<div class="hm-progress">
-									<div
-										class="hm-progress-bar"
-										style="width:{pct}%;background:{complete
-											? 'var(--success)'
-											: 'var(--hinomaru-red)'};"
-									></div>
+									<div style="display:flex;gap:6px;align-items:center;">
+										<span class="hm-pill hm-pill-red">{deck.level}</span>
+										{#if deck.due > 0}
+											<span class="hm-pill" style="background:var(--sumi);color:var(--bg-surface);">
+												{deck.due}
+												{t('home.due', $locale)}
+											</span>
+										{/if}
+									</div>
+									<span style="font-size:12px;color:var(--fg-secondary);"
+										>{t('home.cards', $locale, { n: deck.card_count })}</span
+									>
 								</div>
-								<div class="label-meta" style="margin-top:8px;">
-									{complete
-										? t('home.complete', $locale)
-										: t('home.learned', $locale, { a: deck.learned ?? 0, b: deck.card_count })}
+								<div class="label-meta" style="margin-bottom:4px;">
+									{$locale === 'es' ? (deck.kind_es ?? deck.kind) : deck.kind}
 								</div>
-							</div>
-						</a>
-							{/each}
-						</div>
-					{/if}
+								<div style="font-size:20px;font-weight:600;letter-spacing:-0.01em;">
+									{$locale === 'es' ? deck.title_es : deck.title_en}
+								</div>
+								<div style="font-size:14px;color:var(--fg-secondary);margin-top:4px;line-height:1.5;">
+									{$locale === 'es' ? deck.desc_es : deck.desc_en}
+								</div>
+								<div style="margin-top:20px;">
+									<div class="hm-progress">
+										<div
+											class="hm-progress-bar"
+											style="width:{pct}%;background:{complete
+												? 'var(--success)'
+												: 'var(--hinomaru-red)'};"
+										></div>
+									</div>
+									<div class="label-meta" style="margin-top:8px;">
+										{complete
+											? t('home.complete', $locale)
+											: t('home.learned', $locale, { a: deck.learned ?? 0, b: deck.card_count })}
+									</div>
+								</div>
+							</a>
+						{/each}
+					</div>
 				</div>
 			{/key}
-		</div>
-		<div style="margin-top:40px;">
-			<section class="settings-group">
-				<h2 class="group-label" style="text-align:center;">
-					{t('settings.support.title', $locale)}
-				</h2>
-				<div class="support-container">
-					<p class="support-text">{t('settings.support.desc', $locale)}</p>
-					<a
-						href="https://ko-fi.com/manujsx"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="support-image-btn"
-					>
-						<img src={supportImg} alt="Support on Ko-fi" />
-					</a>
-				</div>
-			</section>
 		</div>
 	</div>
 {/if}
@@ -476,24 +471,56 @@
 		flex-shrink: 0;
 	}
 
-	.view-mode-btn {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
+	/* ── Navigation Section ── */
+	.nav-section {
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		color: var(--fg-tertiary);
-		cursor: pointer;
-		transition: all 0.2s;
+		flex-direction: column;
+		gap: 16px;
+		margin-top: 32px;
+		margin-bottom: 24px;
 	}
 
-	.view-mode-btn.active {
-		background: var(--sumi);
+	.level-scroller {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		overflow-x: auto;
+		padding-bottom: 4px;
+		mask-image: linear-gradient(to right, black 85%, transparent 100%);
+	}
+
+	.nav-divider {
+		width: 1px;
+		height: 24px;
+		background: var(--ink-200);
+		margin: 0 4px;
+		flex-shrink: 0;
+	}
+
+	.level-pill {
+		height: 38px;
+		padding: 0 18px;
+		border-radius: 999px;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface);
+		color: var(--fg-secondary);
+		font-weight: 600;
+		font-size: 13px;
+		cursor: pointer;
+		white-space: nowrap;
+		flex-shrink: 0;
+		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+	}
+
+	.level-pill.active {
 		border-color: var(--sumi);
+		background: var(--sumi);
 		color: var(--bg-surface);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.level-pill:active {
+		transform: scale(0.96);
 	}
 
 	.story-level-pill {

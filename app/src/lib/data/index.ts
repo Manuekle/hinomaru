@@ -210,7 +210,7 @@ export const DECKS: DeckDef[] = [
 		title_es: 'Clima y Naturaleza',
 		desc_en: 'Sun, rain, and mountains.',
 		desc_es: 'Sol, lluvia y montañas.',
-		cards: n5Vocab.filter((c) => c.category_es?.match(/Clima|Naturaleza/))
+		cards: n5Vocab.filter((c) => c.category_es === 'Clima' || c.category_es === 'Naturaleza' || c.category_es === 'Estaciones')
 	},
 	{
 		id: 'n5-verbs',
@@ -232,7 +232,7 @@ export const DECKS: DeckDef[] = [
 		title_es: 'Adjetivos',
 		desc_en: 'Describe things: big, small, new.',
 		desc_es: 'Describe cosas: grande, pequeño, nuevo.',
-		cards: n5Vocab.filter((c) => c.pos_es?.match(/adj/i))
+		cards: n5Vocab.filter((c) => c.category_es === 'Adjetivos')
 	},
 	{
 		id: 'n5-places',
@@ -244,6 +244,215 @@ export const DECKS: DeckDef[] = [
 		desc_en: 'School, Station, Hospital.',
 		desc_es: 'Escuela, Estación, Hospital.',
 		cards: n5Vocab.filter((c) => c.category_es?.match(/Lugares|Transporte/))
+	},
+	{
+		id: 'n5-pronouns',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Pronouns',
+		title_es: 'Pronombres',
+		desc_en: 'I, you, he, she, we.',
+		desc_es: 'Yo, tú, él, ella, nosotros.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Pronombres')
+	},
+	{
+		id: 'n5-questions',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Question Words',
+		title_es: 'Palabras de Pregunta',
+		desc_en: 'What, who, where, when.',
+		desc_es: 'Qué, quién, dónde, cuándo.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Preguntas')
+	},
+	{
+		id: 'n5-time',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Time Expressions',
+		title_es: 'Expresiones de Tiempo',
+		desc_en: 'Today, tomorrow, morning, night.',
+		desc_es: 'Hoy, mañana, mañana (a.m.), noche.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Tiempo')
+	},
+	{
+		id: 'n5-body',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Body Parts',
+		title_es: 'Partes del Cuerpo',
+		desc_en: 'Eyes, ears, hands, feet.',
+		desc_es: 'Ojos, oídos, manos, pies.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Cuerpo')
+	},
+	{
+		id: 'n5-directions',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Directions',
+		title_es: 'Direcciones',
+		desc_en: 'Up, down, front, back, left, right.',
+		desc_es: 'Arriba, abajo, frente, detrás, izquierda, derecha.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Direcciones')
+	},
+	{
+		id: 'n5-objects',
+		level: 'N5',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Everyday Objects',
+		title_es: 'Objetos Cotidianos',
+		desc_en: 'Book, phone, umbrella, watch.',
+		desc_es: 'Libro, teléfono, paraguas, reloj.',
+		cards: n5Vocab.filter((c) => c.category_es === 'Objetos')
+	},
+	{
+		id: 'n4-verbs',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'N4 Verbs',
+		title_es: 'Verbos N4',
+		desc_en: 'Transitive/intransitive pairs and common verbs.',
+		desc_es: 'Pares transitivo/intransitivo y verbos comunes.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Verbos')
+	},
+	{
+		id: 'n4-daily',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Daily Life',
+		title_es: 'Vida Diaria',
+		desc_en: 'Nouns and expressions for daily life.',
+		desc_es: 'Sustantivos y expresiones de la vida diaria.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Sustantivos')
+	},
+	{
+		id: 'n4-time',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Time & Schedule',
+		title_es: 'Tiempo y Horario',
+		desc_en: 'Time, dates, and scheduling vocabulary.',
+		desc_es: 'Tiempo, fechas y vocabulario de horarios.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Tiempo')
+	},
+	{
+		id: 'n4-adjectives',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'N4 Adjectives',
+		title_es: 'Adjetivos N4',
+		desc_en: 'Intermediate adjectives.',
+		desc_es: 'Adjetivos intermedios.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Adjetivos')
+	},
+	{
+		id: 'n4-adverbs',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'N4 Adverbs',
+		title_es: 'Adverbios N4',
+		desc_en: 'Adverbs and expressions.',
+		desc_es: 'Adverbios y expresiones.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Adverbios')
+	},
+	{
+		id: 'n4-counters',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Counters',
+		title_es: 'Contadores',
+		desc_en: 'Numerical counters and units.',
+		desc_es: 'Contadores numéricos y unidades.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Contadores')
+	},
+	{
+		id: 'n4-social',
+		level: 'N4',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Social',
+		title_es: 'Social',
+		desc_en: 'Social interactions and relationships.',
+		desc_es: 'Interacciones sociales y relaciones.',
+		cards: n4Vocab.filter((c) => c.category_es === 'Social')
+	},
+	{
+		id: 'n3-verbs',
+		level: 'N3',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'N3 Verbs',
+		title_es: 'Verbos N3',
+		desc_en: 'Intermediate verbs.',
+		desc_es: 'Verbos intermedios.',
+		cards: n3Vocab.filter((c) => c.category_es === 'Verbo' || c.category_es === 'Verbos')
+	},
+	{
+		id: 'n3-adjectives',
+		level: 'N3',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'N3 Adjectives',
+		title_es: 'Adjetivos N3',
+		desc_en: 'Intermediate adjectives.',
+		desc_es: 'Adjetivos intermedios.',
+		cards: n3Vocab.filter((c) => c.category_es === 'Adjetivo' || c.category_es === 'Adjetivos')
+	},
+	{
+		id: 'n3-society',
+		level: 'N3',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Society',
+		title_es: 'Sociedad',
+		desc_en: 'Society, politics, and social topics.',
+		desc_es: 'Sociedad, política y temas sociales.',
+		cards: n3Vocab.filter((c) => c.category_es === 'Sociedad' || c.category_es === 'Social')
+	},
+	{
+		id: 'n3-emotions',
+		level: 'N3',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Emotions',
+		title_es: 'Emociones',
+		desc_en: 'Emotions and relationships.',
+		desc_es: 'Emociones y relaciones.',
+		cards: n3Vocab.filter((c) => c.category_es === 'Emociones' || c.category_es === 'Emoción')
+	},
+	{
+		id: 'n3-work',
+		level: 'N3',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Work & Society',
+		title_es: 'Trabajo y Sociedad',
+		desc_en: 'Work and professional vocabulary.',
+		desc_es: 'Vocabulario profesional y laboral.',
+		cards: n3Vocab.filter((c) => c.category_es === 'Trabajo')
+	},
+	{
+		id: 'n3-abstract',
+		level: 'N3',
+		kind: 'Vocabulary',
+		kind_es: 'Vocabulario',
+		title_en: 'Abstract Concepts',
+		title_es: 'Conceptos Abstractos',
+		desc_en: 'Abstract nouns and concepts.',
+		desc_es: 'Sustantivos abstractos y conceptos.',
+		cards: n3Vocab.filter((c) => c.category_es === 'Abstracto')
 	},
 	{
 		id: 'n5-grammar-intro',
