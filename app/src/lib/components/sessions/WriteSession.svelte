@@ -225,7 +225,7 @@
 		{#if quizCards.length === 0}
 			<SessionEmptyState totalCards={totalCards} learnedCount={learnedCount} sessionCount={0} deckId={deck?.id} modeLabel={t('mode.write.title', $locale)} />
 		{:else if card}
-			<div class="write-viewer">
+			<div class="write-viewer content-center">
 				<div class="prompt-card">
 					<div class="prompt-row">
 						<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
@@ -281,7 +281,7 @@
 	.total-label { font-size: 10px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; }
 	.close-btn, .lang-btn { color: var(--fg-secondary); background: none; border: none; padding: 8px; cursor: pointer; }
 	.lang-btn.active { color: var(--hinomaru-red); }
-	.write-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; width: 100%; max-width: 520px; margin: 0 auto; padding: 20px 0 8px; }
+	.write-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 20px 0 8px; }
 	.prompt-card { background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 24px; box-shadow: 0 4px 24px rgba(26,26,26,0.07); padding: 24px; display: flex; flex-direction: column; gap: 12px; }
 	.prompt-row { display: flex; align-items: center; justify-content: space-between; }
 	.meaning-text { font-size: 24px; font-weight: 900; color: var(--fg-primary); }

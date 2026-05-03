@@ -127,7 +127,7 @@
 				modeLabel={t('mode.type.title', $locale)}
 			/>
 		{:else if card}
-			<div class="type-viewer">
+			<div class="type-viewer content-center">
 				<div class="word-card">
 					<button onclick={playAudio} class="audio-corner" aria-label="Play pronunciation">
 						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
@@ -204,7 +204,7 @@
 	.session-index { font-size: 17px; font-weight: 900; color: var(--fg-primary); }
 	.total-label { font-size: 10px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; }
 	.close-btn { color: var(--fg-secondary); background: none; border: none; padding: 8px; cursor: pointer; }
-	.type-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; width: 100%; max-width: 480px; margin: 0 auto; padding: 20px 0 8px; }
+	.type-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 20px 0 8px; }
 	.word-card { position: relative; background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 28px; box-shadow: 0 4px 24px rgba(26,26,26,0.08); padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 	.audio-corner { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--ink-200); background: var(--bg-muted); display: flex; align-items: center; justify-content: center; color: var(--fg-secondary); cursor: pointer; }
 	.word-big { font-size: 56px; font-weight: 800; color: var(--fg-primary); line-height: 1; }

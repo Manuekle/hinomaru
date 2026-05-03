@@ -253,7 +253,7 @@
 				modeLabel={t('mode.speaking.title', $locale)}
 			/>
 		{:else if card}
-			<div class="speaking-viewer">
+			<div class="speaking-viewer content-center">
 				<div class="prompt-card">
 					<div class="prompt-meta">
 						<span class="prompt-tag">{t('mode.speaking.title', $locale)}</span>
@@ -420,9 +420,6 @@
 		align-items: center;
 		justify-content: center;
 		gap: clamp(20px, 5vh, 32px);
-		width: 100%;
-		max-width: 480px;
-		margin: 0 auto;
 		padding: 24px 0 8px;
 	}
 

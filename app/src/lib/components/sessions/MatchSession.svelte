@@ -195,7 +195,7 @@
 				modeLabel={t('mode.match.title', $locale)}
 			/>
 		{:else if !finished}
-			<div class="game-area">
+			<div class="game-area content-center">
 				<div class="match-grid">
 					{#each currentSet as item (item.id + item.type)}
 						{@const key = makeKey(item.id, item.type)}
@@ -306,7 +306,6 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		width: 100%;
 		padding: 24px 0;
 	}
 

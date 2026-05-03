@@ -102,7 +102,7 @@
 	<div class="session-container">
 		{#if currentStep && currentCard}
 			{#key stepKey}
-				<div class="step-wrap">
+				<div class="step-wrap content-center">
 					{#if currentStep.kind === 'recognize'}
 						<StepRecognize card={currentCard} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen'}
@@ -197,9 +197,6 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		width: 100%;
-		max-width: 480px;
-		margin: 0 auto;
-		padding: 24px 20px 0;
+		padding-top: 24px;
 	}
 </style>

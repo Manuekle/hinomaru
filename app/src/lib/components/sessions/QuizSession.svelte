@@ -130,7 +130,7 @@
 				modeLabel={t('mode.quiz.title', $locale)}
 			/>
 		{:else if card}
-			<div class="quiz-viewer">
+			<div class="quiz-viewer content-center">
 				<div class="word-card">
 					<button onclick={playAudio} class="audio-corner" aria-label="Play pronunciation">
 						<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
@@ -254,9 +254,6 @@
 		flex-direction: column;
 		justify-content: center;
 		gap: 16px;
-		width: 100%;
-		max-width: 480px;
-		margin: 0 auto;
 		padding: 20px 0 8px;
 	}
 
