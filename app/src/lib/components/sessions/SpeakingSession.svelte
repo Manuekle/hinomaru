@@ -1,16 +1,8 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		VolumeHighIcon, 
-		Mic01Icon, 
-		Tick02Icon, 
-		Cancel01Icon,
-		TranslateIcon,
-		ArrowRight01Icon
-	} from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Mic01Icon, Tick02Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import { onMount, onDestroy } from 'svelte';
 	import { locale } from '$lib/stores/locale';
-	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
@@ -19,7 +11,10 @@
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import { JapaneseSpeechRecognizer, isSpeechSupported } from '$lib/speaking/speech';
 	import { fadeIn, fadeUp } from '$lib/motion';
+	import { fade } from 'svelte/transition';
 
 	interface Props {
 		cards: any[];
@@ -31,31 +26,36 @@
 		learnedCount?: number;
 	}
 
-	let { 
-		cards: initialCards, 
-		deck, 
-		onComplete, 
-		onExit, 
+	let {
+		cards: initialCards,
+		deck,
+		onComplete,
+		onExit,
 		onCardProgress,
 		totalCards = 0,
 		learnedCount = 0
 	} = $props<Props>();
 
 	const queue = $derived.by(() => createMistakeQueue<any>(initialCards));
-	
+
+	let recognizer: JapaneseSpeechRecognizer | null = null;
 	let isRecording = $state(false);
 	let processing = $state(false);
 	let transcript = $state('');
+	let displayTranscript = $state('');
 	let submitted = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 	let error = $state<string | null>(null);
-	let lastErrorCode = $state<string | null>(null);
+	let autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
+	let unsupported = $state(false);
 
-	let supportState = $state<'checking' | 'supported' | 'unsupported' | 'denied'>('checking');
-	let mediaStream: MediaStream | null = null;
-	let unmounted = false;
+	onMount(() => {
+		if (!isSpeechSupported()) {
+			unsupported = true;
+		}
+	});
 
 	function levenshtein(a: string, b: string): number {
 		if (a === b) return 0;
@@ -75,125 +75,63 @@
 		return dp[b.length];
 	}
 
-	const micState = $derived<'idle' | 'recording' | 'processing' | 'done'>(
-		submitted ? 'done' : isRecording ? 'recording' : processing ? 'processing' : 'idle'
+	const micState = $derived<'idle' | 'recording' | 'done'>(
+		submitted ? 'done' : isRecording ? 'recording' : 'idle'
 	);
 
 	const card = $derived(queue.current);
 
-	let recognition: any = null;
-
-	onMount(() => {
-		const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-		if (!SpeechRecognition) {
-			supportState = 'unsupported';
-			return;
-		}
-		recognition = new SpeechRecognition();
-		recognition.lang = 'ja-JP';
-		recognition.interimResults = false;
-		recognition.maxAlternatives = 1;
-		recognition.continuous = false;
-
-		recognition.onresult = (event: any) => {
-			if (unmounted) return;
-			transcript = event.results[0][0].transcript;
-			isRecording = false;
-			processing = true;
-			setTimeout(() => {
-				if (unmounted) return;
-				processing = false;
-				submit();
-			}, 350);
-		};
-
-		recognition.onerror = (event: any) => {
-			if (unmounted) return;
-			isRecording = false;
-			processing = false;
-			lastErrorCode = event.error;
-			if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-				supportState = 'denied';
-				error = $locale === 'es'
-					? 'Permiso de micrófono denegado.'
-					: 'Microphone permission denied.';
-			} else if (event.error === 'no-speech') {
-				error = t('speaking.noSpeech', $locale);
-			} else if (event.error === 'aborted') {
-				error = null;
-			} else {
-				error = t('speaking.unavailable', $locale);
-			}
-			stopMediaTracks();
-		};
-
-		recognition.onend = () => {
-			if (unmounted) return;
-			isRecording = false;
-			stopMediaTracks();
-		};
-
-		supportState = 'supported';
-	});
-
-	function stopMediaTracks() {
-		if (mediaStream) {
-			try { mediaStream.getTracks().forEach((tr) => tr.stop()); } catch { /* ignore */ }
-			mediaStream = null;
-		}
-	}
-
-	function fullStop() {
-		try { recognition?.abort?.(); } catch { /* ignore */ }
-		try { recognition?.stop?.(); } catch { /* ignore */ }
-		isRecording = false;
-		processing = false;
-		stopMediaTracks();
-	}
-
 	onDestroy(() => {
-		unmounted = true;
-		if (recognition) {
-			recognition.onresult = null;
-			recognition.onerror = null;
-			recognition.onend = null;
-		}
-		fullStop();
+		if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+		recognizer?.abort();
 	});
 
 	async function toggleRecording() {
-		if (supportState !== 'supported' || !recognition) return;
+		if (unsupported) return;
 		if (isRecording) {
-			try { recognition.stop(); } catch { /* ignore */ }
+			recognizer?.stop();
 			isRecording = false;
-			stopMediaTracks();
 			return;
 		}
+
 		error = null;
-		lastErrorCode = null;
 		transcript = '';
+		displayTranscript = '';
 		submitted = false;
 
-		if (navigator.mediaDevices?.getUserMedia) {
-			try {
-				mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-			} catch (e: any) {
-				supportState = 'denied';
-				return;
-			}
+		if (!recognizer) {
+			recognizer = new JapaneseSpeechRecognizer();
 		}
 
-		try {
-			recognition.start();
-			isRecording = true;
-		} catch (e) {
-			isRecording = false;
-			stopMediaTracks();
-			error = t('speaking.unavailable', $locale);
-		}
+		isRecording = true;
+		await recognizer.start(
+			(r) => {
+				transcript = r.transcript;
+				displayTranscript = r.transcript;
+				if (r.isFinal) {
+					isRecording = false;
+					processing = true;
+					setTimeout(() => {
+						processing = false;
+						submit();
+					}, 350);
+				}
+			},
+			(err) => {
+				error = err;
+				isRecording = false;
+			},
+			() => {
+				isRecording = false;
+			}
+		);
 	}
 
-	const normalize = (s: string) => s.normalize('NFKC').replace(/[、。！？.,\s]/g, '').toLowerCase();
+	const normalize = (s: string) =>
+		s
+			.normalize('NFKC')
+			.replace(/[、。！？.,\s]/g, '')
+			.toLowerCase();
 
 	const similarity = $derived.by(() => {
 		if (!card || !transcript) return 0;
@@ -205,7 +143,26 @@
 		return Math.max(0, Math.round(((maxLen - dist) / maxLen) * 100));
 	});
 
-	const isCorrect = $derived(similarity >= 85);
+	const matchedIndices = $derived.by(() => {
+		if (!transcript || !card) return new Set();
+		const target = card.jp;
+		const said = transcript.replace(/\s/g, '');
+		const matched = new Set<number>();
+
+		let lastFoundIdx = -1;
+		for (let i = 0; i < target.length; i++) {
+			const char = target[i];
+			const foundIdx = said.indexOf(char, lastFoundIdx + 1);
+			if (foundIdx !== -1) {
+				matched.add(i);
+				lastFoundIdx = foundIdx;
+			}
+		}
+		return matched;
+	});
+
+	const isCorrect = $derived(similarity >= 65);
+	const cardRomaji = $derived(card ? safeRomaji(card.romaji, card.jp) : '');
 
 	function submit() {
 		submitted = true;
@@ -216,10 +173,33 @@
 			struggled = true;
 			playWrong();
 		}
+		autoAdvanceTimer = setTimeout(() => next(), 1600);
+	}
+
+	function skip() {
+		recognizer?.abort();
+		if (autoAdvanceTimer) {
+			clearTimeout(autoAdvanceTimer);
+			autoAdvanceTimer = null;
+		}
+		if (queue.isLast) {
+			showAnticipation = true;
+			onComplete({ correct, total: queue.originalTotal });
+		} else {
+			submitted = false;
+			transcript = '';
+			displayTranscript = '';
+			struggled = false;
+			queue.advance();
+		}
 	}
 
 	async function next() {
-		fullStop();
+		if (autoAdvanceTimer) {
+			clearTimeout(autoAdvanceTimer);
+			autoAdvanceTimer = null;
+		}
+		recognizer?.abort();
 		if (onCardProgress) onCardProgress(card, isCorrect, struggled);
 
 		if (!isCorrect) {
@@ -232,6 +212,7 @@
 		} else {
 			submitted = false;
 			transcript = '';
+			displayTranscript = '';
 			struggled = false;
 			queue.advance();
 		}
@@ -244,7 +225,13 @@
 
 <div class="session-layout premium-bg">
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={() => { fullStop(); onExit(); }}>
+		<button
+			class="close-btn"
+			onclick={() => {
+				recognizer?.abort();
+				onExit();
+			}}
+		>
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
 		</button>
 
@@ -253,23 +240,16 @@
 			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
 
-		<button 
-			class="lang-btn" 
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		<div style="width: 40px;"></div>
 	</div>
 
 	<div class="session-container">
 		{#if initialCards.length === 0}
-			<SessionEmptyState 
-				totalCards={totalCards} 
-				learnedCount={learnedCount}
-				sessionCount={0} 
-				deckId={deck?.id} 
+			<SessionEmptyState
+				{totalCards}
+				{learnedCount}
+				sessionCount={0}
+				deckId={deck?.id}
 				modeLabel={t('mode.speaking.title', $locale)}
 			/>
 		{:else if card}
@@ -281,29 +261,37 @@
 							<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
 						</button>
 					</div>
-					<div class="jp word-text" style="font-size:{card.jp.length <= 4 ? 'var(--fs-display)' : card.jp.length <= 6 ? 'var(--fs-2xl)' : card.jp.length <= 10 ? 'var(--fs-xl)' : 'var(--fs-lg)'};">{card.jp}</div>
-					{#if $showRomaji}
-						{@const rom = safeRomaji(card.romaji, card.jp)}
-						{#if rom}<div class="romaji-sub">{rom}</div>{/if}
+					<div
+						class="jp word-text"
+						style="font-size:{card.jp.length <= 4
+							? 'var(--fs-display)'
+							: card.jp.length <= 6
+								? 'var(--fs-2xl)'
+								: card.jp.length <= 10
+									? 'var(--fs-xl)'
+									: 'var(--fs-lg)'};"
+					>
+						{#if isRecording || processing || (submitted && transcript)}
+							{#each card.jp.split('') as char, i}
+								<span class="char-unit" class:is-matched={matchedIndices.has(i)}>{char}</span>
+							{/each}
+						{:else}
+							<InteractiveText text={card.jp} />
+						{/if}
+					</div>
+					{#if cardRomaji}<div class="romaji-sub">{cardRomaji}</div>{/if}
+					{#if submitted}
+						<div class="meaning-sub" in:fade={{ duration: 200 }}>
+							{$locale === 'es' ? card.es : card.en}
+						</div>
 					{/if}
-					<div class="meaning-sub">{$locale === 'es' ? card.es : card.en}</div>
 				</div>
 
-				{#if supportState === 'checking'}
-					<div class="status-msg" use:fadeIn aria-live="polite">
-						{$locale === 'es' ? 'Verificando soporte…' : 'Checking support…'}
-					</div>
-				{:else if supportState === 'unsupported'}
+				{#if unsupported}
 					<div class="error-msg" use:fadeIn>
 						{$locale === 'es'
 							? 'Reconocimiento de voz no disponible en este navegador.'
-							: 'Speech recognition not supported in this browser.'}
-					</div>
-				{:else if supportState === 'denied'}
-					<div class="error-msg" use:fadeIn>
-						{$locale === 'es'
-							? 'Permiso de micrófono denegado.'
-							: 'Microphone permission denied.'}
+							: 'Speech recognition not supported.'}
 					</div>
 				{:else}
 					<div class="mic-area">
@@ -323,76 +311,52 @@
 										<span style="animation-delay:{idx * 0.1}s"></span>
 									{/each}
 								</div>
-							{:else if micState === 'processing'}
-								<div class="dots" aria-hidden="true">
-									<span></span><span></span><span></span>
-								</div>
 							{:else if micState === 'done'}
-								<Icon icon={isCorrect ? Tick02Icon : Cancel01Icon} size={32} color="currentColor" />
+								<Icon icon={isCorrect ? Tick02Icon : Cancel01Icon} size={32} color="white" />
 							{:else}
-								<Icon icon={Mic01Icon} size={32} color="currentColor" />
+								<Icon icon={Mic01Icon} size={32} color="white" />
 							{/if}
 						</button>
 						<div class="mic-label" aria-hidden="true">
 							{#if micState === 'recording'}
-								{t('speaking.stop', $locale)}
-							{:else if micState === 'processing'}
-								{$locale === 'es' ? 'Procesando…' : 'Processing…'}
+								{$locale === 'es' ? 'ESCUCHANDO' : 'LISTENING'}
 							{:else if micState === 'done'}
-								{similarity}%
+								{isCorrect
+									? $locale === 'es'
+										? 'CORRECTO'
+										: 'CORRECT'
+									: $locale === 'es'
+										? 'INTÉNTALO'
+										: 'TRY AGAIN'}
 							{:else}
-								{t('speaking.speak', $locale)}
+								{$locale === 'es' ? 'TOCA PARA HABLAR' : 'TAP TO SPEAK'}
 							{/if}
 						</div>
 					</div>
 				{/if}
 
 				{#if error && !submitted}
-					<div class="error-msg" use:fadeIn>
-						{error}
-					</div>
+					<div class="error-msg" use:fadeIn>{error}</div>
 				{/if}
 
-				{#if submitted}
-					{@const verdict = similarity >= 85 ? 'correct' : similarity >= 60 ? 'close' : 'wrong'}
-					<div class="result-card" data-verdict={verdict} use:fadeUp={{ y: 12 }}>
-						<div class="result-head">
-							<div class="verdict-icon">
-								<Icon icon={verdict === 'correct' ? Tick02Icon : verdict === 'close' ? ArrowRight01Icon : Cancel01Icon} size={20} color="currentColor" />
-							</div>
-							<div class="verdict-text">
-								{#if verdict === 'correct'}
-									{$locale === 'es' ? '¡Correcto!' : 'Correct!'}
-								{:else if verdict === 'close'}
-									{$locale === 'es' ? 'Casi' : 'Close'}
-								{:else}
-									{$locale === 'es' ? 'Inténtalo de nuevo' : 'Try again'}
-								{/if}
-							</div>
-							<div class="verdict-pct">{similarity}%</div>
-						</div>
-
-						<div class="result-grid">
-							<div class="result-row">
-								<span class="result-label">{$locale === 'es' ? 'Esperado' : 'Expected'}</span>
-								<span class="result-value jp">{card.jp}</span>
-							</div>
-							<div class="result-row">
-								<span class="result-label">{$locale === 'es' ? 'Reconocido' : 'Heard'}</span>
-								<span class="result-value jp">{transcript || '—'}</span>
-							</div>
-						</div>
-					</div>
+				{#if transcript && submitted}
+					<div class="transcript-box" in:fade>"{transcript}"</div>
 				{/if}
 			</div>
 		{/if}
 	</div>
 
-	{#if submitted && !showAnticipation}
+	{#if !showAnticipation && card}
 		<StickyFooter>
-			<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-				{t('session.next', $locale)}
-			</button>
+			{#if submitted}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+					{t('session.next', $locale)}
+				</button>
+			{:else if !isRecording && !processing && !unsupported}
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={skip}>
+					{$locale === 'es' ? 'No puedo hablar ahora' : "Can't speak now"}
+				</button>
+			{/if}
 		</StickyFooter>
 	{/if}
 </div>
@@ -440,7 +404,7 @@
 		letter-spacing: 0.05em;
 	}
 
-	.close-btn, .lang-btn {
+	.close-btn {
 		color: var(--fg-secondary);
 		background: none;
 		border: none;
@@ -448,8 +412,6 @@
 		cursor: pointer;
 		transition: all 0.2s;
 	}
-
-	.lang-btn.active { color: var(--hinomaru-red); }
 
 	.speaking-viewer {
 		flex: 1;
@@ -469,7 +431,7 @@
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 28px;
-		box-shadow: 0 8px 32px rgba(26,26,26,0.06);
+		box-shadow: 0 8px 32px rgba(26, 26, 26, 0.06);
 		padding: 18px 22px 22px;
 		display: flex;
 		flex-direction: column;
@@ -514,6 +476,20 @@
 		line-height: 1.05;
 		font-weight: 800;
 		padding: 8px 0;
+		display: flex;
+		gap: 2px;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	.char-unit {
+		transition:
+			color 0.2s ease,
+			transform 0.2s ease;
+	}
+	.char-unit.is-matched {
+		color: var(--hinomaru-red);
+		transform: scale(1.1);
 	}
 
 	.romaji-sub {
@@ -559,14 +535,16 @@
 		transition: transform 0.18s cubic-bezier(0.34, 1.5, 0.64, 1);
 	}
 
-	.mic-btn:active { transform: scale(0.94); }
-	
-	.mic-btn[data-state="recording"] {
+	.mic-btn:active {
+		transform: scale(0.94);
+	}
+
+	.mic-btn[data-state='recording'] {
 		background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
 		transform: scale(1.04);
 	}
 
-	.mic-btn[data-state="done"] {
+	.mic-btn[data-state='done'] {
 		background: linear-gradient(135deg, #2e7d5b, #1f5e44);
 	}
 
@@ -579,42 +557,77 @@
 		pointer-events: none;
 	}
 
-	.mic-ring-2 { inset: -16px; }
+	.mic-ring-2 {
+		inset: -16px;
+	}
 
-	.mic-btn[data-state="recording"] .mic-ring {
+	.mic-btn[data-state='recording'] .mic-ring {
 		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
 	}
-	.mic-btn[data-state="recording"] .mic-ring-2 {
+	.mic-btn[data-state='recording'] .mic-ring-2 {
 		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
 	}
 
 	@keyframes pulse-ring {
-		0% { transform: scale(0.9); opacity: 0.7; }
-		100% { transform: scale(1.5); opacity: 0; }
+		0% {
+			transform: scale(0.9);
+			opacity: 0.7;
+		}
+		100% {
+			transform: scale(1.5);
+			opacity: 0;
+		}
 	}
 
-	.wave { display: flex; align-items: center; gap: 4px; height: 36px; }
+	.wave {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		height: 36px;
+	}
 	.wave span {
-		width: 4px; height: 100%; background: white; border-radius: 2px;
+		width: 4px;
+		height: 100%;
+		background: white;
+		border-radius: 2px;
 		animation: wave-bounce 0.9s ease-in-out infinite;
 	}
 	@keyframes wave-bounce {
-		0%, 100% { transform: scaleY(0.3); }
-		50% { transform: scaleY(1); }
+		0%,
+		100% {
+			transform: scaleY(0.3);
+		}
+		50% {
+			transform: scaleY(1);
+		}
 	}
 
-	.dots { display: flex; gap: 6px; }
+	.dots {
+		display: flex;
+		gap: 6px;
+	}
 	.dots span {
-		width: 8px; height: 8px; border-radius: 50%; background: white;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: white;
 		animation: dot-pulse 1s ease-in-out infinite;
 	}
 	@keyframes dot-pulse {
-		0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-		40% { opacity: 1; transform: scale(1.1); }
+		0%,
+		80%,
+		100% {
+			opacity: 0.3;
+			transform: scale(0.8);
+		}
+		40% {
+			opacity: 1;
+			transform: scale(1.1);
+		}
 	}
 
 	.mic-label {
-		font-size: 12px;
+		font-size: 11px;
 		font-weight: 800;
 		color: var(--fg-secondary);
 		text-transform: uppercase;
@@ -639,21 +652,54 @@
 		gap: 14px;
 	}
 
-	.result-card[data-verdict="correct"] { border-color: var(--success); background: var(--success-wash); }
-	.result-card[data-verdict="close"] { border-color: #d4a017; background: rgba(212,160,23,0.08); }
-	.result-card[data-verdict="wrong"] { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
-
-	.result-head { display: flex; align-items: center; gap: 12px; }
-	.verdict-icon {
-		width: 36px; height: 36px; border-radius: 50%;
-		display: flex; align-items: center; justify-content: center; color: white;
+	.result-card[data-verdict='correct'] {
+		border-color: var(--success);
+		background: var(--success-wash);
 	}
-	.result-card[data-verdict="correct"] .verdict-icon { background: var(--success); }
-	.result-card[data-verdict="close"] .verdict-icon { background: #d4a017; }
-	.result-card[data-verdict="wrong"] .verdict-icon { background: var(--hinomaru-red); }
+	.result-card[data-verdict='close'] {
+		border-color: #d4a017;
+		background: rgba(212, 160, 23, 0.08);
+	}
+	.result-card[data-verdict='wrong'] {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+	}
 
-	.verdict-text { font-size: 16px; font-weight: 800; color: var(--fg-primary); flex: 1; }
-	.verdict-pct { font-size: 18px; font-weight: 900; color: var(--fg-primary); }
+	.result-head {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.verdict-icon {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+	}
+	.result-card[data-verdict='correct'] .verdict-icon {
+		background: var(--success);
+	}
+	.result-card[data-verdict='close'] .verdict-icon {
+		background: #d4a017;
+	}
+	.result-card[data-verdict='wrong'] .verdict-icon {
+		background: var(--hinomaru-red);
+	}
+
+	.verdict-text {
+		font-size: 16px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		flex: 1;
+	}
+	.verdict-pct {
+		font-size: 18px;
+		font-weight: 900;
+		color: var(--fg-primary);
+	}
 
 	.result-grid {
 		display: flex;
@@ -664,7 +710,55 @@
 		border-radius: 12px;
 	}
 
-	.result-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-	.result-label { font-size: 10px; font-weight: 800; color: var(--fg-tertiary); text-transform: uppercase; }
-	.result-value { font-size: 15px; font-weight: 700; color: var(--fg-primary); }
+	.result-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.result-label {
+		font-size: 10px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+	}
+	.result-value {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--fg-primary);
+	}
+
+	.session-container {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		padding: 0 20px 100px;
+		overflow-y: auto;
+	}
+
+	.transcript-box {
+		font-size: 15px;
+		font-family: var(--font-jp);
+		color: var(--fg-secondary);
+		font-weight: 600;
+		font-style: italic;
+		text-align: center;
+	}
+
+	.skip-link {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-decoration: underline;
+		background: none;
+		border: none;
+		cursor: pointer;
+		opacity: 0.7;
+		transition: opacity 0.2s;
+		padding: 4px 8px;
+	}
+	.skip-link:hover {
+		opacity: 1;
+		color: var(--hinomaru-red);
+	}
 </style>

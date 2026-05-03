@@ -9,8 +9,11 @@ export const VOICEVOX_URL = PUBLIC_VOICEVOX_URL || 'http://localhost:8000';
 
 let currentAudio: HTMLAudioElement | null = null;
 let currentResolve: (() => void) | null = null;
+let currentAbortController: AbortController | null = null;
 
 export function stopVoicevox(): void {
+    currentAbortController?.abort();
+    currentAbortController = null;
     if (currentAudio) {
         currentAudio.pause();
         currentAudio.src = '';
@@ -48,6 +51,9 @@ export async function speakVoicevox(
 ): Promise<void> {
     stopVoicevox();
 
+    const controller = new AbortController();
+    currentAbortController = controller;
+
     const params = new URLSearchParams({
         text,
         preset,
@@ -60,8 +66,8 @@ export async function speakVoicevox(
 
     const url = `${VOICEVOX_URL}/tts/audio?${params.toString()}`;
 
-    // Fetch without custom headers to avoid CORS preflight issues
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: controller.signal });
+    currentAbortController = null;
     if (!response.ok) throw new Error('TTS Service Error');
 
     const blob = await response.blob();

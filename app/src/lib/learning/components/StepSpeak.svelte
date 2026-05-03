@@ -10,8 +10,8 @@
 	import { Mic01Icon, VolumeHighIcon, Tick02Icon } from '@hugeicons/core-free-icons';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
-	const props: { 
-		card: any; 
+	const props: {
+		card: any;
 		onAnswer: (correct: boolean) => void;
 		onDisableSpeak?: () => void;
 	} = $props();
@@ -23,12 +23,12 @@
 	let locked = $state(false);
 	let isCorrect = $state(false);
 	let unsupported = $state(false);
-	
+
 	const matchedIndex = $derived.by(() => {
 		if (!transcript) return 0;
 		const target = card.jp;
 		const said = transcript.replace(/\s/g, '');
-		
+
 		// Simple prefix matching for visual feedback
 		let longest = 0;
 		for (let len = 1; len <= target.length; len++) {
@@ -102,6 +102,7 @@
 	}
 
 	function finish(said: string) {
+		if (locked) return;
 		listening = false;
 		locked = true;
 		const acc = score(card.jp, said);
@@ -127,11 +128,18 @@
 		<div class="prompt-card">
 			<div class="prompt-meta">
 				<span class="prompt-tag">{$locale === 'es' ? 'PRONUNCIACIÓN' : 'PRONUNCIATION'}</span>
-				<button onclick={() => speakJapanese(card.jp)} class="audio-mini" aria-label="Play pronunciation">
+				<button
+					onclick={() => speakJapanese(card.jp)}
+					class="audio-mini"
+					aria-label="Play pronunciation"
+				>
 					<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
 				</button>
 			</div>
-			<div class="jp word-text" style="font-size: {card.jp.length <= 4 ? 'var(--fs-display)' : 'var(--fs-2xl)'};">
+			<div
+				class="jp word-text"
+				style="font-size: {card.jp.length <= 4 ? 'var(--fs-display)' : 'var(--fs-2xl)'};"
+			>
 				{#if listening || (locked && transcript)}
 					{#each card.jp.split('') as char, i}
 						<span class="char-unit" class:is-matched={i < matchedIndex}>{char}</span>
@@ -154,7 +162,7 @@
 			<div class="mic-area">
 				<button
 					class="mic-btn"
-					data-state={locked ? (isCorrect ? 'done' : 'idle') : (listening ? 'recording' : 'idle')}
+					data-state={locked ? (isCorrect ? 'done' : 'idle') : listening ? 'recording' : 'idle'}
 					disabled={locked}
 					onclick={listening ? stop : start}
 					aria-label="Mic"
@@ -177,17 +185,17 @@
 					{#if listening}
 						{$locale === 'es' ? 'ESCUCHANDO' : 'LISTENING'}
 					{:else if locked}
-						{isCorrect ? ( $locale === 'es' ? 'CORRECTO' : 'CORRECT' ) : ( $locale === 'es' ? 'INTÉNTALO' : 'TRY AGAIN' )}
+						{isCorrect
+							? $locale === 'es'
+								? 'CORRECTO'
+								: 'CORRECT'
+							: $locale === 'es'
+								? 'INTÉNTALO'
+								: 'TRY AGAIN'}
 					{:else}
 						{$locale === 'es' ? 'TOCA PARA HABLAR' : 'TAP TO SPEAK'}
 					{/if}
 				</div>
-
-				{#if !locked && !listening}
-					<button class="hm-btn-text skip-link" onclick={skip}>
-						{$locale === 'es' ? 'No puedo hablar ahora' : "Can't speak now"}
-					</button>
-				{/if}
 			</div>
 
 			{#if transcript}
@@ -203,7 +211,10 @@
 					{$locale === 'es' ? 'No puedo hablar ahora' : "Can't speak now"}
 				</button>
 			{:else if unsupported}
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => props.onAnswer(true)}>
+				<button
+					class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
+					onclick={() => props.onAnswer(true)}
+				>
 					{$locale === 'es' ? 'Saltar paso' : 'Skip step'}
 				</button>
 			{/if}
@@ -234,7 +245,7 @@
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 28px;
-		box-shadow: 0 8px 32px rgba(26,26,26,0.06);
+		box-shadow: 0 8px 32px rgba(26, 26, 26, 0.06);
 		padding: 18px 22px 22px;
 		display: flex;
 		flex-direction: column;
@@ -286,7 +297,9 @@
 	}
 
 	.char-unit {
-		transition: color 0.2s ease, transform 0.2s ease;
+		transition:
+			color 0.2s ease,
+			transform 0.2s ease;
 	}
 
 	.char-unit.is-matched {
@@ -329,14 +342,16 @@
 		transition: transform 0.18s cubic-bezier(0.34, 1.5, 0.64, 1);
 	}
 
-	.mic-btn:active { transform: scale(0.94); }
-	
-	.mic-btn[data-state="recording"] {
+	.mic-btn:active {
+		transform: scale(0.94);
+	}
+
+	.mic-btn[data-state='recording'] {
 		background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
 		transform: scale(1.04);
 	}
 
-	.mic-btn[data-state="done"] {
+	.mic-btn[data-state='done'] {
 		background: linear-gradient(135deg, #2e7d5b, #1f5e44);
 	}
 
@@ -349,28 +364,49 @@
 		pointer-events: none;
 	}
 
-	.mic-ring-2 { inset: -16px; }
+	.mic-ring-2 {
+		inset: -16px;
+	}
 
-	.mic-btn[data-state="recording"] .mic-ring {
+	.mic-btn[data-state='recording'] .mic-ring {
 		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
 	}
-	.mic-btn[data-state="recording"] .mic-ring-2 {
+	.mic-btn[data-state='recording'] .mic-ring-2 {
 		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
 	}
 
 	@keyframes pulse-ring {
-		0% { transform: scale(0.9); opacity: 0.7; }
-		100% { transform: scale(1.5); opacity: 0; }
+		0% {
+			transform: scale(0.9);
+			opacity: 0.7;
+		}
+		100% {
+			transform: scale(1.5);
+			opacity: 0;
+		}
 	}
 
-	.wave { display: flex; align-items: center; gap: 4px; height: 36px; }
+	.wave {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		height: 36px;
+	}
 	.wave span {
-		width: 4px; height: 100%; background: white; border-radius: 2px;
+		width: 4px;
+		height: 100%;
+		background: white;
+		border-radius: 2px;
 		animation: wave-bounce 0.9s ease-in-out infinite;
 	}
 	@keyframes wave-bounce {
-		0%, 100% { transform: scaleY(0.3); }
-		50% { transform: scaleY(1); }
+		0%,
+		100% {
+			transform: scaleY(0.3);
+		}
+		50% {
+			transform: scaleY(1);
+		}
 	}
 
 	.mic-label {
@@ -409,7 +445,10 @@
 		transition: opacity 0.2s;
 		padding: 4px 8px;
 	}
-	.skip-link:hover { opacity: 1; color: var(--hinomaru-red); }
+	.skip-link:hover {
+		opacity: 1;
+		color: var(--hinomaru-red);
+	}
 
 	.error-msg {
 		font-size: 14px;
@@ -418,5 +457,9 @@
 		text-align: center;
 	}
 
-	.footer-inner { width: 100%; max-width: 480px; margin: 0 auto; }
+	.footer-inner {
+		width: 100%;
+		max-width: 480px;
+		margin: 0 auto;
+	}
 </style>
