@@ -8,7 +8,10 @@ export type StepKind =
 	| 'listen'
 	| 'speak'
 	| 'fill_sentence'
-	| 'build_sentence';
+	| 'build_sentence'
+	| 'listen_select'
+	| 'translate_sentence'
+	| 'match_pairs';
 
 export interface Step {
 	id: string;

@@ -1,4 +1,4 @@
-export type LessonType = 'learn' | 'quiz' | 'review' | 'speak';
+export type LessonType = 'learn' | 'practice' | 'quiz' | 'review' | 'speak';
 
 export interface Lesson {
 	id: string;
@@ -57,12 +57,12 @@ function build(u: BasicUnit): RoadmapUnit {
 		},
 		{
 			id: `${u.id}__practice`,
-			type: 'quiz',
+			type: 'practice',
 			deckId: primaryDeck.id,
 			title_es: `Práctica: ${u.title_es}`,
 			title_en: `Practice: ${u.title_en}`,
-			goal_es: 'Refuerza lo aprendido con ejercicios.',
-			goal_en: 'Reinforce what you learned with exercises.'
+			goal_es: 'Refuerza lo aprendido con ejercicios variados.',
+			goal_en: 'Reinforce what you learned with varied exercises.'
 		},
 		{
 			id: `${u.id}__speak`,
@@ -75,7 +75,7 @@ function build(u: BasicUnit): RoadmapUnit {
 		},
 		{
 			id: `${u.id}__mastery`,
-			type: 'quiz',
+			type: 'review',
 			deckId: primaryDeck.id,
 			title_es: `Maestría: ${u.title_es}`,
 			title_en: `Mastery: ${u.title_en}`,

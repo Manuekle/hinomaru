@@ -3,10 +3,11 @@ import type { Step, StepKind } from './engine';
 import { cardSupportsTemplate } from './sentenceBuilder';
 
 const POOL: Record<LessonType, StepKind[]> = {
-	learn: ['recognize', 'choose', 'fill_sentence', 'build_sentence', 'listen', 'write'],
+	learn: ['recognize', 'listen_select', 'fill_sentence', 'choose', 'build_sentence'],
+	practice: ['choose', 'translate_sentence', 'fill_sentence', 'match_pairs', 'build_sentence', 'listen_select'],
 	quiz: ['choose', 'fill_sentence', 'build_sentence', 'listen', 'write'],
-	review: ['recognize', 'fill_sentence'],
-	speak: ['listen', 'speak']
+	review: ['translate_sentence', 'match_pairs', 'fill_sentence', 'build_sentence', 'choose'],
+	speak: ['listen_select', 'speak', 'listen', 'speak']
 };
 
 const MAX_CARDS = 6;
@@ -52,9 +53,11 @@ export function buildSteps(lessonType: LessonType, cards: any[]): Step[] {
 	const pairs: Pair[] = [];
 	for (const card of usable) {
 		const supportsTemplate = cardSupportsTemplate(card, cards);
+		const hasExample = !!(card.example && card.example_es);
 		for (const kind of pool) {
 			if ((kind === 'fill_sentence' || kind === 'build_sentence') && !supportsTemplate) continue;
 			if (kind === 'speak' && !card.jp) continue;
+			if (kind === 'translate_sentence' && !hasExample) continue;
 			pairs.push({ card, kind });
 		}
 	}
