@@ -30,7 +30,7 @@
 			id: 'type',
 			titleKey: 'mode.type.title',
 			descKey: 'mode.type.desc',
-			icon: '⌨️'
+			icon: '🔤'
 		},
 		{
 			id: 'write',

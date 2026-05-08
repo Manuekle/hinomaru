@@ -1,54 +1,76 @@
 <script lang="ts">
-	import { HIRAGANA, KATAKANA } from '$lib/data/kana';
+	import {
+		HIRAGANA, KATAKANA,
+		HIRAGANA_DAKUON, KATAKANA_DAKUON,
+		HIRAGANA_HANDAKUON, KATAKANA_HANDAKUON,
+		HIRAGANA_YOON, KATAKANA_YOON,
+		HIRAGANA_LONG, KATAKANA_LONG,
+		HIRAGANA_SOKUON, KATAKANA_SOKUON,
+		type KanaItem
+	} from '$lib/data/kana';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { fadeUp } from '$lib/motion';
+	import { locale } from '$lib/stores/locale';
 
 	let mode = $state<'hiragana' | 'katakana'>('hiragana');
-	const currentData = $derived(mode === 'hiragana' ? HIRAGANA : KATAKANA);
 
-	function play(char: string) {
+	const sections = $derived<{ title_es: string; title_en: string; cols: number; data: KanaItem[] }[]>(
+		mode === 'hiragana'
+			? [
+				{ title_es: 'Gojūon', title_en: 'Gojūon', cols: 5, data: HIRAGANA },
+				{ title_es: 'Dakuon', title_en: 'Dakuon', cols: 5, data: HIRAGANA_DAKUON },
+				{ title_es: 'Handakuon', title_en: 'Handakuon', cols: 5, data: HIRAGANA_HANDAKUON },
+				{ title_es: 'Combinaciones (Yōon)', title_en: 'Combinations (Yōon)', cols: 3, data: HIRAGANA_YOON },
+				{ title_es: 'Vocales largas', title_en: 'Long vowels', cols: 5, data: HIRAGANA_LONG },
+				{ title_es: 'Sokuon (っ)', title_en: 'Sokuon (っ)', cols: 5, data: HIRAGANA_SOKUON }
+			]
+			: [
+				{ title_es: 'Gojūon', title_en: 'Gojūon', cols: 5, data: KATAKANA },
+				{ title_es: 'Dakuon', title_en: 'Dakuon', cols: 5, data: KATAKANA_DAKUON },
+				{ title_es: 'Handakuon', title_en: 'Handakuon', cols: 5, data: KATAKANA_HANDAKUON },
+				{ title_es: 'Combinaciones (Yōon)', title_en: 'Combinations (Yōon)', cols: 3, data: KATAKANA_YOON },
+				{ title_es: 'Vocales largas (ー)', title_en: 'Long vowels (ー)', cols: 5, data: KATAKANA_LONG },
+				{ title_es: 'Sokuon (ッ)', title_en: 'Sokuon (ッ)', cols: 5, data: KATAKANA_SOKUON }
+			]
+	);
+
+	function play(char: string | null) {
 		if (char) speakJapanese(char);
 	}
 </script>
 
 <div class="kana-chart-wrapper">
-	<!-- Pill Toggle inspired by design ref -->
 	<div class="toggle-container" use:fadeUp={{ delay: 0, y: 10 }}>
 		<div class="pill-track">
-			<div
-				class="pill-glider"
-				style="transform: translateX({mode === 'hiragana' ? '0' : '100%'})"
-			></div>
-			<button
-				class="pill-btn"
-				class:active={mode === 'hiragana'}
-				onclick={() => (mode = 'hiragana')}
-			>
+			<div class="pill-glider" style="transform: translateX({mode === 'hiragana' ? '0' : '100%'})"></div>
+			<button class="pill-btn" class:active={mode === 'hiragana'} onclick={() => (mode = 'hiragana')}>
 				Hiragana
 			</button>
-			<button
-				class="pill-btn"
-				class:active={mode === 'katakana'}
-				onclick={() => (mode = 'katakana')}
-			>
+			<button class="pill-btn" class:active={mode === 'katakana'} onclick={() => (mode = 'katakana')}>
 				Katakana
 			</button>
 		</div>
 	</div>
 
-	<!-- Kana Grid -->
-	<div class="kana-grid" use:fadeUp={{ delay: 0.1, y: 16 }}>
-		{#each currentData as item, i (i)}
-			{#if item.jp}
-				<button class="kana-cell" onclick={() => play(item.jp)}>
-					<span class="kana-char">{item.jp}</span>
-					<span class="kana-romaji">{item.romaji}</span>
-				</button>
-			{:else}
-				<div class="kana-cell empty"></div>
+	{#each sections as section, sIdx (mode + sIdx)}
+		<div class="section" use:fadeUp={{ delay: 0.05 + sIdx * 0.04, y: 12 }}>
+			{#if sIdx > 0}
+				<h3 class="section-title">{$locale === 'es' ? section.title_es : section.title_en}</h3>
 			{/if}
-		{/each}
-	</div>
+			<div class="kana-grid" style="grid-template-columns: repeat({section.cols}, 1fr);">
+				{#each section.data as item, i (i)}
+					{#if item.jp}
+						<button class="kana-cell" onclick={() => play(item.jp)}>
+							<span class="kana-char">{item.jp}</span>
+							<span class="kana-romaji">{item.romaji}</span>
+						</button>
+					{:else}
+						<div class="kana-cell empty"></div>
+					{/if}
+				{/each}
+			</div>
+		</div>
+	{/each}
 </div>
 
 <style>
@@ -59,7 +81,7 @@
 	.toggle-container {
 		display: flex;
 		justify-content: center;
-		margin-bottom: 40px;
+		margin-bottom: 32px;
 	}
 
 	.pill-track {
@@ -103,9 +125,22 @@
 		color: var(--sumi);
 	}
 
+	.section {
+		margin-bottom: 28px;
+	}
+
+	.section-title {
+		font-size: 13px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		margin: 0 0 14px;
+		text-align: center;
+	}
+
 	.kana-grid {
 		display: grid;
-		grid-template-columns: repeat(5, 1fr);
 		gap: 12px;
 		max-width: 480px;
 		margin: 0 auto;

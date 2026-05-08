@@ -4,7 +4,7 @@
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import { addXP } from '$lib/utils/gamification';
-	import MatchSession from '$lib/components/sessions/MatchSession.svelte';
+	import MatchPairs from '$lib/components/study/MatchPairs.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -55,7 +55,7 @@
 	}
 </script>
 
-<MatchSession 
+<MatchPairs 
 	cards={data.cards} 
 	deck={data.deck}
 	totalCards={data.totalCards}

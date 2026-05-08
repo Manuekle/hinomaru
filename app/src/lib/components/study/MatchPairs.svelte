@@ -15,24 +15,45 @@
 	import { safeRomaji } from '$lib/utils/romaji';
 
 	interface Props {
-		cards: any[];
-		deck: any;
-		onComplete: (results: { correct: number; total: number; time: number }) => void;
-		onExit: () => void;
+		mode?: 'deck' | 'lesson';
+		cards?: any[];
+		deck?: any;
+		onComplete?: (results: { correct: number; total: number; time: number }) => void;
+		onExit?: () => void;
 		onCardProgress?: (card: any, correct: boolean, struggled: boolean) => void;
 		totalCards?: number;
 		learnedCount?: number;
+		card?: any;
+		pool?: any[];
+		onAnswer?: (correct: boolean) => void;
 	}
 
-	let { 
-		cards: allCards, 
-		deck, 
-		onComplete, 
-		onExit, 
+	let {
+		mode = 'deck',
+		cards: deckCards,
+		deck,
+		onComplete,
+		onExit,
 		onCardProgress,
 		totalCards = 0,
-		learnedCount = 0
-	} = $props<Props>();
+		learnedCount = 0,
+		card: lessonCard,
+		pool = [],
+		onAnswer
+	}: Props = $props();
+
+	const isLesson = $derived(mode === 'lesson');
+	const allCards = $derived(
+		isLesson && lessonCard ? [lessonCard, ...pool].slice(0, 4) : (deckCards ?? [])
+	);
+	const _onComplete = (r: { correct: number; total: number; time: number }) => {
+		if (isLesson) onAnswer?.(true);
+		else onComplete?.(r);
+	};
+	const _onExit = () => {
+		if (isLesson) onAnswer?.(false);
+		else onExit?.();
+	};
 
 	let sessionCards = $state<any[]>([]);
 	let currentIndex = $state(0);
@@ -143,7 +164,7 @@
 		finalTime = elapsed;
 		finished = true;
 		playFinish();
-		onComplete({ correct: allCards.length, total: allCards.length, time: finalTime });
+		_onComplete({ correct: allCards.length, total: allCards.length, time: finalTime });
 	}
 
 	function restart() {
@@ -171,9 +192,10 @@
 	};
 </script>
 
-<div class="session-layout premium-bg">
+<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
+	{#if !isLesson}
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={onExit}>
+		<button class="close-btn" onclick={_onExit}>
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
 		</button>
 
@@ -181,9 +203,10 @@
 			<span class="session-index">{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}</span>
 			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-		
+
 		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
+	{/if}
 
 	<div class="session-container">
 		{#if allCards.length === 0}
@@ -211,17 +234,13 @@
 							onclick={() => select(item)}
 							disabled={isMatched || transitioning}
 						>
-							{#if !isMatched}
-								<div class="card-inner">
-									<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
-									{#if item.type === 'jp'}
-										{@const rom = safeRomaji(item.romaji, item.text)}
-										{#if rom}<div class="romaji-hint">{rom}</div>{/if}
-									{/if}
-								</div>
-							{:else}
-								<div class="matched-icon">✓</div>
-							{/if}
+							<div class="card-inner">
+								<div class="card-text" class:jp={item.type === 'jp'}>{item.text}</div>
+								{#if item.type === 'jp'}
+									{@const rom = safeRomaji(item.romaji, item.text)}
+									{#if rom}<div class="romaji-hint">{rom}</div>{/if}
+								{/if}
+							</div>
 						</button>
 					{/each}
 				</div>
@@ -240,7 +259,7 @@
 						<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={restart}>
 							{t('session.again', $locale)}
 						</button>
-						<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={onExit}>
+						<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={_onExit}>
 							{t('session.finish', $locale)}
 						</button>
 					</StickyFooter>
@@ -259,6 +278,7 @@
 		background-color: var(--bg-page);
 		min-height: 100dvh;
 	}
+	.lesson-embed { min-height: 0; background: transparent; }
 
 	.premium-header-minimal {
 		display: flex;
@@ -344,10 +364,11 @@
 	}
 
 	.match-card.matched {
-		border-color: var(--success);
-		background: var(--success-wash);
-		opacity: 0.45;
-		transform: scale(0.92);
+		opacity: 0.85;
+	}
+	.match-card.matched .card-text,
+	.match-card.matched .romaji-hint {
+		color: var(--success);
 	}
 
 	.match-card.wrong {

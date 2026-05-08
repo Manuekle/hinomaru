@@ -3,7 +3,7 @@
 	import { createClient } from '$lib/supabase';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import FlashcardSession from '$lib/components/sessions/FlashcardSession.svelte';
+	import Flashcards from '$lib/components/study/Flashcards.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<FlashcardSession 
+<Flashcards 
 	cards={data.cards} 
 	deck={data.deck}
 	totalCards={data.totalCards}

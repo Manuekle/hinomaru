@@ -3,7 +3,7 @@
 	import { createClient } from '$lib/supabase';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import SpeakingSession from '$lib/components/sessions/SpeakingSession.svelte';
+	import Pronunciation from '$lib/components/study/Pronunciation.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<SpeakingSession 
+<Pronunciation 
 	cards={data.cards} 
 	deck={data.deck}
 	totalCards={data.totalCards}

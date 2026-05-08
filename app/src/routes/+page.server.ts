@@ -148,6 +148,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		wordSaved,
 		learnedToday,
 		dailyGoal,
-		lessonProgress: lessonProgressRes.data ?? []
+		lessonProgress: (lessonProgressRes.data ?? []).filter(
+			(p: any) => !p.lesson_id?.startsWith('alpha-')
+		)
 	};
 };

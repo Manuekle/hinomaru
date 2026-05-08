@@ -21,24 +21,45 @@
 	import { fadeIn } from '$lib/motion';
 
 	interface Props {
-		cards: any[];
-		deck: any;
-		onComplete: (results: { correct: number; total: number }) => void;
-		onExit: () => void;
+		mode?: 'deck' | 'lesson';
+		cards?: any[];
+		deck?: any;
+		onComplete?: (results: { correct: number; total: number }) => void;
+		onExit?: () => void;
 		onCardProgress?: (card: any, correct: boolean, struggled: boolean) => void;
 		totalCards?: number;
 		learnedCount?: number;
+		card?: any;
+		distractors?: any[];
+		onAnswer?: (correct: boolean) => void;
 	}
 
-	let { 
-		cards: initialCards, 
-		deck, 
-		onComplete, 
-		onExit, 
+	let {
+		mode = 'deck',
+		cards: deckCards,
+		deck,
+		onComplete,
+		onExit,
 		onCardProgress,
 		totalCards = 0,
-		learnedCount = 0
-	} = $props<Props>();
+		learnedCount = 0,
+		card: lessonCard,
+		distractors = [],
+		onAnswer
+	}: Props = $props();
+
+	const isLesson = $derived(mode === 'lesson');
+	const initialCards = $derived(
+		isLesson && lessonCard ? [lessonCard, ...distractors].slice(0, 4) : (deckCards ?? [])
+	);
+	const _onComplete = (r: { correct: number; total: number }) => {
+		if (isLesson) onAnswer?.(r.correct === r.total);
+		else onComplete?.(r);
+	};
+	const _onExit = () => {
+		if (isLesson) onAnswer?.(false);
+		else onExit?.();
+	};
 
 	const queue = $derived.by(() => createMistakeQueue<any>(initialCards));
 	
@@ -47,13 +68,31 @@
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 
-	const card = $derived(queue.current);
-	const isCorrect = $derived(picked === ($locale === 'es' ? card?.es : card?.en));
+	const card = $derived(isLesson ? lessonCard : queue.current);
+	const correctValue = $derived(
+		isLesson ? card?.jp : ($locale === 'es' ? card?.es : card?.en)
+	);
+	const isCorrect = $derived(picked === correctValue);
 
-	const options = $derived.by(() => {
+	interface Option {
+		text: string;
+		romaji?: string;
+	}
+
+	const options = $derived.by<Option[]>(() => {
 		if (!card) return [];
+		if (isLesson) {
+			const target: Option = { text: card.jp, romaji: safeRomaji(card.romaji, card.jp) };
+			const pool: Option[] = [];
+			for (const d of distractors) {
+				if (pool.length >= 3) break;
+				if (!d?.jp || d.jp === card.jp) continue;
+				pool.push({ text: d.jp, romaji: safeRomaji(d.romaji, d.jp) });
+			}
+			const result = [...pool, target].sort(() => Math.random() - 0.5);
+			return result;
+		}
 		const correctMeaning = $locale === 'es' ? card.es : card.en;
-
 		const pool = Array.from(
 			new Set(
 				initialCards
@@ -62,25 +101,32 @@
 					.filter(Boolean)
 			)
 		);
-
 		const need = Math.min(3, pool.length);
 		const shuffled = [...pool].sort(() => Math.random() - 0.5);
-		const distractors = shuffled.slice(0, need);
-		
-		const result = [...distractors, correctMeaning].sort(() => Math.random() - 0.5);
-		return result;
+		const picks = shuffled.slice(0, need).map((s: string) => ({ text: s }));
+		return [...picks, { text: correctMeaning }].sort(() => Math.random() - 0.5);
+	});
+
+	$effect(() => {
+		if (!isLesson) return;
+		void card;
+		picked = null;
+		struggled = false;
+		setTimeout(() => speakJapanese(card?.jp ?? ''), 250);
 	});
 
 	function pick(opt: string) {
 		if (picked) return;
 		picked = opt;
-		const correctMeaning = $locale === 'es' ? card.es : card.en;
-		if (opt === correctMeaning) {
+		if (opt === correctValue) {
 			correct++;
 			playCorrect();
 		} else {
 			struggled = true;
 			playWrong();
+		}
+		if (isLesson) {
+			setTimeout(() => next(), 800);
 		}
 	}
 
@@ -93,7 +139,7 @@
 
 		if (queue.isLast) {
 			showAnticipation = true;
-			onComplete({ correct, total: queue.originalTotal });
+			_onComplete({ correct, total: queue.originalTotal });
 		} else {
 			picked = null;
 			queue.advance();
@@ -106,9 +152,10 @@
 	}
 </script>
 
-<div class="session-layout premium-bg">
+<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
+	{#if !isLesson}
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={onExit}>
+		<button class="close-btn" onclick={_onExit}>
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
 		</button>
 
@@ -116,9 +163,10 @@
 			<span class="session-index">{queue.index + 1} / {queue.total}</span>
 			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-		
+
 		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
+	{/if}
 
 	<div class="session-container">
 		{#if initialCards.length === 0}
@@ -144,10 +192,10 @@
 
 				<div class="options-list">
 					{#each options as opt, idx (idx)}
-						{@const isThisCorrect = opt === ($locale === 'es' ? card.es : card.en)}
-						{@const isThisPicked = opt === picked}
+						{@const isThisCorrect = opt.text === correctValue}
+						{@const isThisPicked = opt.text === picked}
 						<button
-							onclick={() => pick(opt)}
+							onclick={() => pick(opt.text)}
 							class="option-item"
 							class:is-correct={picked && isThisPicked && isThisCorrect}
 							class:is-wrong={picked && isThisPicked && !isThisCorrect}
@@ -163,7 +211,10 @@
 									{String.fromCharCode(65 + idx)}
 								{/if}
 							</div>
-							<span class="opt-text">{opt}</span>
+							<div class="opt-content">
+								<span class="opt-text" class:jp={isLesson}>{opt.text}</span>
+								{#if opt.romaji}<span class="opt-romaji">{opt.romaji}</span>{/if}
+							</div>
 						</button>
 					{/each}
 				</div>
@@ -204,6 +255,10 @@
 		min-height: 100dvh;
 		display: flex;
 		flex-direction: column;
+	}
+	.lesson-embed {
+		min-height: 0;
+		background: transparent;
 	}
 
 	.premium-header-minimal {
@@ -362,10 +417,26 @@
 	.option-item.is-correct .opt-marker { background: var(--success); border-color: var(--success); color: white; }
 	.option-item.is-wrong .opt-marker { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
 
+	.opt-content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
 	.opt-text {
 		font-size: 14px;
 		font-weight: 600;
 		color: var(--fg-primary);
+	}
+	.opt-text.jp {
+		font-size: 17px;
+		font-weight: 700;
+	}
+	.opt-romaji {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--hinomaru-red);
+		opacity: 0.85;
 	}
 
 	.feedback-bar {

@@ -3,7 +3,7 @@
 	import { createClient } from '$lib/supabase';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import TypeSession from '$lib/components/sessions/TypeSession.svelte';
+	import TranslateSentence from '$lib/components/study/TranslateSentence.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<TypeSession 
+<TranslateSentence 
 	cards={data.cards} 
 	deck={data.deck}
 	totalCards={data.totalCards}

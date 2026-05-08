@@ -25,8 +25,9 @@ export function isCleanRomaji(s: string | null | undefined): boolean {
  */
 export function safeRomaji(provided: string | null | undefined, kana?: string | null): string {
 	if (isCleanRomaji(provided ?? '')) return (provided ?? '').trim();
-	if (kana && !KANJI_RE.test(kana)) {
-		const out = kanaToRomaji(kana);
+	if (kana) {
+		// Convert kana parts; if kanji present, drop those chars but still produce best-effort romaji.
+		const out = kanaToRomaji(kana).trim().replace(/\s+/g, ' ');
 		return isCleanRomaji(out) ? out : '';
 	}
 	return '';
@@ -201,6 +202,16 @@ export function kanaToRomaji(kana: string): string {
 					result += mapped;
 				} else if (/[A-Za-z0-9\s'\-.,!?]/.test(char1)) {
 					result += char1;
+				} else if (char1 === '、') {
+					result += ', ';
+				} else if (char1 === '。') {
+					result += '. ';
+				} else if (char1 === '！') {
+					result += '!';
+				} else if (char1 === '？') {
+					result += '?';
+				} else if (char1 === '　') {
+					result += ' ';
 				}
 				// drop kanji and other non-kana, non-latin chars
 				i++;

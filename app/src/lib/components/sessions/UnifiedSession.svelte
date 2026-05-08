@@ -11,16 +11,17 @@
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
-	// Step components
-	import StepRecognize from '$lib/learning/components/StepRecognize.svelte';
+	// Canonical study components (also used by /deck/ routes)
+	import Flashcards from '$lib/components/study/Flashcards.svelte';
+	import MultipleChoice from '$lib/components/study/MultipleChoice.svelte';
+	import WriteKanji from '$lib/components/study/WriteKanji.svelte';
+	import MatchPairs from '$lib/components/study/MatchPairs.svelte';
+	import Pronunciation from '$lib/components/study/Pronunciation.svelte';
+	// Lesson-only steps (no deck mode equivalent)
 	import StepListen from '$lib/learning/components/StepListen.svelte';
-	import StepListenSelect from '$lib/learning/components/StepListenSelect.svelte';
-	import StepSpeak from '$lib/learning/components/StepSpeak.svelte';
-	import StepWrite from '$lib/learning/components/StepWrite.svelte';
 	import StepFillSentence from '$lib/learning/components/StepFillSentence.svelte';
 	import StepBuildSentence from '$lib/learning/components/StepBuildSentence.svelte';
 	import StepTranslateSentence from '$lib/learning/components/StepTranslateSentence.svelte';
-	import StepMatchPairs from '$lib/learning/components/StepMatchPairs.svelte';
 
 	interface Props {
 		cards: any[];
@@ -84,7 +85,6 @@
 </script>
 
 <div class="session-layout premium-bg">
-	<!-- Same header chrome as FlashcardSession / QuizSession -->
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
 		<button class="close-btn" onclick={onExit} aria-label="Salir">
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
@@ -92,7 +92,6 @@
 
 		<div class="header-progress">
 			<span class="session-index">{Math.min(stepsDone + 1, stepsTotal)} / {stepsTotal}</span>
-			<span class="total-label">{t('home.cards', $locale, { n: cards.length })}</span>
 		</div>
 		
 		<div style="width: 44px;"></div> <!-- Spacer for balance -->
@@ -104,15 +103,15 @@
 			{#key stepKey}
 				<div class="step-wrap content-center">
 					{#if currentStep.kind === 'recognize'}
-						<StepRecognize card={currentCard} onAnswer={onStepAnswer} />
+						<Flashcards mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen'}
 						<StepListen card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen_select'}
-						<StepListenSelect card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
+						<MultipleChoice mode="lesson" card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'speak'}
-						<StepSpeak card={currentCard} onAnswer={onStepAnswer} onDisableSpeak={() => canSpeak = false} />
+						<Pronunciation mode="lesson" card={currentCard} onAnswer={onStepAnswer} onDisableSpeak={() => canSpeak = false} />
 					{:else if currentStep.kind === 'write'}
-						<StepWrite card={currentCard} onAnswer={onStepAnswer} />
+						<WriteKanji mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'fill_sentence'}
 						<StepFillSentence card={currentCard} pool={cards} retries={currentStep.retries} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'build_sentence'}
@@ -120,7 +119,7 @@
 					{:else if currentStep.kind === 'translate_sentence'}
 						<StepTranslateSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'match_pairs'}
-						<StepMatchPairs card={currentCard} pool={distractors} onAnswer={onStepAnswer} />
+						<MatchPairs mode="lesson" card={currentCard} pool={distractors} onAnswer={onStepAnswer} />
 					{/if}
 				</div>
 			{/key}
@@ -161,13 +160,6 @@
 		font-weight: 900;
 		color: var(--fg-primary);
 		letter-spacing: -0.01em;
-	}
-	.total-label {
-		font-size: 10px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
 	}
 
 	.close-btn,

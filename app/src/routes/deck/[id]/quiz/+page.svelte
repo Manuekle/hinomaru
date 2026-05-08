@@ -3,7 +3,7 @@
 	import { createClient } from '$lib/supabase';
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
-	import QuizSession from '$lib/components/sessions/QuizSession.svelte';
+	import MultipleChoice from '$lib/components/study/MultipleChoice.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -52,7 +52,7 @@
 	}
 </script>
 
-<QuizSession 
+<MultipleChoice 
 	cards={data.cards} 
 	deck={data.deck}
 	totalCards={data.totalCards}

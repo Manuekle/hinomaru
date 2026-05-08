@@ -27,24 +27,41 @@
 	}
 
 	interface Props {
-		cards: any[];
-		deck: any;
-		onComplete: (results: { correct: number; total: number }) => void;
-		onExit: () => void;
+		mode?: 'deck' | 'lesson';
+		cards?: any[];
+		deck?: any;
+		onComplete?: (results: { correct: number; total: number }) => void;
+		onExit?: () => void;
 		onCardProgress?: (card: any, correct: boolean, struggled: boolean) => void;
 		totalCards?: number;
 		learnedCount?: number;
+		card?: any;
+		onAnswer?: (correct: boolean) => void;
 	}
 
-	let { 
-		cards: quizCards, 
-		deck, 
-		onComplete, 
-		onExit, 
+	let {
+		mode = 'deck',
+		cards: deckCards,
+		deck,
+		onComplete,
+		onExit,
 		onCardProgress,
 		totalCards = 0,
-		learnedCount = 0
-	} = $props<Props>();
+		learnedCount = 0,
+		card: lessonCard,
+		onAnswer
+	}: Props = $props();
+
+	const isLesson = $derived(mode === 'lesson');
+	const quizCards = $derived(isLesson && lessonCard ? [lessonCard] : (deckCards ?? []));
+	const _onComplete = (r: { correct: number; total: number }) => {
+		if (isLesson) onAnswer?.(r.correct === r.total);
+		else onComplete?.(r);
+	};
+	const _onExit = () => {
+		if (isLesson) onAnswer?.(false);
+		else onExit?.();
+	};
 
 	let i = $state(0);
 	let correctCount = $state(0);
@@ -197,7 +214,7 @@
 
 		if (i === quizCards.length - 1) {
 			showAnticipation = true;
-			onComplete({ correct: correctCount, total: quizCards.length });
+			_onComplete({ correct: correctCount, total: quizCards.length });
 		} else {
 			i++;
 			checked = false;
@@ -207,9 +224,10 @@
 	}
 </script>
 
-<div class="session-layout premium-bg">
+<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
+	{#if !isLesson}
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={onExit}>
+		<button class="close-btn" onclick={_onExit}>
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
 		</button>
 
@@ -217,9 +235,10 @@
 			<span class="session-index">{i + 1} / {quizCards.length}</span>
 			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
 		</div>
-		
+
 		<div style="width: 44px;"></div> <!-- Spacer -->
 	</div>
+	{/if}
 
 	<div class="session-container">
 		{#if quizCards.length === 0}
@@ -275,6 +294,7 @@
 
 <style>
 	.premium-bg { background-color: var(--bg-page); min-height: 100dvh; display: flex; flex-direction: column; }
+	.lesson-embed { min-height: 0; background: transparent; }
 	.premium-header-minimal { display: flex; align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 24px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--ink-200); }
 	.header-progress { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
 	.session-index { font-size: 17px; font-weight: 900; color: var(--fg-primary); }

@@ -36,15 +36,18 @@
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
 
-		await supabase.from('lesson_progress').upsert({
-			user_id: user.id,
-			lesson_id: lesson.id,
-			correct_count: results.correct,
-			total_steps: results.total,
-			mistakes_count: results.mistakes,
-			state: results.state as any,
-			completed_at: new Date().toISOString()
-		});
+		await supabase.from('lesson_progress').upsert(
+			{
+				user_id: user.id,
+				lesson_id: lesson.id,
+				correct_count: results.correct,
+				total_steps: results.total,
+				mistakes_count: results.mistakes,
+				state: results.state as any,
+				completed_at: new Date().toISOString()
+			},
+			{ onConflict: 'user_id,lesson_id' }
+		);
 
 		await supabase.from('sessions').insert({
 			user_id: user.id,

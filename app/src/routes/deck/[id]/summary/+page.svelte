@@ -47,8 +47,8 @@
 		const { data: { user } } = await supabase.auth.getUser();
 		if (user && xpEarned > 0) {
 			await addXP(supabase, user.id, xpEarned);
-			await invalidateAll();
 		}
+		await invalidateAll();
 
 		setTimeout(() => {
 			if (pct >= 70) {
@@ -110,15 +110,8 @@
 		</div>
 
 		<StickyFooter>
-			{#if mode && (lessonId || data?.deck?.id)}
-				{@const retryUrl = fromRoadmap ? `/learning/${lessonId}` : `/deck/${data.deck.id}/${mode}`}
-				<a href={retryUrl} class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg">
-					{t('session.again', $locale)}
-				</a>
-			{/if}
-			
 			<a href="/" class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg summary-back-btn">
-				{fromRoadmap ? t('summary.back', $locale) : t('summary.back', $locale)}
+				{t('summary.back', $locale)}
 			</a>
 		</StickyFooter>
 	</div>

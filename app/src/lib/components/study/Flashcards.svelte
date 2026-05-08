@@ -1,11 +1,9 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		VolumeHighIcon, 
-		Cancel01Icon
-	} from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { locale } from '$lib/stores/locale';
 	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
@@ -20,36 +18,59 @@
 	import { fadeIn } from '$lib/motion';
 
 	interface Props {
-		cards: any[];
-		deck: any;
-		onComplete: (results: { correct: number; total: number }) => void;
-		onExit: () => void;
+		mode?: 'deck' | 'lesson';
+		// deck-mode
+		cards?: any[];
+		deck?: any;
+		onComplete?: (results: { correct: number; total: number }) => void;
+		onExit?: () => void;
 		onCardProgress?: (card: any, correct: boolean, struggled: boolean) => void;
 		totalCards?: number;
 		learnedCount?: number;
+		// lesson-mode
+		card?: any;
+		onAnswer?: (correct: boolean) => void;
 	}
 
-	let { 
-		cards: initialCards, 
-		deck, 
-		onComplete, 
-		onExit, 
+	let {
+		mode = 'deck',
+		cards: initialCards = [],
+		deck,
+		onComplete,
+		onExit,
 		onCardProgress,
 		totalCards = 0,
-		learnedCount = 0
-	} = $props<Props>();
+		learnedCount = 0,
+		card: lessonCard,
+		onAnswer
+	}: Props = $props();
 
+	const isLesson = $derived(mode === 'lesson');
+
+	// ---- DECK MODE STATE ----
 	const queue = $derived.by(() => createMistakeQueue<any>(initialCards));
-	
 	let flipped = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 	let cardEl = $state<HTMLDivElement | null>(null);
 
-	const card = $derived(queue.current);
+	const card = $derived(isLesson ? lessonCard : queue.current);
 	const rom = $derived(card ? safeRomaji(card.romaji, card.jp) : '');
-	const exRom = $derived(card?.example ? safeRomaji(card.example_romaji || card.extra?.example_romaji, card.example_kana || card.example) : '');
+	const exRom = $derived(
+		card?.example
+			? safeRomaji(card.example_romaji || card.extra?.example_romaji, card.example_kana || card.example)
+			: ''
+	);
+
+	// reset on lesson card change
+	$effect(() => {
+		if (isLesson) {
+			void lessonCard;
+			flipped = false;
+			struggled = false;
+		}
+	});
 
 	onMount(() => {
 		if (cardEl) {
@@ -66,6 +87,12 @@
 	}
 
 	async function next(gotIt: boolean) {
+		if (isLesson) {
+			if (gotIt) playCorrect();
+			else playWrong();
+			onAnswer?.(gotIt && !struggled);
+			return;
+		}
 		if (gotIt) {
 			correct++;
 			playCorrect();
@@ -73,20 +100,15 @@
 		if (!gotIt || struggled) {
 			queue.requeueCurrent();
 		}
-		
 		if (onCardProgress) onCardProgress(card, gotIt, struggled);
-
 		if (queue.isLast) {
 			showAnticipation = true;
-			onComplete({ correct, total: queue.originalTotal });
+			onComplete?.({ correct, total: queue.originalTotal });
 		} else {
 			if (cardEl) {
 				const dir = gotIt ? -1 : 1;
-				await animate(
-					cardEl,
-					{ opacity: [1, 0], x: [0, dir * 40] },
-					{ duration: 0.2, ease: 'easeIn' }
-				).finished;
+				await animate(cardEl, { opacity: [1, 0], x: [0, dir * 40] }, { duration: 0.2, ease: 'easeIn' })
+					.finished;
 				queue.advance();
 				flipped = false;
 				struggled = false;
@@ -111,32 +133,24 @@
 			animate(cardEl, { scale: [1, 0.98, 1] }, { duration: 0.3 });
 		}
 	}
-
-	function getFontSize(text: string) {
-		const len = text?.length || 0;
-		if (len <= 4) return 'var(--fs-display)';
-		if (len <= 6) return 'var(--fs-2xl)';
-		if (len <= 10) return 'var(--fs-xl)';
-		return 'var(--fs-lg)';
-	}
 </script>
 
-<div class="session-layout premium-bg">
-	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={onExit}>
-			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-		</button>
-
-		<div class="header-progress">
-			<span class="session-index">{queue.index + 1} / {queue.total}</span>
-			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
+	{#if !isLesson}
+		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+			<button class="close-btn" onclick={onExit}>
+				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+			</button>
+			<div class="header-progress">
+				<span class="session-index">{queue.index + 1} / {queue.total}</span>
+				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			</div>
+			<div style="width: 44px;"></div>
 		</div>
-		
-		<div style="width: 44px;"></div> <!-- Spacer -->
-	</div>
+	{/if}
 
 	<div class="session-container">
-		{#if initialCards.length === 0}
+		{#if !isLesson && initialCards.length === 0}
 			<SessionEmptyState
 				totalCards={totalCards}
 				learnedCount={learnedCount}
@@ -153,15 +167,17 @@
 					class="card-scene"
 					aria-label="Flashcard — tap to flip"
 					onclick={() => (flipped = !flipped)}
-					onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), (flipped = !flipped))}
+					onkeydown={(e) =>
+						(e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), (flipped = !flipped))}
 				>
 					<div class="card-body" class:flipped>
-						<!-- Front -->
 						<div class="card-face card-front">
 							<span class="card-tag">{deck?.title || t('nav.vocabulary', $locale)}</span>
-
 							<div class="word-center">
-								<div class="jp card-text" style="font-size: {card.jp.length <= 4 ? 'var(--fs-display)' : 'var(--fs-3xl)'};">
+								<div
+									class="jp card-text"
+									style="font-size: {card.jp.length <= 4 ? 'var(--fs-display)' : 'var(--fs-3xl)'};"
+								>
 									<InteractiveText text={card.jp} />
 								</div>
 								{#if $showRomaji}
@@ -169,14 +185,20 @@
 								{/if}
 								<div class="audio-row">
 									<button
-										onclick={(e) => { e.stopPropagation(); speak(card.jp); }}
+										onclick={(e) => {
+											e.stopPropagation();
+											speak(card.jp);
+										}}
 										class="audio-btn"
 										aria-label="Play normal speed"
 									>
 										<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
 									</button>
 									<button
-										onclick={(e) => { e.stopPropagation(); speak(card.jp, true); }}
+										onclick={(e) => {
+											e.stopPropagation();
+											speak(card.jp, true);
+										}}
 										class="audio-btn slow-btn"
 										aria-label="Play slow speed"
 									>
@@ -185,28 +207,32 @@
 									</button>
 								</div>
 							</div>
-
 							<span class="tap-hint" aria-hidden="true">{t('session.flip', $locale)}</span>
 						</div>
-
-						<!-- Back -->
 						<div class="card-face card-back">
 							<div class="back-scroll">
 								<div class="meaning-large">{$locale === 'es' ? card.es : card.en}</div>
 								{#if rom}<div class="romaji-red">{rom}</div>{/if}
-
 								{#if card.example}
 									<div class="example-block">
 										<div class="example-jp jp">
 											{card.example}
-											<button onclick={(e) => { e.stopPropagation(); speak(card.example); }} class="mini-audio">
+											<button
+												onclick={(e) => {
+													e.stopPropagation();
+													speak(card.example);
+												}}
+												class="mini-audio"
+											>
 												<Icon icon={VolumeHighIcon} size={13} color="currentColor" />
 											</button>
 										</div>
 										{#if $showRomaji}
 											{#if exRom}<div class="example-romaji">{exRom}</div>{/if}
 										{/if}
-										<div class="example-translation">{$locale === 'es' ? card.example_es : card.example_en}</div>
+										<div class="example-translation">
+											{$locale === 'es' ? card.example_es : card.example_en}
+										</div>
 									</div>
 								{:else}
 									<div class="example-block example-empty">
@@ -252,7 +278,10 @@
 		display: flex;
 		flex-direction: column;
 	}
-
+	.lesson-embed {
+		min-height: 0;
+		background: transparent;
+	}
 	.premium-header-minimal {
 		display: flex;
 		align-items: center;
@@ -261,7 +290,6 @@
 		background: var(--bg-surface);
 		border-bottom: 1px solid var(--ink-200);
 	}
-
 	.header-progress {
 		display: flex;
 		flex-direction: column;
@@ -281,7 +309,6 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
-
 	.close-btn {
 		color: var(--fg-secondary);
 		background: none;
@@ -290,7 +317,6 @@
 		cursor: pointer;
 		transition: all 0.2s;
 	}
-
 	.card-stack-center {
 		flex: 1;
 		display: flex;
@@ -299,7 +325,6 @@
 		padding: 24px 0 24px;
 		perspective: 1000px;
 	}
-
 	.card-scene {
 		width: 100%;
 		max-width: 440px;
@@ -312,13 +337,11 @@
 		display: flex;
 		font: inherit;
 	}
-
 	.card-scene:focus-visible {
 		outline: 3px solid var(--hinomaru-red);
 		outline-offset: 6px;
 		border-radius: 32px;
 	}
-
 	.card-body {
 		position: relative;
 		width: 100%;
@@ -328,9 +351,9 @@
 		transform-style: preserve-3d;
 		will-change: transform;
 	}
-
-	.card-body.flipped { transform: rotateY(180deg); }
-
+	.card-body.flipped {
+		transform: rotateY(180deg);
+	}
 	.card-face {
 		position: absolute;
 		inset: 0;
@@ -339,9 +362,10 @@
 		display: flex;
 		flex-direction: column;
 		border: 1px solid var(--ink-200);
-		box-shadow: 0 4px 24px rgba(26,26,26,0.08), 0 1px 4px rgba(26,26,26,0.04);
+		box-shadow:
+			0 4px 24px rgba(26, 26, 26, 0.08),
+			0 1px 4px rgba(26, 26, 26, 0.04);
 	}
-
 	.card-front {
 		background: var(--bg-surface);
 		align-items: center;
@@ -349,14 +373,12 @@
 		padding: 20px 24px 24px;
 		overflow: hidden;
 	}
-
 	.card-back {
 		transform: rotateY(180deg);
 		background: var(--bg-surface);
 		padding: 0;
 		overflow: hidden;
 	}
-
 	.card-tag {
 		font-size: 10px;
 		font-weight: 800;
@@ -367,7 +389,6 @@
 		padding: 4px 10px;
 		border-radius: 20px;
 	}
-
 	.word-center {
 		flex: 1;
 		display: flex;
@@ -376,19 +397,10 @@
 		justify-content: center;
 		gap: 20px;
 	}
-
-	.word-text {
-		color: var(--fg-primary);
-		line-height: 1;
-		text-align: center;
-		font-weight: 700;
-	}
-
 	.audio-row {
 		display: flex;
 		gap: 10px;
 	}
-
 	.audio-btn {
 		height: 44px;
 		padding: 0 16px;
@@ -404,23 +416,19 @@
 		font-family: inherit;
 		-webkit-tap-highlight-color: transparent;
 	}
-
 	.audio-btn:focus-visible {
 		outline: 2px solid var(--hinomaru-red);
 		outline-offset: 2px;
 	}
-
 	.slow-btn {
 		border-color: var(--hinomaru-red);
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 	}
-
 	.slow-label {
 		font-size: 11px;
 		font-weight: 800;
 	}
-
 	.tap-hint {
 		font-size: 11px;
 		font-weight: 700;
@@ -428,7 +436,6 @@
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 	}
-
 	.back-scroll {
 		flex: 1;
 		overflow-y: auto;
@@ -440,12 +447,9 @@
 		align-items: center;
 		justify-content: center;
 	}
-
-	@supports (height: 1px) {
-		.back-scroll > :global(*) { flex-shrink: 0; }
+	.example-empty {
+		align-items: center;
 	}
-
-	.example-empty { align-items: center; }
 	.example-empty-text {
 		font-size: 13px;
 		font-style: italic;
@@ -454,21 +458,18 @@
 		background: var(--bg-muted);
 		border-radius: 10px;
 	}
-
 	.meaning-large {
 		font-size: clamp(28px, 7vw, 38px);
 		font-weight: 900;
 		color: var(--fg-primary);
 		line-height: 1.1;
 	}
-
 	.romaji-red {
 		margin-top: 10px;
 		font-size: clamp(15px, 4vw, 19px);
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
-
 	.example-block {
 		margin-top: 20px;
 		padding-top: 20px;
@@ -478,7 +479,6 @@
 		gap: 6px;
 		width: 100%;
 	}
-
 	.example-jp {
 		font-size: 17px;
 		font-weight: 600;
@@ -488,7 +488,6 @@
 		justify-content: center;
 		gap: 8px;
 	}
-
 	.mini-audio {
 		flex-shrink: 0;
 		width: 26px;
@@ -503,13 +502,11 @@
 		cursor: pointer;
 		-webkit-tap-highlight-color: transparent;
 	}
-
 	.example-romaji {
 		font-size: 13px;
 		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
-
 	.example-translation {
 		font-size: 14px;
 		color: var(--fg-secondary);

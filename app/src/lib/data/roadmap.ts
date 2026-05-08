@@ -52,8 +52,8 @@ function build(u: BasicUnit): RoadmapUnit {
 			deckId: primaryDeck.id,
 			title_es: `Aprender: ${primaryDeck.title_es}`,
 			title_en: `Learn: ${primaryDeck.title_en}`,
-			goal_es: 'Introducción al vocabulario esencial.',
-			goal_en: 'Introduction to essential vocabulary.'
+			goal_es: 'Conoce el vocabulario base.',
+			goal_en: 'Meet the base vocabulary.'
 		},
 		{
 			id: `${u.id}__practice`,
@@ -61,8 +61,8 @@ function build(u: BasicUnit): RoadmapUnit {
 			deckId: primaryDeck.id,
 			title_es: `Práctica: ${u.title_es}`,
 			title_en: `Practice: ${u.title_en}`,
-			goal_es: 'Refuerza lo aprendido con ejercicios variados.',
-			goal_en: 'Reinforce what you learned with varied exercises.'
+			goal_es: 'Refuerza con ejercicios.',
+			goal_en: 'Reinforce with exercises.'
 		},
 		{
 			id: `${u.id}__speak`,
@@ -70,8 +70,17 @@ function build(u: BasicUnit): RoadmapUnit {
 			deckId: primaryDeck.id,
 			title_es: `Hablar: ${u.title_es}`,
 			title_en: `Speak: ${u.title_en}`,
-			goal_es: 'Mejora tu pronunciación y fluidez.',
-			goal_en: 'Improve your pronunciation and fluency.'
+			goal_es: 'Mejora tu pronunciación.',
+			goal_en: 'Improve your pronunciation.'
+		},
+		{
+			id: `${u.id}__quiz`,
+			type: 'quiz',
+			deckId: primaryDeck.id,
+			title_es: `Quiz: ${u.title_es}`,
+			title_en: `Quiz: ${u.title_en}`,
+			goal_es: 'Evalúa tu progreso.',
+			goal_en: 'Evaluate your progress.'
 		},
 		{
 			id: `${u.id}__mastery`,
@@ -79,8 +88,8 @@ function build(u: BasicUnit): RoadmapUnit {
 			deckId: primaryDeck.id,
 			title_es: `Maestría: ${u.title_es}`,
 			title_en: `Mastery: ${u.title_en}`,
-			goal_es: 'Demuestra tu dominio total del tema.',
-			goal_en: 'Demonstrate your total mastery of the topic.'
+			goal_es: 'Demuestra dominio total.',
+			goal_en: 'Show total mastery.'
 		}
 	];
 
@@ -230,90 +239,226 @@ export const ROADMAPS: Record<string, RoadmapUnit[]> = {
 			objective_es: 'Pregunta por lugares específicos.',
 			objective_en: 'Ask for specific places.',
 			decks: [{ id: 'n5-places', title_es: 'Lugares', title_en: 'Places' }]
+		}),
+		// Primeros Saludos — secciones adicionales
+		build({
+			id: 'sv-s1-u4',
+			section_es: 'Primeros Saludos',
+			section_en: 'First Greetings',
+			title_es: 'Despedidas Variadas',
+			title_en: 'Varied Farewells',
+			emoji: '👋',
+			objective_es: 'Aprende formas de despedida según el contexto.',
+			objective_en: 'Learn ways to say goodbye by context.',
+			decks: [{ id: 'n5-greetings', title_es: 'Despedidas', title_en: 'Farewells' }]
+		}),
+		build({
+			id: 'sv-s1-u5',
+			section_es: 'Primeros Saludos',
+			section_en: 'First Greetings',
+			title_es: 'Saludos del Día',
+			title_en: 'Time-of-Day Greetings',
+			emoji: '🌅',
+			objective_es: 'Ohayou, Konnichiwa, Konbanwa.',
+			objective_en: 'Ohayou, Konnichiwa, Konbanwa.',
+			decks: [{ id: 'n5-greetings', title_es: 'Saludos del día', title_en: 'Day greetings' }]
+		}),
+		build({
+			id: 'sv-s1-u6',
+			section_es: 'Primeros Saludos',
+			section_en: 'First Greetings',
+			title_es: 'Conocer Personas',
+			title_en: 'Meeting People',
+			emoji: '🤝',
+			objective_es: 'Hajimemashite y presentaciones formales.',
+			objective_en: 'Hajimemashite and formal introductions.',
+			decks: [{ id: 'survival-intro', title_es: 'Presentaciones', title_en: 'Introductions' }]
+		}),
+		// En el Restaurante — secciones adicionales
+		build({
+			id: 'sv-s2-u5',
+			section_es: 'En el Restaurante',
+			section_en: 'At the Restaurant',
+			title_es: 'Sabores y Texturas',
+			title_en: 'Flavors & Textures',
+			emoji: '🍱',
+			objective_es: 'Describe la comida que pruebas.',
+			objective_en: 'Describe the food you taste.',
+			decks: [{ id: 'n5-food', title_es: 'Sabores', title_en: 'Flavors' }]
+		}),
+		build({
+			id: 'sv-s2-u6',
+			section_es: 'En el Restaurante',
+			section_en: 'At the Restaurant',
+			title_es: 'Reservar Mesa',
+			title_en: 'Booking a Table',
+			emoji: '📅',
+			objective_es: 'Haz una reserva con tu nombre.',
+			objective_en: 'Make a reservation with your name.',
+			decks: [{ id: 'survival-restaurant', title_es: 'Reservas', title_en: 'Reservations' }]
+		}),
+		// De Compras — secciones adicionales
+		build({
+			id: 'sv-s3-u4',
+			section_es: 'De Compras',
+			section_en: 'Shopping',
+			title_es: 'Tallas y Colores',
+			title_en: 'Sizes & Colors',
+			emoji: '👕',
+			objective_es: 'Pide la talla y color que necesitas.',
+			objective_en: 'Ask for the size and color you need.',
+			decks: [{ id: 'n5-objects', title_es: 'Ropa', title_en: 'Clothing' }]
+		}),
+		build({
+			id: 'sv-s3-u5',
+			section_es: 'De Compras',
+			section_en: 'Shopping',
+			title_es: 'Pagar y Cambio',
+			title_en: 'Paying & Change',
+			emoji: '💳',
+			objective_es: 'Paga, recibe el cambio y la factura.',
+			objective_en: 'Pay, get change and the receipt.',
+			decks: [{ id: 'n5-numbers', title_es: 'Pagos', title_en: 'Payments' }]
+		}),
+		build({
+			id: 'sv-s3-u6',
+			section_es: 'De Compras',
+			section_en: 'Shopping',
+			title_es: 'Regalos y Souvenirs',
+			title_en: 'Gifts & Souvenirs',
+			emoji: '🎁',
+			objective_es: 'Vocabulario para comprar regalos típicos.',
+			objective_en: 'Vocabulary to buy typical gifts.',
+			decks: [{ id: 'survival-shopping', title_es: 'Regalos', title_en: 'Gifts' }]
+		}),
+		// Moverse en Japón — secciones adicionales
+		build({
+			id: 'sv-s4-u3',
+			section_es: 'Moverse en Japón',
+			section_en: 'Getting Around',
+			title_es: 'Direcciones Básicas',
+			title_en: 'Basic Directions',
+			emoji: '🧭',
+			objective_es: 'Izquierda, derecha, recto y cerca.',
+			objective_en: 'Left, right, straight and near.',
+			decks: [{ id: 'survival-directions', title_es: 'Direcciones', title_en: 'Directions' }]
+		}),
+		build({
+			id: 'sv-s4-u4',
+			section_es: 'Moverse en Japón',
+			section_en: 'Getting Around',
+			title_es: 'Taxi y Autobús',
+			title_en: 'Taxi & Bus',
+			emoji: '🚕',
+			objective_es: 'Toma taxis y buses sin perderte.',
+			objective_en: 'Take taxis and buses without getting lost.',
+			decks: [{ id: 'survival-directions', title_es: 'Taxi/Bus', title_en: 'Taxi/Bus' }]
+		}),
+		build({
+			id: 'sv-s4-u5',
+			section_es: 'Moverse en Japón',
+			section_en: 'Getting Around',
+			title_es: 'Aeropuerto y Hotel',
+			title_en: 'Airport & Hotel',
+			emoji: '✈️',
+			objective_es: 'Llega y hospédate sin problema.',
+			objective_en: 'Arrive and check in without trouble.',
+			decks: [{ id: 'n5-places', title_es: 'Viaje', title_en: 'Travel' }]
+		}),
+		// Nueva etapa: Tiempo y Clima
+		build({
+			id: 'sv-s5-u1',
+			section_es: 'Tiempo y Clima',
+			section_en: 'Time & Weather',
+			title_es: 'La Hora',
+			title_en: 'Telling Time',
+			emoji: '🕐',
+			objective_es: 'Pregunta y di la hora exacta.',
+			objective_en: 'Ask and tell the exact time.',
+			decks: [{ id: 'n5-numbers', title_es: 'Hora', title_en: 'Time' }]
+		}),
+		build({
+			id: 'sv-s5-u2',
+			section_es: 'Tiempo y Clima',
+			section_en: 'Time & Weather',
+			title_es: 'Días y Semanas',
+			title_en: 'Days & Weeks',
+			emoji: '📆',
+			objective_es: 'Días de la semana y meses.',
+			objective_en: 'Days of the week and months.',
+			decks: [{ id: 'n5-numbers', title_es: 'Calendario', title_en: 'Calendar' }]
+		}),
+		build({
+			id: 'sv-s5-u3',
+			section_es: 'Tiempo y Clima',
+			section_en: 'Time & Weather',
+			title_es: 'El Clima',
+			title_en: 'Weather',
+			emoji: '☀️',
+			objective_es: 'Habla del calor, frío y lluvia.',
+			objective_en: 'Talk about heat, cold and rain.',
+			decks: [{ id: 'survival-intro', title_es: 'Clima', title_en: 'Weather' }]
+		}),
+		build({
+			id: 'sv-s5-u4',
+			section_es: 'Tiempo y Clima',
+			section_en: 'Time & Weather',
+			title_es: 'Estaciones',
+			title_en: 'Seasons',
+			emoji: '🍂',
+			objective_es: 'Primavera, verano, otoño, invierno.',
+			objective_en: 'Spring, summer, autumn, winter.',
+			decks: [{ id: 'survival-intro', title_es: 'Estaciones', title_en: 'Seasons' }]
+		}),
+		// Nueva etapa: Vida Diaria
+		build({
+			id: 'sv-s6-u1',
+			section_es: 'Vida Diaria',
+			section_en: 'Daily Life',
+			title_es: 'Mi Familia',
+			title_en: 'My Family',
+			emoji: '👨‍👩‍👧',
+			objective_es: 'Habla sobre tu familia.',
+			objective_en: 'Talk about your family.',
+			decks: [{ id: 'n5-greetings', title_es: 'Familia', title_en: 'Family' }]
+		}),
+		build({
+			id: 'sv-s6-u2',
+			section_es: 'Vida Diaria',
+			section_en: 'Daily Life',
+			title_es: 'Mi Casa',
+			title_en: 'My Home',
+			emoji: '🏠',
+			objective_es: 'Habitaciones y muebles.',
+			objective_en: 'Rooms and furniture.',
+			decks: [{ id: 'n5-objects', title_es: 'Casa', title_en: 'Home' }]
+		}),
+		build({
+			id: 'sv-s6-u3',
+			section_es: 'Vida Diaria',
+			section_en: 'Daily Life',
+			title_es: 'Rutina Diaria',
+			title_en: 'Daily Routine',
+			emoji: '☕',
+			objective_es: 'Despertar, comer, trabajar, dormir.',
+			objective_en: 'Wake up, eat, work, sleep.',
+			decks: [{ id: 'survival-intro', title_es: 'Rutina', title_en: 'Routine' }]
+		}),
+		build({
+			id: 'sv-s6-u4',
+			section_es: 'Vida Diaria',
+			section_en: 'Daily Life',
+			title_es: 'Hobbies y Tiempo Libre',
+			title_en: 'Hobbies & Free Time',
+			emoji: '🎨',
+			objective_es: 'Cuenta qué te gusta hacer.',
+			objective_en: 'Tell what you like to do.',
+			decks: [{ id: 'survival-intro', title_es: 'Hobbies', title_en: 'Hobbies' }]
 		})
 	],
 
 	N5: [
-		// ── ESCRITURA: HIRAGANA ──────────────────────────────────────────────
-		build({
-			id: 'n5-s1-u1',
-			section_es: 'Escritura: Hiragana',
-			section_en: 'Writing: Hiragana',
-			title_es: 'Hiragana: Vocales',
-			title_en: 'Hiragana: Vowels',
-			emoji: 'あ',
-			objective_es: 'Domina あ い う え お, los cinco sonidos base.',
-			objective_en: 'Master あ い う え お, the five base sounds.',
-			decks: [{ id: 'n5-hiragana', title_es: 'Vocales Hiragana', title_en: 'Hiragana Vowels' }]
-		}),
-		build({
-			id: 'n5-s1-u2',
-			section_es: 'Escritura: Hiragana',
-			section_en: 'Writing: Hiragana',
-			title_es: 'Hiragana: K, S, T, N',
-			title_en: 'Hiragana: K, S, T, N',
-			emoji: 'か',
-			objective_es: 'Aprende las filas KA, SA, TA y NA.',
-			objective_en: 'Learn the KA, SA, TA and NA rows.',
-			decks: [{ id: 'n5-hiragana', title_es: 'K S T N', title_en: 'K S T N' }]
-		}),
-		build({
-			id: 'n5-s1-u3',
-			section_es: 'Escritura: Hiragana',
-			section_en: 'Writing: Hiragana',
-			title_es: 'Hiragana: H, M, Y, R, W',
-			title_en: 'Hiragana: H, M, Y, R, W',
-			emoji: 'は',
-			objective_es: 'Completa el silabario con HA, MA, YA, RA, WA y N.',
-			objective_en: 'Complete the syllabary with HA, MA, YA, RA, WA and N.',
-			decks: [{ id: 'n5-hiragana', title_es: 'H M Y R W', title_en: 'H M Y R W' }]
-		}),
-		build({
-			id: 'n5-s1-u4',
-			section_es: 'Escritura: Hiragana',
-			section_en: 'Writing: Hiragana',
-			title_es: 'Hiragana: Dakuten y Combinaciones',
-			title_en: 'Hiragana: Dakuten & Combos',
-			emoji: '💮',
-			objective_es: 'Sonidos voiced (が、ざ、だ…) y combinaciones (きゃ、しゃ…).',
-			objective_en: 'Voiced sounds (が、ざ、だ…) and combos (きゃ、しゃ…).',
-			decks: [{ id: 'n5-hiragana', title_es: 'Dakuten y Combos', title_en: 'Dakuten & Combos' }]
-		}),
-
-		// ── ESCRITURA: KATAKANA ──────────────────────────────────────────────
-		build({
-			id: 'n5-s2-u1',
-			section_es: 'Escritura: Katakana',
-			section_en: 'Writing: Katakana',
-			title_es: 'Katakana: Grupo 1',
-			title_en: 'Katakana: Group 1',
-			emoji: 'ア',
-			objective_es: 'Aprende ア行 a ナ行 para leer palabras extranjeras.',
-			objective_en: 'Learn ア row to ナ row to read foreign words.',
-			decks: [{ id: 'n5-katakana', title_es: 'Katakana 1', title_en: 'Katakana 1' }]
-		}),
-		build({
-			id: 'n5-s2-u2',
-			section_es: 'Escritura: Katakana',
-			section_en: 'Writing: Katakana',
-			title_es: 'Katakana: Grupo 2',
-			title_en: 'Katakana: Group 2',
-			emoji: 'ハ',
-			objective_es: 'Completa ハ行 a ワ行 y domina el katakana completo.',
-			objective_en: 'Complete ハ row to ワ row and master full katakana.',
-			decks: [{ id: 'n5-katakana', title_es: 'Katakana 2', title_en: 'Katakana 2' }]
-		}),
-		build({
-			id: 'n5-s2-u3',
-			section_es: 'Escritura: Katakana',
-			section_en: 'Writing: Katakana',
-			title_es: 'Palabras del Exterior',
-			title_en: 'Loanwords',
-			emoji: '🌐',
-			objective_es: 'Lee y reconoce préstamos del inglés y otros idiomas.',
-			objective_en: 'Read and recognize loanwords from English and other languages.',
-			decks: [{ id: 'n5-katakana', title_es: 'Préstamos', title_en: 'Loanwords' }]
-		}),
+		// Alfabeto (hiragana / katakana) movido a `alphabetRoadmap.ts` — ruta /alphabet.
 
 		// ── KANJI BÁSICO ─────────────────────────────────────────────────────
 		build({

@@ -17,24 +17,45 @@
 	import { fade } from 'svelte/transition';
 
 	interface Props {
-		cards: any[];
-		deck: any;
-		onComplete: (results: { correct: number; total: number }) => void;
-		onExit: () => void;
+		mode?: 'deck' | 'lesson';
+		cards?: any[];
+		deck?: any;
+		onComplete?: (results: { correct: number; total: number }) => void;
+		onExit?: () => void;
 		onCardProgress?: (card: any, correct: boolean, struggled: boolean) => void;
 		totalCards?: number;
 		learnedCount?: number;
+		card?: any;
+		onAnswer?: (correct: boolean) => void;
+		onDisableSpeak?: () => void;
 	}
 
 	let {
-		cards: initialCards,
+		mode = 'deck',
+		cards: deckCards,
 		deck,
 		onComplete,
 		onExit,
 		onCardProgress,
 		totalCards = 0,
-		learnedCount = 0
-	} = $props<Props>();
+		learnedCount = 0,
+		card: lessonCard,
+		onAnswer,
+		onDisableSpeak
+	}: Props = $props();
+
+	const isLesson = $derived(mode === 'lesson');
+	const initialCards = $derived(isLesson && lessonCard ? [lessonCard] : (deckCards ?? []));
+	const _onComplete = (r: { correct: number; total: number }) => {
+		if (isLesson) onAnswer?.(r.correct === r.total);
+		else onComplete?.(r);
+	};
+	const _onExit = () => {
+		if (isLesson) {
+			onDisableSpeak?.();
+			onAnswer?.(true);
+		} else onExit?.();
+	};
 
 	const queue = $derived.by(() => createMistakeQueue<any>(initialCards));
 
@@ -184,7 +205,7 @@
 		}
 		if (queue.isLast) {
 			showAnticipation = true;
-			onComplete({ correct, total: queue.originalTotal });
+			_onComplete({ correct, total: queue.originalTotal });
 		} else {
 			submitted = false;
 			transcript = '';
@@ -208,7 +229,7 @@
 
 		if (queue.isLast) {
 			showAnticipation = true;
-			onComplete({ correct, total: queue.originalTotal });
+			_onComplete({ correct, total: queue.originalTotal });
 		} else {
 			submitted = false;
 			transcript = '';
@@ -223,13 +244,14 @@
 	}
 </script>
 
-<div class="session-layout premium-bg">
+<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
+	{#if !isLesson}
 	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
 		<button
 			class="close-btn"
 			onclick={() => {
 				recognizer?.abort();
-				onExit();
+				_onExit();
 			}}
 		>
 			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
@@ -242,6 +264,7 @@
 
 		<div style="width: 40px;"></div>
 	</div>
+	{/if}
 
 	<div class="session-container">
 		{#if initialCards.length === 0}
@@ -372,6 +395,7 @@
 		display: flex;
 		flex-direction: column;
 	}
+	.lesson-embed { min-height: 0; background: transparent; }
 
 	.premium-header-minimal {
 		display: flex;
