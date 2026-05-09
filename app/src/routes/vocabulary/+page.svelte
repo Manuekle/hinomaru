@@ -6,7 +6,6 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { speakJapanese } from '$lib/utils/tts';
-	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import Icon from '$lib/Icon.svelte';
 	import {
@@ -229,9 +228,7 @@
 										</div>
 										<span class="kana-text jp">{word.kana}</span>
 									</div>
-									{#if $showRomaji}
-										<span class="romaji-text">{word.romaji || kanaToRomaji(word.kana)}</span>
-									{/if}
+									<span class="romaji-text">{word.romaji || kanaToRomaji(word.kana)}</span>
 								</div>
 							</div>
 

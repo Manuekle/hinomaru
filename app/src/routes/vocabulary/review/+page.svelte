@@ -1,10 +1,9 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { VolumeHighIcon, Cancel01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
-	import { showRomaji } from '$lib/stores/settings';
 	import { t } from '$lib/i18n';
 	import { createClient } from '$lib/supabase';
 	import { animate } from 'motion';
@@ -159,14 +158,7 @@
 			{Math.min(i + 1, words.length)} / {words.length}
 		</div>
 
-		<button
-			class="lang-btn"
-			class:active={$showRomaji}
-			onclick={() => ($showRomaji = !$showRomaji)}
-			title="Toggle Romaji"
-		>
-			<Icon icon={TranslateIcon} size={24} color="currentColor" />
-		</button>
+		<div style="width: 44px;"></div>
 	</div>
 
 	<div class="session-container">
@@ -223,7 +215,7 @@
 						<div class="card-face card-back">
 							<div class="back-scroll">
 								<div class="meaning-large">{$locale === 'es' ? word.es : word.en}</div>
-								{#if $showRomaji && rom}
+								{#if rom}
 									<div class="romaji-red">{rom}</div>
 								{/if}
 
@@ -235,16 +227,10 @@
 												<Icon icon={VolumeHighIcon} size={13} color="currentColor" />
 											</button>
 										</div>
-										{#if $showRomaji && exRom}
+										{#if exRom}
 											<div class="example-romaji">{exRom}</div>
 										{/if}
 										<div class="example-translation">{$locale === 'es' ? word.example_es : word.example_en}</div>
-									</div>
-								{:else}
-									<div class="example-block example-empty">
-										<div class="example-empty-text">
-											{$locale === 'es' ? 'Sin ejemplo disponible' : 'No example available'}
-										</div>
 									</div>
 								{/if}
 							</div>
@@ -300,17 +286,13 @@
 		color: var(--fg-primary);
 	}
 
-	.close-btn, .lang-btn {
+	.close-btn {
 		color: var(--fg-secondary);
 		background: none;
 		border: none;
 		padding: 8px;
 		cursor: pointer;
 		transition: all 0.2s;
-	}
-
-	.lang-btn.active {
-		color: var(--hinomaru-red);
 	}
 
 	.card-stack-center {
@@ -513,16 +495,6 @@
 
 	.example-romaji { font-size: 13px; font-weight: 700; color: var(--hinomaru-red); }
 	.example-translation { font-size: 14px; color: var(--fg-secondary); line-height: 1.4; }
-
-	.example-empty { align-items: center; }
-	.example-empty-text {
-		font-size: 13px;
-		font-style: italic;
-		color: var(--fg-tertiary);
-		padding: 6px 12px;
-		background: var(--bg-muted);
-		border-radius: 10px;
-	}
 
 	.empty-state-wrapper {
 		flex: 1;

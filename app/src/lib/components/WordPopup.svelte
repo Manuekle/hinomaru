@@ -125,12 +125,12 @@
 	.popup-overlay {
 		position: fixed;
 		inset: 0;
-		z-index: 3000;
+		z-index: 12000;
 	}
 
 	.word-popup {
 		position: fixed;
-		z-index: 3001;
+		z-index: 12001;
 		width: 220px;
 		background: var(--bg-surface, rgba(255, 255, 255, 0.95));
 		backdrop-filter: blur(12px);

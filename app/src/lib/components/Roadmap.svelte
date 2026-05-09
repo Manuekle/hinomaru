@@ -368,6 +368,36 @@
 			css: (t: number) => `transform: translateY(${(1 - t) * 100}%);`
 		};
 	}
+
+	let drawerEl = $state<HTMLDivElement | null>(null);
+	let dragStartY = 0;
+	let dragOffset = $state(0);
+	let dragging = false;
+
+	function dragStart(e: PointerEvent) {
+		if (!drawerEl) return;
+		dragging = true;
+		dragStartY = e.clientY;
+		dragOffset = 0;
+		(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+	}
+
+	function dragMove(e: PointerEvent) {
+		if (!dragging) return;
+		const dy = e.clientY - dragStartY;
+		dragOffset = Math.max(0, dy);
+	}
+
+	function dragEnd(e: PointerEvent) {
+		if (!dragging) return;
+		dragging = false;
+		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+		const threshold = drawerEl ? drawerEl.offsetHeight * 0.25 : 120;
+		if (dragOffset > threshold) {
+			drawerOpen = false;
+		}
+		dragOffset = 0;
+	}
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -584,9 +614,21 @@
 		class="drawer"
 		role="dialog"
 		aria-modal="true"
+		bind:this={drawerEl}
+		class:dragging
+		style={dragOffset > 0 ? `transform: translateY(${dragOffset}px);` : ''}
 		transition:drawerSlide={{ duration: 320 }}
 	>
-		<div class="drawer-handle"></div>
+		<div
+			class="drawer-handle-zone"
+			onpointerdown={dragStart}
+			onpointermove={dragMove}
+			onpointerup={dragEnd}
+			onpointercancel={dragEnd}
+			role="presentation"
+		>
+			<div class="drawer-handle"></div>
+		</div>
 		<div class="drawer-header" style="--accent: {dc.bg};">
 			<div class="drawer-emoji">{drawerSeccion?.emoji || '📚'}</div>
 			<div class="drawer-info">
@@ -1149,6 +1191,11 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+		transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.drawer.dragging {
+		transition: none;
 	}
 
 	@media (min-width: 720px) {
@@ -1163,13 +1210,25 @@
 		}
 	}
 
+	.drawer-handle-zone {
+		padding: 8px 0 4px;
+		display: flex;
+		justify-content: center;
+		cursor: grab;
+		touch-action: none;
+		flex-shrink: 0;
+	}
+
+	.drawer-handle-zone:active {
+		cursor: grabbing;
+	}
+
 	.drawer-handle {
 		width: 44px;
 		height: 5px;
 		background: var(--ink-300);
 		border-radius: 99px;
-		margin: 10px auto 6px;
-		flex-shrink: 0;
+		pointer-events: none;
 	}
 
 	.drawer-header {
