@@ -14,9 +14,10 @@
 	import AlphabetCharMcq from '$lib/components/alphabet/AlphabetCharMcq.svelte';
 	import AlphabetListenWord from '$lib/components/alphabet/AlphabetListenWord.svelte';
 	import MatchPairs from '$lib/components/study/MatchPairs.svelte';
+	import WriteKanji from '$lib/components/study/WriteKanji.svelte';
 	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 
-	type StepKind = 'introduce' | 'sound_for_char' | 'char_for_sound' | 'match_pairs' | 'listen_word';
+	type StepKind = 'introduce' | 'write' | 'sound_for_char' | 'char_for_sound' | 'match_pairs' | 'listen_word';
 
 	interface Step {
 		kind: StepKind;
@@ -53,6 +54,7 @@
 	function buildLessonForChar(c: KanaChar): Step[] {
 		return [
 			{ kind: 'introduce', char: c },
+			{ kind: 'write', char: c },
 			{ kind: 'sound_for_char', char: c, pool: poolFor(c) },
 			{ kind: 'char_for_sound', char: c, pool: poolFor(c) }
 		];
@@ -183,6 +185,9 @@
 						pool={cards.slice(1)}
 						onAnswer={onMatchAnswer}
 					/>
+				{:else if current.kind === 'write' && current.char}
+					{@const card = { jp: current.char.jp, romaji: current.char.romaji, es: current.char.romaji, en: current.char.romaji }}
+					<WriteKanji mode="lesson" {card} onAnswer={advance} />
 				{:else if current.kind === 'listen_word' && current.word}
 					<AlphabetListenWord word={current.word} script={scriptParam} onAnswer={advance} />
 				{/if}

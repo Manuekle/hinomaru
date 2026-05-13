@@ -93,11 +93,46 @@
 		);
 	}
 
+	async function fetchWithTimeout(url: string, timeout = 3000) {
+		const controller = new AbortController();
+		const id = setTimeout(() => controller.abort(), timeout);
+		try {
+			const response = await fetch(url, { signal: controller.signal });
+			clearTimeout(id);
+			return response;
+		} catch (e) {
+			clearTimeout(id);
+			throw e;
+		}
+	}
+
 	async function loadCharData(char: string) {
-		const resJp = await fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data-jp/${encodeURIComponent(char)}.json`);
-		if (resJp.ok) return resJp.json();
-		const resCn = await fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data/${encodeURIComponent(char)}.json`);
+		const code = char.codePointAt(0)!;
+		const isKana = code >= 0x3040 && code <= 0x30ff;
+
+		if (isKana) {
+			try {
+				// Try jsdelivr first as it's usually faster
+				const res = await fetchWithTimeout(`https://cdn.jsdelivr.net/gh/ailectra/kana-json@main/data/${encodeURIComponent(char)}.json`);
+				if (res.ok) return res.json();
+			} catch (e) {
+				console.warn(`Primary kana source failed for ${char}, trying fallback`);
+			}
+			
+			const resRaw = await fetchWithTimeout(`https://raw.githubusercontent.com/ailectra/kana-json/main/data/${encodeURIComponent(char)}.json`);
+			if (resRaw.ok) return resRaw.json();
+		}
+
+		try {
+			const resJp = await fetchWithTimeout(`https://cdn.jsdelivr.net/npm/hanzi-writer-data-jp/${encodeURIComponent(char)}.json`);
+			if (resJp.ok) return resJp.json();
+		} catch (e) {
+			console.warn(`Primary JP source failed for ${char}, trying fallback`);
+		}
+
+		const resCn = await fetchWithTimeout(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`);
 		if (resCn.ok) return resCn.json();
+		
 		throw new Error(`No stroke data for ${char}`);
 	}
 
@@ -160,13 +195,22 @@
 
 		const loadedWriters: { writer: HanziWriterInstance; box: HTMLDivElement; char: string }[] = [];
 
-		for (let idx = 0; idx < chars.length; idx++) {
-			const char = chars[idx];
-			
-			let charData;
+		const fetchPromises = chars.map(async (char) => {
 			try {
-				charData = await loadCharData(char);
+				const data = await loadCharData(char);
+				return { char, data };
 			} catch (err) {
+				return { char, data: null };
+			}
+		});
+
+		const charDataResults = await Promise.all(fetchPromises);
+		if (iteration !== setupIteration) return; // Abort if another setup started
+
+		for (let idx = 0; idx < charDataResults.length; idx++) {
+			const { char, data } = charDataResults[idx];
+			
+			if (!data) {
 				console.warn(`Skipping char ${char} - no stroke data`);
 				continue;
 			}
@@ -191,7 +235,7 @@
 					leniency: 1.5,
 					highlightOnComplete: true,
 					highlightCompleteColor: highlightColor,
-					charDataLoader: (c: string, onLoad: (d: any) => void) => onLoad(charData)
+					charDataLoader: (c: string, onLoad: (d: any) => void) => onLoad(data)
 				});
 
 				loadedWriters.push({ writer, box, char });
@@ -312,11 +356,12 @@
 								<Icon icon={showGuide ? ViewOffIcon : EyeIcon} size={16} color="currentColor" />
 							</button>
 						</div>
-
-						<div class="canvas-wrapper">
-							<div bind:this={hanziContainer} class="hanzi-container"></div>
-						</div>
 					{/if}
+
+					<!-- Always render the container so bind:this works and $effect triggers -->
+					<div class="canvas-wrapper" style="display: {loadingWriters || writers.length === 0 ? 'none' : 'flex'}">
+						<div bind:this={hanziContainer} class="hanzi-container"></div>
+					</div>
 				</div>
 			</div>
 		{/if}
