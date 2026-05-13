@@ -14,6 +14,7 @@
 	import AlphabetCharMcq from '$lib/components/alphabet/AlphabetCharMcq.svelte';
 	import AlphabetListenWord from '$lib/components/alphabet/AlphabetListenWord.svelte';
 	import MatchPairs from '$lib/components/study/MatchPairs.svelte';
+	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 
 	type StepKind = 'introduce' | 'sound_for_char' | 'char_for_sound' | 'match_pairs' | 'listen_word';
 
@@ -138,19 +139,11 @@
 	<title>{$locale === 'es' ? 'Aprender' : 'Learn'} — Hinomaru</title>
 </svelte:head>
 
-<div class="session-layout premium-bg">
-	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={exit} aria-label="Salir">
-			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-		</button>
-		<div class="header-progress">
-			<span class="session-index">
-				{Math.min(stepIdx + 1, Math.max(queue.length, 1))} / {Math.max(queue.length, 1)}
-			</span>
-		</div>
-		<div style="width: 44px;"></div>
-	</div>
-
+<StudySessionLayout
+	onExit={exit}
+	currentIndex={stepIdx}
+	totalCount={Math.max(queue.length, 1)}
+>
 	<div class="session-container">
 		{#if done}
 			<div class="finish content-center" use:fadeIn>
@@ -196,47 +189,9 @@
 			{/key}
 		{/if}
 	</div>
-</div>
+</StudySessionLayout>
 
 <style>
-	.premium-bg {
-		background-color: var(--bg-page);
-		min-height: 100dvh;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.premium-header-minimal {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-200);
-		flex-shrink: 0;
-	}
-
-	.header-progress {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		line-height: 1.1;
-	}
-	.session-index {
-		font-size: 17px;
-		font-weight: 900;
-		color: var(--fg-primary);
-		letter-spacing: -0.01em;
-	}
-
-	.close-btn {
-		color: var(--fg-secondary);
-		background: none;
-		border: none;
-		padding: 8px;
-		cursor: pointer;
-	}
-
 	.session-container {
 		flex: 1;
 		display: flex;

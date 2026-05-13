@@ -74,8 +74,8 @@
 	--lh-snug: 1.25;
 	--lh-body: 1.55;
 	--tracking-tight: -0.02em;
-	--tracking-wide: 0.04em;
-	--tracking-wider: 0.1em;
+	--tracking-wide: -0.04em;
+	--tracking-wider: -0.04em;
 	--space-1: 4px;
 	--space-2: 8px;
 	--space-3: 12px;

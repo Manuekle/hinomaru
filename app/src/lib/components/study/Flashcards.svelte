@@ -15,6 +15,7 @@
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { fadeIn } from '$lib/motion';
 
 	interface Props {
@@ -141,30 +142,21 @@
 	}
 </script>
 
-<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
-	{#if !isLesson}
-		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-			<button class="close-btn" onclick={onExit}>
-				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-			</button>
-			<div class="header-progress">
-				<span class="session-index">{queue.index + 1} / {queue.total}</span>
-				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
-			</div>
-			<div style="width: 44px;"></div>
-		</div>
-	{/if}
-
-	<div class="session-container">
-		{#if !isLesson && initialCards.length === 0}
-			<SessionEmptyState
-				{totalCards}
-				{learnedCount}
-				sessionCount={0}
-				deckId={deck?.id}
-				modeLabel={t('mode.flashcards.title', $locale)}
-			/>
-		{:else if card}
+<StudySessionLayout
+	{isLesson}
+	onExit={onExit}
+	currentIndex={queue.index}
+	totalCount={queue.total}
+>
+	{#if !isLesson && initialCards.length === 0}
+		<SessionEmptyState
+			{totalCards}
+			{learnedCount}
+			sessionCount={0}
+			deckId={deck?.id}
+			modeLabel={t('mode.flashcards.title', $locale)}
+		/>
+	{:else if card}
 			<div class="card-stack-center">
 				<div
 					role="button"
@@ -253,7 +245,6 @@
 				</div>
 			</div>
 		{/if}
-	</div>
 
 	{#if card && !showAnticipation}
 		<StickyFooter>
@@ -274,58 +265,13 @@
 			{/if}
 		</StickyFooter>
 	{/if}
-</div>
+</StudySessionLayout>
 
 {#if showAnticipation}
 	<AnticipationScreen />
 {/if}
 
 <style>
-	.premium-bg {
-		background-color: var(--bg-page);
-		min-height: 100dvh;
-		display: flex;
-		flex-direction: column;
-	}
-	.lesson-embed {
-		min-height: 0;
-		background: transparent;
-	}
-	.premium-header-minimal {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-200);
-	}
-	.header-progress {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		line-height: 1.1;
-	}
-	.session-index {
-		font-size: 17px;
-		font-weight: 900;
-		color: var(--fg-primary);
-		letter-spacing: -0.04em;
-	}
-	.total-label {
-		font-size: 10px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: -0.04em;
-	}
-	.close-btn {
-		color: var(--fg-secondary);
-		background: none;
-		border: none;
-		padding: 8px;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
 	.card-stack-center {
 		flex: 1;
 		display: flex;

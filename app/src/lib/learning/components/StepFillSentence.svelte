@@ -98,7 +98,7 @@
 			<div class="sentence-translation">{sentence.translation}</div>
 
 			{#if props.retries >= 1 && !picked}
-				<div class="hint-banner" in:fadeUp={{ y: 10 }}>
+				<div class="hint-banner" use:fadeUp={{ y: 10 }}>
 					<span class="hint-tag">{$locale === 'es' ? 'PISTA' : 'HINT'}</span>
 					<span class="hint-text">
 						{$locale === 'es' ? sentence.primaryCard.es : sentence.primaryCard.en}

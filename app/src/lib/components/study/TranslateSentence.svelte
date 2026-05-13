@@ -16,6 +16,7 @@
 	import { createMistakeQueue } from '$lib/utils/mistakeQueue.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import { buildSentence, type BuiltSentence } from '$lib/learning/sentenceBuilder';
 
@@ -205,29 +206,21 @@
 	}
 </script>
 
-<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
-	{#if !isLesson}
-		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-			<button class="close-btn" onclick={_onExit}>
-				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-			</button>
-			<div class="header-progress">
-				<span class="session-index">{queue.index + 1} / {queue.total}</span>
-			</div>
-			<div style="width: 44px;"></div>
-		</div>
-	{/if}
-
-	<div class="session-container">
-		{#if !isLesson && initialCards.length === 0}
-			<SessionEmptyState
-				{totalCards}
-				{learnedCount}
-				sessionCount={0}
-				deckId={deck?.id}
-				modeLabel={t('mode.type.title', $locale)}
-			/>
-		{:else if currentCard && sentence}
+<StudySessionLayout
+	{isLesson}
+	onExit={_onExit}
+	currentIndex={queue.index}
+	totalCount={queue.total}
+>
+	{#if !isLesson && initialCards.length === 0}
+		<SessionEmptyState
+			{totalCards}
+			{learnedCount}
+			sessionCount={0}
+			deckId={deck?.id}
+			modeLabel={t('mode.type.title', $locale)}
+		/>
+	{:else if currentCard && sentence}
 			<div class="translate-viewer">
 				<div class="prompt-card">
 					<span class="prompt-tag">{$locale === 'es' ? 'TRADUCIR' : 'TRANSLATE'}</span>
@@ -311,95 +304,13 @@
 				{/if}
 			</div>
 		{/if}
-	</div>
-
-	{#if currentCard && sentence && !showAnticipation}
-		<StickyFooter>
-			<div class="footer-row">
-				{#if !useKeyboard && answer.length > 0 && !submitted}
-					<button
-						class="icon-btn hm-btn hm-btn-secondary"
-						onclick={clearAnswer}
-						aria-label="Limpiar"
-					>
-						<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
-					</button>
-				{/if}
-				{#if submitted}
-					<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={nextCard}>
-						{t('session.next', $locale)}
-					</button>
-				{:else}
-					<button
-						class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
-						onclick={check}
-						disabled={!ready}
-					>
-						{t('session.check', $locale)}
-					</button>
-					<button
-						class="icon-btn hm-btn"
-						class:hm-btn-secondary={!useKeyboard}
-						class:hm-btn-primary={useKeyboard}
-						onclick={toggleKeyboard}
-						aria-label={$locale === 'es' ? 'Cambiar a teclado' : 'Toggle keyboard'}
-						aria-pressed={useKeyboard}
-					>
-						<Icon icon={KeyboardIcon} size={20} color="currentColor" />
-					</button>
-				{/if}
-			</div>
-		</StickyFooter>
-	{/if}
-</div>
+</StudySessionLayout>
 
 {#if showAnticipation}
 	<AnticipationScreen />
 {/if}
 
 <style>
-	.premium-bg {
-		background-color: var(--bg-page);
-		min-height: 100dvh;
-		display: flex;
-		flex-direction: column;
-	}
-	.lesson-embed {
-		min-height: 0;
-		background: transparent;
-	}
-	.premium-header-minimal {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-200);
-	}
-	.header-progress {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		line-height: 1.1;
-	}
-	.session-index {
-		font-size: 17px;
-		font-weight: 900;
-		color: var(--fg-primary);
-	}
-	.close-btn {
-		color: var(--fg-secondary);
-		background: none;
-		border: none;
-		padding: 8px;
-		cursor: pointer;
-	}
-	.session-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 0 20px 100px;
-	}
 	.translate-viewer {
 		flex: 1;
 		display: flex;

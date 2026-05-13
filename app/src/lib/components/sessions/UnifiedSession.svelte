@@ -17,6 +17,7 @@
 	import { Cancel01Icon, TranslateIcon } from '@hugeicons/core-free-icons';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 
 	// Canonical study components (also used by /deck/ routes)
 	import Flashcards from '$lib/components/study/Flashcards.svelte';
@@ -24,11 +25,11 @@
 	import WriteKanji from '$lib/components/study/WriteKanji.svelte';
 	import MatchPairs from '$lib/components/study/MatchPairs.svelte';
 	import Pronunciation from '$lib/components/study/Pronunciation.svelte';
+	import TranslateSentence from '$lib/components/study/TranslateSentence.svelte';
 	// Lesson-only steps (no deck mode equivalent)
 	import StepListen from '$lib/learning/components/StepListen.svelte';
 	import StepFillSentence from '$lib/learning/components/StepFillSentence.svelte';
 	import StepBuildSentence from '$lib/learning/components/StepBuildSentence.svelte';
-	import StepTranslateSentence from '$lib/learning/components/StepTranslateSentence.svelte';
 
 	interface Props {
 		cards: any[];
@@ -94,22 +95,13 @@
 	}
 </script>
 
-<div class="session-layout premium-bg">
-	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={onExit} aria-label="Salir">
-			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-		</button>
-
-		<div class="header-progress">
-			<span class="session-index">{Math.min(stepsDone + 1, stepsTotal)} / {stepsTotal}</span>
-		</div>
-
-		<div style="width: 44px;"></div>
-		<!-- Spacer for balance -->
-	</div>
-
+<StudySessionLayout
+	onExit={onExit}
+	currentIndex={stepsDone}
+	totalCount={stepsTotal}
+>
 	<!-- Step content -->
-	<div class="session-container">
+	<div class="lesson-step-host">
 		{#if currentStep && currentCard}
 			{#key stepKey}
 				<div class="step-wrap content-center">
@@ -143,7 +135,12 @@
 					{:else if currentStep.kind === 'build_sentence'}
 						<StepBuildSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'translate_sentence'}
-						<StepTranslateSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
+						<TranslateSentence
+							mode="lesson"
+							card={currentCard}
+							pool={cards}
+							onAnswer={onStepAnswer}
+						/>
 					{:else if currentStep.kind === 'match_pairs'}
 						<MatchPairs
 							mode="lesson"
@@ -156,63 +153,23 @@
 			{/key}
 		{/if}
 	</div>
-</div>
+</StudySessionLayout>
 
 {#if showAnticipation}
 	<AnticipationScreen />
 {/if}
 
 <style>
-	.premium-bg {
-		background-color: var(--bg-page);
-		min-height: 100dvh;
-		display: flex;
-		flex-direction: column;
-	}
 
-	.premium-header-minimal {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-200);
-		flex-shrink: 0;
-	}
-
-	.header-progress {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		line-height: 1.1;
-	}
-	.session-index {
-		font-size: 17px;
-		font-weight: 900;
-		color: var(--fg-primary);
-		letter-spacing: -0.04em;
-	}
-
-	.close-btn,
-	.lang-btn {
-		color: var(--fg-secondary);
-		background: none;
-		border: none;
-		padding: 8px;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.lang-btn.active {
-		color: var(--hinomaru-red);
-	}
-
-	.session-container {
+	.lesson-step-host {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
-		/* Padding so step footer isn't hidden behind sticky footer */
+		/* No horizontal padding here — each lesson-mode study component
+		   wraps in its own .session-container which already provides
+		   horizontal padding via the global rule in app.css. Only reserve
+		   bottom space so the step content isn't hidden behind StickyFooter. */
 		padding-bottom: 100px;
 	}
 

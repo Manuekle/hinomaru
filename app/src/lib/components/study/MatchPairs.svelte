@@ -10,6 +10,7 @@
 	import Confetti from '$lib/components/Confetti.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { Award01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
+	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { fadeIn } from '$lib/motion';
 	import { playCorrect, playWrong, playFinish } from '$lib/utils/sounds';
 	import { safeRomaji } from '$lib/utils/romaji';
@@ -198,35 +199,21 @@
 	};
 </script>
 
-<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
-	{#if !isLesson}
-		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-			<button class="close-btn" onclick={_onExit}>
-				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-			</button>
-
-			<div class="header-progress">
-				<span class="session-index"
-					>{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}</span
-				>
-				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
-			</div>
-
-			<div style="width: 44px;"></div>
-			<!-- Spacer -->
-		</div>
-	{/if}
-
-	<div class="session-container">
-		{#if allCards.length === 0}
-			<SessionEmptyState
-				{totalCards}
-				{learnedCount}
-				sessionCount={0}
-				deckId={deck?.id}
-				modeLabel={t('mode.match.title', $locale)}
-			/>
-		{:else if !finished}
+<StudySessionLayout
+	{isLesson}
+	onExit={_onExit}
+	currentIndex={currentIndex + matchedIds.size}
+	totalCount={allCards.length}
+>
+	{#if allCards.length === 0}
+		<SessionEmptyState
+			{totalCards}
+			{learnedCount}
+			sessionCount={0}
+			deckId={deck?.id}
+			modeLabel={t('mode.match.title', $locale)}
+		/>
+	{:else if !finished}
 			<div class="game-area content-center">
 				<div class="match-grid">
 					{#each currentSet as item (item.id + item.type)}
@@ -274,67 +261,14 @@
 					</StickyFooter>
 				</div>
 			</div>
-		{/if}
-	</div>
-</div>
+	{/if}
+</StudySessionLayout>
 
 {#if finished}
 	<Confetti fireOnMount={true} />
 {/if}
 
 <style>
-	.premium-bg {
-		background-color: var(--bg-page);
-		min-height: 100dvh;
-	}
-	.lesson-embed {
-		min-height: 0;
-		background: transparent;
-	}
-
-	.premium-header-minimal {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-200);
-	}
-
-	.header-progress {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		line-height: 1.1;
-	}
-	.session-index {
-		font-size: 17px;
-		font-weight: 900;
-		color: var(--fg-primary);
-		letter-spacing: -0.04em;
-	}
-	.total-label {
-		font-size: 10px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: -0.04em;
-	}
-
-	.close-btn,
-	.lang-btn {
-		color: var(--fg-secondary);
-		background: none;
-		border: none;
-		padding: 8px;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.lang-btn.active {
-		color: var(--hinomaru-red);
-	}
-
 	.game-area {
 		flex: 1;
 		display: flex;

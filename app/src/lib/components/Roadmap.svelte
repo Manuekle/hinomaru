@@ -597,9 +597,6 @@
 											? item.lesson.unitTitle_es
 											: item.lesson.unitTitle_en}
 									</div>
-									<h3 class="popover-title">
-										{$locale === 'es' ? item.lesson.title_es : item.lesson.title_en}
-									</h3>
 									<button
 										class="popover-btn"
 										class:is-completed={state === 'completed'}

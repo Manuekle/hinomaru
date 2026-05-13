@@ -12,6 +12,7 @@
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { JapaneseSpeechRecognizer, isSpeechSupported } from '$lib/speaking/speech';
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import { fade } from 'svelte/transition';
@@ -244,38 +245,24 @@
 	}
 </script>
 
-<div class="session-layout premium-bg" class:lesson-embed={isLesson}>
-	{#if !isLesson}
-		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-			<button
-				class="close-btn"
-				onclick={() => {
-					recognizer?.abort();
-					_onExit();
-				}}
-			>
-				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-			</button>
-
-			<div class="header-progress">
-				<span class="session-index">{queue.index + 1} / {queue.total}</span>
-				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
-			</div>
-
-			<div style="width: 40px;"></div>
-		</div>
-	{/if}
-
-	<div class="session-container">
-		{#if initialCards.length === 0}
-			<SessionEmptyState
-				{totalCards}
-				{learnedCount}
-				sessionCount={0}
-				deckId={deck?.id}
-				modeLabel={t('mode.speaking.title', $locale)}
-			/>
-		{:else if card}
+<StudySessionLayout
+	{isLesson}
+	onExit={() => {
+		recognizer?.abort();
+		_onExit();
+	}}
+	currentIndex={queue.index}
+	totalCount={queue.total}
+>
+	{#if initialCards.length === 0}
+		<SessionEmptyState
+			{totalCards}
+			{learnedCount}
+			sessionCount={0}
+			deckId={deck?.id}
+			modeLabel={t('mode.speaking.title', $locale)}
+		/>
+	{:else if card}
 			<div class="speaking-viewer content-center">
 				<div class="prompt-card">
 					<div class="prompt-meta">
@@ -367,79 +354,13 @@
 				{/if}
 			</div>
 		{/if}
-	</div>
-
-	{#if !showAnticipation && card}
-		<StickyFooter>
-			{#if submitted}
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-					{t('session.next', $locale)}
-				</button>
-			{:else if !isRecording && !processing && !unsupported}
-				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={skip}>
-					{$locale === 'es' ? 'No puedo hablar ahora' : "Can't speak now"}
-				</button>
-			{/if}
-		</StickyFooter>
-	{/if}
-</div>
+</StudySessionLayout>
 
 {#if showAnticipation}
 	<AnticipationScreen />
 {/if}
 
 <style>
-	.premium-bg {
-		background-color: var(--bg-page);
-		min-height: 100dvh;
-		display: flex;
-		flex-direction: column;
-	}
-	.lesson-embed {
-		min-height: 0;
-		background: transparent;
-	}
-
-	.premium-header-minimal {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: calc(16px + env(safe-area-inset-top)) 24px 16px;
-		background: var(--bg-surface);
-		border-bottom: 1px solid var(--ink-200);
-	}
-
-	.header-progress {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		line-height: 1.1;
-	}
-
-	.session-index {
-		font-size: 17px;
-		font-weight: 900;
-		color: var(--fg-primary);
-		letter-spacing: -0.04em;
-	}
-
-	.total-label {
-		font-size: 10px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: -0.04em;
-	}
-
-	.close-btn {
-		color: var(--fg-secondary);
-		background: none;
-		border: none;
-		padding: 8px;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
 	.speaking-viewer {
 		flex: 1;
 		display: flex;
@@ -750,14 +671,6 @@
 		font-size: 15px;
 		font-weight: 700;
 		color: var(--fg-primary);
-	}
-
-	.session-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 0 20px 100px;
-		overflow-y: auto;
 	}
 
 	.transcript-box {
