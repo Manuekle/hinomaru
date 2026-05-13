@@ -54,7 +54,7 @@
 			const handleScroll = () => {
 				onclose();
 			};
-			
+
 			window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
 			return () => {
 				window.removeEventListener('scroll', handleScroll, { capture: true });
@@ -226,7 +226,7 @@
 		font-size: 10px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 		padding: 3px 8px;
 		border-radius: 6px;
 		line-height: 1;

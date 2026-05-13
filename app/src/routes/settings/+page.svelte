@@ -47,8 +47,6 @@
 		goto('/login');
 	}
 
-
-
 	function setLanguage(lang: 'es' | 'en') {
 		locale.set(lang);
 	}
@@ -416,7 +414,6 @@
 					)}
 				</button>
 			</div>
-
 		</div>
 
 		<!-- ── Idioma ── -->
@@ -505,7 +502,12 @@
 					<div class="pref-divider"></div>
 					<div class="pref-row" style="cursor:default;">
 						<div class="pref-icon" style="background:#34c75914;color:#34c759;">
-							<Icon icon={TwentyFourHoursClockIcon} size={18} color="currentColor" strokeWidth={1.8} />
+							<Icon
+								icon={TwentyFourHoursClockIcon}
+								size={18}
+								color="currentColor"
+								strokeWidth={1.8}
+							/>
 						</div>
 						<div class="pref-text">
 							<span class="pref-title">{t('settings.reminderHour', $locale)}</span>
@@ -542,7 +544,6 @@
 		<!-- ── Sign out ── -->
 		<div>
 			<button onclick={signOut} class="signout-btn">{t('nav.signout', $locale)}</button>
-
 		</div>
 
 		<!-- ── Danger Zone ── -->
@@ -552,7 +553,9 @@
 					<Icon icon={Delete02Icon} size={18} color="currentColor" strokeWidth={1.8} />
 				</div>
 				<div class="pref-text">
-					<span class="pref-title" style="color:#ff3b30;">{t('settings.deleteAccount', $locale)}</span>
+					<span class="pref-title" style="color:#ff3b30;"
+						>{t('settings.deleteAccount', $locale)}</span
+					>
 					<span class="pref-sub">{t('settings.deleteAccount.desc', $locale)}</span>
 				</div>
 				<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
@@ -628,10 +631,7 @@
 				{/if}
 			</button>
 		{:else}
-			<button
-				class="modal-btn-cancel"
-				onclick={() => (showDeleteConfirm = false)}
-			>
+			<button class="modal-btn-cancel" onclick={() => (showDeleteConfirm = false)}>
 				{t('common.cancel', $locale)}
 			</button>
 			<button
@@ -690,7 +690,7 @@
 		font-size: 11px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin: 0 0 8px 4px;
 	}
@@ -806,7 +806,7 @@
 		color: var(--fg-tertiary);
 		margin-bottom: 12px;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		text-align: center;
 	}
 
@@ -907,7 +907,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 5px;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 	.seg-btn.active {
 		color: var(--sumi);
@@ -956,7 +956,7 @@
 		font-size: 15px;
 		font-weight: 600;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 	.pref-sub {
 		font-size: 12px;
@@ -1068,7 +1068,7 @@
 		font-weight: 800;
 		font-size: 15px;
 		cursor: pointer;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
 		box-shadow: var(--shadow-sm);
 	}
@@ -1083,8 +1083,6 @@
 	.signout-btn:active {
 		transform: scale(0.97) translateY(0);
 	}
-
-
 
 	/* ── Danger Zone ── */
 	.danger-card {
@@ -1152,8 +1150,6 @@
 			transform: rotate(360deg);
 		}
 	}
-
-
 
 	.hour-select {
 		appearance: none;

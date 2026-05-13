@@ -1,10 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		VolumeHighIcon, 
-		Cancel01Icon, 
-		CheckmarkCircle01Icon
-	} from '@hugeicons/core-free-icons';
+	import { VolumeHighIcon, Cancel01Icon, CheckmarkCircle01Icon } from '@hugeicons/core-free-icons';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { onMount } from 'svelte';
 	import { locale } from '$lib/stores/locale';
@@ -62,16 +58,14 @@
 	};
 
 	const queue = $derived.by(() => createMistakeQueue<any>(initialCards));
-	
+
 	let picked = $state<string | null>(null);
 	let correct = $state(0);
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 
 	const card = $derived(isLesson ? lessonCard : queue.current);
-	const correctValue = $derived(
-		isLesson ? card?.jp : ($locale === 'es' ? card?.es : card?.en)
-	);
+	const correctValue = $derived(isLesson ? card?.jp : $locale === 'es' ? card?.es : card?.en);
 	const isCorrect = $derived(picked === correctValue);
 
 	interface Option {
@@ -154,27 +148,28 @@
 
 <div class="session-layout premium-bg" class:lesson-embed={isLesson}>
 	{#if !isLesson}
-	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={_onExit}>
-			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-		</button>
+		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+			<button class="close-btn" onclick={_onExit}>
+				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+			</button>
 
-		<div class="header-progress">
-			<span class="session-index">{queue.index + 1} / {queue.total}</span>
-			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			<div class="header-progress">
+				<span class="session-index">{queue.index + 1} / {queue.total}</span>
+				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			</div>
+
+			<div style="width: 44px;"></div>
+			<!-- Spacer -->
 		</div>
-
-		<div style="width: 44px;"></div> <!-- Spacer -->
-	</div>
 	{/if}
 
 	<div class="session-container">
 		{#if initialCards.length === 0}
-			<SessionEmptyState 
-				totalCards={totalCards} 
-				learnedCount={learnedCount}
-				sessionCount={0} 
-				deckId={deck?.id} 
+			<SessionEmptyState
+				{totalCards}
+				{learnedCount}
+				sessionCount={0}
+				deckId={deck?.id}
 				modeLabel={t('mode.quiz.title', $locale)}
 			/>
 		{:else if card}
@@ -221,14 +216,24 @@
 
 				{#if picked}
 					<div class="feedback-bar" class:is-correct={isCorrect} use:fadeUp={{ y: 10 }}>
-						<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={18} color="currentColor" />
-						<span class="fb-label">{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}</span>
+						<Icon
+							icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
+							size={18}
+							color="currentColor"
+						/>
+						<span class="fb-label"
+							>{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}</span
+						>
 					</div>
 
 					{#if !isCorrect && card.example}
 						<div class="example-hint" use:fadeIn>
-							<div class="jp" style="font-size:15px;font-weight:600;color:var(--fg-primary);">{card.example}</div>
-							<div style="font-size:13px;color:var(--fg-secondary);margin-top:3px;">{$locale === 'es' ? card.example_es : card.example_en}</div>
+							<div class="jp" style="font-size:15px;font-weight:600;color:var(--fg-primary);">
+								{card.example}
+							</div>
+							<div style="font-size:13px;color:var(--fg-secondary);margin-top:3px;">
+								{$locale === 'es' ? card.example_es : card.example_en}
+							</div>
 						</div>
 					{/if}
 				{/if}
@@ -280,14 +285,14 @@
 		font-size: 17px;
 		font-weight: 900;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 	.total-label {
 		font-size: 10px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	.close-btn {
@@ -317,7 +322,7 @@
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 20px;
-		box-shadow: 0 2px 12px rgba(26,26,26,0.06);
+		box-shadow: 0 2px 12px rgba(26, 26, 26, 0.06);
 		padding: 20px 20px 18px;
 		display: flex;
 		flex-direction: column;
@@ -374,17 +379,21 @@
 		background: var(--bg-surface);
 		cursor: pointer;
 		text-align: left;
-		transition: border-color 0.15s, background 0.15s, opacity 0.15s, transform 0.1s;
+		transition:
+			border-color 0.15s,
+			background 0.15s,
+			opacity 0.15s,
+			transform 0.1s;
 		width: 100%;
 		-webkit-tap-highlight-color: transparent;
 		font-family: inherit;
-		box-shadow: 0 1px 4px rgba(26,26,26,0.04);
+		box-shadow: 0 1px 4px rgba(26, 26, 26, 0.04);
 	}
 
 	.option-item:not(:disabled):hover {
 		border-color: var(--ink-300);
 		transform: translateY(-1px);
-		box-shadow: 0 3px 10px rgba(26,26,26,0.08);
+		box-shadow: 0 3px 10px rgba(26, 26, 26, 0.08);
 	}
 
 	.option-item.is-correct {
@@ -397,7 +406,10 @@
 		background: var(--hinomaru-red-wash) !important;
 	}
 
-	.option-item.is-dimmed { opacity: 0.55; filter: grayscale(0.4); }
+	.option-item.is-dimmed {
+		opacity: 0.55;
+		filter: grayscale(0.4);
+	}
 
 	.opt-marker {
 		width: 28px;
@@ -414,8 +426,16 @@
 		flex-shrink: 0;
 	}
 
-	.option-item.is-correct .opt-marker { background: var(--success); border-color: var(--success); color: white; }
-	.option-item.is-wrong .opt-marker { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
+	.option-item.is-correct .opt-marker {
+		background: var(--success);
+		border-color: var(--success);
+		color: white;
+	}
+	.option-item.is-wrong .opt-marker {
+		background: var(--hinomaru-red);
+		border-color: var(--hinomaru-red);
+		color: white;
+	}
 
 	.opt-content {
 		display: flex;
@@ -456,7 +476,10 @@
 		border-color: rgba(46, 125, 91, 0.12);
 	}
 
-	.fb-label { font-size: 15px; font-weight: 800; }
+	.fb-label {
+		font-size: 15px;
+		font-weight: 800;
+	}
 
 	.example-hint {
 		padding: 14px;

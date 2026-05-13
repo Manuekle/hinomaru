@@ -143,7 +143,7 @@
 		padding: 4px 12px;
 		border-radius: 99px;
 		text-transform: uppercase;
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
 	}
 
@@ -164,7 +164,7 @@
 		color: var(--fg-tertiary);
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	.goal-info {

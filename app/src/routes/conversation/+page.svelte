@@ -21,8 +21,6 @@
 <div
 	style="max-width:720px;margin:0 auto;padding:calc(32px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));"
 >
-
-
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}
 		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;"
@@ -88,7 +86,6 @@
 </div>
 
 <style>
-
 	.filter-chip {
 		height: 42px;
 		padding: 0 16px;
@@ -155,7 +152,7 @@
 		font-variant-numeric: tabular-nums;
 		padding-top: 3px;
 		min-width: 24px;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	.row-body {
@@ -215,7 +212,7 @@
 		font-size: 10px;
 		font-weight: 700;
 		color: var(--hinomaru-red);
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 		background: var(--hinomaru-red-wash);
 		padding: 2px 7px;
 		border-radius: 6px;

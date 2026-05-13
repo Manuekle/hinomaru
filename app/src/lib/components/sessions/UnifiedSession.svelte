@@ -3,7 +3,14 @@
 	import { t } from '$lib/i18n';
 	import { showRomaji } from '$lib/stores/settings';
 	import { fadeIn } from '$lib/motion';
-	import { init, answer, isComplete, progressPct, accuracyPct, type EngineState } from '$lib/learning/engine';
+	import {
+		init,
+		answer,
+		isComplete,
+		progressPct,
+		accuracyPct,
+		type EngineState
+	} from '$lib/learning/engine';
 	import { buildSteps } from '$lib/learning/stepGenerator';
 	import type { LessonType } from '$lib/data/roadmap';
 	import Icon from '$lib/Icon.svelte';
@@ -26,7 +33,12 @@
 	interface Props {
 		cards: any[];
 		lessonType: LessonType;
-		onComplete: (results: { correct: number; total: number; mistakes: number; state: EngineState }) => void;
+		onComplete: (results: {
+			correct: number;
+			total: number;
+			mistakes: number;
+			state: EngineState;
+		}) => void;
 		onExit: () => void;
 		onCardProgress?: (card: any, correct: boolean, struggled: boolean) => void;
 	}
@@ -54,11 +66,9 @@
 
 	const currentStep = $derived(engineState.current);
 	const currentCard = $derived(
-		currentStep ? cards.find((c) => c.id === currentStep.cardId) ?? null : null
+		currentStep ? (cards.find((c) => c.id === currentStep.cardId) ?? null) : null
 	);
-	const distractors = $derived(
-		currentCard ? cards.filter((c) => c.id !== currentCard.id) : []
-	);
+	const distractors = $derived(currentCard ? cards.filter((c) => c.id !== currentCard.id) : []);
 	const stepsDone = $derived(engineState.done.length);
 	const stepsTotal = $derived(engineState.totalPlanned);
 
@@ -93,8 +103,9 @@
 		<div class="header-progress">
 			<span class="session-index">{Math.min(stepsDone + 1, stepsTotal)} / {stepsTotal}</span>
 		</div>
-		
-		<div style="width: 44px;"></div> <!-- Spacer for balance -->
+
+		<div style="width: 44px;"></div>
+		<!-- Spacer for balance -->
 	</div>
 
 	<!-- Step content -->
@@ -105,21 +116,41 @@
 					{#if currentStep.kind === 'recognize'}
 						<Flashcards mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen'}
-						<StepListen card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
+						<StepListen card={currentCard} {distractors} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'listen_select'}
-						<MultipleChoice mode="lesson" card={currentCard} distractors={distractors} onAnswer={onStepAnswer} />
+						<MultipleChoice
+							mode="lesson"
+							card={currentCard}
+							{distractors}
+							onAnswer={onStepAnswer}
+						/>
 					{:else if currentStep.kind === 'speak'}
-						<Pronunciation mode="lesson" card={currentCard} onAnswer={onStepAnswer} onDisableSpeak={() => canSpeak = false} />
+						<Pronunciation
+							mode="lesson"
+							card={currentCard}
+							onAnswer={onStepAnswer}
+							onDisableSpeak={() => (canSpeak = false)}
+						/>
 					{:else if currentStep.kind === 'write'}
 						<WriteKanji mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'fill_sentence'}
-						<StepFillSentence card={currentCard} pool={cards} retries={currentStep.retries} onAnswer={onStepAnswer} />
+						<StepFillSentence
+							card={currentCard}
+							pool={cards}
+							retries={currentStep.retries}
+							onAnswer={onStepAnswer}
+						/>
 					{:else if currentStep.kind === 'build_sentence'}
 						<StepBuildSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'translate_sentence'}
 						<StepTranslateSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
 					{:else if currentStep.kind === 'match_pairs'}
-						<MatchPairs mode="lesson" card={currentCard} pool={distractors} onAnswer={onStepAnswer} />
+						<MatchPairs
+							mode="lesson"
+							card={currentCard}
+							pool={distractors}
+							onAnswer={onStepAnswer}
+						/>
 					{/if}
 				</div>
 			{/key}
@@ -159,7 +190,7 @@
 		font-size: 17px;
 		font-weight: 900;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.close-btn,

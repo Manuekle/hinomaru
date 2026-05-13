@@ -59,7 +59,10 @@
 	const rom = $derived(card ? safeRomaji(card.romaji, card.jp) : '');
 	const exRom = $derived(
 		card?.example
-			? safeRomaji(card.example_romaji || card.extra?.example_romaji, card.example_kana || card.example)
+			? safeRomaji(
+					card.example_romaji || card.extra?.example_romaji,
+					card.example_kana || card.example
+				)
 			: ''
 	);
 
@@ -107,8 +110,11 @@
 		} else {
 			if (cardEl) {
 				const dir = gotIt ? -1 : 1;
-				await animate(cardEl, { opacity: [1, 0], x: [0, dir * 40] }, { duration: 0.2, ease: 'easeIn' })
-					.finished;
+				await animate(
+					cardEl,
+					{ opacity: [1, 0], x: [0, dir * 40] },
+					{ duration: 0.2, ease: 'easeIn' }
+				).finished;
 				queue.advance();
 				flipped = false;
 				struggled = false;
@@ -152,8 +158,8 @@
 	<div class="session-container">
 		{#if !isLesson && initialCards.length === 0}
 			<SessionEmptyState
-				totalCards={totalCards}
-				learnedCount={learnedCount}
+				{totalCards}
+				{learnedCount}
 				sessionCount={0}
 				deckId={deck?.id}
 				modeLabel={t('mode.flashcards.title', $locale)}
@@ -252,7 +258,10 @@
 	{#if card && !showAnticipation}
 		<StickyFooter>
 			{#if !flipped}
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => (flipped = true)}>
+				<button
+					class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
+					onclick={() => (flipped = true)}
+				>
 					{t('session.flip', $locale)}
 				</button>
 			{:else}
@@ -300,14 +309,14 @@
 		font-size: 17px;
 		font-weight: 900;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 	.total-label {
 		font-size: 10px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 	.close-btn {
 		color: var(--fg-secondary);
@@ -382,7 +391,7 @@
 	.card-tag {
 		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 		background: var(--bg-muted);
@@ -432,7 +441,7 @@
 	.tap-hint {
 		font-size: 11px;
 		font-weight: 700;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 	}

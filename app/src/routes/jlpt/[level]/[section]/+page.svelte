@@ -54,9 +54,7 @@
 
 	// ── Test data ──────────────────────────────────────────────────────────────
 	const test = $derived(getTest(level, section));
-	const audioFiles = $derived(
-		section === 'listening' ? (AUDIO_FILES[level] ?? []) : []
-	);
+	const audioFiles = $derived(section === 'listening' ? (AUDIO_FILES[level] ?? []) : []);
 
 	const tracks = $derived(
 		audioFiles.map((file, idx) => ({
@@ -117,7 +115,9 @@
 	const activeTranscript = $derived(LISTENING_TRANSCRIPTS[level]?.[currentAudioIdx] ?? '');
 	const score = $derived(correctness.filter(Boolean).length);
 	const wrong = $derived(correctness.filter((b) => !b).length);
-	const pct = $derived(allQuestions.length > 0 ? Math.round((score / allQuestions.length) * 100) : 0);
+	const pct = $derived(
+		allQuestions.length > 0 ? Math.round((score / allQuestions.length) * 100) : 0
+	);
 	const timerCritical = $derived(timeLeft <= 60);
 	const timerLabel = $derived(
 		`${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
@@ -125,8 +125,6 @@
 	const timeUsedLabel = $derived(
 		`${Math.floor(timeUsed / 60)}:${String(timeUsed % 60).padStart(2, '0')}`
 	);
-
-
 
 	// ── Timer ─────────────────────────────────────────────────────────────────
 	function startTimer() {
@@ -140,15 +138,18 @@
 		}, 1000);
 	}
 	function stopTimer() {
-		if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+		if (timerInterval) {
+			clearInterval(timerInterval);
+			timerInterval = null;
+		}
 		timeUsed = DURATION - timeLeft;
 	}
 
 	// ── Exam flow ─────────────────────────────────────────────────────────────
 	function startExam() {
-		if (section === 'listening' && !test) { 
-			phase = 'listening'; 
-			return; 
+		if (section === 'listening' && !test) {
+			phase = 'listening';
+			return;
 		}
 
 		// Prepare and Shuffle Questions & Options
@@ -162,20 +163,18 @@
 					const newAnswer = shuffledChoices.indexOf(originalCorrectChoice) + 1;
 
 					// Match audio file if this is a listening test
-					const audioFile = (section === 'listening' && test?.audioFiles) 
-						? test.audioFiles[qIdx] 
-						: undefined;
+					const audioFile =
+						section === 'listening' && test?.audioFiles ? test.audioFiles[qIdx] : undefined;
 
 					// Randomize mode for variety (30% typing for vocab/grammar)
-					const mode = (section === 'listening') 
-						? 'choice' 
-						: (Math.random() < 0.3 ? 'typing' : 'choice');
+					const mode =
+						section === 'listening' ? 'choice' : Math.random() < 0.3 ? 'typing' : 'choice';
 
-					return { 
-						...q, 
+					return {
+						...q,
 						choices: shuffledChoices,
 						answer: newAnswer,
-						mondaiTitle: m.title, 
+						mondaiTitle: m.title,
 						mondaiId: m.id,
 						audioFile,
 						mode: mode as 'choice' | 'typing'
@@ -197,7 +196,7 @@
 
 	function checkAnswer() {
 		if (checked) return;
-		
+
 		let isRight: boolean;
 		if (currentQ.mode === 'choice') {
 			if (selected === null) return;
@@ -211,7 +210,8 @@
 
 		checked = true;
 		correctness = [...correctness, isRight];
-		if (isRight) playCorrect(); else playWrong();
+		if (isRight) playCorrect();
+		else playWrong();
 		advanceTimeout = setTimeout(advanceQuestion, isRight ? 1800 : 2800);
 	}
 
@@ -223,8 +223,14 @@
 	});
 
 	function advanceQuestion() {
-		if (advanceTimeout) { clearTimeout(advanceTimeout); advanceTimeout = null; }
-		if (currentIdx + 1 >= allQuestions.length) { endExam(); return; }
+		if (advanceTimeout) {
+			clearTimeout(advanceTimeout);
+			advanceTimeout = null;
+		}
+		if (currentIdx + 1 >= allQuestions.length) {
+			endExam();
+			return;
+		}
 		currentIdx += 1;
 		selected = null;
 		typingValue = '';
@@ -238,17 +244,31 @@
 				`jlpt_result_${level}_${sec}`,
 				JSON.stringify({ score: s, total: tot, pct: p, date })
 			);
-		} catch { /* ignore */ }
+		} catch {
+			/* ignore */
+		}
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (user) {
 				await supabase.from('jlpt_results').upsert(
-					{ user_id: user.id, level, section: sec, score: s, total: tot, pct: p, completed_at: date },
+					{
+						user_id: user.id,
+						level,
+						section: sec,
+						score: s,
+						total: tot,
+						pct: p,
+						completed_at: date
+					},
 					{ onConflict: 'user_id,level,section' }
 				);
 				if (sec !== 'listening') await addXP(supabase, user.id, p);
 			}
-		} catch { /* ignore — offline or unauthenticated */ }
+		} catch {
+			/* ignore — offline or unauthenticated */
+		}
 	}
 
 	function endExam() {
@@ -268,9 +288,7 @@
 		goto('/jlpt');
 	}
 
-	const isCorrect = $derived(
-		checked && correctness[currentIdx] === true
-	);
+	const isCorrect = $derived(checked && correctness[currentIdx] === true);
 
 	// ── Navigation Protection ─────────────────────────────────────────────────
 	let showExitModal = $state(false);
@@ -311,7 +329,6 @@
 
 <div class="session-layout">
 	<div class="session-container">
-
 		<!-- ── NO INTRO (Removed) ── -->
 
 		<!-- ── EXAM ── -->
@@ -321,12 +338,13 @@
 			</div>
 			<!-- Progress + timer bar -->
 
-
 			<!-- Premium Exam Header -->
 			<div class="exam-premium-header">
 				<div class="exam-header-main">
 					<div class="header-left">
-						<span class="exam-label-pill">{t('exam.mondai', $locale, { n: currentQ?.mondaiId?.split('-').pop() || 1 })}</span>
+						<span class="exam-label-pill"
+							>{t('exam.mondai', $locale, { n: currentQ?.mondaiId?.split('-').pop() || 1 })}</span
+						>
 					</div>
 
 					<div class="exam-step-indicator">
@@ -351,10 +369,10 @@
 					<AudioPlayerProvider>
 						<div class="audio-question-player" use:fadeUp={{ delay: 0.05, y: 10 }}>
 							<AudioPlayerButton
-								item={{ 
-									id: currentQ.id.toString(), 
-									name: currentQ.sentence, 
-									src: `/jlpt/audio/${currentQ.audioFile}` 
+								item={{
+									id: currentQ.id.toString(),
+									name: currentQ.sentence,
+									src: `/jlpt/audio/${currentQ.audioFile}`
 								}}
 								variant="default"
 								size="icon"
@@ -387,7 +405,9 @@
 								class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
 								class:is-dimmed={checked && selected !== idx}
 								disabled={checked}
-								onclick={() => { if (!checked) selected = idx; }}
+								onclick={() => {
+									if (!checked) selected = idx;
+								}}
 							>
 								<div class="opt-marker">
 									{#if checked && idx + 1 === currentQ.answer}
@@ -417,7 +437,9 @@
 							placeholder={t('exam.type_answer', $locale)}
 							bind:value={typingValue}
 							disabled={checked}
-							onkeydown={(e) => { if (e.key === 'Enter') checkAnswer(); }}
+							onkeydown={(e) => {
+								if (e.key === 'Enter') checkAnswer();
+							}}
 							autocomplete="off"
 							autocorrect="off"
 							autocapitalize="off"
@@ -432,16 +454,22 @@
 				{/if}
 
 				{#if checked}
-					<div 
-						class="feedback-premium-bar" 
+					<div
+						class="feedback-premium-bar"
 						class:is-correct={isCorrect}
 						use:fadeUp={{ delay: 0, y: 15 }}
 					>
 						<div class="feedback-icon-wrap">
-							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={22} color="currentColor" />
+							<Icon
+								icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
+								size={22}
+								color="currentColor"
+							/>
 						</div>
 						<div class="feedback-text-side">
-							<span class="feedback-title">{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span>
+							<span class="feedback-title"
+								>{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span
+							>
 						</div>
 					</div>
 				{/if}
@@ -458,30 +486,29 @@
 					</button>
 				{:else}
 					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
-						{currentIdx + 1 < allQuestions.length ? t('exam.next', $locale) : t('exam.see_results', $locale)}
+						{currentIdx + 1 < allQuestions.length
+							? t('exam.next', $locale)
+							: t('exam.see_results', $locale)}
 					</button>
 				{/if}
 			</StickyFooter>
 
-		<!-- ── LISTENING ── -->
+			<!-- ── LISTENING ── -->
 		{:else if phase === 'listening'}
 			<div class="listening-screen">
 				<div use:fadeIn={{ delay: 0 }}>
 					<a href="/jlpt" class="back">← {t('deck.back', $locale)}</a>
 				</div>
 
-				<AudioPlayerProvider
-					items={tracks}
-					bind:currentIndex={currentAudioIdx}
-				>
+				<AudioPlayerProvider items={tracks} bind:currentIndex={currentAudioIdx}>
 					{@const player = getAudioPlayerContext()}
 
 					<!-- Compact Playlist -->
 					<div class="compact-playlist" use:fadeUp={{ delay: 0.05, y: 5 }}>
 						{#each tracks as track, idx (track.id)}
 							{@const isActive = currentAudioIdx === idx}
-							<button 
-								class="playlist-pill" 
+							<button
+								class="playlist-pill"
 								class:is-active={isActive}
 								onclick={() => {
 									if (currentAudioIdx === idx) {
@@ -527,7 +554,7 @@
 
 						<div class="ctrl-row-compact">
 							<div class="time-compact"><AudioPlayerTime /></div>
-							
+
 							<div class="actions-compact">
 								<AudioPlayerButton
 									item={tracks[currentAudioIdx]}
@@ -535,14 +562,20 @@
 									size="icon"
 									className="play-btn-compact"
 								/>
-								<button class="replay-btn-compact" onclick={() => { player.currentTime = 0; player.isPlaying = true; }}>
+								<button
+									class="replay-btn-compact"
+									onclick={() => {
+										player.currentTime = 0;
+										player.isPlaying = true;
+									}}
+								>
 									<Icon icon={ArrowReloadHorizontalIcon} size={14} />
 								</button>
 							</div>
 
 							<div class="time-compact"><AudioPlayerDuration /></div>
 						</div>
-						
+
 						<div class="progress-bar-minimal">
 							<AudioPlayerProgress className="custom-player-progress" />
 						</div>
@@ -572,21 +605,30 @@
 				</AudioPlayerProvider>
 			</div>
 
-		<!-- ── RESULT ── -->
+			<!-- ── RESULT ── -->
 		{:else if phase === 'result'}
 			<Confetti bind:this={confettiRef} />
 			<div use:fadeUp={{ delay: 0, y: 20 }} class="result-screen">
-
 				<!-- Premium Hero Header -->
 				<div class="result-premium-hero" class:is-pass={pct >= 60}>
 					<div class="hero-content-wrapper">
 						<div class="score-display-ring" use:fadeUp={{ delay: 0.2, y: 20 }}>
 							<svg class="progress-svg" viewBox="0 0 100 100">
-								<circle class="progress-track" cx="50" cy="50" r="45" fill="none" stroke-width="4" />
-								<circle 
-									class="progress-bar" 
-									cx="50" cy="50" r="45" 
-									fill="none" stroke-width="6" 
+								<circle
+									class="progress-track"
+									cx="50"
+									cy="50"
+									r="45"
+									fill="none"
+									stroke-width="4"
+								/>
+								<circle
+									class="progress-bar"
+									cx="50"
+									cy="50"
+									r="45"
+									fill="none"
+									stroke-width="6"
 									stroke-linecap="round"
 									stroke-dasharray="283"
 									stroke-dashoffset={283 - (283 * pct) / 100}
@@ -642,16 +684,16 @@
 								{@const userIdx = selectedHistory[i]}
 								{@const userText = userIdx !== undefined ? q.choices[userIdx] : null}
 								{#if ok && userText}
-								<div class="review-item-premium is-review-correct">
-									<div class="review-num">{i + 1}</div>
-									<div class="review-body">
-										<p class="review-q jp">{q.sentence}</p>
-										<p class="review-correct-ans">
-											<span class="review-check">✓</span>
-											<span class="review-correct-text jp">{userText}</span>
-										</p>
+									<div class="review-item-premium is-review-correct">
+										<div class="review-num">{i + 1}</div>
+										<div class="review-body">
+											<p class="review-q jp">{q.sentence}</p>
+											<p class="review-correct-ans">
+												<span class="review-check">✓</span>
+												<span class="review-correct-text jp">{userText}</span>
+											</p>
+										</div>
 									</div>
-								</div>
 								{/if}
 							{/each}
 						</div>
@@ -660,7 +702,11 @@
 
 				<!-- Result actions — inline, not sticky -->
 				<div class="result-actions" use:fadeUp={{ delay: 0.6, y: 12 }}>
-					<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1;" onclick={() => goto('/jlpt')}>
+					<button
+						class="hm-btn hm-btn-secondary hm-btn-lg"
+						style="flex:1;"
+						onclick={() => goto('/jlpt')}
+					>
 						<Icon icon={ArrowLeft01Icon} size={20} color="currentColor" />
 						<span>JLPT</span>
 					</button>
@@ -670,7 +716,6 @@
 				</div>
 			</div>
 		{/if}
-
 	</div>
 </div>
 
@@ -711,33 +756,50 @@
 
 	/* ── Romaji toggle ── */
 	/* ── Intro ── */
-	.intro-screen { text-align: center; padding: 40px 0 20px; }
+	.intro-screen {
+		text-align: center;
+		padding: 40px 0 20px;
+	}
 	.intro-icon {
-		width: 80px; height: 80px;
+		width: 80px;
+		height: 80px;
 		background: var(--sumi);
 		border-radius: 22px;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: 0 auto 20px;
 	}
 	.intro-badge {
 		display: inline-block;
-		font-size: 12px; font-weight: 700;
-		letter-spacing: 0.08em; text-transform: uppercase;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		text-transform: uppercase;
 		color: var(--fg-tertiary);
 		background: var(--ink-100);
-		padding: 4px 12px; border-radius: 99px;
+		padding: 4px 12px;
+		border-radius: 99px;
 		margin-bottom: 10px;
 	}
 	.intro-title {
-		font-size: 34px; font-weight: 700;
+		font-size: 34px;
+		font-weight: 700;
 		font-family: var(--font-jp);
-		letter-spacing: -0.02em; margin: 0 0 6px;
+		letter-spacing: -0.02em;
+		margin: 0 0 6px;
 		color: var(--sumi);
 	}
-	.intro-sub { font-size: 15px; color: var(--fg-secondary); margin: 0 0 32px; }
+	.intro-sub {
+		font-size: 15px;
+		color: var(--fg-secondary);
+		margin: 0 0 32px;
+	}
 
 	.intro-stats {
-		display: inline-flex; align-items: center; gap: 0;
+		display: inline-flex;
+		align-items: center;
+		gap: 0;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 16px;
@@ -745,18 +807,33 @@
 		margin-bottom: 24px;
 	}
 	.stat-card {
-		display: flex; flex-direction: column; align-items: center;
-		padding: 16px 20px; gap: 3px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 16px 20px;
+		gap: 3px;
 	}
 	.stat-divider {
-		width: 1px; height: 36px;
+		width: 1px;
+		height: 36px;
 		background: var(--ink-200);
 	}
-	.stat-val { font-size: 28px; font-weight: 700; color: var(--sumi); line-height: 1; }
-	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
-	.unavail { font-size: 14px; color: var(--fg-secondary); }
-
-
+	.stat-val {
+		font-size: 28px;
+		font-weight: 700;
+		color: var(--sumi);
+		line-height: 1;
+	}
+	.stat-label {
+		font-size: 11px;
+		color: var(--fg-tertiary);
+		font-weight: 600;
+		letter-spacing: -0.04em;
+	}
+	.unavail {
+		font-size: 14px;
+		color: var(--fg-secondary);
+	}
 
 	/* ── PREMIUM EXAM HEADER ── */
 	.exam-premium-header {
@@ -769,8 +846,15 @@
 		gap: 12px;
 	}
 
-	.header-left { display: flex; align-items: center; }
-	.header-right { display: flex; justify-content: flex-end; align-items: center; }
+	.header-left {
+		display: flex;
+		align-items: center;
+	}
+	.header-right {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+	}
 
 	.exam-label-pill {
 		font-size: 11px;
@@ -780,7 +864,7 @@
 		padding: 4px 10px;
 		border-radius: 6px;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	/* ── AUDIO QUESTION PLAYER ── */
@@ -813,7 +897,7 @@
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 	.player-progress-wrap {
 		width: 100%;
@@ -829,9 +913,21 @@
 		font-family: var(--font-ui);
 		font-weight: 700;
 	}
-	.step-curr { font-size: 18px; font-weight: 800; color: var(--sumi); }
-	.step-divider { font-size: 14px; color: var(--fg-tertiary); opacity: 0.4; }
-	.step-total { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); }
+	.step-curr {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.step-divider {
+		font-size: 14px;
+		color: var(--fg-tertiary);
+		opacity: 0.4;
+	}
+	.step-total {
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+	}
 
 	.exam-timer-pill {
 		display: flex;
@@ -853,8 +949,12 @@
 		animation: timer-pulse 1s infinite alternate;
 	}
 	@keyframes timer-pulse {
-		from { transform: scale(1); }
-		to { transform: scale(1.05); }
+		from {
+			transform: scale(1);
+		}
+		to {
+			transform: scale(1.05);
+		}
 	}
 
 	:global([data-theme='dark']) .exam-timer-pill {
@@ -863,7 +963,11 @@
 	}
 
 	/* ── Question ── */
-	.question-wrap { display: flex; flex-direction: column; gap: 12px; }
+	.question-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
 	.question-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
@@ -886,7 +990,7 @@
 		margin: 8px 0 0;
 		line-height: 1.6;
 		font-style: italic;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	/* ── Feedback Premium Bar ── */
@@ -907,9 +1011,12 @@
 		border-color: rgba(46, 125, 91, 0.1);
 	}
 	.feedback-icon-wrap {
-		width: 44px; height: 44px;
+		width: 44px;
+		height: 44px;
 		border-radius: 14px;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		background: rgba(255, 255, 255, 0.5);
 		flex-shrink: 0;
 	}
@@ -917,14 +1024,31 @@
 		background: rgba(0, 0, 0, 0.2);
 	}
 
-	.feedback-text-side { display: flex; flex-direction: column; gap: 2px; }
-	.feedback-title { font-size: 16px; font-weight: 800; }
-	.feedback-sub { font-size: 13px; font-weight: 600; opacity: 0.8; }
+	.feedback-text-side {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.feedback-title {
+		font-size: 16px;
+		font-weight: 800;
+	}
+	.feedback-sub {
+		font-size: 13px;
+		font-weight: 600;
+		opacity: 0.8;
+	}
 
 	/* ── Options ── */
-	.options-list { display: flex; flex-direction: column; gap: 10px; }
+	.options-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
 	.option-item {
-		display: flex; align-items: center; gap: 14px;
+		display: flex;
+		align-items: center;
+		gap: 14px;
 		padding: 16px;
 		border: 2px solid var(--ink-200);
 		border-radius: 18px;
@@ -955,22 +1079,54 @@
 		border-width: 3px;
 	}
 	.opt-marker {
-		width: 32px; height: 32px;
+		width: 32px;
+		height: 32px;
 		border-radius: 10px;
 		background: var(--ink-100);
-		display: flex; align-items: center; justify-content: center;
-		font-size: 14px; font-weight: 800;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
+		font-weight: 800;
 		color: var(--fg-secondary);
 		flex-shrink: 0;
 		transition: all 0.2s;
 	}
-	.is-selected:not(.is-correct):not(.is-wrong) .opt-marker { background: var(--sumi); color: var(--washi); }
-	.is-correct .opt-marker { background: var(--success); color: white; border-radius: 50%; box-shadow: 0 0 10px rgba(46, 125, 91, 0.3); }
-	.is-wrong .opt-marker { background: var(--hinomaru-red); color: white; border-radius: 50%; box-shadow: 0 0 10px rgba(188, 0, 45, 0.3); }
-	
-	.opt-content { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-	.opt-text { font-size: 17px; font-weight: 600; color: var(--fg-primary); line-height: 1.4; }
-	.opt-romaji { font-size: 12px; color: var(--fg-tertiary); font-style: italic; opacity: 0.7; }
+	.is-selected:not(.is-correct):not(.is-wrong) .opt-marker {
+		background: var(--sumi);
+		color: var(--washi);
+	}
+	.is-correct .opt-marker {
+		background: var(--success);
+		color: white;
+		border-radius: 50%;
+		box-shadow: 0 0 10px rgba(46, 125, 91, 0.3);
+	}
+	.is-wrong .opt-marker {
+		background: var(--hinomaru-red);
+		color: white;
+		border-radius: 50%;
+		box-shadow: 0 0 10px rgba(188, 0, 45, 0.3);
+	}
+
+	.opt-content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+	}
+	.opt-text {
+		font-size: 17px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		line-height: 1.4;
+	}
+	.opt-romaji {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		font-style: italic;
+		opacity: 0.7;
+	}
 
 	/* ── MINIMALIST LISTENING ── */
 	.listening-screen {
@@ -998,7 +1154,9 @@
 		margin-bottom: 32px;
 	}
 	.playlist-pill {
-		display: flex; align-items: center; gap: 8px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
 		padding: 6px 14px;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
@@ -1010,24 +1168,87 @@
 		background: var(--hinomaru-red);
 		border-color: var(--hinomaru-red);
 	}
-	.p-idx-tiny { font-size: 10px; font-weight: 800; color: var(--fg-tertiary); }
-	.p-name-tiny { font-size: 13px; font-weight: 700; color: var(--fg-secondary); }
-	.is-active .p-idx-tiny, .is-active .p-name-tiny { color: white; }
+	.p-idx-tiny {
+		font-size: 10px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+	}
+	.p-name-tiny {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+	}
+	.is-active .p-idx-tiny,
+	.is-active .p-name-tiny {
+		color: white;
+	}
 
-	.p-wave-tiny { display: flex; align-items: flex-end; gap: 1.5px; height: 8px; }
-	.p-wave-tiny span { width: 1.5px; background: white; border-radius: 1px; animation: p-wave-tiny 0.6s infinite alternate; }
-	.p-wave-tiny span:nth-child(2) { animation-delay: 0.2s; height: 60%; }
-	.p-wave-tiny span:nth-child(1) { height: 40%; }
-	.p-wave-tiny span:nth-child(3) { height: 80%; }
-	@keyframes p-wave-tiny { from { height: 20%; } to { height: 100%; } }
+	.p-wave-tiny {
+		display: flex;
+		align-items: flex-end;
+		gap: 1.5px;
+		height: 8px;
+	}
+	.p-wave-tiny span {
+		width: 1.5px;
+		background: white;
+		border-radius: 1px;
+		animation: p-wave-tiny 0.6s infinite alternate;
+	}
+	.p-wave-tiny span:nth-child(2) {
+		animation-delay: 0.2s;
+		height: 60%;
+	}
+	.p-wave-tiny span:nth-child(1) {
+		height: 40%;
+	}
+	.p-wave-tiny span:nth-child(3) {
+		height: 80%;
+	}
+	@keyframes p-wave-tiny {
+		from {
+			height: 20%;
+		}
+		to {
+			height: 100%;
+		}
+	}
 
-	.hero-compact { margin-bottom: 24px; text-align: center; }
-	.hero-top-meta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
-	.level-pill-tiny { font-size: 9px; font-weight: 800; color: var(--hinomaru-red); background: var(--hinomaru-red-wash); padding: 1px 6px; border-radius: 4px; }
-	.section-label-tiny { font-size: 9px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
-	.title-compact { font-size: 28px; font-weight: 800; color: var(--sumi); margin: 0; letter-spacing: -0.02em; }
+	.hero-compact {
+		margin-bottom: 24px;
+		text-align: center;
+	}
+	.hero-top-meta {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 8px;
+	}
+	.level-pill-tiny {
+		font-size: 9px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 1px 6px;
+		border-radius: 4px;
+	}
+	.section-label-tiny {
+		font-size: 9px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
+	}
+	.title-compact {
+		font-size: 28px;
+		font-weight: 800;
+		color: var(--sumi);
+		margin: 0;
+		letter-spacing: -0.02em;
+	}
 
-	.player-minimal { 
+	.player-minimal {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-100);
 		border-radius: 20px;
@@ -1035,54 +1256,104 @@
 		margin-bottom: 40px;
 		box-shadow: var(--shadow-sm);
 	}
-	.wave-row-minimal { margin-bottom: 20px; opacity: 0.6; }
-	.ctrl-row-compact { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-	.time-compact { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); font-family: var(--font-mono); width: 40px; text-align: center; }
-	.actions-compact { display: flex; align-items: center; gap: 12px; }
+	.wave-row-minimal {
+		margin-bottom: 20px;
+		opacity: 0.6;
+	}
+	.ctrl-row-compact {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 16px;
+	}
+	.time-compact {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+		font-family: var(--font-mono);
+		width: 40px;
+		text-align: center;
+	}
+	.actions-compact {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
 
 	:global(.play-btn-compact) {
-		width: 44px !important; height: 44px !important;
+		width: 44px !important;
+		height: 44px !important;
 		border-radius: 50% !important;
 		background: var(--sumi) !important;
 		color: var(--washi) !important;
 		border: none !important;
 	}
 	.replay-btn-compact {
-		width: 32px; height: 32px;
+		width: 32px;
+		height: 32px;
 		border-radius: 50%;
 		border: 1px solid var(--ink-200);
 		background: none;
 		color: var(--fg-secondary);
 		cursor: pointer;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	:global(.custom-player-progress) {
 		height: 8px !important;
 	}
-	:global(.custom-player-progress [role="slider"]) {
+	:global(.custom-player-progress [role='slider']) {
 		--primary: var(--hinomaru-red);
 		--secondary: var(--ink-100);
 	}
 	:global(.custom-player-progress .SliderRange) {
 		background-color: var(--hinomaru-red) !important;
 	}
-	:global(.custom-player-progress span[role="slider"]) {
+	:global(.custom-player-progress span[role='slider']) {
 		display: none !important;
 	}
 
-	.transcript-minimal { border-top: 1px solid var(--ink-100); padding-top: 32px; }
-	.minimal-label { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
-	.text-minimal { font-size: 17px; line-height: 2; color: var(--fg-primary); white-space: pre-wrap; font-weight: 500; }
-	.romaji-minimal { margin-top: 16px; font-size: 14px; color: var(--fg-tertiary); font-style: italic; opacity: 0.8; line-height: 1.6; }
+	.transcript-minimal {
+		border-top: 1px solid var(--ink-100);
+		padding-top: 32px;
+	}
+	.minimal-label {
+		font-size: 11px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
+		margin-bottom: 16px;
+	}
+	.text-minimal {
+		font-size: 17px;
+		line-height: 2;
+		color: var(--fg-primary);
+		white-space: pre-wrap;
+		font-weight: 500;
+	}
+	.romaji-minimal {
+		margin-top: 16px;
+		font-size: 14px;
+		color: var(--fg-tertiary);
+		font-style: italic;
+		opacity: 0.8;
+		line-height: 1.6;
+	}
 
 	/* ── Transcript PREMIUM ── */
 	.transcript-section {
 		margin-top: 24px;
 	}
 	.transcript-toggle-card {
-		display: flex; align-items: center; justify-content: space-between;
-		width: 100%; padding: 16px 20px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		padding: 16px 20px;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 20px;
@@ -1101,18 +1372,43 @@
 		background: var(--paper);
 	}
 
-	.toggle-left { display: flex; align-items: center; gap: 14px; }
+	.toggle-left {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+	}
 	.toggle-icon-box {
-		width: 36px; height: 36px;
+		width: 36px;
+		height: 36px;
 		background: var(--hinomaru-red-wash);
 		border-radius: 10px;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
-	.toggle-text-stack { display: flex; flex-direction: column; text-align: left; }
-	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
-	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+	.toggle-text-stack {
+		display: flex;
+		flex-direction: column;
+		text-align: left;
+	}
+	.toggle-label {
+		font-size: 15px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.toggle-sublabel {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
+	}
 
-	.toggle-arrow-premium { font-size: 12px; color: var(--fg-tertiary); opacity: 0.5; }
+	.toggle-arrow-premium {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		opacity: 0.5;
+	}
 
 	.transcript-expandable-content {
 		border: 1px solid var(--ink-200);
@@ -1140,20 +1436,68 @@
 		border-radius: 14px;
 		border-left: 3px solid var(--hinomaru-red);
 	}
-	.romaji-label { font-size: 10px; font-weight: 800; color: var(--hinomaru-red); margin-bottom: 6px; }
-	.romaji-content { font-size: 14px; color: var(--fg-secondary); font-style: italic; line-height: 1.6; }
+	.romaji-label {
+		font-size: 10px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		margin-bottom: 6px;
+	}
+	.romaji-content {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		font-style: italic;
+		line-height: 1.6;
+	}
 
-	.typing-area { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
-	.typing-input { height: 64px !important; font-size: 20px !important; text-align: center; border-width: 2px !important; }
-	.typing-input.is-correct { border-color: var(--success) !important; background: var(--success-wash) !important; }
-	.typing-input.is-wrong { border-color: var(--hinomaru-red) !important; background: var(--hinomaru-red-wash) !important; }
-	.typing-reveal { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: var(--bg-surface); border: 1px dashed var(--ink-300); border-radius: 12px; }
-	.reveal-label { font-size: 13px; color: var(--fg-secondary); font-weight: 600; }
-	.reveal-val { font-size: 16px; font-weight: 800; color: var(--hinomaru-red); }
-	.is-dimmed { opacity: 0.4; }
+	.typing-area {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		margin-top: 10px;
+	}
+	.typing-input {
+		height: 64px !important;
+		font-size: 20px !important;
+		text-align: center;
+		border-width: 2px !important;
+	}
+	.typing-input.is-correct {
+		border-color: var(--success) !important;
+		background: var(--success-wash) !important;
+	}
+	.typing-input.is-wrong {
+		border-color: var(--hinomaru-red) !important;
+		background: var(--hinomaru-red-wash) !important;
+	}
+	.typing-reveal {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px;
+		background: var(--bg-surface);
+		border: 1px dashed var(--ink-300);
+		border-radius: 12px;
+	}
+	.reveal-label {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		font-weight: 600;
+	}
+	.reveal-val {
+		font-size: 16px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+	}
+	.is-dimmed {
+		opacity: 0.4;
+	}
 
 	.footer-back-btn {
-		display: flex; align-items: center; justify-content: center; gap: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
 		font-weight: 700;
 	}
 
@@ -1167,49 +1511,95 @@
 
 	/* ── Answer Review ── */
 	.review-section-label {
-		font-size: 11px; font-weight: 700;
-		text-transform: uppercase; letter-spacing: 0.08em;
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin: 0 0 10px;
 	}
 	.review-list {
-		display: flex; flex-direction: column; gap: 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 	.review-item-premium {
-		display: flex; align-items: center; gap: 12px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		border-radius: 14px;
 		padding: 12px 14px;
 	}
-	.review-item-premium.is-review-correct { border-color: var(--success-wash); }
-	.review-item-premium.is-review-wrong { border-color: var(--hinomaru-red-wash); }
+	.review-item-premium.is-review-correct {
+		border-color: var(--success-wash);
+	}
+	.review-item-premium.is-review-wrong {
+		border-color: var(--hinomaru-red-wash);
+	}
 
 	.review-num {
-		width: 22px; height: 22px;
+		width: 22px;
+		height: 22px;
 		border-radius: 50%;
 		background: var(--ink-100);
 		color: var(--fg-tertiary);
-		font-size: 11px; font-weight: 700;
-		display: flex; align-items: center; justify-content: center;
+		font-size: 11px;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 	}
-	.is-review-correct .review-num { background: var(--success-wash); color: var(--success); }
-	.is-review-wrong .review-num { background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
-
-	.review-body { flex: 1; min-width: 0; }
-	.review-q {
-		font-size: 13px; color: var(--fg-secondary);
-		margin: 0 0 6px; line-height: 1.5;
+	.is-review-correct .review-num {
+		background: var(--success-wash);
+		color: var(--success);
 	}
-	.review-user-ans, .review-correct-ans {
-		display: flex; align-items: baseline; gap: 6px;
+	.is-review-wrong .review-num {
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+	}
+
+	.review-body {
+		flex: 1;
+		min-width: 0;
+	}
+	.review-q {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		margin: 0 0 6px;
+		line-height: 1.5;
+	}
+	.review-user-ans,
+	.review-correct-ans {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
 		margin: 0 0 3px;
 	}
-	.review-x { font-size: 12px; font-weight: 700; color: var(--hinomaru-red); flex-shrink: 0; }
-	.review-check { font-size: 12px; font-weight: 700; color: var(--success); flex-shrink: 0; }
-	.review-wrong-text { font-size: 13px; color: var(--hinomaru-red); text-decoration: line-through; }
-	.review-correct-text { font-size: 14px; font-weight: 700; color: var(--success); }
+	.review-x {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		flex-shrink: 0;
+	}
+	.review-check {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--success);
+		flex-shrink: 0;
+	}
+	.review-wrong-text {
+		font-size: 13px;
+		color: var(--hinomaru-red);
+		text-decoration: line-through;
+	}
+	.review-correct-text {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--success);
+	}
 
 	.result-premium-hero {
 		position: relative;
@@ -1219,7 +1609,7 @@
 		overflow: hidden;
 		background: #1a1a1a;
 		color: white;
-		box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 	}
 
 	.result-premium-hero.is-pass {
@@ -1230,61 +1620,98 @@
 		background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%);
 	}
 
-	.hero-content-wrapper { position: relative; z-index: 2; }
+	.hero-content-wrapper {
+		position: relative;
+		z-index: 2;
+	}
 
 	.hero-badge {
-		display: inline-flex; align-items: center; gap: 8px;
-		background: rgba(255,255,255,0.1);
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(8px);
-		padding: 6px 16px; border-radius: 99px;
-		font-size: 12px; font-weight: 700;
-		text-transform: uppercase; letter-spacing: 0.05em;
+		padding: 6px 16px;
+		border-radius: 99px;
+		font-size: 12px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
 		margin-bottom: 32px;
-		border: 1px solid rgba(255,255,255,0.1);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.score-display-ring {
 		position: relative;
-		width: 160px; height: 160px;
+		width: 160px;
+		height: 160px;
 		margin: 0 auto 32px;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.progress-svg {
 		position: absolute;
-		top: 0; left: 0; width: 100%; height: 100%;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
 		transform: rotate(-90deg);
 	}
 
-	.progress-track { stroke: rgba(255,255,255,0.1); }
+	.progress-track {
+		stroke: rgba(255, 255, 255, 0.1);
+	}
 	.progress-bar {
 		stroke: white;
 		transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
-	.is-pass .progress-bar { stroke: #4ade80; }
+	.is-pass .progress-bar {
+		stroke: #4ade80;
+	}
 
 	.score-labels {
-		display: flex; align-items: baseline; gap: 2px;
+		display: flex;
+		align-items: baseline;
+		gap: 2px;
 	}
-	.score-big { font-size: 64px; font-weight: 900; line-height: 1; }
-	.score-small { font-size: 20px; font-weight: 600; opacity: 0.6; }
+	.score-big {
+		font-size: 64px;
+		font-weight: 900;
+		line-height: 1;
+	}
+	.score-small {
+		font-size: 20px;
+		font-weight: 600;
+		opacity: 0.6;
+	}
 
 	.hero-main-title {
-		font-size: 28px; font-weight: 800; margin: 0 0 8px;
+		font-size: 28px;
+		font-weight: 800;
+		margin: 0 0 8px;
 		letter-spacing: -0.02em;
 	}
 	.hero-xp-badge {
-		display: inline-flex; align-items: center; gap: 6px;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 		background: rgba(251, 191, 36, 0.15);
 		color: #f59e0b;
-		padding: 4px 12px; border-radius: 99px;
-		font-size: 13px; font-weight: 700;
+		padding: 4px 12px;
+		border-radius: 99px;
+		font-size: 13px;
+		font-weight: 700;
 		margin-bottom: 12px;
 		border: 1px solid rgba(251, 191, 36, 0.2);
 	}
 	.hero-main-sub {
-		font-size: 14px; font-weight: 600; opacity: 0.6;
-		text-transform: uppercase; letter-spacing: 0.1em;
+		font-size: 14px;
+		font-weight: 600;
+		opacity: 0.6;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
 	}
 
 	/* Result actions */
@@ -1307,22 +1734,38 @@
 		border: 1px solid var(--ink-200);
 		border-radius: 99px;
 		padding: 8px 14px;
-		display: flex; align-items: center; gap: 6px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		transition: all 0.2s;
 		box-shadow: var(--shadow-sm);
 	}
 
-	.stat-v { font-size: 14px; font-weight: 800; color: var(--sumi); }
-	.stat-l { font-size: 11px; font-weight: 600; color: var(--fg-secondary); text-transform: lowercase; }
+	.stat-v {
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.stat-l {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+		text-transform: lowercase;
+	}
 
-	.jp { font-family: var(--font-jp); }
+	.jp {
+		font-family: var(--font-jp);
+	}
 
 	/* Modal handled by ResponsiveModal */
 
-	.jp { font-family: var(--font-jp); }
+	.jp {
+		font-family: var(--font-jp);
+	}
 
 	/* ── DARK MODE OVERRIDES ── */
-	:global([data-theme='dark']) .option-item:not(.is-correct):not(.is-wrong):not(.is-selected):hover {
+	:global([data-theme='dark'])
+		.option-item:not(.is-correct):not(.is-wrong):not(.is-selected):hover {
 		background: var(--ink-100);
 		border-color: var(--ink-300);
 	}
@@ -1345,8 +1788,10 @@
 		border-radius: 50% !important;
 		background: var(--sumi) !important;
 		color: var(--washi) !important;
-		box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-		display: flex; align-items: center; justify-content: center;
+		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	:global([data-theme='dark'] .player-main-btn) {
 		background: var(--washi) !important;
@@ -1359,7 +1804,7 @@
 	:global(.audio-player-progress-area .bg-primary) {
 		background: var(--hinomaru-red) !important;
 	}
-	:global(.audio-player-progress-area [role="slider"] > span:last-child) {
+	:global(.audio-player-progress-area [role='slider'] > span:last-child) {
 		background: var(--hinomaru-red) !important;
 	}
 </style>

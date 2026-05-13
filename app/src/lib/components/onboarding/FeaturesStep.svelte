@@ -139,7 +139,7 @@
 		font-weight: 700;
 		margin: 0;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.feature-desc {

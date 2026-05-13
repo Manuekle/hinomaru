@@ -35,7 +35,10 @@
 	const rom = $derived(word ? safeRomaji(word.romaji, word.kana || word.jp) : '');
 	const exRom = $derived(
 		word?.example
-			? safeRomaji(word.example_romaji || word.extra?.example_romaji, word.example_kana || word.example)
+			? safeRomaji(
+					word.example_romaji || word.extra?.example_romaji,
+					word.example_kana || word.example
+				)
 			: ''
 	);
 
@@ -54,7 +57,9 @@
 	}
 
 	async function updateWordProgress(w: any, gotIt: boolean, hadDifficulty: boolean) {
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
 		if (!user) return;
 
 		const currentSRS = {
@@ -121,7 +126,9 @@
 	}
 
 	async function saveSession() {
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user }
+		} = await supabase.auth.getUser();
 		if (!user) return;
 		await supabase.from('sessions').insert({
 			user_id: user.id,
@@ -180,25 +187,35 @@
 					class="card-scene"
 					aria-label="Flashcard — tap to flip"
 					onclick={() => (flipped = !flipped)}
-					onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), (flipped = !flipped))}
+					onkeydown={(e) =>
+						(e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), (flipped = !flipped))}
 				>
 					<div class="card-body" class:flipped>
 						<!-- Front -->
 						<div class="card-face card-front">
-							<span class="card-tag">{($locale === 'es' ? word.category_es : word.category) || t('nav.vocabulary', $locale)}</span>
+							<span class="card-tag"
+								>{($locale === 'es' ? word.category_es : word.category) ||
+									t('nav.vocabulary', $locale)}</span
+							>
 
 							<div class="word-center">
 								<div class="jp word-text" style="font-size:{getFontSize(word.jp)};">{word.jp}</div>
 								<div class="audio-row">
 									<button
-										onclick={(e) => { e.stopPropagation(); speak(word.jp); }}
+										onclick={(e) => {
+											e.stopPropagation();
+											speak(word.jp);
+										}}
 										class="audio-btn"
 										aria-label="Play normal speed"
 									>
 										<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
 									</button>
 									<button
-										onclick={(e) => { e.stopPropagation(); speak(word.jp, true); }}
+										onclick={(e) => {
+											e.stopPropagation();
+											speak(word.jp, true);
+										}}
 										class="audio-btn slow-btn"
 										aria-label="Play slow speed"
 									>
@@ -223,14 +240,23 @@
 									<div class="example-block">
 										<div class="example-jp jp">
 											{word.example}
-											<button onclick={(e) => { e.stopPropagation(); speak(word.example); }} class="mini-audio" aria-label="Play example">
+											<button
+												onclick={(e) => {
+													e.stopPropagation();
+													speak(word.example);
+												}}
+												class="mini-audio"
+												aria-label="Play example"
+											>
 												<Icon icon={VolumeHighIcon} size={13} color="currentColor" />
 											</button>
 										</div>
 										{#if exRom}
 											<div class="example-romaji">{exRom}</div>
 										{/if}
-										<div class="example-translation">{$locale === 'es' ? word.example_es : word.example_en}</div>
+										<div class="example-translation">
+											{$locale === 'es' ? word.example_es : word.example_en}
+										</div>
 									</div>
 								{/if}
 							</div>
@@ -244,7 +270,10 @@
 	{#if word && !showAnticipation}
 		<StickyFooter>
 			{#if !flipped}
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => (flipped = true)}>
+				<button
+					class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
+					onclick={() => (flipped = true)}
+				>
 					{t('session.flip', $locale)}
 				</button>
 			{:else}
@@ -332,7 +361,9 @@
 		will-change: transform;
 	}
 
-	.card-body.flipped { transform: rotateY(180deg); }
+	.card-body.flipped {
+		transform: rotateY(180deg);
+	}
 
 	.card-face {
 		position: absolute;
@@ -342,7 +373,9 @@
 		display: flex;
 		flex-direction: column;
 		border: 1px solid var(--ink-200);
-		box-shadow: 0 4px 24px rgba(26,26,26,0.08), 0 1px 4px rgba(26,26,26,0.04);
+		box-shadow:
+			0 4px 24px rgba(26, 26, 26, 0.08),
+			0 1px 4px rgba(26, 26, 26, 0.04);
 	}
 
 	.card-front {
@@ -363,7 +396,7 @@
 	.card-tag {
 		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 		background: var(--bg-muted);
@@ -419,12 +452,15 @@
 		background: var(--hinomaru-red-wash);
 	}
 
-	.slow-label { font-size: 11px; font-weight: 800; }
+	.slow-label {
+		font-size: 11px;
+		font-weight: 800;
+	}
 
 	.tap-hint {
 		font-size: 11px;
 		font-weight: 700;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 	}
@@ -442,7 +478,9 @@
 	}
 
 	@supports (height: 1px) {
-		.back-scroll > :global(*) { flex-shrink: 0; }
+		.back-scroll > :global(*) {
+			flex-shrink: 0;
+		}
 	}
 
 	.meaning-large {
@@ -493,8 +531,16 @@
 		cursor: pointer;
 	}
 
-	.example-romaji { font-size: 13px; font-weight: 700; color: var(--hinomaru-red); }
-	.example-translation { font-size: 14px; color: var(--fg-secondary); line-height: 1.4; }
+	.example-romaji {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+	}
+	.example-translation {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		line-height: 1.4;
+	}
 
 	.empty-state-wrapper {
 		flex: 1;
@@ -506,7 +552,17 @@
 		text-align: center;
 	}
 
-	.empty-emoji { font-size: 48px; margin-bottom: 16px; }
-	.empty-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-	.empty-desc { color: var(--fg-secondary); margin-bottom: 32px; }
+	.empty-emoji {
+		font-size: 48px;
+		margin-bottom: 16px;
+	}
+	.empty-title {
+		font-size: 24px;
+		font-weight: 800;
+		margin-bottom: 8px;
+	}
+	.empty-desc {
+		color: var(--fg-secondary);
+		margin-bottom: 32px;
+	}
 </style>

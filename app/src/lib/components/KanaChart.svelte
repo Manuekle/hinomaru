@@ -1,11 +1,17 @@
 <script lang="ts">
 	import {
-		HIRAGANA, KATAKANA,
-		HIRAGANA_DAKUON, KATAKANA_DAKUON,
-		HIRAGANA_HANDAKUON, KATAKANA_HANDAKUON,
-		HIRAGANA_YOON, KATAKANA_YOON,
-		HIRAGANA_LONG, KATAKANA_LONG,
-		HIRAGANA_SOKUON, KATAKANA_SOKUON,
+		HIRAGANA,
+		KATAKANA,
+		HIRAGANA_DAKUON,
+		KATAKANA_DAKUON,
+		HIRAGANA_HANDAKUON,
+		KATAKANA_HANDAKUON,
+		HIRAGANA_YOON,
+		KATAKANA_YOON,
+		HIRAGANA_LONG,
+		KATAKANA_LONG,
+		HIRAGANA_SOKUON,
+		KATAKANA_SOKUON,
 		type KanaItem
 	} from '$lib/data/kana';
 	import { speakJapanese } from '$lib/utils/tts';
@@ -14,24 +20,41 @@
 
 	let mode = $state<'hiragana' | 'katakana'>('hiragana');
 
-	const sections = $derived<{ title_es: string; title_en: string; cols: number; data: KanaItem[] }[]>(
+	const sections = $derived<
+		{ title_es: string; title_en: string; cols: number; data: KanaItem[] }[]
+	>(
 		mode === 'hiragana'
 			? [
-				{ title_es: 'Gojūon', title_en: 'Gojūon', cols: 5, data: HIRAGANA },
-				{ title_es: 'Dakuon', title_en: 'Dakuon', cols: 5, data: HIRAGANA_DAKUON },
-				{ title_es: 'Handakuon', title_en: 'Handakuon', cols: 5, data: HIRAGANA_HANDAKUON },
-				{ title_es: 'Combinaciones (Yōon)', title_en: 'Combinations (Yōon)', cols: 3, data: HIRAGANA_YOON },
-				{ title_es: 'Vocales largas', title_en: 'Long vowels', cols: 5, data: HIRAGANA_LONG },
-				{ title_es: 'Sokuon (っ)', title_en: 'Sokuon (っ)', cols: 5, data: HIRAGANA_SOKUON }
-			]
+					{ title_es: 'Gojūon', title_en: 'Gojūon', cols: 5, data: HIRAGANA },
+					{ title_es: 'Dakuon', title_en: 'Dakuon', cols: 5, data: HIRAGANA_DAKUON },
+					{ title_es: 'Handakuon', title_en: 'Handakuon', cols: 5, data: HIRAGANA_HANDAKUON },
+					{
+						title_es: 'Combinaciones (Yōon)',
+						title_en: 'Combinations (Yōon)',
+						cols: 3,
+						data: HIRAGANA_YOON
+					},
+					{ title_es: 'Vocales largas', title_en: 'Long vowels', cols: 5, data: HIRAGANA_LONG },
+					{ title_es: 'Sokuon (っ)', title_en: 'Sokuon (っ)', cols: 5, data: HIRAGANA_SOKUON }
+				]
 			: [
-				{ title_es: 'Gojūon', title_en: 'Gojūon', cols: 5, data: KATAKANA },
-				{ title_es: 'Dakuon', title_en: 'Dakuon', cols: 5, data: KATAKANA_DAKUON },
-				{ title_es: 'Handakuon', title_en: 'Handakuon', cols: 5, data: KATAKANA_HANDAKUON },
-				{ title_es: 'Combinaciones (Yōon)', title_en: 'Combinations (Yōon)', cols: 3, data: KATAKANA_YOON },
-				{ title_es: 'Vocales largas (ー)', title_en: 'Long vowels (ー)', cols: 5, data: KATAKANA_LONG },
-				{ title_es: 'Sokuon (ッ)', title_en: 'Sokuon (ッ)', cols: 5, data: KATAKANA_SOKUON }
-			]
+					{ title_es: 'Gojūon', title_en: 'Gojūon', cols: 5, data: KATAKANA },
+					{ title_es: 'Dakuon', title_en: 'Dakuon', cols: 5, data: KATAKANA_DAKUON },
+					{ title_es: 'Handakuon', title_en: 'Handakuon', cols: 5, data: KATAKANA_HANDAKUON },
+					{
+						title_es: 'Combinaciones (Yōon)',
+						title_en: 'Combinations (Yōon)',
+						cols: 3,
+						data: KATAKANA_YOON
+					},
+					{
+						title_es: 'Vocales largas (ー)',
+						title_en: 'Long vowels (ー)',
+						cols: 5,
+						data: KATAKANA_LONG
+					},
+					{ title_es: 'Sokuon (ッ)', title_en: 'Sokuon (ッ)', cols: 5, data: KATAKANA_SOKUON }
+				]
 	);
 
 	function play(char: string | null) {
@@ -42,11 +65,22 @@
 <div class="kana-chart-wrapper">
 	<div class="toggle-container" use:fadeUp={{ delay: 0, y: 10 }}>
 		<div class="pill-track">
-			<div class="pill-glider" style="transform: translateX({mode === 'hiragana' ? '0' : '100%'})"></div>
-			<button class="pill-btn" class:active={mode === 'hiragana'} onclick={() => (mode = 'hiragana')}>
+			<div
+				class="pill-glider"
+				style="transform: translateX({mode === 'hiragana' ? '0' : '100%'})"
+			></div>
+			<button
+				class="pill-btn"
+				class:active={mode === 'hiragana'}
+				onclick={() => (mode = 'hiragana')}
+			>
 				Hiragana
 			</button>
-			<button class="pill-btn" class:active={mode === 'katakana'} onclick={() => (mode = 'katakana')}>
+			<button
+				class="pill-btn"
+				class:active={mode === 'katakana'}
+				onclick={() => (mode = 'katakana')}
+			>
 				Katakana
 			</button>
 		</div>
@@ -134,7 +168,7 @@
 		font-weight: 800;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		margin: 0 0 14px;
 		text-align: center;
 	}

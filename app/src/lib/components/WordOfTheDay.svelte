@@ -183,7 +183,7 @@
 		font-size: 11px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--hinomaru-red);
 	}
 
@@ -277,7 +277,7 @@
 		cursor: pointer;
 		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
 		font-family: var(--font-ui);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	@media (hover: hover) {

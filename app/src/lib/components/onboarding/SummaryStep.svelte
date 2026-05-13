@@ -84,12 +84,12 @@
 
 	async function processSequentially() {
 		for (let i = 1; i <= items.length; i++) {
-			await new Promise(r => setTimeout(r, 700 + Math.random() * 300));
+			await new Promise((r) => setTimeout(r, 700 + Math.random() * 300));
 			visibleSteps = i;
 			playCorrectSound();
 			progress.set((i / items.length) * 100);
 		}
-		await new Promise(r => setTimeout(r, 500));
+		await new Promise((r) => setTimeout(r, 500));
 		isFinished = true;
 	}
 </script>
@@ -97,9 +97,9 @@
 <div class="step-content">
 	<div class="orb-header" use:fadeUp={{ delay: 0, y: -20 }}>
 		<div class="orb-container">
-			<Orb 
-				agentState={!isFinished ? 'thinking' : null} 
-				colors={['#BC002D', '#FF6B6B']} 
+			<Orb
+				agentState={!isFinished ? 'thinking' : null}
+				colors={['#BC002D', '#FF6B6B']}
 				className="h-full w-full"
 			/>
 		</div>
@@ -113,12 +113,8 @@
 		{#each items as item, i (item.id)}
 			{@const isVisible = visibleSteps > i}
 			{@const isProcessing = visibleSteps === i}
-			
-			<div 
-				class="summary-row" 
-				class:visible={isVisible}
-				class:processing={isProcessing}
-			>
+
+			<div class="summary-row" class:visible={isVisible} class:processing={isProcessing}>
 				<div class="icon-box" style="background: {item.color}14; color: {item.color};">
 					<Icon icon={item.icon} size={18} color="currentColor" strokeWidth={2} />
 				</div>
@@ -126,11 +122,18 @@
 					<span class="label">{item.label}</span>
 					<span class="value">{isVisible ? item.value : '...'}</span>
 				</div>
-				
+
 				<div class="status-indicator">
 					{#if isVisible}
 						<div class="check-badge">
-							<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="white"
+								stroke-width="4"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
 								<polyline points="20 6 9 17 4 12"></polyline>
 							</svg>
 						</div>
@@ -267,7 +270,7 @@
 		color: var(--fg-tertiary);
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	.value {
@@ -301,9 +304,15 @@
 	}
 
 	@keyframes checkPop {
-		0% { transform: scale(0); }
-		70% { transform: scale(1.1); }
-		100% { transform: scale(1); }
+		0% {
+			transform: scale(0);
+		}
+		70% {
+			transform: scale(1.1);
+		}
+		100% {
+			transform: scale(1);
+		}
 	}
 
 	.spinner {
@@ -316,7 +325,9 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.finish-btn {
@@ -346,16 +357,13 @@
 		left: -100%;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(
-			90deg,
-			transparent,
-			rgba(255, 255, 255, 0.2),
-			transparent
-		);
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
 		animation: shimmer 2s infinite;
 	}
 
 	@keyframes shimmer {
-		to { left: 100%; }
+		to {
+			left: 100%;
+		}
 	}
 </style>

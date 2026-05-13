@@ -164,7 +164,7 @@
 		font-variant-numeric: tabular-nums;
 		padding-top: 3px;
 		min-width: 24px;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	.row-body {
@@ -238,4 +238,3 @@
 			transform 150ms;
 	}
 </style>
-

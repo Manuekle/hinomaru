@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,7 +8,11 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background: #F7F5F2;
@@ -17,34 +22,77 @@
       color: #1A1A1A;
     }
 
-    .wrapper { max-width: 520px; margin: 0 auto; }
+    .wrapper {
+      max-width: 520px;
+      margin: 0 auto;
+    }
 
-    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
-    .brand-dot { width: 28px; height: 28px; background: #BC002D; border-radius: 50%; flex-shrink: 0; }
-    .brand-name { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #1A1A1A; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .brand-dot {
+      width: 28px;
+      height: 28px;
+      background: #BC002D;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1A1A1A;
+    }
 
     .card {
       background: #FFFFFF;
       border: 1px solid #E8E6E2;
       border-radius: 24px;
       padding: 40px 36px;
-      box-shadow: 0 4px 16px rgba(26,26,26,0.06), 0 2px 4px rgba(26,26,26,0.04);
+      box-shadow: 0 4px 16px rgba(26, 26, 26, 0.06), 0 2px 4px rgba(26, 26, 26, 0.04);
     }
 
     /* Shield icon with glow */
     .icon-wrap {
-      width: 72px; height: 72px;
+      width: 72px;
+      height: 72px;
       background: linear-gradient(135deg, #FDECEF, #fff0f3);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 24px; font-size: 32px;
-      box-shadow: 0 0 0 10px rgba(188,0,45,0.07);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 32px;
+      box-shadow: 0 0 0 10px rgba(188, 0, 45, 0.07);
     }
 
-    h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; text-align: center; margin-bottom: 12px; }
-    .jp-accent { font-size: 13px; color: #A8A6A2; text-align: center; letter-spacing: 0.06em; margin-bottom: 8px; }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .jp-accent {
+      font-size: 13px;
+      color: #A8A6A2;
+      text-align: center;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
 
     .subtitle {
-      font-size: 15px; color: #6E6C69; text-align: center; line-height: 1.6; margin-bottom: 28px;
+      font-size: 15px;
+      color: #6E6C69;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 28px;
     }
 
     /* OTP Code */
@@ -57,28 +105,45 @@
       position: relative;
       overflow: hidden;
     }
+
     .otp-box::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 20px,
-        rgba(255,255,255,0.02) 20px,
-        rgba(255,255,255,0.02) 40px
-      );
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(45deg,
+          transparent,
+          transparent 20px,
+          rgba(255, 255, 255, 0.02) 20px,
+          rgba(255, 255, 255, 0.02) 40px);
     }
+
     .otp-label {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
-      text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 12px;
       position: relative;
     }
+
     .otp-code {
-      font-size: 42px; font-weight: 700; letter-spacing: 0.2em;
-      color: #FFFFFF; font-variant-numeric: tabular-nums; position: relative;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #FFFFFF;
+      font-variant-numeric: tabular-nums;
+      position: relative;
     }
+
     .otp-expires {
-      font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 10px; position: relative;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 10px;
+      position: relative;
     }
 
     /* Context box */
@@ -92,25 +157,50 @@
       color: #4A4846;
       line-height: 1.5;
     }
-    .context-box strong { color: #1A1A1A; }
+
+    .context-box strong {
+      color: #1A1A1A;
+    }
 
     .btn {
-      display: block; width: 100%; padding: 16px 24px;
-      background: #BC002D; color: #FFFFFF; text-align: center; text-decoration: none;
-      font-size: 16px; font-weight: 600; border-radius: 16px; letter-spacing: -0.01em;
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      background: #BC002D;
+      color: #FFFFFF;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 16px;
+      letter-spacing: -0.04em;
     }
 
-    .divider { height: 1px; background: #E8E6E2; margin: 28px 0; }
+    .divider {
+      height: 1px;
+      background: #E8E6E2;
+      margin: 28px 0;
+    }
 
     .fallback-label {
-      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: #A8A6A2; margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      color: #A8A6A2;
+      margin-bottom: 8px;
     }
-    .fallback-url { font-size: 12px; color: #BC002D; word-break: break-all; line-height: 1.5; }
+
+    .fallback-url {
+      font-size: 12px;
+      color: #BC002D;
+      word-break: break-all;
+      line-height: 1.5;
+    }
 
     .danger-box {
       background: #FDECEF;
-      border: 1px solid rgba(188,0,45,0.15);
+      border: 1px solid rgba(188, 0, 45, 0.15);
       border-radius: 12px;
       padding: 12px 16px;
       margin-top: 20px;
@@ -120,11 +210,20 @@
     }
 
     .footer {
-      text-align: center; margin-top: 32px; font-size: 12px; color: #A8A6A2; line-height: 1.6;
+      text-align: center;
+      margin-top: 32px;
+      font-size: 12px;
+      color: #A8A6A2;
+      line-height: 1.6;
     }
-    .footer a { color: #6E6C69; text-decoration: none; }
+
+    .footer a {
+      color: #6E6C69;
+      text-decoration: none;
+    }
   </style>
 </head>
+
 <body>
   <div class="wrapper">
 
@@ -180,4 +279,5 @@
 
   </div>
 </body>
+
 </html>

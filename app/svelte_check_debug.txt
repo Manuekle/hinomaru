@@ -344,19 +344,19 @@ Warn: Unused CSS selector ".stat-val"
 https://svelte.dev/e/css_unused_selector (svelte)
 	}
 	.stat-val { font-size: 28px; font-weight: 700; color: var(--sumi); line-height: 1; }
-	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: -0.04em; }
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:755:2
 Warn: Unused CSS selector ".stat-label"
 https://svelte.dev/e/css_unused_selector (svelte)
 	.stat-val { font-size: 28px; font-weight: 700; color: var(--sumi); line-height: 1; }
-	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: -0.04em; }
 	.unavail { font-size: 14px; color: var(--fg-secondary); }
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:756:2
 Warn: Unused CSS selector ".unavail"
 https://svelte.dev/e/css_unused_selector (svelte)
-	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: -0.04em; }
 	.unavail { font-size: 14px; color: var(--fg-secondary); }
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:921:2
@@ -382,7 +382,7 @@ https://svelte.dev/e/css_unused_selector (svelte)
 Warn: Unused CSS selector ".minimal-label"
 https://svelte.dev/e/css_unused_selector (svelte)
 	.transcript-minimal { border-top: 1px solid var(--ink-100); padding-top: 32px; }
-	.minimal-label { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+	.minimal-label { font-size: 11px; font-weight: 700; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: -0.04em; margin-bottom: 16px; }
 	.text-minimal { font-size: 17px; line-height: 2; color: var(--fg-primary); white-space: pre-wrap; font-weight: 500; }
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1079:2
@@ -439,13 +439,13 @@ Warn: Unused CSS selector ".toggle-label"
 https://svelte.dev/e/css_unused_selector (svelte)
 	.toggle-text-stack { display: flex; flex-direction: column; text-align: left; }
 	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
-	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: -0.04em; }
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1112:2
 Warn: Unused CSS selector ".toggle-sublabel"
 https://svelte.dev/e/css_unused_selector (svelte)
 	.toggle-label { font-size: 15px; font-weight: 800; color: var(--sumi); }
-	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+	.toggle-sublabel { font-size: 11px; font-weight: 600; color: var(--fg-tertiary); text-transform: uppercase; letter-spacing: -0.04em; }
 
 /home/manudev/Dev/nihongo/app/src/routes/jlpt/[level]/[section]/+page.svelte:1114:2
 Warn: Unused CSS selector ".toggle-arrow-premium"

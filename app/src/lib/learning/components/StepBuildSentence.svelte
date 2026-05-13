@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { locale } from '$lib/stores/locale';
-	import { fade } from 'svelte/transition';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { buildSentence, type BuiltSentence } from '$lib/learning/sentenceBuilder';
+	import { safeRomaji } from '$lib/utils/romaji';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { ArrowLeft02Icon, CheckmarkCircle01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
+	import {
+		ArrowLeft02Icon,
+		CheckmarkCircle01Icon,
+		Cancel01Icon,
+		VolumeHighIcon
+	} from '@hugeicons/core-free-icons';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import { fadeUp } from '$lib/motion';
+	import { fadeIn, fadeUp } from '$lib/motion';
+	import { playCorrect, playWrong } from '$lib/utils/sounds';
 
 	const props: { card: any; pool: any[]; onAnswer: (correct: boolean) => void } = $props();
 	const card = $derived(props.card);
@@ -15,10 +21,10 @@
 		buildSentence(props.pool, card, $locale === 'es' ? 'es' : 'en')
 	);
 
-	// Bank holds {tok, origIdx} so duplicate tokens (rare) can be tracked individually.
 	interface Chip {
 		tok: string;
 		uid: number;
+		romaji: string;
 	}
 	let bank: Chip[] = $state([]);
 	let answer: Chip[] = $state([]);
@@ -26,54 +32,59 @@
 	let result: 'correct' | 'wrong' | null = $state(null);
 
 	$effect(() => {
-		// reset when sentence changes (card change)
 		if (sentence) {
-			bank = sentence.shuffled.map((tok, i) => ({ tok, uid: i }));
+			bank = sentence.shuffled.map((tok, i) => ({
+				tok,
+				uid: i,
+				romaji: safeRomaji(undefined, tok)
+			}));
 			answer = [];
 			locked = false;
 			result = null;
 		}
 	});
 
-	function addToAnswer(chip: Chip) {
+	function add(c: Chip) {
 		if (locked) return;
-		answer = [...answer, chip];
-		bank = bank.filter((c) => c.uid !== chip.uid);
+		answer = [...answer, c];
+		bank = bank.filter((x) => x.uid !== c.uid);
 	}
-
-	function removeFromAnswer(chip: Chip) {
+	function remove(c: Chip) {
 		if (locked) return;
-		bank = [...bank, chip];
-		answer = answer.filter((c) => c.uid !== chip.uid);
+		bank = [...bank, c];
+		answer = answer.filter((x) => x.uid !== c.uid);
 	}
-
-	function clear() {
+	function clearAnswer() {
 		if (locked || !sentence) return;
-		bank = sentence.shuffled.map((tok, i) => ({ tok, uid: i }));
+		bank = sentence.shuffled.map((tok, i) => ({
+			tok,
+			uid: i,
+			romaji: safeRomaji(undefined, tok)
+		}));
 		answer = [];
+	}
+
+	function playFull() {
+		if (sentence) speakJapanese(sentence.tokens.join('') + sentence.suffix);
 	}
 
 	function check() {
 		if (locked || !sentence) return;
 		const got = answer.map((c) => c.tok);
-		const correct =
-			got.length === sentence.tokens.length &&
-			got.every((t, i) => t === sentence.tokens[i]);
+		const ok =
+			got.length === sentence.tokens.length && got.every((t, i) => t === sentence.tokens[i]);
 		locked = true;
-		result = correct ? 'correct' : 'wrong';
-		if (correct) {
-			speakJapanese(sentence.tokens.join('') + sentence.suffix);
+		result = ok ? 'correct' : 'wrong';
+		if (ok) {
+			playCorrect();
+			playFull();
+		} else {
+			playWrong();
 		}
-		setTimeout(() => {
-			if (!correct) {
-				locked = false;
-				result = null;
-			}
-			props.onAnswer(correct);
-		}, correct ? 1100 : 1200);
+		setTimeout(() => props.onAnswer(ok), ok ? 1100 : 1200);
 	}
 
-	const ready = $derived(answer.length > 0 && bank.length === 0);
+	const ready = $derived(answer.length > 0 && !locked);
 
 	$effect(() => {
 		if (!sentence) queueMicrotask(() => props.onAnswer(true));
@@ -81,125 +92,155 @@
 </script>
 
 {#if sentence}
-	<div class="step-layout">
-		<div class="step-content">
-			<div class="sentence-card">
-				<div class="prompt-meta">
-					<span class="prompt-tag">{$locale === 'es' ? 'CONSTRUIR' : 'BUILD'}</span>
-				</div>
-				<div class="sentence-translation">
-					{sentence.translation}
-				</div>
-			</div>
+	<div class="build-viewer content-center">
+		<div class="word-card" use:fadeIn>
+			<button onclick={playFull} class="audio-corner" aria-label="Reproducir oración">
+				<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
+			</button>
+			<span class="prompt-tag">{$locale === 'es' ? 'CONSTRUIR' : 'BUILD'}</span>
+			<div class="sentence-translation">{sentence.translation}</div>
+		</div>
 
-			<div class="answer-zone" class:is-correct={result === 'correct'} class:is-wrong={result === 'wrong'}>
-				{#if answer.length === 0}
-					<div class="answer-placeholder">
-						{$locale === 'es' ? 'Toca las palabras para empezar' : 'Tap words to start'}
-					</div>
-				{:else}
-					{#each answer as chip (chip.uid)}
-						<button class="token-chip is-selected" disabled={locked} onclick={() => removeFromAnswer(chip)}>
-							{chip.tok}
-						</button>
-					{/each}
-				{/if}
-			</div>
-
-			<div class="tokens-bank">
-				{#each bank as chip (chip.uid)}
-					<button class="token-chip" onclick={() => addToAnswer(chip)} disabled={locked}>
-						{chip.tok}
+		<div
+			class="answer-zone"
+			class:is-correct={result === 'correct'}
+			class:is-wrong={result === 'wrong'}
+		>
+			{#if answer.length === 0}
+				<div class="answer-placeholder">
+					{$locale === 'es' ? 'Toca las palabras para empezar' : 'Tap words to start'}
+				</div>
+			{:else}
+				{#each answer as chip (chip.uid)}
+					<button
+						class="token-chip is-selected"
+						disabled={locked}
+						onclick={() => remove(chip)}
+					>
+						<span class="chip-jp jp">{chip.tok}</span>
+						{#if chip.romaji}<span class="chip-romaji">{chip.romaji}</span>{/if}
 					</button>
 				{/each}
-			</div>
-
-			{#if result === 'correct'}
-				<div class="sentence-reveal" in:fadeUp={{ y: 10 }}>
-					<InteractiveText text={sentence.tokens.join('') + sentence.suffix} />
-				</div>
 			{/if}
 		</div>
 
-		<StickyFooter>
-			<div class="footer-inner">
-				<button class="hm-btn hm-btn-secondary icon-btn" onclick={clear} disabled={answer.length === 0 || locked} aria-label="Limpiar">
+		<div class="tokens-bank">
+			{#each bank as chip (chip.uid)}
+				<button class="token-chip" onclick={() => add(chip)} disabled={locked}>
+					<span class="chip-jp jp">{chip.tok}</span>
+					{#if chip.romaji}<span class="chip-romaji">{chip.romaji}</span>{/if}
+				</button>
+			{/each}
+		</div>
+
+		{#if result}
+			<div
+				class="feedback-bar"
+				class:is-correct={result === 'correct'}
+				use:fadeUp={{ y: 10 }}
+			>
+				<Icon
+					icon={result === 'correct' ? CheckmarkCircle01Icon : Cancel01Icon}
+					size={18}
+					color="currentColor"
+				/>
+				<span class="fb-label">
+					{result === 'correct'
+						? $locale === 'es' ? '¡Correcto!' : 'Correct!'
+						: $locale === 'es' ? 'Incorrecto' : 'Incorrect'}
+				</span>
+				<button onclick={playFull} class="audio-mini" aria-label="Reproducir">
+					<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
+				</button>
+			</div>
+			{#if result === 'correct'}
+				<div class="reveal-row" use:fadeIn>
+					<div class="reveal-jp jp">
+						<InteractiveText text={sentence.tokens.join('') + sentence.suffix} />
+					</div>
+				</div>
+			{/if}
+		{/if}
+	</div>
+
+	<StickyFooter>
+		<div class="footer-row">
+			{#if !locked && answer.length > 0}
+				<button
+					class="hm-btn hm-btn-secondary icon-btn"
+					onclick={clearAnswer}
+					aria-label="Limpiar"
+				>
 					<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
 				</button>
-				
-				{#if result === 'correct'}
-					<div class="feedback-status is-success" in:fadeUp={{ y: 8 }}>
-						<Icon icon={CheckmarkCircle01Icon} size={18} color="currentColor" />
-						<span>{$locale === 'es' ? '¡Correcto!' : 'Correct!'}</span>
-					</div>
-				{:else if result === 'wrong'}
-					<div class="feedback-status is-error" in:fadeUp={{ y: 8 }}>
-						<Icon icon={Cancel01Icon} size={18} color="currentColor" />
-						<span>{$locale === 'es' ? 'Incorrecto' : 'Incorrect'}</span>
-					</div>
-				{:else}
-					<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" disabled={!ready} onclick={check}>
-						{$locale === 'es' ? 'Comprobar' : 'Check'}
-					</button>
-				{/if}
-			</div>
-		</StickyFooter>
-	</div>
+			{/if}
+			<button
+				class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
+				disabled={!ready}
+				onclick={check}
+			>
+				{$locale === 'es' ? 'Comprobar' : 'Check'}
+			</button>
+		</div>
+	</StickyFooter>
 {/if}
 
 <style>
-	.step-layout {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		gap: 20px;
-	}
-
-	.step-content {
+	.build-viewer {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-		gap: 24px;
+		gap: 16px;
+		padding: 20px 20px 8px;
 	}
 
-	.sentence-card {
-		width: 100%;
+	.word-card {
+		position: relative;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 24px;
-		padding: 16px 20px 20px;
+		border-radius: 20px;
+		box-shadow: 0 2px 12px rgba(26, 26, 26, 0.06);
+		padding: 22px 20px 20px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 14px;
+		gap: 12px;
 		text-align: center;
-		box-shadow: 0 4px 16px rgba(26,26,26,0.04);
 	}
 
-	.prompt-meta {
+	.audio-corner {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
+		align-items: center;
 		justify-content: center;
-		width: 100%;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	.prompt-tag {
-		font-size: 9px;
+		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.12em;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
-		padding: 3px 8px;
+		padding: 4px 10px;
 		border-radius: 20px;
 	}
 
 	.sentence-translation {
 		font-size: 17px;
-		font-weight: 600;
-		color: var(--fg-secondary);
+		font-weight: 700;
+		color: var(--fg-primary);
 		line-height: 1.4;
 	}
 
@@ -208,8 +249,8 @@
 		min-height: 110px;
 		background: var(--bg-muted);
 		border: 1.5px dashed var(--ink-200);
-		border-radius: 24px;
-		padding: 16px;
+		border-radius: 20px;
+		padding: 14px;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
@@ -217,11 +258,22 @@
 		justify-content: center;
 		transition: all 0.2s ease;
 	}
-
-	.answer-zone.is-correct { border-color: var(--success); background: var(--success-wash); border-style: solid; }
-	.answer-zone.is-wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); border-style: solid; animation: shake 0.4s both; }
-
-	.answer-placeholder { color: var(--fg-tertiary); font-size: 14px; font-weight: 600; opacity: 0.6; }
+	.answer-zone.is-correct {
+		border-color: var(--success);
+		background: var(--success-wash);
+		border-style: solid;
+	}
+	.answer-zone.is-wrong {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		border-style: solid;
+	}
+	.answer-placeholder {
+		color: var(--fg-tertiary);
+		font-size: 14px;
+		font-weight: 600;
+		opacity: 0.6;
+	}
 
 	.tokens-bank {
 		display: flex;
@@ -232,10 +284,11 @@
 	}
 
 	.token-chip {
-		font-family: var(--font-jp);
-		font-size: 18px;
-		font-weight: 700;
-		padding: 10px 18px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		padding: 8px 14px;
 		border-radius: 14px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
@@ -243,63 +296,102 @@
 		cursor: pointer;
 		box-shadow: 0 3px 0 var(--ink-200);
 		transition: all 0.1s;
+		font-family: inherit;
 	}
-
-	.token-chip:not(:disabled):active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink-200); }
-	
+	.token-chip:not(:disabled):active {
+		transform: translateY(2px);
+		box-shadow: 0 1px 0 var(--ink-200);
+	}
 	.token-chip.is-selected {
 		background: var(--fg-primary);
 		color: white;
 		border-color: var(--fg-primary);
 		box-shadow: 0 3px 0 #000;
 	}
+	.token-chip:disabled {
+		opacity: 0.55;
+		cursor: default;
+	}
+	.chip-jp {
+		font-size: 18px;
+		font-weight: 700;
+		line-height: 1.1;
+		font-family: var(--font-jp);
+	}
+	.chip-romaji {
+		font-size: 11px;
+		font-weight: 600;
+		opacity: 0.75;
+		color: var(--hinomaru-red);
+	}
+	.token-chip.is-selected .chip-romaji {
+		color: rgba(255, 255, 255, 0.7);
+	}
 
-	.token-chip:disabled { opacity: 0.4; cursor: default; }
-
-	.footer-inner { flex: 1; display: flex; gap: 12px; align-items: center; max-width: 480px; margin: 0 auto; }
-
-	.icon-btn { width: 54px; height: 54px; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-	.feedback-status {
+	.feedback-bar {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 12px 16px;
+		border-radius: 14px;
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+	}
+	.feedback-bar.is-correct {
+		background: var(--success-wash);
+		color: var(--success);
+	}
+	.fb-label {
+		font-size: 15px;
+		font-weight: 800;
 		flex: 1;
+	}
+	.audio-mini {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1.5px solid currentColor;
+		background: transparent;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	.reveal-row {
 		padding: 14px;
-		border-radius: 16px;
-		font-weight: 800;
-		font-size: 15px;
+		background: var(--bg-surface);
+		border: 1px solid var(--success);
+		border-radius: 14px;
+		text-align: center;
 	}
-
-	.feedback-status.is-success { color: var(--success); background: var(--success-wash); }
-	.feedback-status.is-error { color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
-
-	@keyframes shake {
-		10%, 90% { transform: translate3d(-1px, 0, 0); }
-		20%, 80% { transform: translate3d(2px, 0, 0); }
-		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-		40%, 60% { transform: translate3d(4px, 0, 0); }
-	}
-
-	.sentence-reveal {
-		font-family: var(--font-jp);
-		font-size: 24px;
+	.reveal-jp {
+		font-size: 22px;
 		font-weight: 700;
 		color: var(--fg-primary);
-		margin-top: 10px;
-		padding: 12px;
-		background: var(--bg-surface);
-		border-radius: 16px;
-		border: 1px solid var(--success);
-		box-shadow: 0 4px 12px var(--success-wash);
+		font-family: var(--font-jp);
 	}
 
-	:global(.sentence-reveal .word-link) {
+	.footer-row {
+		display: flex;
+		gap: 10px;
+		max-width: 480px;
+		margin: 0 auto;
+		width: 100%;
+	}
+	.icon-btn {
+		width: 54px;
+		height: 54px;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	:global(.reveal-jp .word-link) {
 		color: inherit !important;
 		border-bottom: 2px solid var(--hinomaru-red-wash) !important;
-	}
-	:global(.sentence-reveal .word-link:hover) {
-		border-bottom-color: var(--hinomaru-red) !important;
 	}
 </style>

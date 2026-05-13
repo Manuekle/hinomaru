@@ -199,7 +199,7 @@
 	.lp-type-tag {
 		font-size: 11px;
 		font-weight: 800;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		color: var(--lp-color);
 		margin-bottom: 4px;
 	}

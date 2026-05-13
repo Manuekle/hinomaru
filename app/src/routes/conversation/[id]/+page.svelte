@@ -19,12 +19,15 @@
 	import { conversations, type DialogueChoice } from '$lib/data/conversations';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
-	import { getSpeechStatus, JapaneseSpeechRecognizer, type SpeechStatus } from '$lib/speaking/speech';
+	import {
+		getSpeechStatus,
+		JapaneseSpeechRecognizer,
+		type SpeechStatus
+	} from '$lib/speaking/speech';
 	import { comparePhrase } from '$lib/speaking/compare';
 	import { Mic01Icon } from '@hugeicons/core-free-icons';
 	import { onDestroy } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
-
 
 	const supabase = createClient();
 
@@ -51,9 +54,10 @@
 	let speechStatus = $state<SpeechStatus>({ ok: false, reason: 'no-window' });
 	let speechHost = $state('');
 
-
 	const currentTurn = $derived(scenario?.turns[turnIndex] ?? null);
-	const progressPct = $derived(scenario ? Math.round((turnIndex / scenario.turns.length) * 100) : 0);
+	const progressPct = $derived(
+		scenario ? Math.round((turnIndex / scenario.turns.length) * 100) : 0
+	);
 	const scorePct = $derived(totalChoices > 0 ? Math.round((score / totalChoices) * 100) : 0);
 
 	const shuffledChoices = $derived.by(() => {
@@ -104,7 +108,9 @@
 				setTimeout(() => (fireConfetti = false), 4000);
 			}
 			try {
-				const { data: { user } } = await supabase.auth.getUser();
+				const {
+					data: { user }
+				} = await supabase.auth.getUser();
 				if (user) {
 					await supabase.from('sessions').insert({
 						user_id: user.id,
@@ -116,7 +122,9 @@
 					await addXP(supabase, user.id, score * 5 + 10);
 					await invalidateAll();
 				}
-			} catch { /* non-critical */ }
+			} catch {
+				/* non-critical */
+			}
 			svileo.success({ title: t('conversation.complete', $locale) });
 		}, 1800);
 	}
@@ -143,8 +151,13 @@
 		isRecording = true;
 
 		await recognizer.start(
-			(r) => { liveTranscript = r.transcript; },
-			(err) => { speechError = err; isRecording = false; },
+			(r) => {
+				liveTranscript = r.transcript;
+			},
+			(err) => {
+				speechError = err;
+				isRecording = false;
+			},
 			() => {
 				isRecording = false;
 				if (!liveTranscript && !speechError) {
@@ -180,10 +193,13 @@
 		if (bestScore > 0.4 && bestIdx !== -1) {
 			const matchedChoice = currentTurn.choices[bestIdx];
 			// Find its original index in shuffledChoices to select the right one visually
-			const visualIdx = shuffledChoices.findIndex(sc => sc.originalIdx === bestIdx);
+			const visualIdx = shuffledChoices.findIndex((sc) => sc.originalIdx === bestIdx);
 			pickChoice(matchedChoice, visualIdx !== -1 ? visualIdx : bestIdx);
 		} else {
-			speechError = $locale === 'es' ? 'No reconocí ninguna de las opciones. Intenta de nuevo.' : "Didn't recognize any of the options. Try again.";
+			speechError =
+				$locale === 'es'
+					? 'No reconocí ninguna de las opciones. Intenta de nuevo.'
+					: "Didn't recognize any of the options. Try again.";
 		}
 	}
 
@@ -195,7 +211,10 @@
 	});
 
 	onMount(() => {
-		if (!scenario) { goto('/conversation'); return; }
+		if (!scenario) {
+			goto('/conversation');
+			return;
+		}
 		speechStatus = getSpeechStatus();
 		speechHost = typeof location !== 'undefined' ? location.host : '';
 		if (!speechStatus.ok) {
@@ -211,16 +230,22 @@
 	const speechOk = $derived(speechStatus.ok);
 	const speechWarn = $derived.by(() => {
 		if (speechStatus.ok) return '';
-		if (speechStatus.reason === 'insecure') return `${t('speaking.insecure', $locale)} (${speechHost})`;
+		if (speechStatus.reason === 'insecure')
+			return `${t('speaking.insecure', $locale)} (${speechHost})`;
 		if (speechStatus.reason === 'unsupported') return t('speaking.unsupported', $locale);
 		return '';
 	});
-
 </script>
 
 <svelte:head>
 	<title>
-		{scenario ? ($locale === 'es' ? scenario.title_es : scenario.title_en) : ($locale === 'es' ? 'Conversaciones' : 'Conversations')} — Hinomaru
+		{scenario
+			? $locale === 'es'
+				? scenario.title_es
+				: scenario.title_en
+			: $locale === 'es'
+				? 'Conversaciones'
+				: 'Conversations'} — Hinomaru
 	</title>
 </svelte:head>
 
@@ -236,20 +261,37 @@
 			style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));width:100%;"
 		>
 			<!-- Header actions -->
-			<div use:fadeUp={{ delay: 0, y: 12 }} style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+			<div
+				use:fadeUp={{ delay: 0, y: 12 }}
+				style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;"
+			>
 				<a href="/conversation" class="back-link-beautiful">
 					← {t('deck.back', $locale)}
 				</a>
-				
+
 				{#if speechOk}
-					<button 
-						class="roleplay-toggle" 
+					<button
+						class="roleplay-toggle"
 						class:active={roleplayMode}
 						onclick={() => (roleplayMode = !roleplayMode)}
-						aria-label={roleplayMode ? ($locale === 'es' ? 'Desactivar voz' : 'Disable voice') : ($locale === 'es' ? 'Activar voz' : 'Enable voice')}
+						aria-label={roleplayMode
+							? $locale === 'es'
+								? 'Desactivar voz'
+								: 'Disable voice'
+							: $locale === 'es'
+								? 'Activar voz'
+								: 'Enable voice'}
 					>
 						<Icon icon={Mic01Icon} size={14} color="currentColor" />
-						<span>{roleplayMode ? ($locale === 'es' ? 'Voz: ON' : 'Voice: ON') : ($locale === 'es' ? 'Voz: OFF' : 'Voice: OFF')}</span>
+						<span
+							>{roleplayMode
+								? $locale === 'es'
+									? 'Voz: ON'
+									: 'Voice: ON'
+								: $locale === 'es'
+									? 'Voz: OFF'
+									: 'Voice: OFF'}</span
+						>
 					</button>
 				{/if}
 			</div>
@@ -258,14 +300,16 @@
 				<div class="speech-warn" style="margin-bottom:16px;">{speechWarn}</div>
 			{/if}
 
-
 			{#if phase !== 'result'}
 				<!-- Header row -->
 				<div use:fadeUp={{ delay: 0.05, y: 10 }} class="scenario-header">
 					<div class="scenario-meta">
-						<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;">{scenario.level}</span>
+						<span class="hm-pill hm-pill-red" style="font-size:10px;height:20px;"
+							>{scenario.level}</span
+						>
 						<span class="scenario-progress-label label-meta">
-							{score}/{totalChoices} {$locale === 'es' ? 'correctas' : 'correct'}
+							{score}/{totalChoices}
+							{$locale === 'es' ? 'correctas' : 'correct'}
 						</span>
 					</div>
 
@@ -310,15 +354,20 @@
 							<div class="translation-section">
 								<button class="toggle-btn" onclick={() => (showTranslation = !showTranslation)}>
 									{showTranslation
-										? ($locale === 'es' ? 'Ocultar traducción' : 'Hide translation')
-										: ($locale === 'es' ? 'Ver traducción' : 'Show translation')}
+										? $locale === 'es'
+											? 'Ocultar traducción'
+											: 'Hide translation'
+										: $locale === 'es'
+											? 'Ver traducción'
+											: 'Show translation'}
 								</button>
 								{#if showTranslation}
-									<p class="body-text-translated" use:fadeUp={{ y: 5 }}>{currentTurn.translation}</p>
+									<p class="body-text-translated" use:fadeUp={{ y: 5 }}>
+										{currentTurn.translation}
+									</p>
 								{/if}
 							</div>
 						</div>
-
 					{:else if currentTurn.type === 'choice'}
 						<!-- Choice prompt card -->
 						<div use:fadeUp={{ delay: 0.1, y: 12 }} class="story-body-card">
@@ -342,23 +391,31 @@
 							{/if}
 
 							<div class="translation-section">
-								<p class="body-text-translated" style="margin:0;">{currentTurn.prompt_translation}</p>
+								<p class="body-text-translated" style="margin:0;">
+									{currentTurn.prompt_translation}
+								</p>
 							</div>
 						</div>
 
 						<!-- Options or Recording Mode -->
 						<div use:fadeUp={{ delay: 0.18, y: 10 }} style="margin-top:32px;">
 							<p class="question-text">
-								{$locale === 'es' ? 'Elige la respuesta más natural:' : 'Choose the most natural response:'}
+								{$locale === 'es'
+									? 'Elige la respuesta más natural:'
+									: 'Choose the most natural response:'}
 							</p>
 
 							{#if roleplayMode && phase === 'choice'}
 								<!-- ROLEPLAY MODE -->
 								<div class="roleplay-box">
-									<p style="font-size:14px;color:var(--fg-secondary);margin:0 0 16px;text-align:center;">
-										{$locale === 'es' ? 'Mantén presionado para hablar tu respuesta' : 'Hold to speak your response'}
+									<p
+										style="font-size:14px;color:var(--fg-secondary);margin:0 0 16px;text-align:center;"
+									>
+										{$locale === 'es'
+											? 'Mantén presionado para hablar tu respuesta'
+											: 'Hold to speak your response'}
 									</p>
-									
+
 									<button
 										class="hm-btn hm-btn-lg roleplay-mic-btn"
 										class:is-recording={isRecording}
@@ -367,11 +424,19 @@
 										ontouchstart={startRecording}
 										ontouchend={stopRecording}
 										aria-pressed={isRecording}
-										aria-label={isRecording ? ($locale === 'es' ? 'Soltar para detener' : 'Release to stop') : ($locale === 'es' ? 'Mantener para hablar' : 'Hold to speak')}
+										aria-label={isRecording
+											? $locale === 'es'
+												? 'Soltar para detener'
+												: 'Release to stop'
+											: $locale === 'es'
+												? 'Mantener para hablar'
+												: 'Hold to speak'}
 									>
 										{#if isRecording}
 											<span class="rec-dot"></span>
-											<span class="rec-text">{liveTranscript || ($locale === 'es' ? 'Escuchando…' : 'Listening…')}</span>
+											<span class="rec-text"
+												>{liveTranscript || ($locale === 'es' ? 'Escuchando…' : 'Listening…')}</span
+											>
 										{:else}
 											<Icon icon={Mic01Icon} size={24} color="currentColor" />
 											<span>{$locale === 'es' ? 'Hablar' : 'Speak'}</span>
@@ -393,29 +458,29 @@
 							{:else}
 								<!-- STANDARD MULTIPLE CHOICE -->
 								<div class="options-grid">
-								{#each shuffledChoices as choice, loopIdx (choice.originalIdx)}
-									{@const isPicked = selectedIdx === loopIdx}
-									{@const isRevealed = phase === 'feedback'}
-									<button
-										class="option-item"
-										class:is-selected={phase === 'choice' && isPicked}
-										class:is-correct={isRevealed && choice.correct && selectedChoice?.correct}
-										class:is-wrong={isRevealed && isPicked && !choice.correct}
-										class:is-dimmed={isRevealed && !isPicked && !choice.correct}
-										onclick={() => pickChoice(choice, loopIdx)}
-										disabled={phase === 'feedback'}
-										style="touch-action:manipulation"
-									>
-										<div class="option-marker">{String.fromCharCode(65 + loopIdx)}</div>
-										<div class="option-content">
-											<div class="option-label jp">{choice.jp}</div>
-											{#if $showRomaji}
-												<div class="option-romaji">{choice.romaji}</div>
-											{/if}
-										</div>
-									</button>
-								{/each}
-							</div>
+									{#each shuffledChoices as choice, loopIdx (choice.originalIdx)}
+										{@const isPicked = selectedIdx === loopIdx}
+										{@const isRevealed = phase === 'feedback'}
+										<button
+											class="option-item"
+											class:is-selected={phase === 'choice' && isPicked}
+											class:is-correct={isRevealed && choice.correct && selectedChoice?.correct}
+											class:is-wrong={isRevealed && isPicked && !choice.correct}
+											class:is-dimmed={isRevealed && !isPicked && !choice.correct}
+											onclick={() => pickChoice(choice, loopIdx)}
+											disabled={phase === 'feedback'}
+											style="touch-action:manipulation"
+										>
+											<div class="option-marker">{String.fromCharCode(65 + loopIdx)}</div>
+											<div class="option-content">
+												<div class="option-label jp">{choice.jp}</div>
+												{#if $showRomaji}
+													<div class="option-romaji">{choice.romaji}</div>
+												{/if}
+											</div>
+										</button>
+									{/each}
+								</div>
 							{/if}
 						</div>
 
@@ -428,9 +493,15 @@
 								class:wrong={!selectedChoice.correct}
 							>
 								<div class="feedback-row">
-									<strong>{selectedChoice.correct
-										? ($locale === 'es' ? '✓ ¡Correcto!' : '✓ Correct!')
-										: ($locale === 'es' ? '✗ No del todo...' : '✗ Not quite...')}</strong>
+									<strong
+										>{selectedChoice.correct
+											? $locale === 'es'
+												? '✓ ¡Correcto!'
+												: '✓ Correct!'
+											: $locale === 'es'
+												? '✗ No del todo...'
+												: '✗ Not quite...'}</strong
+									>
 									<span class="feedback-text">{selectedChoice.feedback_es}</span>
 								</div>
 
@@ -439,18 +510,25 @@
 										<span class="label-meta" style="display:block;margin-bottom:6px;">
 											{$locale === 'es' ? 'El NPC responde:' : 'NPC responds:'}
 										</span>
-										<p class="body-text-jp" style="font-size:18px;margin:0 0 4px;">{currentTurn.next_npc.jp}</p>
+										<p class="body-text-jp" style="font-size:18px;margin:0 0 4px;">
+											{currentTurn.next_npc.jp}
+										</p>
 										{#if $showRomaji}
-											<p style="font-size:12px;color:var(--hinomaru-red);font-weight:600;margin:0 0 4px;">{currentTurn.next_npc.romaji}</p>
+											<p
+												style="font-size:12px;color:var(--hinomaru-red);font-weight:600;margin:0 0 4px;"
+											>
+												{currentTurn.next_npc.romaji}
+											</p>
 										{/if}
-										<p style="font-size:13px;color:var(--fg-secondary);margin:0;">{currentTurn.next_npc.translation}</p>
+										<p style="font-size:13px;color:var(--fg-secondary);margin:0;">
+											{currentTurn.next_npc.translation}
+										</p>
 									</div>
 								{/if}
 							</div>
 						{/if}
 					{/if}
 				{/if}
-
 			{:else}
 				<!-- Result screen — mirrors stories result -->
 				<div class="result-container" use:fadeUp={{ delay: 0, y: 20 }}>
@@ -464,10 +542,16 @@
 					</div>
 					<h2 class="result-headline">
 						{scorePct === 100
-							? ($locale === 'es' ? '¡Perfecto!' : 'Perfect!')
+							? $locale === 'es'
+								? '¡Perfecto!'
+								: 'Perfect!'
 							: scorePct >= 70
-							? ($locale === 'es' ? '¡Muy bien!' : 'Great job!')
-							: ($locale === 'es' ? '¡Sigue practicando!' : 'Keep practicing!')}
+								? $locale === 'es'
+									? '¡Muy bien!'
+									: 'Great job!'
+								: $locale === 'es'
+									? '¡Sigue practicando!'
+									: 'Keep practicing!'}
 					</h2>
 					<p class="result-summary">
 						{$locale === 'es'
@@ -500,8 +584,12 @@
 						{$locale === 'es' ? 'Elige una respuesta' : 'Choose a response'}
 					{:else}
 						{turnIndex >= (scenario?.turns.length ?? 0) - 1
-							? ($locale === 'es' ? 'Terminar' : 'Finish')
-							: ($locale === 'es' ? 'Continuar' : 'Continue')} →
+							? $locale === 'es'
+								? 'Terminar'
+								: 'Finish'
+							: $locale === 'es'
+								? 'Continuar'
+								: 'Continue'} →
 					{/if}
 				</button>
 			{/if}
@@ -527,7 +615,11 @@
 		text-decoration: none;
 		transition: color 150ms ease;
 	}
-	@media (hover: hover) { .back-link-beautiful:hover { color: var(--sumi); } }
+	@media (hover: hover) {
+		.back-link-beautiful:hover {
+			color: var(--sumi);
+		}
+	}
 
 	.roleplay-toggle {
 		display: inline-flex;
@@ -545,10 +637,10 @@
 	}
 	.roleplay-toggle.active {
 		color: var(--hinomaru-red);
-		border-color: rgba(188,0,45,0.4);
+		border-color: rgba(188, 0, 45, 0.4);
 		background: var(--hinomaru-red-wash);
 	}
-	
+
 	.roleplay-box {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
@@ -559,7 +651,7 @@
 		flex-direction: column;
 		align-items: center;
 	}
-	
+
 	.roleplay-mic-btn {
 		background: var(--bg-surface);
 		color: var(--sumi);
@@ -578,12 +670,12 @@
 		user-select: none;
 		-webkit-user-select: none;
 	}
-	
+
 	.roleplay-mic-btn:active {
 		transform: scale(0.96);
 		background: var(--ink-100);
 	}
-	
+
 	.roleplay-mic-btn.is-recording {
 		background: var(--sumi);
 		color: var(--paper);
@@ -591,8 +683,10 @@
 	}
 
 	.rec-dot {
-		width: 10px; height: 10px;
-		border-radius: 50%; background: var(--hinomaru-red);
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--hinomaru-red);
 		flex-shrink: 0;
 		animation: pulse-btn 0.7s infinite alternate;
 	}
@@ -622,12 +716,32 @@
 		transform-origin: center;
 	}
 	@keyframes mic-wave-bounce {
-		0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
-		50% { transform: scaleY(1); opacity: 1; }
+		0%,
+		100% {
+			transform: scaleY(0.3);
+			opacity: 0.5;
+		}
+		50% {
+			transform: scaleY(1);
+			opacity: 1;
+		}
 	}
-	@keyframes pulse-btn { from { opacity: 1; } to { opacity: 0.5; } }
+	@keyframes pulse-btn {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0.5;
+		}
+	}
 
-	.error-text { font-size: 13px; color: var(--hinomaru-red); font-weight: 600; text-align: center; margin:0;}
+	.error-text {
+		font-size: 13px;
+		color: var(--hinomaru-red);
+		font-weight: 600;
+		text-align: center;
+		margin: 0;
+	}
 
 	.speech-warn {
 		width: 100%;
@@ -714,7 +828,7 @@
 		font-size: 12px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 	}
 
 	.story-audio-btn {
@@ -732,8 +846,15 @@
 		flex-shrink: 0;
 		touch-action: manipulation;
 	}
-	.story-audio-btn:active { transform: scale(0.95); }
-	@media (hover: hover) { .story-audio-btn:hover { background: var(--ink-200); transform: scale(1.05); } }
+	.story-audio-btn:active {
+		transform: scale(0.95);
+	}
+	@media (hover: hover) {
+		.story-audio-btn:hover {
+			background: var(--ink-200);
+			transform: scale(1.05);
+		}
+	}
 
 	.body-text-jp {
 		font-family: var(--font-jp);
@@ -777,8 +898,6 @@
 		margin: 0;
 	}
 
-
-
 	.question-text {
 		font-size: 16px;
 		font-weight: 700;
@@ -814,7 +933,9 @@
 			background: var(--ink-50);
 		}
 	}
-	.option-item:disabled { cursor: default; }
+	.option-item:disabled {
+		cursor: default;
+	}
 
 	.option-item.is-selected {
 		border-color: var(--sumi);
@@ -828,7 +949,9 @@
 		border-color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 	}
-	.option-item.is-dimmed { opacity: 0.4; }
+	.option-item.is-dimmed {
+		opacity: 0.4;
+	}
 
 	.option-marker {
 		width: 28px;
@@ -844,10 +967,19 @@
 		flex-shrink: 0;
 		margin-top: 2px;
 	}
-	.is-correct .option-marker { background: var(--success); color: white; }
-	.is-wrong .option-marker { background: var(--hinomaru-red); color: white; }
+	.is-correct .option-marker {
+		background: var(--success);
+		color: white;
+	}
+	.is-wrong .option-marker {
+		background: var(--hinomaru-red);
+		color: white;
+	}
 
-	.option-content { flex: 1; min-width: 0; }
+	.option-content {
+		flex: 1;
+		min-width: 0;
+	}
 
 	.option-label {
 		font-size: 16px;
@@ -893,7 +1025,7 @@
 	}
 
 	.feedback-npc-response {
-		border-top: 1px solid rgba(0,0,0,0.08);
+		border-top: 1px solid rgba(0, 0, 0, 0.08);
 		padding-top: 14px;
 		margin-top: 4px;
 	}
@@ -928,8 +1060,12 @@
 	}
 
 	@media (max-width: 480px) {
-		.scenario-display-title { font-size: 26px; }
-		.body-text-jp { font-size: 19px; }
+		.scenario-display-title {
+			font-size: 26px;
+		}
+		.body-text-jp {
+			font-size: 19px;
+		}
 	}
 
 	.story-viewer-layout {

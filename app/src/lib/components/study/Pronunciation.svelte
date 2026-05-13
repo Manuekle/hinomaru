@@ -246,24 +246,24 @@
 
 <div class="session-layout premium-bg" class:lesson-embed={isLesson}>
 	{#if !isLesson}
-	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button
-			class="close-btn"
-			onclick={() => {
-				recognizer?.abort();
-				_onExit();
-			}}
-		>
-			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-		</button>
+		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+			<button
+				class="close-btn"
+				onclick={() => {
+					recognizer?.abort();
+					_onExit();
+				}}
+			>
+				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+			</button>
 
-		<div class="header-progress">
-			<span class="session-index">{queue.index + 1} / {queue.total}</span>
-			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			<div class="header-progress">
+				<span class="session-index">{queue.index + 1} / {queue.total}</span>
+				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			</div>
+
+			<div style="width: 40px;"></div>
 		</div>
-
-		<div style="width: 40px;"></div>
-	</div>
 	{/if}
 
 	<div class="session-container">
@@ -395,7 +395,10 @@
 		display: flex;
 		flex-direction: column;
 	}
-	.lesson-embed { min-height: 0; background: transparent; }
+	.lesson-embed {
+		min-height: 0;
+		background: transparent;
+	}
 
 	.premium-header-minimal {
 		display: flex;
@@ -417,7 +420,7 @@
 		font-size: 17px;
 		font-weight: 900;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.total-label {
@@ -425,7 +428,7 @@
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	.close-btn {
@@ -471,7 +474,7 @@
 	.prompt-tag {
 		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
@@ -652,7 +655,7 @@
 		font-weight: 800;
 		color: var(--fg-secondary);
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 	}
 
 	.error-msg {

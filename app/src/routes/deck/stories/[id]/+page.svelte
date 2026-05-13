@@ -100,9 +100,16 @@
 			if (error) {
 				if (error.code === '23505') {
 					savedVocab = new Set([...savedVocab, word.jp]);
-					svileo.info({ title: $locale === 'es' ? 'Ya está en tu vocabulario' : 'Already in your vocabulary' });
+					svileo.info({
+						title: $locale === 'es' ? 'Ya está en tu vocabulario' : 'Already in your vocabulary'
+					});
 				} else {
-					console.error('save vocab failed:', { code: error.code, message: error.message, details: error.details, hint: error.hint });
+					console.error('save vocab failed:', {
+						code: error.code,
+						message: error.message,
+						details: error.details,
+						hint: error.hint
+					});
 					svileo.error({ title: $locale === 'es' ? 'Error al guardar' : 'Save failed' });
 				}
 			} else {
@@ -233,7 +240,7 @@
 	$effect(() => {
 		if (story && typeof window !== 'undefined') {
 			const preset = get(preferredVoice) === 'cool' ? 'cool' : 'kawaii';
-			
+
 			// Preload story body (if within limits)
 			if (bodyJp && bodyJp.length < 200) {
 				preloadVoicevox(bodyJp, preset);
@@ -417,7 +424,7 @@
 	style="--story-fs: {fontSize === 'sm' ? '18px' : fontSize === 'lg' ? '24px' : '20px'}"
 >
 	{#if phase === 'quiz'}
-		<SessionNav 
+		<SessionNav
 			progress={((currentQ + (checked ? 1 : 0)) / quiz.length) * 100}
 			current={currentQ + 1}
 			total={quiz.length}
@@ -645,7 +652,9 @@
 								class="tool-btn"
 								class:active-tool={isSpeaking}
 								onclick={toggleAudio}
-								title={isSpeaking ? t('stories.audio.stop', $locale) : t('stories.audio.listen', $locale)}
+								title={isSpeaking
+									? t('stories.audio.stop', $locale)
+									: t('stories.audio.listen', $locale)}
 							>
 								<Icon
 									icon={VolumeHighIcon}
@@ -737,16 +746,22 @@
 				</div>
 
 				{#if checked}
-					<div 
-						class="feedback-premium-bar" 
+					<div
+						class="feedback-premium-bar"
 						class:is-correct={isCorrect}
 						use:fadeUp={{ delay: 0, y: 15 }}
 					>
 						<div class="feedback-icon-wrap">
-							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={22} color="currentColor" />
+							<Icon
+								icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
+								size={22}
+								color="currentColor"
+							/>
 						</div>
 						<div class="feedback-text-side">
-							<span class="feedback-title">{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span>
+							<span class="feedback-title"
+								>{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span
+							>
 						</div>
 					</div>
 				{/if}
@@ -763,23 +778,34 @@
 					</button>
 				{:else}
 					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
-						{currentQ + 1 < quiz.length ? t('stories.quiz.next', $locale) : t('stories.quiz.done', $locale)}
+						{currentQ + 1 < quiz.length
+							? t('stories.quiz.next', $locale)
+							: t('stories.quiz.done', $locale)}
 					</button>
 				{/if}
 			</StickyFooter>
 		{:else if phase === 'result'}
 			<div use:fadeUp={{ delay: 0, y: 20 }} class="result-screen">
-
 				<!-- Premium Hero Header -->
 				<div class="result-premium-hero" class:is-pass={scorePct >= 70}>
 					<div class="hero-content-wrapper">
 						<div class="score-display-ring" use:fadeUp={{ delay: 0.2, y: 20 }}>
 							<svg class="progress-svg" viewBox="0 0 100 100">
-								<circle class="progress-track" cx="50" cy="50" r="45" fill="none" stroke-width="4" />
-								<circle 
-									class="progress-bar" 
-									cx="50" cy="50" r="45" 
-									fill="none" stroke-width="6" 
+								<circle
+									class="progress-track"
+									cx="50"
+									cy="50"
+									r="45"
+									fill="none"
+									stroke-width="4"
+								/>
+								<circle
+									class="progress-bar"
+									cx="50"
+									cy="50"
+									r="45"
+									fill="none"
+									stroke-width="6"
 									stroke-linecap="round"
 									stroke-dasharray="283"
 									stroke-dashoffset={283 - (283 * scorePct) / 100}
@@ -835,8 +861,12 @@
 								{@const userIdx = selectedHistory[i]}
 								{@const userText = userIdx !== null ? (q.o_jp || q.o)[userIdx] : null}
 								{@const qJpLocal = q.q_jp || q.q}
-								
-								<div class="review-item-premium" class:is-review-correct={ok} class:is-review-wrong={!ok}>
+
+								<div
+									class="review-item-premium"
+									class:is-review-correct={ok}
+									class:is-review-wrong={!ok}
+								>
 									<div class="review-num">{i + 1}</div>
 									<div class="review-body">
 										<p class="review-q jp">{qJpLocal}</p>
@@ -856,7 +886,11 @@
 						<Icon icon={ArrowLeft01Icon} size={20} color="currentColor" />
 						<span>{t('stories.read_again', $locale) || 'Leer de nuevo'}</span>
 					</button>
-					<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={() => goto('/deck/stories')}>
+					<button
+						class="hm-btn hm-btn-dark hm-btn-lg"
+						style="flex:1;"
+						onclick={() => goto('/deck/stories')}
+					>
 						{t('stories.more_stories', $locale) || 'Otras historias'}
 					</button>
 				</div>
@@ -872,14 +906,25 @@
 <Confetti bind:this={confettiRef} />
 
 {#if isSpeaking}
-	<div class="now-playing-toast" data-theme={isReadingMode ? readingTheme : undefined} transition:fly={{ y: -60, duration: 300, easing: quintOut }}>
+	<div
+		class="now-playing-toast"
+		data-theme={isReadingMode ? readingTheme : undefined}
+		transition:fly={{ y: -60, duration: 300, easing: quintOut }}
+	>
 		<div class="now-playing-wave">
-			<ScrollingWaveform playing={true} height={28} barWidth={3} barGap={2} speed={8} barColor="var(--hinomaru-red)" />
+			<ScrollingWaveform
+				playing={true}
+				height={28}
+				barWidth={3}
+				barGap={2}
+				speed={8}
+				barColor="var(--hinomaru-red)"
+			/>
 		</div>
 		<span class="now-playing-label">{t('stories.audio.playing', $locale)}</span>
 		<button class="now-playing-stop" onclick={toggleAudio} aria-label="Stop">
 			<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-				<rect x="1" y="1" width="12" height="12" rx="2"/>
+				<rect x="1" y="1" width="12" height="12" rx="2" />
 			</svg>
 		</button>
 	</div>
@@ -1050,7 +1095,7 @@
 		font-size: 11px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin-bottom: 16px;
 		padding-bottom: 10px;
@@ -1160,7 +1205,7 @@
 		font-size: 10px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		background: var(--ink-100);
 		color: var(--fg-tertiary);
 		padding: 2px 8px;
@@ -1193,7 +1238,7 @@
 	.question-badge {
 		font-size: 10px;
 		font-weight: 400;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		color: var(--hinomaru-red);
 		opacity: 0.8;
 	}
@@ -1210,7 +1255,7 @@
 		line-height: 1.2;
 		margin-bottom: 12px;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.question-translation {
@@ -1481,7 +1526,7 @@
 		font-size: 11px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin: 0 0 12px;
 		padding-bottom: 8px;
@@ -1596,8 +1641,15 @@
 		align-items: center;
 		gap: 12px;
 	}
-	.header-left { display: flex; align-items: center; }
-	.header-right { display: flex; justify-content: flex-end; align-items: center; }
+	.header-left {
+		display: flex;
+		align-items: center;
+	}
+	.header-right {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+	}
 
 	.exam-label-pill {
 		font-size: 11px;
@@ -1607,7 +1659,7 @@
 		padding: 4px 10px;
 		border-radius: 6px;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	.exam-step-indicator {
@@ -1617,9 +1669,21 @@
 		font-family: var(--font-ui);
 		font-weight: 700;
 	}
-	.step-curr { font-size: 18px; font-weight: 800; color: var(--sumi); }
-	.step-divider { font-size: 14px; color: var(--fg-tertiary); opacity: 0.4; }
-	.step-total { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); }
+	.step-curr {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.step-divider {
+		font-size: 14px;
+		color: var(--fg-tertiary);
+		opacity: 0.4;
+	}
+	.step-total {
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+	}
 
 	.exam-timer-pill {
 		display: flex;
@@ -1635,7 +1699,11 @@
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
-	.question-wrap { display: flex; flex-direction: column; gap: 12px; }
+	.question-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
 	.question-card {
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
@@ -1657,7 +1725,7 @@
 		margin: 8px 0 0;
 		line-height: 1.6;
 		font-style: italic;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 	.question-wrap .question-translation {
 		font-size: 14px;
@@ -1683,21 +1751,37 @@
 		border-color: rgba(46, 125, 91, 0.1);
 	}
 	.feedback-icon-wrap {
-		width: 44px; height: 44px;
+		width: 44px;
+		height: 44px;
 		border-radius: 14px;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		background: rgba(255, 255, 255, 0.5);
 		flex-shrink: 0;
 	}
 	:global([data-theme='dark']) .feedback-icon-wrap {
 		background: rgba(0, 0, 0, 0.2);
 	}
-	.feedback-text-side { display: flex; flex-direction: column; gap: 2px; }
-	.feedback-title { font-size: 16px; font-weight: 800; }
+	.feedback-text-side {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.feedback-title {
+		font-size: 16px;
+		font-weight: 800;
+	}
 
-	.options-list { display: flex; flex-direction: column; gap: 10px; }
+	.options-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
 	.question-wrap .option-item {
-		display: flex; align-items: center; gap: 14px;
+		display: flex;
+		align-items: center;
+		gap: 14px;
 		padding: 16px;
 		border: 2px solid var(--ink-200);
 		border-radius: 18px;
@@ -1727,26 +1811,64 @@
 		background: var(--hinomaru-red-wash) !important;
 		border-width: 3px;
 	}
-	.question-wrap .option-item.is-dimmed { opacity: 0.4; }
+	.question-wrap .option-item.is-dimmed {
+		opacity: 0.4;
+	}
 
 	.question-wrap .opt-marker {
-		width: 32px; height: 32px;
+		width: 32px;
+		height: 32px;
 		border-radius: 10px;
 		background: var(--ink-100);
-		display: flex; align-items: center; justify-content: center;
-		font-size: 14px; font-weight: 800;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
+		font-weight: 800;
 		color: var(--fg-secondary);
 		flex-shrink: 0;
 		transition: all 0.2s;
 	}
-	.question-wrap .is-selected:not(.is-correct):not(.is-wrong) .opt-marker { background: var(--sumi); color: var(--washi); }
-	.question-wrap .is-correct .opt-marker { background: var(--success); color: white; border-radius: 50%; box-shadow: 0 0 10px rgba(46, 125, 91, 0.3); }
-	.question-wrap .is-wrong .opt-marker { background: var(--hinomaru-red); color: white; border-radius: 50%; box-shadow: 0 0 10px rgba(188, 0, 45, 0.3); }
-	
-	.opt-content { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-	.opt-text { font-size: 17px; font-weight: 600; color: var(--fg-primary); line-height: 1.4; }
-	.opt-romaji { font-size: 12px; color: var(--fg-tertiary); font-style: italic; opacity: 0.7; }
-	.opt-translation { font-size: 13px; color: var(--fg-tertiary); opacity: 0.6; }
+	.question-wrap .is-selected:not(.is-correct):not(.is-wrong) .opt-marker {
+		background: var(--sumi);
+		color: var(--washi);
+	}
+	.question-wrap .is-correct .opt-marker {
+		background: var(--success);
+		color: white;
+		border-radius: 50%;
+		box-shadow: 0 0 10px rgba(46, 125, 91, 0.3);
+	}
+	.question-wrap .is-wrong .opt-marker {
+		background: var(--hinomaru-red);
+		color: white;
+		border-radius: 50%;
+		box-shadow: 0 0 10px rgba(188, 0, 45, 0.3);
+	}
+
+	.opt-content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+	}
+	.opt-text {
+		font-size: 17px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		line-height: 1.4;
+	}
+	.opt-romaji {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		font-style: italic;
+		opacity: 0.7;
+	}
+	.opt-translation {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		opacity: 0.6;
+	}
 
 	/* ── PREMIUM RESULT SCREEN ── */
 	.result-screen {
@@ -1764,7 +1886,7 @@
 		overflow: hidden;
 		background: #1a1a1a;
 		color: white;
-		box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 	}
 	.result-premium-hero.is-pass {
 		background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
@@ -1772,47 +1894,79 @@
 	.result-premium-hero:not(.is-pass) {
 		background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%);
 	}
-	.hero-content-wrapper { position: relative; z-index: 2; }
+	.hero-content-wrapper {
+		position: relative;
+		z-index: 2;
+	}
 
 	.score-display-ring {
 		position: relative;
-		width: 160px; height: 160px;
+		width: 160px;
+		height: 160px;
 		margin: 0 auto 32px;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	.progress-svg {
 		position: absolute;
-		top: 0; left: 0; width: 100%; height: 100%;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
 		transform: rotate(-90deg);
 	}
-	.progress-track { stroke: rgba(255,255,255,0.1); }
+	.progress-track {
+		stroke: rgba(255, 255, 255, 0.1);
+	}
 	.progress-bar {
 		stroke: white;
 		transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
-	.is-pass .progress-bar { stroke: #4ade80; }
-	.score-labels {
-		display: flex; align-items: baseline; gap: 2px;
+	.is-pass .progress-bar {
+		stroke: #4ade80;
 	}
-	.score-big { font-size: 64px; font-weight: 900; line-height: 1; }
-	.score-small { font-size: 20px; font-weight: 600; opacity: 0.6; }
+	.score-labels {
+		display: flex;
+		align-items: baseline;
+		gap: 2px;
+	}
+	.score-big {
+		font-size: 64px;
+		font-weight: 900;
+		line-height: 1;
+	}
+	.score-small {
+		font-size: 20px;
+		font-weight: 600;
+		opacity: 0.6;
+	}
 
 	.hero-main-title {
-		font-size: 28px; font-weight: 800; margin: 0 0 8px;
+		font-size: 28px;
+		font-weight: 800;
+		margin: 0 0 8px;
 		letter-spacing: -0.02em;
 	}
 	.hero-xp-badge {
-		display: inline-flex; align-items: center; gap: 6px;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 		background: rgba(251, 191, 36, 0.15);
 		color: #f59e0b;
-		padding: 4px 12px; border-radius: 99px;
-		font-size: 13px; font-weight: 700;
+		padding: 4px 12px;
+		border-radius: 99px;
+		font-size: 13px;
+		font-weight: 700;
 		margin-bottom: 12px;
 		border: 1px solid rgba(251, 191, 36, 0.2);
 	}
 	.hero-main-sub {
-		font-size: 14px; font-weight: 600; opacity: 0.6;
-		text-transform: uppercase; letter-spacing: 0.1em;
+		font-size: 14px;
+		font-weight: 600;
+		opacity: 0.6;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
 	}
 
 	.stats-premium-row {
@@ -1826,56 +1980,107 @@
 		border: 1px solid var(--ink-200);
 		border-radius: 99px;
 		padding: 8px 14px;
-		display: flex; align-items: center; gap: 6px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		transition: all 0.2s;
 		box-shadow: var(--shadow-sm);
 	}
-	.stat-v { font-size: 14px; font-weight: 800; color: var(--sumi); }
-	.stat-l { font-size: 11px; font-weight: 600; color: var(--fg-secondary); text-transform: lowercase; }
+	.stat-v {
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.stat-l {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+		text-transform: lowercase;
+	}
 
 	.review-section-label {
-		font-size: 11px; font-weight: 700;
-		text-transform: uppercase; letter-spacing: 0.08em;
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin: 0 0 10px;
 	}
 	.review-list {
-		display: flex; flex-direction: column; gap: 8px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 	.review-item-premium {
-		display: flex; align-items: center; gap: 12px;
+		display: flex;
+		align-items: center;
+		gap: 12px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		border-radius: 14px;
 		padding: 12px 14px;
 	}
-	.review-item-premium.is-review-correct { border-color: var(--success-wash); }
-	.review-item-premium.is-review-wrong { border-color: var(--hinomaru-red-wash); }
+	.review-item-premium.is-review-correct {
+		border-color: var(--success-wash);
+	}
+	.review-item-premium.is-review-wrong {
+		border-color: var(--hinomaru-red-wash);
+	}
 
 	.review-num {
-		width: 22px; height: 22px;
+		width: 22px;
+		height: 22px;
 		border-radius: 50%;
 		background: var(--ink-100);
 		color: var(--fg-tertiary);
-		font-size: 11px; font-weight: 700;
-		display: flex; align-items: center; justify-content: center;
+		font-size: 11px;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 	}
-	.is-review-correct .review-num { background: var(--success-wash); color: var(--success); }
-	.is-review-wrong .review-num { background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+	.is-review-correct .review-num {
+		background: var(--success-wash);
+		color: var(--success);
+	}
+	.is-review-wrong .review-num {
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+	}
 
-	.review-body { flex: 1; min-width: 0; }
+	.review-body {
+		flex: 1;
+		min-width: 0;
+	}
 	.review-q {
-		font-size: 13px; color: var(--fg-secondary);
-		margin: 0 0 6px; line-height: 1.5;
+		font-size: 13px;
+		color: var(--fg-secondary);
+		margin: 0 0 6px;
+		line-height: 1.5;
 	}
 	.review-correct-ans {
-		display: flex; align-items: baseline; gap: 6px;
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
 		margin: 0;
 	}
-	.review-check { font-size: 12px; font-weight: 700; color: var(--success); flex-shrink: 0; }
-	.review-correct-text { font-size: 14px; font-weight: 700; color: var(--success); }
-	.review-actual-correct { font-size: 12px; color: var(--fg-tertiary); font-style: italic; }
+	.review-check {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--success);
+		flex-shrink: 0;
+	}
+	.review-correct-text {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--success);
+	}
+	.review-actual-correct {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		font-style: italic;
+	}
 
 	.result-actions {
 		display: flex;
@@ -1883,7 +2088,9 @@
 		margin-top: 8px;
 	}
 
-	.jp { font-family: var(--font-jp); }
+	.jp {
+		font-family: var(--font-jp);
+	}
 
 	:global([data-theme='dark']) .stat-pill-sm,
 	:global([data-theme='dark']) .question-card,
@@ -1970,7 +2177,7 @@
 		font-size: var(--story-fs);
 		line-height: 2.2;
 		color: var(--fg-primary);
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 		white-space: pre-wrap;
 		text-align: left;
 	}
@@ -2033,7 +2240,6 @@
 	.reading-mode-overlay[data-theme='sepia'] :global(.word-link) {
 		border-bottom-color: rgba(91, 70, 54, 0.4);
 	}
-
 
 	.glass-reading {
 		transition: all 0.4s ease;
@@ -2217,7 +2423,9 @@
 		-webkit-backdrop-filter: blur(16px);
 		border: 1px solid rgba(188, 0, 45, 0.18);
 		border-radius: 999px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(188, 0, 45, 0.08);
+		box-shadow:
+			0 8px 32px rgba(0, 0, 0, 0.14),
+			0 2px 8px rgba(188, 0, 45, 0.08);
 		z-index: 3000;
 		min-width: 200px;
 	}
@@ -2259,7 +2467,9 @@
 		justify-content: center;
 		cursor: pointer;
 		flex-shrink: 0;
-		transition: transform 0.15s ease, opacity 0.15s ease;
+		transition:
+			transform 0.15s ease,
+			opacity 0.15s ease;
 	}
 
 	:global(.now-playing-stop:hover) {

@@ -221,7 +221,7 @@
 		font-size: 11px;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		margin-bottom: 24px;
 	}
 	h1 {
@@ -299,7 +299,7 @@
 		font-size: 10px;
 		font-weight: 800;
 		color: var(--brand-primary);
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		flex-shrink: 0;
 	}
 
@@ -314,7 +314,9 @@
 		border-radius: 24px;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-100);
-		transition: border-color 240ms var(--ease-brand), transform 240ms var(--ease-brand);
+		transition:
+			border-color 240ms var(--ease-brand),
+			transform 240ms var(--ease-brand);
 		scroll-margin-top: 96px;
 	}
 	section:hover {

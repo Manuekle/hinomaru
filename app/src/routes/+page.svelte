@@ -19,7 +19,6 @@
 	let activeLevel = $state(data.motivation === 'travel' ? 'Survival' : 'N5');
 	let viewMode = $state('roadmap'); // 'grid' or 'roadmap'
 
-
 	const filtered = $derived(data.decks.filter((d: any) => d.level === activeLevel));
 	const totalLearned = $derived(data.decks.reduce((s: number, d: any) => s + (d.learned ?? 0), 0));
 	const profile = $derived(data.profile);
@@ -40,8 +39,8 @@
 	const allUnits = $derived.by(() => {
 		const levels = ['Survival', 'N5', 'N4', 'N3', 'N2', 'N1'];
 		let units: any[] = [];
-		
-		levels.forEach(lvl => {
+
+		levels.forEach((lvl) => {
 			const levelUnits = ROADMAPS[lvl] || [];
 			if (levelUnits.length > 0) {
 				// Marcamos la primera unidad de cada nivel para el Roadmap
@@ -53,7 +52,7 @@
 				units = [...units, ...processed];
 			}
 		});
-		
+
 		return units;
 	});
 
@@ -64,7 +63,11 @@
 			if (pill && container) {
 				const containerRect = container.getBoundingClientRect();
 				const pillRect = pill.getBoundingClientRect();
-				const targetScrollLeft = (container as HTMLElement).scrollLeft + pillRect.left - containerRect.left - (containerRect.width - pillRect.width) / 2;
+				const targetScrollLeft =
+					(container as HTMLElement).scrollLeft +
+					pillRect.left -
+					containerRect.left -
+					(containerRect.width - pillRect.width) / 2;
 				(container as HTMLElement).scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
 			}
 		}
@@ -96,16 +99,41 @@
 			<!-- Right: streak chip + settings -->
 			<div class="dash-header-right">
 				<div class="dash-streak-chip" class:streak-active={data.streak > 0}>
-					<svg class="streak-flame" viewBox="-33 0 255 255" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+					<svg
+						class="streak-flame"
+						viewBox="-33 0 255 255"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						preserveAspectRatio="xMidYMid"
+					>
 						<defs>
-							<linearGradient id="streak-flame-grad" gradientUnits="userSpaceOnUse" x1="94.141" y1="255" x2="94.141" y2="0.188">
-								<stop offset="0" stop-color="#ff4c0d"/>
-								<stop offset="1" stop-color="#fc9502"/>
+							<linearGradient
+								id="streak-flame-grad"
+								gradientUnits="userSpaceOnUse"
+								x1="94.141"
+								y1="255"
+								x2="94.141"
+								y2="0.188"
+							>
+								<stop offset="0" stop-color="#ff4c0d" />
+								<stop offset="1" stop-color="#fc9502" />
 							</linearGradient>
 						</defs>
-						<path d="M187.899,164.809 C185.803,214.868 144.574,254.812 94.000,254.812 C42.085,254.812 -0.000,211.312 -0.000,160.812 C-0.000,154.062 -0.121,140.572 10.000,117.812 C16.057,104.191 19.856,95.634 22.000,87.812 C23.178,83.513 25.469,76.683 32.000,87.812 C35.851,94.374 36.000,103.812 36.000,103.812 C36.000,103.812 50.328,92.817 60.000,71.812 C74.179,41.019 62.866,22.612 59.000,9.812 C57.662,5.384 56.822,-2.574 66.000,0.812 C75.352,4.263 100.076,21.570 113.000,39.812 C131.445,65.847 138.000,90.812 138.000,90.812 C138.000,90.812 143.906,83.482 146.000,75.812 C148.365,67.151 148.400,58.573 155.999,67.813 C163.226,76.600 173.959,93.113 180.000,108.812 C190.969,137.321 187.899,164.809 187.899,164.809 Z" fill="url(#streak-flame-grad)" fill-rule="evenodd"/>
-						<path d="M94.000,254.812 C58.101,254.812 29.000,225.711 29.000,189.812 C29.000,168.151 37.729,155.000 55.896,137.166 C67.528,125.747 78.415,111.722 83.042,102.172 C83.953,100.292 86.026,90.495 94.019,101.966 C98.212,107.982 104.785,118.681 109.000,127.812 C116.266,143.555 118.000,158.812 118.000,158.812 C118.000,158.812 125.121,154.616 130.000,143.812 C131.573,140.330 134.753,127.148 143.643,140.328 C150.166,150.000 159.127,167.390 159.000,189.812 C159.000,225.711 129.898,254.812 94.000,254.812 Z" fill="#fc9502" fill-rule="evenodd"/>
-						<path d="M95.000,183.812 C104.250,183.812 104.250,200.941 116.000,223.812 C123.824,239.041 112.121,254.812 95.000,254.812 C77.879,254.812 69.000,240.933 69.000,223.812 C69.000,206.692 85.750,183.812 95.000,183.812 Z" fill="#fce202" fill-rule="evenodd"/>
+						<path
+							d="M187.899,164.809 C185.803,214.868 144.574,254.812 94.000,254.812 C42.085,254.812 -0.000,211.312 -0.000,160.812 C-0.000,154.062 -0.121,140.572 10.000,117.812 C16.057,104.191 19.856,95.634 22.000,87.812 C23.178,83.513 25.469,76.683 32.000,87.812 C35.851,94.374 36.000,103.812 36.000,103.812 C36.000,103.812 50.328,92.817 60.000,71.812 C74.179,41.019 62.866,22.612 59.000,9.812 C57.662,5.384 56.822,-2.574 66.000,0.812 C75.352,4.263 100.076,21.570 113.000,39.812 C131.445,65.847 138.000,90.812 138.000,90.812 C138.000,90.812 143.906,83.482 146.000,75.812 C148.365,67.151 148.400,58.573 155.999,67.813 C163.226,76.600 173.959,93.113 180.000,108.812 C190.969,137.321 187.899,164.809 187.899,164.809 Z"
+							fill="url(#streak-flame-grad)"
+							fill-rule="evenodd"
+						/>
+						<path
+							d="M94.000,254.812 C58.101,254.812 29.000,225.711 29.000,189.812 C29.000,168.151 37.729,155.000 55.896,137.166 C67.528,125.747 78.415,111.722 83.042,102.172 C83.953,100.292 86.026,90.495 94.019,101.966 C98.212,107.982 104.785,118.681 109.000,127.812 C116.266,143.555 118.000,158.812 118.000,158.812 C118.000,158.812 125.121,154.616 130.000,143.812 C131.573,140.330 134.753,127.148 143.643,140.328 C150.166,150.000 159.127,167.390 159.000,189.812 C159.000,225.711 129.898,254.812 94.000,254.812 Z"
+							fill="#fc9502"
+							fill-rule="evenodd"
+						/>
+						<path
+							d="M95.000,183.812 C104.250,183.812 104.250,200.941 116.000,223.812 C123.824,239.041 112.121,254.812 95.000,254.812 C77.879,254.812 69.000,240.933 69.000,223.812 C69.000,206.692 85.750,183.812 95.000,183.812 Z"
+							fill="#fce202"
+							fill-rule="evenodd"
+						/>
 					</svg>
 					<span class="dash-streak-num">{data.streak}</span>
 				</div>
@@ -137,9 +165,7 @@
 				class="story-card"
 				class:story-read={data.storyRead}
 			>
-				<div class="story-card-icon" class:story-icon-read={data.storyRead}>
-					🏮
-				</div>
+				<div class="story-card-icon" class:story-icon-read={data.storyRead}>🏮</div>
 				<div class="story-card-info">
 					<div class="story-card-label">{t('stories.today', $locale)}</div>
 					<div class="story-card-title">
@@ -164,29 +190,26 @@
 		{/if}
 
 		<!-- Word of the Day & Progress -->
-		<WordOfTheDay 
-			word={data.todayWord} 
-			initiallySaved={data.wordSaved} 
-			learnedToday={learnedToday}
-			dailyGoal={dailyGoal}
+		<WordOfTheDay
+			word={data.todayWord}
+			initiallySaved={data.wordSaved}
+			{learnedToday}
+			{dailyGoal}
 		/>
 
 		<!-- Navigation & Filters -->
-		<div
-			use:fadeIn={{ delay: 0.18 }}
-			class="nav-section"
-		>
+		<div use:fadeIn={{ delay: 0.18 }} class="nav-section">
 			<div class="level-scroller hide-scrollbar">
 				<!-- Roadmap Tab -->
 				<button
-					onclick={() => viewMode = 'roadmap'}
+					onclick={() => (viewMode = 'roadmap')}
 					class="level-pill"
 					class:active={viewMode === 'roadmap'}
 					data-level-pill="Roadmap"
 				>
 					Roadmap
 				</button>
-				
+
 				<!-- Separator -->
 				<div class="nav-divider"></div>
 
@@ -209,15 +232,15 @@
 
 		<div style="display:grid; grid-template-columns: 1fr; margin-top: 8px; position: relative;">
 			<!-- Vista Roadmap: Se mantiene viva para evitar recálculos de performance -->
-			<div 
+			<div
 				style="grid-area: 1 / 1; transition: opacity 0.2s ease, visibility 0.2s;"
 				style:opacity={viewMode === 'roadmap' ? 1 : 0}
 				style:visibility={viewMode === 'roadmap' ? 'visible' : 'hidden'}
 				style:pointer-events={viewMode === 'roadmap' ? 'auto' : 'none'}
 			>
-				<Roadmap 
-					decks={data.decks} 
-					units={allUnits} 
+				<Roadmap
+					decks={data.decks}
+					units={allUnits}
 					lessonProgress={data.lessonProgress}
 					bind:activeLevel
 					onLevelChange={(lvl) => {
@@ -236,7 +259,9 @@
 					style:visibility={viewMode === 'grid' ? 'visible' : 'hidden'}
 					style:pointer-events={viewMode === 'grid' ? 'auto' : 'none'}
 				>
-					<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+					<div
+						style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"
+					>
 						{#if filtered.length === 0}
 							<div
 								style="padding:40px;text-align:center;color:var(--fg-tertiary);border:1px dashed var(--ink-200);border-radius:24px;grid-column:1 / -1;"
@@ -248,10 +273,7 @@
 							{@const pct =
 								deck.card_count > 0 ? Math.round(((deck.learned ?? 0) / deck.card_count) * 100) : 0}
 							{@const complete = deck.card_count > 0 && (deck.learned ?? 0) >= deck.card_count}
-							<a
-								href="/deck/{deck.id}"
-								class="deck-card"
-							>
+							<a href="/deck/{deck.id}" class="deck-card">
 								<div
 									style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"
 								>
@@ -274,7 +296,9 @@
 								<div style="font-size:20px;font-weight:600;letter-spacing:-0.01em;">
 									{$locale === 'es' ? deck.title_es : deck.title_en}
 								</div>
-								<div style="font-size:14px;color:var(--fg-secondary);margin-top:4px;line-height:1.5;">
+								<div
+									style="font-size:14px;color:var(--fg-secondary);margin-top:4px;line-height:1.5;"
+								>
 									{$locale === 'es' ? deck.desc_es : deck.desc_en}
 								</div>
 								<div style="margin-top:20px;">
@@ -315,7 +339,7 @@
 		font-size: 11px;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin-bottom: 4px;
 	}
@@ -469,7 +493,7 @@
 	.story-card-label {
 		font-size: 11px;
 		font-weight: 700;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
 		margin-bottom: 2px;
@@ -560,7 +584,7 @@
 		font-weight: 600;
 		padding: 2px 8px;
 		border-radius: 6px;
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 	}
 
 	.story-read-btn {
@@ -625,7 +649,7 @@
 		font-weight: 800;
 		font-size: 14px;
 		color: var(--sumi);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.dash-xp-label {
@@ -682,7 +706,7 @@
 	.dash-streak-num {
 		font-size: 13px;
 		font-weight: 800;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 		line-height: 1;
 	}
 

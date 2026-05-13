@@ -5,9 +5,9 @@
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import Icon from '$lib/Icon.svelte';
-	import { 
-		VolumeHighIcon, 
-		CheckmarkCircle01Icon, 
+	import {
+		VolumeHighIcon,
+		CheckmarkCircle01Icon,
 		Cancel01Icon,
 		ArrowRight02Icon
 	} from '@hugeicons/core-free-icons';
@@ -88,7 +88,7 @@
 					class:is-wrong={locked && isThisPicked && !isThisCorrect}
 					class:is-dimmed={locked && !isThisPicked}
 					disabled={locked}
-					onclick={() => picked = opt}
+					onclick={() => (picked = opt)}
 				>
 					<div class="opt-indicator">{String.fromCharCode(65 + idx)}</div>
 					<div class="opt-body">
@@ -103,8 +103,20 @@
 			<div class="feedback-reveal" in:fadeUp={{ y: 12 }}>
 				<div class="feedback-card" class:correct={isCorrect} class:wrong={!isCorrect}>
 					<div class="feedback-header">
-						<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={20} color="currentColor" />
-						<span>{isCorrect ? ($locale === 'es' ? '¡Excelente!' : 'Excellent!') : ($locale === 'es' ? 'La respuesta correcta es:' : 'The correct answer is:')}</span>
+						<Icon
+							icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
+							size={20}
+							color="currentColor"
+						/>
+						<span
+							>{isCorrect
+								? $locale === 'es'
+									? '¡Excelente!'
+									: 'Excellent!'
+								: $locale === 'es'
+									? 'La respuesta correcta es:'
+									: 'The correct answer is:'}</span
+						>
 					</div>
 					<div class="jp feedback-jp"><InteractiveText text={targetJp} /></div>
 					<div class="feedback-rom">{targetRomaji}</div>
@@ -116,16 +128,16 @@
 	<StickyFooter>
 		<div class="footer-inner">
 			{#if !locked}
-				<button 
-					class="hm-btn hm-btn-primary hm-btn-lg hm-btn-full" 
-					disabled={!picked} 
+				<button
+					class="hm-btn hm-btn-primary hm-btn-lg hm-btn-full"
+					disabled={!picked}
 					onclick={handleCheck}
 				>
 					{$locale === 'es' ? 'Comprobar' : 'Check'}
 				</button>
 			{:else}
-				<button 
-					class="hm-btn hm-btn-lg hm-btn-full" 
+				<button
+					class="hm-btn hm-btn-lg hm-btn-full"
 					class:hm-btn-primary={isCorrect}
 					class:hm-btn-secondary={!isCorrect}
 					onclick={handleContinue}
@@ -139,63 +151,170 @@
 </div>
 
 <style>
-	.step-layout { flex: 1; display: flex; flex-direction: column; height: 100%; }
-	.step-content { flex: 1; display: flex; flex-direction: column; gap: 32px; padding-top: 20px; }
+	.step-layout {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+	.step-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+		padding-top: 20px;
+	}
 
-	.prompt-section { text-align: center; }
+	.prompt-section {
+		text-align: center;
+	}
 	.prompt-tag {
-		font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
-		color: var(--hinomaru-red); background: var(--hinomaru-red-wash);
-		padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
+		font-size: 11px;
+		font-weight: 800;
+		letter-spacing: -0.04em;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 12px;
+		border-radius: 20px;
+		text-transform: uppercase;
 	}
 	.prompt-text {
-		margin-top: 16px; font-size: 24px; font-weight: 800;
-		color: var(--fg-primary); line-height: 1.3;
+		margin-top: 16px;
+		font-size: 24px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		line-height: 1.3;
 	}
 
-	.options-grid { display: flex; flex-direction: column; gap: 12px; }
+	.options-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
 
 	.option-card {
-		display: flex; align-items: center; gap: 16px; padding: 16px 20px;
-		background: var(--bg-surface); border: 2px solid var(--ink-200);
-		border-radius: 20px; cursor: pointer; text-align: left;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 16px 20px;
+		background: var(--bg-surface);
+		border: 2px solid var(--ink-200);
+		border-radius: 20px;
+		cursor: pointer;
+		text-align: left;
 		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-		box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
-	.option-card:not(:disabled):hover { border-color: var(--ink-300); transform: translateY(-1px); }
-	.option-card.is-selected { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
-	.option-card.is-correct { border-color: var(--success); background: var(--success-wash); }
-	.option-card.is-wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); }
-	.option-card.is-dimmed { opacity: 0.5; filter: grayscale(0.5); }
+	.option-card:not(:disabled):hover {
+		border-color: var(--ink-300);
+		transform: translateY(-1px);
+	}
+	.option-card.is-selected {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+	}
+	.option-card.is-correct {
+		border-color: var(--success);
+		background: var(--success-wash);
+	}
+	.option-card.is-wrong {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+	}
+	.option-card.is-dimmed {
+		opacity: 0.5;
+		filter: grayscale(0.5);
+	}
 
 	.opt-indicator {
-		width: 32px; height: 32px; border-radius: 10px;
-		background: var(--bg-muted); border: 1.5px solid var(--ink-200);
-		display: flex; align-items: center; justify-content: center;
-		font-size: 13px; font-weight: 900; color: var(--fg-tertiary);
+		width: 32px;
+		height: 32px;
+		border-radius: 10px;
+		background: var(--bg-muted);
+		border: 1.5px solid var(--ink-200);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 13px;
+		font-weight: 900;
+		color: var(--fg-tertiary);
 		flex-shrink: 0;
 	}
-	.is-selected .opt-indicator { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
-	.is-correct .opt-indicator { background: var(--success); border-color: var(--success); color: white; }
-
-	.opt-body { display: flex; flex-direction: column; gap: 2px; }
-	.opt-jp { font-size: 18px; font-weight: 700; color: var(--fg-primary); }
-	.opt-romaji { font-size: 12px; font-weight: 600; color: var(--hinomaru-red); opacity: 0.7; }
-
-	.feedback-reveal { margin-top: 8px; }
-	.feedback-card {
-		padding: 20px; border-radius: 24px; border: 2px solid var(--ink-200);
-		display: flex; flex-direction: column; gap: 8px; text-align: center;
+	.is-selected .opt-indicator {
+		background: var(--hinomaru-red);
+		border-color: var(--hinomaru-red);
+		color: white;
 	}
-	.feedback-card.correct { border-color: var(--success); background: var(--success-wash); color: var(--success); }
-	.feedback-card.wrong { border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); color: var(--hinomaru-red); }
+	.is-correct .opt-indicator {
+		background: var(--success);
+		border-color: var(--success);
+		color: white;
+	}
 
-	.feedback-header { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 800; }
-	.feedback-jp { font-size: 22px; font-weight: 800; }
-	.feedback-rom { font-size: 14px; font-weight: 600; opacity: 0.8; }
+	.opt-body {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.opt-jp {
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--fg-primary);
+	}
+	.opt-romaji {
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--hinomaru-red);
+		opacity: 0.7;
+	}
 
-	.footer-inner { width: 100%; max-width: 480px; margin: 0 auto; }
+	.feedback-reveal {
+		margin-top: 8px;
+	}
+	.feedback-card {
+		padding: 20px;
+		border-radius: 24px;
+		border: 2px solid var(--ink-200);
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		text-align: center;
+	}
+	.feedback-card.correct {
+		border-color: var(--success);
+		background: var(--success-wash);
+		color: var(--success);
+	}
+	.feedback-card.wrong {
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
+	}
+
+	.feedback-header {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 800;
+	}
+	.feedback-jp {
+		font-size: 22px;
+		font-weight: 800;
+	}
+	.feedback-rom {
+		font-size: 14px;
+		font-weight: 600;
+		opacity: 0.8;
+	}
+
+	.footer-inner {
+		width: 100%;
+		max-width: 480px;
+		margin: 0 auto;
+	}
 
 	:global(.feedback-jp .word-link) {
 		color: inherit !important;

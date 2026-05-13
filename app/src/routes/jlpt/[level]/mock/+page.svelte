@@ -20,11 +20,7 @@
 		AlertCircleIcon,
 		Target01Icon
 	} from '@hugeicons/core-free-icons';
-	import {
-		getTest,
-		type JLPTLevel,
-		type JLPTMondai
-	} from '$lib/data/jlpt/index';
+	import { getTest, type JLPTLevel, type JLPTMondai } from '$lib/data/jlpt/index';
 	import { showRomaji } from '$lib/stores/settings';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 
@@ -65,7 +61,7 @@
 	let advanceTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	// Timer
-	const DURATION = 20 * 60; 
+	const DURATION = 20 * 60;
 	let timeLeft = $state(DURATION);
 	let timerInterval: ReturnType<typeof setInterval> | null = null;
 	let timeUsed = $state(0);
@@ -76,7 +72,9 @@
 	const currentQ = $derived(allQuestions[currentIdx]);
 	const score = $derived(correctness.filter(Boolean).length);
 	const wrongCount = $derived(correctness.filter((b) => !b).length);
-	const pct = $derived(allQuestions.length > 0 ? Math.round((score / allQuestions.length) * 100) : 0);
+	const pct = $derived(
+		allQuestions.length > 0 ? Math.round((score / allQuestions.length) * 100) : 0
+	);
 	const timerCritical = $derived(timeLeft <= 60);
 	const timerLabel = $derived(
 		`${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
@@ -101,7 +99,10 @@
 		}, 1000);
 	}
 	function stopTimer() {
-		if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+		if (timerInterval) {
+			clearInterval(timerInterval);
+			timerInterval = null;
+		}
 		timeUsed = DURATION - timeLeft;
 	}
 
@@ -109,7 +110,7 @@
 		const vTest = getTest(level, 'vocabulary');
 		const gTest = getTest(level, 'grammar');
 		const pool: FlatQuestion[] = [];
-		
+
 		[vTest, gTest].forEach((test, idx) => {
 			if (!test) return;
 			const type = idx === 0 ? 'vocabulary' : 'grammar';
@@ -143,13 +144,20 @@
 		const isRight = selected + 1 === currentQ.answer;
 		checked = true;
 		correctness = [...correctness, isRight];
-		if (isRight) playCorrect(); else playWrong();
+		if (isRight) playCorrect();
+		else playWrong();
 		advanceTimeout = setTimeout(advanceQuestion, isRight ? 1200 : 2500);
 	}
 
 	function advanceQuestion() {
-		if (advanceTimeout) { clearTimeout(advanceTimeout); advanceTimeout = null; }
-		if (currentIdx + 1 >= allQuestions.length) { endExam(); return; }
+		if (advanceTimeout) {
+			clearTimeout(advanceTimeout);
+			advanceTimeout = null;
+		}
+		if (currentIdx + 1 >= allQuestions.length) {
+			endExam();
+			return;
+		}
 		currentIdx += 1;
 		selected = null;
 		checked = false;
@@ -157,16 +165,31 @@
 
 	async function saveResult() {
 		const date = new Date().toISOString();
-		localStorage.setItem(`jlpt_result_${level}_mock`, JSON.stringify({ score, total: allQuestions.length, pct, date }));
+		localStorage.setItem(
+			`jlpt_result_${level}_mock`,
+			JSON.stringify({ score, total: allQuestions.length, pct, date })
+		);
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (user) {
 				await supabase.from('jlpt_results').upsert(
-					{ user_id: user.id, level, section: 'mock', score, total: allQuestions.length, pct, completed_at: date },
+					{
+						user_id: user.id,
+						level,
+						section: 'mock',
+						score,
+						total: allQuestions.length,
+						pct,
+						completed_at: date
+					},
 					{ onConflict: 'user_id,level,section' }
 				);
 			}
-		} catch { /* ignore */ }
+		} catch {
+			/* ignore */
+		}
 	}
 
 	function endExam() {
@@ -207,7 +230,6 @@
 
 <div class="session-layout">
 	<div class="session-container">
-
 		{#if phase === 'intro'}
 			<div class="intro-screen" use:fadeIn>
 				<div class="intro-icon">
@@ -236,7 +258,11 @@
 
 				<StickyFooter>
 					<div class="result-actions">
-						<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1" onclick={() => goto('/jlpt')}>
+						<button
+							class="hm-btn hm-btn-secondary hm-btn-lg"
+							style="flex:1"
+							onclick={() => goto('/jlpt')}
+						>
 							{t('jlpt.mock.back_btn', $locale)}
 						</button>
 						<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:2" onclick={startExam}>
@@ -245,10 +271,9 @@
 					</div>
 				</StickyFooter>
 			</div>
-
 		{:else if phase === 'exam' && currentQ}
 			<div use:fadeIn={{ delay: 0 }}>
-				<button class="back-link-premium" onclick={() => showExitModal = true}>
+				<button class="back-link-premium" onclick={() => (showExitModal = true)}>
 					← {t('jlpt.mock.back_btn', $locale)}
 				</button>
 			</div>
@@ -295,7 +320,9 @@
 							class:is-correct={checked && selected === idx && idx + 1 === currentQ.answer}
 							class:is-wrong={checked && selected === idx && idx + 1 !== currentQ.answer}
 							disabled={checked}
-							onclick={() => { if (!checked) selected = idx; }}
+							onclick={() => {
+								if (!checked) selected = idx;
+							}}
 						>
 							<div class="opt-marker">
 								{#if checked && selected === idx && idx + 1 === currentQ.answer}
@@ -317,16 +344,22 @@
 				</div>
 
 				{#if checked}
-					<div 
-						class="feedback-premium-bar" 
+					<div
+						class="feedback-premium-bar"
 						class:is-correct={isCorrect}
 						use:fadeUp={{ delay: 0, y: 10 }}
 					>
 						<div class="feedback-icon-wrap">
-							<Icon icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon} size={20} color="currentColor" />
+							<Icon
+								icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
+								size={20}
+								color="currentColor"
+							/>
 						</div>
 						<div class="feedback-text-side">
-							<span class="feedback-title">{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span>
+							<span class="feedback-title"
+								>{isCorrect ? t('exam.correct', $locale) : t('exam.incorrect', $locale)}</span
+							>
 						</div>
 					</div>
 				{/if}
@@ -334,29 +367,43 @@
 
 			<StickyFooter>
 				{#if !checked}
-					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={checkAnswer} disabled={selected === null}>
+					<button
+						class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
+						onclick={checkAnswer}
+						disabled={selected === null}
+					>
 						{t('jlpt.mock.confirm_btn', $locale)}
 					</button>
 				{:else}
 					<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={advanceQuestion}>
-						{currentIdx + 1 < allQuestions.length ? t('exam.next', $locale) : t('exam.see_results', $locale)}
+						{currentIdx + 1 < allQuestions.length
+							? t('exam.next', $locale)
+							: t('exam.see_results', $locale)}
 					</button>
 				{/if}
 			</StickyFooter>
-
 		{:else if phase === 'result'}
 			<Confetti bind:this={confettiRef} />
 			<div class="result-screen" use:fadeUp>
-				
 				<div class="result-premium-hero" class:is-pass={isPass}>
 					<div class="hero-content-wrapper">
 						<div class="score-display-ring">
 							<svg class="progress-svg" viewBox="0 0 100 100">
-								<circle class="progress-track" cx="50" cy="50" r="45" fill="none" stroke-width="4" />
-								<circle 
-									class="progress-bar" 
-									cx="50" cy="50" r="45" 
-									fill="none" stroke-width="6" 
+								<circle
+									class="progress-track"
+									cx="50"
+									cy="50"
+									r="45"
+									fill="none"
+									stroke-width="4"
+								/>
+								<circle
+									class="progress-bar"
+									cx="50"
+									cy="50"
+									r="45"
+									fill="none"
+									stroke-width="6"
 									stroke-linecap="round"
 									stroke-dasharray="283"
 									stroke-dashoffset={283 - (283 * pct) / 100}
@@ -368,7 +415,9 @@
 							</div>
 						</div>
 
-						<h1 class="hero-main-title">{isPass ? t('jlpt.mock.passed_title', $locale) : t('jlpt.mock.failed_title', $locale)}</h1>
+						<h1 class="hero-main-title">
+							{isPass ? t('jlpt.mock.passed_title', $locale) : t('jlpt.mock.failed_title', $locale)}
+						</h1>
 						<div class="hero-xp-badge">
 							<Icon icon={Award01Icon} size={14} color="currentColor" />
 							<span>CERTIFICATION MOCK</span>
@@ -397,11 +446,19 @@
 
 				<StickyFooter>
 					<div class="result-actions">
-						<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex:1" onclick={() => goto('/jlpt')}>
+						<button
+							class="hm-btn hm-btn-secondary hm-btn-lg"
+							style="flex:1"
+							onclick={() => goto('/jlpt')}
+						>
 							{t('jlpt.mock.back_btn', $locale)}
 						</button>
 						{#if isPass}
-							<button class="hm-btn hm-btn-primary hm-btn-lg" style="flex:2" onclick={() => goto(`/jlpt/certificate/${level}`)}>
+							<button
+								class="hm-btn hm-btn-primary hm-btn-lg"
+								style="flex:2"
+								onclick={() => goto(`/jlpt/certificate/${level}`)}
+							>
 								{t('jlpt.mock.cert_btn', $locale)}
 							</button>
 						{:else}
@@ -413,7 +470,6 @@
 				</StickyFooter>
 			</div>
 		{/if}
-
 	</div>
 </div>
 
@@ -432,8 +488,12 @@
 	icon={exitIcon}
 >
 	{#snippet actions()}
-		<button class="modal-btn-cancel" onclick={() => (showExitModal = false)}>{t('common.cancel', $locale)}</button>
-		<button class="modal-btn-confirm" onclick={handleConfirmExit}>{t('exam.exit_confirm', $locale)}</button>
+		<button class="modal-btn-cancel" onclick={() => (showExitModal = false)}
+			>{t('common.cancel', $locale)}</button
+		>
+		<button class="modal-btn-confirm" onclick={handleConfirmExit}
+			>{t('exam.exit_confirm', $locale)}</button
+		>
 	{/snippet}
 </ResponsiveModal>
 
@@ -450,160 +510,498 @@
 	}
 
 	/* ── INTRO ── */
-	.intro-screen { text-align: center; padding: 40px 0 20px; }
+	.intro-screen {
+		text-align: center;
+		padding: 40px 0 20px;
+	}
 	.intro-icon {
-		width: 80px; height: 80px;
-		background: #ffffff; border-radius: 22px;
-		display: flex; align-items: center; justify-content: center;
+		width: 80px;
+		height: 80px;
+		background: #ffffff;
+		border-radius: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: 0 auto 20px;
-		box-shadow: var(--shadow-md); border: 1.5px solid var(--ink-200);
+		box-shadow: var(--shadow-md);
+		border: 1.5px solid var(--ink-200);
 	}
-	.hinomaru-dot-big { width: 36px; height: 36px; background: #bc002d; border-radius: 50%; }
-	
+	.hinomaru-dot-big {
+		width: 36px;
+		height: 36px;
+		background: #bc002d;
+		border-radius: 50%;
+	}
+
 	.intro-badge {
-		display: inline-block; font-size: 12px; font-weight: 700;
-		letter-spacing: 0.08em; text-transform: uppercase;
-		color: var(--fg-tertiary); background: var(--ink-100);
-		padding: 4px 12px; border-radius: 99px; margin-bottom: 10px;
+		display: inline-block;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: -0.04em;
+		text-transform: uppercase;
+		color: var(--fg-tertiary);
+		background: var(--ink-100);
+		padding: 4px 12px;
+		border-radius: 99px;
+		margin-bottom: 10px;
 	}
-	.intro-title { font-size: 34px; font-weight: 800; color: var(--sumi); margin: 0 0 6px; letter-spacing: -0.02em; }
-	.intro-sub { font-size: 15px; color: var(--fg-secondary); margin: 0 0 32px; }
+	.intro-title {
+		font-size: 34px;
+		font-weight: 800;
+		color: var(--sumi);
+		margin: 0 0 6px;
+		letter-spacing: -0.02em;
+	}
+	.intro-sub {
+		font-size: 15px;
+		color: var(--fg-secondary);
+		margin: 0 0 32px;
+	}
 
 	.intro-stats {
-		display: inline-flex; align-items: center; gap: 0;
-		background: var(--bg-surface); border: 1px solid var(--ink-200);
-		border-radius: 16px; padding: 0 24px; margin-bottom: 24px;
+		display: inline-flex;
+		align-items: center;
+		gap: 0;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 16px;
+		padding: 0 24px;
+		margin-bottom: 24px;
 	}
-	.stat-card { display: flex; flex-direction: column; align-items: center; padding: 16px 20px; gap: 3px; }
-	.stat-divider { width: 1px; height: 36px; background: var(--ink-200); }
-	.stat-val { font-size: 28px; font-weight: 700; color: var(--sumi); line-height: 1; }
-	.stat-label { font-size: 11px; color: var(--fg-tertiary); font-weight: 600; letter-spacing: 0.04em; }
+	.stat-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 16px 20px;
+		gap: 3px;
+	}
+	.stat-divider {
+		width: 1px;
+		height: 36px;
+		background: var(--ink-200);
+	}
+	.stat-val {
+		font-size: 28px;
+		font-weight: 700;
+		color: var(--sumi);
+		line-height: 1;
+	}
+	.stat-label {
+		font-size: 11px;
+		color: var(--fg-tertiary);
+		font-weight: 600;
+		letter-spacing: -0.04em;
+	}
 
 	/* ── Mondai Card ── */
 	.mondai-info-card {
-		background: var(--bg-surface); border: 1px solid var(--ink-200);
-		border-radius: 14px; padding: 10px 16px; margin-bottom: 12px; display: inline-flex;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 14px;
+		padding: 10px 16px;
+		margin-bottom: 12px;
+		display: inline-flex;
 	}
-	.mondai-title { font-size: 12px; font-weight: 700; color: var(--fg-secondary); margin: 0; }
+	.mondai-title {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--fg-secondary);
+		margin: 0;
+	}
 
 	/* ── EXAM ── */
 	.back-link-premium {
-		background: none; border: none; padding: 0;
-		font-size: 13px; color: var(--fg-secondary); cursor: pointer;
-		margin-bottom: 20px; transition: color 0.2s;
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: 13px;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		margin-bottom: 20px;
+		transition: color 0.2s;
 	}
-	.back-link-premium:hover { color: var(--fg-primary); }
+	.back-link-premium:hover {
+		color: var(--fg-primary);
+	}
 
-	.exam-premium-header { margin: 0 0 24px; }
-	.exam-header-main { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
-	.header-left { display: flex; align-items: center; }
-	.header-right { display: flex; justify-content: flex-end; align-items: center; }
+	.exam-premium-header {
+		margin: 0 0 24px;
+	}
+	.exam-header-main {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 12px;
+	}
+	.header-left {
+		display: flex;
+		align-items: center;
+	}
+	.header-right {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+	}
 
 	.exam-label-pill {
-		font-size: 11px; font-weight: 800;
-		color: var(--hinomaru-red); background: var(--hinomaru-red-wash);
-		padding: 4px 10px; border-radius: 6px;
-		text-transform: uppercase; letter-spacing: 0.05em;
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 10px;
+		border-radius: 6px;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
 	}
 
-	.exam-step-indicator { display: flex; align-items: baseline; gap: 3px; font-weight: 700; }
-	.step-curr { font-size: 18px; font-weight: 800; color: var(--sumi); }
-	.step-divider { font-size: 14px; color: var(--fg-tertiary); opacity: 0.4; }
-	.step-total { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); }
+	.exam-step-indicator {
+		display: flex;
+		align-items: baseline;
+		gap: 3px;
+		font-weight: 700;
+	}
+	.step-curr {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.step-divider {
+		font-size: 14px;
+		color: var(--fg-tertiary);
+		opacity: 0.4;
+	}
+	.step-total {
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-tertiary);
+	}
 
 	.exam-timer-pill {
-		display: flex; align-items: center; gap: 8px;
-		background: var(--bg-surface); border: 1.5px solid var(--ink-200);
-		padding: 6px 14px; border-radius: 99px;
-		font-weight: 700; color: var(--sumi); font-variant-numeric: tabular-nums;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		padding: 6px 14px;
+		border-radius: 99px;
+		font-weight: 700;
+		color: var(--sumi);
+		font-variant-numeric: tabular-nums;
 	}
-	.exam-timer-pill.is-critical { color: var(--hinomaru-red); border-color: var(--hinomaru-red); background: var(--hinomaru-red-wash); animation: timer-pulse 1s infinite alternate; }
-	@keyframes timer-pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+	.exam-timer-pill.is-critical {
+		color: var(--hinomaru-red);
+		border-color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		animation: timer-pulse 1s infinite alternate;
+	}
+	@keyframes timer-pulse {
+		from {
+			transform: scale(1);
+		}
+		to {
+			transform: scale(1.05);
+		}
+	}
 
-	.question-wrap { display: flex; flex-direction: column; }
-	.question-card { background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 20px; padding: 24px 22px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-	.question-text { font-size: 19px; line-height: 1.75; margin: 0; color: var(--sumi); white-space: pre-line; }
-	.question-romaji { font-size: 13px; color: var(--fg-tertiary); margin: 8px 0 0; line-height: 1.6; font-style: italic; letter-spacing: 0.02em; }
+	.question-wrap {
+		display: flex;
+		flex-direction: column;
+	}
+	.question-card {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 24px 22px;
+		margin-bottom: 12px;
+		box-shadow: var(--shadow-sm);
+	}
+	.question-text {
+		font-size: 19px;
+		line-height: 1.75;
+		margin: 0;
+		color: var(--sumi);
+		white-space: pre-line;
+	}
+	.question-romaji {
+		font-size: 13px;
+		color: var(--fg-tertiary);
+		margin: 8px 0 0;
+		line-height: 1.6;
+		font-style: italic;
+		letter-spacing: -0.04em;
+	}
 
-	.options-list { display: flex; flex-direction: column; gap: 10px; }
+	.options-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
 	.option-item {
-		display: flex; align-items: center; gap: 14px; padding: 16px;
-		border: 2px solid var(--ink-200); border-radius: 18px;
-		background: var(--bg-surface); cursor: pointer; text-align: left;
-		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 16px;
+		border: 2px solid var(--ink-200);
+		border-radius: 18px;
+		background: var(--bg-surface);
+		cursor: pointer;
+		text-align: left;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		width: 100%;
 	}
-	.option-item:not(:disabled):hover { border-color: var(--ink-400); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-	.option-item.is-selected { border-color: var(--sumi); background: var(--ink-50); }
-	.option-item.is-correct { border-color: var(--success) !important; background: var(--success-wash) !important; border-width: 3px; }
-	.option-item.is-wrong { border-color: var(--hinomaru-red) !important; background: var(--hinomaru-red-wash) !important; border-width: 3px; }
-
-	.opt-marker { 
-		width: 32px; height: 32px; background: var(--ink-100); border-radius: 10px; 
-		display: flex; align-items: center; justify-content: center; 
-		font-size: 14px; font-weight: 800; color: var(--fg-secondary); flex-shrink: 0; 
+	.option-item:not(:disabled):hover {
+		border-color: var(--ink-400);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-sm);
 	}
-	.is-selected .opt-marker { background: var(--sumi); color: white; }
-	.is-correct .opt-marker { background: var(--success); color: white; border-radius: 50%; }
-	.is-wrong .opt-marker { background: var(--hinomaru-red); color: white; border-radius: 50%; }
+	.option-item.is-selected {
+		border-color: var(--sumi);
+		background: var(--ink-50);
+	}
+	.option-item.is-correct {
+		border-color: var(--success) !important;
+		background: var(--success-wash) !important;
+		border-width: 3px;
+	}
+	.option-item.is-wrong {
+		border-color: var(--hinomaru-red) !important;
+		background: var(--hinomaru-red-wash) !important;
+		border-width: 3px;
+	}
 
-	.opt-content { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-	.opt-text { font-size: 17px; font-weight: 600; color: var(--fg-primary); line-height: 1.4; }
-	.opt-romaji { font-size: 12px; color: var(--fg-tertiary); font-style: italic; opacity: 0.7; }
+	.opt-marker {
+		width: 32px;
+		height: 32px;
+		background: var(--ink-100);
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--fg-secondary);
+		flex-shrink: 0;
+	}
+	.is-selected .opt-marker {
+		background: var(--sumi);
+		color: white;
+	}
+	.is-correct .opt-marker {
+		background: var(--success);
+		color: white;
+		border-radius: 50%;
+	}
+	.is-wrong .opt-marker {
+		background: var(--hinomaru-red);
+		color: white;
+		border-radius: 50%;
+	}
+
+	.opt-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.opt-text {
+		font-size: 17px;
+		font-weight: 600;
+		color: var(--fg-primary);
+		line-height: 1.4;
+	}
+	.opt-romaji {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		font-style: italic;
+		opacity: 0.7;
+	}
 
 	.feedback-premium-bar {
-		margin-top: 12px; display: flex; align-items: center; gap: 16px;
-		padding: 16px 20px; border-radius: 20px;
-		background: var(--hinomaru-red-wash); border: 1px solid rgba(188, 0, 45, 0.1); color: var(--hinomaru-red);
+		margin-top: 12px;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 16px 20px;
+		border-radius: 20px;
+		background: var(--hinomaru-red-wash);
+		border: 1px solid rgba(188, 0, 45, 0.1);
+		color: var(--hinomaru-red);
 	}
-	.feedback-premium-bar.is-correct { border-color: rgba(46, 125, 91, 0.1); background: var(--success-wash); color: var(--success); }
-	.feedback-icon-wrap { width: 44px; height: 44px; border-radius: 14px; background: rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-	:global(.dark) .feedback-icon-wrap { background: rgba(0, 0, 0, 0.2); }
-	.feedback-title { font-size: 16px; font-weight: 800; }
+	.feedback-premium-bar.is-correct {
+		border-color: rgba(46, 125, 91, 0.1);
+		background: var(--success-wash);
+		color: var(--success);
+	}
+	.feedback-icon-wrap {
+		width: 44px;
+		height: 44px;
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+	:global(.dark) .feedback-icon-wrap {
+		background: rgba(0, 0, 0, 0.2);
+	}
+	.feedback-title {
+		font-size: 16px;
+		font-weight: 800;
+	}
 
 	/* ── RESULT SCREEN ── */
-	.result-screen { display: flex; flex-direction: column; gap: 24px; padding-bottom: 40px; }
+	.result-screen {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		padding-bottom: 40px;
+	}
 
 	.result-premium-hero {
-		position: relative; border-radius: 32px; padding: 48px 24px;
-		text-align: center; overflow: hidden; background: #1a1a1a; color: white;
-		box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+		position: relative;
+		border-radius: 32px;
+		padding: 48px 24px;
+		text-align: center;
+		overflow: hidden;
+		background: #1a1a1a;
+		color: white;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 	}
-	.result-premium-hero.is-pass { background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); }
-	.result-premium-hero:not(.is-pass) { background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%); }
-	.hero-content-wrapper { position: relative; z-index: 2; }
+	.result-premium-hero.is-pass {
+		background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+	}
+	.result-premium-hero:not(.is-pass) {
+		background: linear-gradient(135deg, #bc002d 0%, #8b0021 100%);
+	}
+	.hero-content-wrapper {
+		position: relative;
+		z-index: 2;
+	}
 
-	.score-display-ring { position: relative; width: 140px; height: 140px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; }
-	.progress-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-	.progress-track { stroke: rgba(255,255,255,0.1); }
-	.progress-bar { stroke: white; transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-	.is-pass .progress-bar { stroke: #4ade80; }
-	.score-labels { display: flex; align-items: baseline; gap: 2px; }
-	.score-big { font-size: 52px; font-weight: 900; line-height: 1; }
-	.score-small { font-size: 18px; font-weight: 600; opacity: 0.6; }
+	.score-display-ring {
+		position: relative;
+		width: 140px;
+		height: 140px;
+		margin: 0 auto 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.progress-svg {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		transform: rotate(-90deg);
+	}
+	.progress-track {
+		stroke: rgba(255, 255, 255, 0.1);
+	}
+	.progress-bar {
+		stroke: white;
+		transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.is-pass .progress-bar {
+		stroke: #4ade80;
+	}
+	.score-labels {
+		display: flex;
+		align-items: baseline;
+		gap: 2px;
+	}
+	.score-big {
+		font-size: 52px;
+		font-weight: 900;
+		line-height: 1;
+	}
+	.score-small {
+		font-size: 18px;
+		font-weight: 600;
+		opacity: 0.6;
+	}
 
-	.hero-main-title { font-size: 26px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.02em; }
+	.hero-main-title {
+		font-size: 26px;
+		font-weight: 800;
+		margin: 0 0 8px;
+		letter-spacing: -0.02em;
+	}
 	.hero-xp-badge {
-		display: inline-flex; align-items: center; gap: 6px;
-		background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
-		padding: 4px 12px; border-radius: 99px;
-		font-size: 12px; font-weight: 700; margin-bottom: 12px;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 4px 12px;
+		border-radius: 99px;
+		font-size: 12px;
+		font-weight: 700;
+		margin-bottom: 12px;
 	}
-	.hero-main-sub { font-size: 13px; font-weight: 600; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.1em; }
+	.hero-main-sub {
+		font-size: 13px;
+		font-weight: 600;
+		opacity: 0.6;
+		text-transform: uppercase;
+		letter-spacing: -0.04em;
+	}
 
-	.stats-premium-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
-	.stat-pill-sm { background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 99px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: var(--shadow-sm); }
-	.stat-v { font-size: 14px; font-weight: 800; color: var(--sumi); }
-	.stat-l { font-size: 11px; font-weight: 600; color: var(--fg-secondary); text-transform: lowercase; }
+	.stats-premium-row {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 8px;
+	}
+	.stat-pill-sm {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 99px;
+		padding: 8px 14px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		transition: all 0.2s;
+		box-shadow: var(--shadow-sm);
+	}
+	.stat-v {
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--sumi);
+	}
+	.stat-l {
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+		text-transform: lowercase;
+	}
 
-	.result-actions { display: flex; gap: 12px; width: 100%; }
+	.result-actions {
+		display: flex;
+		gap: 12px;
+		width: 100%;
+	}
 
 	/* ── DARK MODE OVERRIDES ── */
-	:global([data-theme='dark']) .option-item:not(.is-correct):not(.is-wrong):not(.is-selected):hover { background: var(--ink-100); border-color: var(--ink-300); }
-	:global([data-theme='dark']) .option-item.is-selected { background: var(--ink-200); border-color: var(--sumi); }
+	:global([data-theme='dark'])
+		.option-item:not(.is-correct):not(.is-wrong):not(.is-selected):hover {
+		background: var(--ink-100);
+		border-color: var(--ink-300);
+	}
+	:global([data-theme='dark']) .option-item.is-selected {
+		background: var(--ink-200);
+		border-color: var(--sumi);
+	}
 	:global([data-theme='dark']) .stat-pill-sm,
 	:global([data-theme='dark']) .intro-stats,
 	:global([data-theme='dark']) .question-card,
-	:global([data-theme='dark']) .mondai-info-card { background: var(--ink-100); border-color: var(--ink-200); }
+	:global([data-theme='dark']) .mondai-info-card {
+		background: var(--ink-100);
+		border-color: var(--ink-200);
+	}
 
-	.jp { font-family: var(--font-jp); }
+	.jp {
+		font-family: var(--font-jp);
+	}
 </style>

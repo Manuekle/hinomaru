@@ -60,7 +60,10 @@
 			if (built) return built;
 			if (currentCard.example && currentCard.example_es) {
 				const exampleJp = String(currentCard.example);
-				const exampleTr = $locale === 'es' ? currentCard.example_es : currentCard.example_en || currentCard.example_es;
+				const exampleTr =
+					$locale === 'es'
+						? currentCard.example_es
+						: currentCard.example_en || currentCard.example_es;
 				return {
 					templateId: 'fallback-example',
 					tokens: [exampleJp],
@@ -218,8 +221,8 @@
 	<div class="session-container">
 		{#if !isLesson && initialCards.length === 0}
 			<SessionEmptyState
-				totalCards={totalCards}
-				learnedCount={learnedCount}
+				{totalCards}
+				{learnedCount}
 				sessionCount={0}
 				deckId={deck?.id}
 				modeLabel={t('mode.type.title', $locale)}
@@ -289,11 +292,7 @@
 				{/if}
 
 				{#if submitted}
-					<div
-						class="feedback-bar"
-						class:is-correct={isCorrectAnswer}
-						use:fadeUp={{ y: 10 }}
-					>
+					<div class="feedback-bar" class:is-correct={isCorrectAnswer} use:fadeUp={{ y: 10 }}>
 						<Icon
 							icon={isCorrectAnswer ? CheckmarkCircle01Icon : Cancel01Icon}
 							size={18}
@@ -318,7 +317,11 @@
 		<StickyFooter>
 			<div class="footer-row">
 				{#if !useKeyboard && answer.length > 0 && !submitted}
-					<button class="icon-btn hm-btn hm-btn-secondary" onclick={clearAnswer} aria-label="Limpiar">
+					<button
+						class="icon-btn hm-btn hm-btn-secondary"
+						onclick={clearAnswer}
+						aria-label="Limpiar"
+					>
 						<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
 					</button>
 				{/if}
@@ -420,7 +423,7 @@
 	.prompt-tag {
 		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
@@ -521,7 +524,7 @@
 	.kb-label {
 		font-size: 11px;
 		font-weight: 800;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 	}

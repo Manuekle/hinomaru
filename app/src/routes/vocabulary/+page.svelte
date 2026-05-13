@@ -8,12 +8,7 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import Icon from '$lib/Icon.svelte';
-	import {
-		Cancel01Icon,
-		VolumeHighIcon,
-		Search01Icon,
-		ZapIcon
-	} from '@hugeicons/core-free-icons';
+	import { Cancel01Icon, VolumeHighIcon, Search01Icon, ZapIcon } from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
 
@@ -220,7 +215,10 @@
 											<span class="jp-text jp">{word.jp}</span>
 											<button
 												class="action-btn-inline"
-												onclick={(e) => { e.stopPropagation(); speakJapanese(word.jp); }}
+												onclick={(e) => {
+													e.stopPropagation();
+													speakJapanese(word.jp);
+												}}
 												title={t('vocab.listen', $locale)}
 											>
 												<Icon icon={VolumeHighIcon} size={16} />
@@ -267,7 +265,10 @@
 									{/if}
 									<button
 										class="action-btn-subtle del-btn"
-										onclick={(e) => { e.stopPropagation(); removeWord(word.id); }}
+										onclick={(e) => {
+											e.stopPropagation();
+											removeWord(word.id);
+										}}
 										title={t('vocab.delete', $locale)}
 									>
 										<Icon icon={Cancel01Icon} size={14} />
@@ -495,7 +496,7 @@
 		font-weight: 700;
 		color: var(--sumi);
 		line-height: 1.1;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.kana-text {
@@ -587,7 +588,7 @@
 		padding: 2px 6px;
 		border-radius: 6px;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	.pos-tag {
@@ -624,7 +625,7 @@
 		font-size: 11px;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 	}
 

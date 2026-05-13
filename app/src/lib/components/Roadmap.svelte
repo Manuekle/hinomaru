@@ -8,7 +8,12 @@
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
 	import UnitIcon from '$lib/components/UnitIcon.svelte';
-	import { LockIcon, AlphabetJapaneseIcon, Cancel01Icon, VolumeHighIcon } from '@hugeicons/core-free-icons';
+	import {
+		LockIcon,
+		AlphabetJapaneseIcon,
+		Cancel01Icon,
+		VolumeHighIcon
+	} from '@hugeicons/core-free-icons';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
@@ -28,10 +33,18 @@
 	let drawerOpen = $state(false);
 	let drawerCards = $state<any[]>([]);
 	let drawerLoading = $state(false);
-	let drawerSeccion = $state<{ title_es: string; title_en: string; emoji: string; colorIdx: number } | null>(null);
+	let drawerSeccion = $state<{
+		title_es: string;
+		title_en: string;
+		emoji: string;
+		colorIdx: number;
+	} | null>(null);
 	const supabase = createClient();
 
-	async function openVocabDrawer(deckId: string, seccion: { title_es: string; title_en: string; emoji: string; colorIdx: number }) {
+	async function openVocabDrawer(
+		deckId: string,
+		seccion: { title_es: string; title_en: string; emoji: string; colorIdx: number }
+	) {
 		drawerSeccion = seccion;
 		drawerOpen = true;
 		drawerLoading = true;
@@ -428,7 +441,9 @@
 						<div class="topic-emoji">{currentSeccion.emoji || '📚'}</div>
 						<div class="topic-info">
 							<div class="topic-eyebrow">
-								{$locale === 'es' ? 'Etapa' : 'Stage'} {currentEtapa.index + 1}, {$locale === 'es' ? 'Sección' : 'Section'} {seccIdx + 1}
+								{$locale === 'es' ? 'Etapa' : 'Stage'}
+								{currentEtapa.index + 1}, {$locale === 'es' ? 'Sección' : 'Section'}
+								{seccIdx + 1}
 							</div>
 							<div class="topic-title">
 								{$locale === 'es' ? currentSeccion.title_es : currentSeccion.title_en}
@@ -500,14 +515,16 @@
 							<div class="preview-row">
 								<Icon icon={LockIcon} size={18} />
 								<span class="preview-title">
-									{$locale === 'es' ? 'Etapa' : 'Stage'} {item.nextEtapa.index + 1}: {LEVEL_NAMES[item.nextEtapa.level] ?? item.nextEtapa.level}
+									{$locale === 'es' ? 'Etapa' : 'Stage'}
+									{item.nextEtapa.index + 1}: {LEVEL_NAMES[item.nextEtapa.level] ??
+										item.nextEtapa.level}
 								</span>
 							</div>
 							<div class="preview-desc">
 								{item.nextEtapa.secciones[0]
-									? ($locale === 'es'
-											? item.nextEtapa.secciones[0].objective_es
-											: item.nextEtapa.secciones[0].objective_en)
+									? $locale === 'es'
+										? item.nextEtapa.secciones[0].objective_es
+										: item.nextEtapa.secciones[0].objective_en
 									: ''}
 							</div>
 						</div>
@@ -516,7 +533,8 @@
 					{@const state = lessonState(item.lesson)}
 					{@const isActive = activeLessonId === item.lesson.id}
 					{@const lPct = lessonProgressPct(item.lesson)}
-					{@const iconState = state === 'completed' ? 'completed' : state === 'locked' ? 'neutral' : 'active'}
+					{@const iconState =
+						state === 'completed' ? 'completed' : state === 'locked' ? 'neutral' : 'active'}
 					<div
 						class="node-anchor"
 						class:is-active={isActive}
@@ -553,7 +571,11 @@
 										<Icon icon={LockIcon} size={22} />
 									</div>
 								{:else}
-									<UnitIcon state={iconState} size={28} color={state === 'current' || state === 'completed' ? 'white' : undefined} />
+									<UnitIcon
+										state={iconState}
+										size={28}
+										color={state === 'current' || state === 'completed' ? 'white' : undefined}
+									/>
 								{/if}
 							</div>
 						</button>
@@ -571,7 +593,9 @@
 									out:fade={{ duration: 150 }}
 								>
 									<div class="popover-type">
-										{lessonTypeLabel(item.lesson.type)} · {$locale === 'es' ? item.lesson.unitTitle_es : item.lesson.unitTitle_en}
+										{lessonTypeLabel(item.lesson.type)} · {$locale === 'es'
+											? item.lesson.unitTitle_es
+											: item.lesson.unitTitle_en}
 									</div>
 									<h3 class="popover-title">
 										{$locale === 'es' ? item.lesson.title_es : item.lesson.title_en}
@@ -583,10 +607,16 @@
 									>
 										<span>
 											{state === 'completed'
-												? $locale === 'es' ? 'Repasar' : 'Review'
+												? $locale === 'es'
+													? 'Repasar'
+													: 'Review'
 												: state === 'current'
-													? $locale === 'es' ? 'Continuar' : 'Continue'
-													: $locale === 'es' ? 'Empezar' : 'Start'}
+													? $locale === 'es'
+														? 'Continuar'
+														: 'Continue'
+													: $locale === 'es'
+														? 'Empezar'
+														: 'Start'}
 										</span>
 										<span class="xp-badge">+{state === 'completed' ? 5 : 15} XP</span>
 									</button>
@@ -634,7 +664,11 @@
 			<div class="drawer-info">
 				<div class="drawer-eyebrow">{$locale === 'es' ? 'Palabras clave' : 'Key vocabulary'}</div>
 				<div class="drawer-title">
-					{drawerSeccion ? ($locale === 'es' ? drawerSeccion.title_es : drawerSeccion.title_en) : ''}
+					{drawerSeccion
+						? $locale === 'es'
+							? drawerSeccion.title_es
+							: drawerSeccion.title_en
+						: ''}
 				</div>
 			</div>
 			<button class="drawer-close" onclick={closeDrawer} aria-label="Cerrar">
@@ -665,7 +699,12 @@
 										<div class="vocab-romaji">{c.romaji}</div>
 									{/if}
 									<div class="vocab-translation">
-										<InteractiveText text={$locale === 'es' ? c.es || c.translation_es || '' : c.en || c.translation_en || ''} vocab={drawerCards} />
+										<InteractiveText
+											text={$locale === 'es'
+												? c.es || c.translation_es || ''
+												: c.en || c.translation_en || ''}
+											vocab={drawerCards}
+										/>
 									</div>
 								</div>
 								<button
@@ -777,7 +816,7 @@
 	.topic-eyebrow {
 		font-size: 9px;
 		font-weight: 900;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.78);
 		line-height: 1;
@@ -805,7 +844,9 @@
 		color: white;
 		border: none;
 		cursor: pointer;
-		transition: background 0.2s, transform 0.2s;
+		transition:
+			background 0.2s,
+			transform 0.2s;
 		text-decoration: none;
 	}
 
@@ -882,7 +923,7 @@
 	.preview-eyebrow {
 		font-size: 10px;
 		font-weight: 800;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin-bottom: 12px;
 		background: var(--ink-100);
@@ -1084,7 +1125,7 @@
 	.popover-type {
 		font-size: 10px;
 		font-weight: 900;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 		margin-bottom: 4px;
@@ -1158,7 +1199,9 @@
 	}
 
 	@media (max-width: 600px) {
-		.roadmap-wrapper { max-width: 100%; }
+		.roadmap-wrapper {
+			max-width: 100%;
+		}
 		.lesson-popover {
 			width: calc(100vw - 40px);
 			max-width: 320px;
@@ -1260,7 +1303,7 @@
 	.drawer-eyebrow {
 		font-size: 10px;
 		font-weight: 900;
-		letter-spacing: 0.14em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--accent);
 		margin-bottom: 2px;
@@ -1270,10 +1313,13 @@
 		font-size: 17px;
 		font-weight: 800;
 		color: var(--fg-primary);
-		line-height: 1.2;
+		line-height: 1.25;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
 		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		overflow-wrap: anywhere;
+		word-break: break-word;
 	}
 
 	.drawer-close {
@@ -1298,8 +1344,19 @@
 	.drawer-body {
 		flex: 1;
 		overflow-y: auto;
-		padding: 8px 12px 24px;
+		padding: 8px 12px max(24px, env(safe-area-inset-bottom) + 16px);
 		-webkit-overflow-scrolling: touch;
+	}
+
+	@media (max-width: 360px) {
+		.drawer-body {
+			padding-left: 8px;
+			padding-right: 8px;
+		}
+		.drawer-header {
+			padding: 12px 14px 16px;
+			gap: 10px;
+		}
 	}
 
 	.drawer-loading,
@@ -1350,20 +1407,24 @@
 		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-primary);
-		line-height: 1.1;
+		line-height: 1.15;
+		overflow-wrap: anywhere;
+		word-break: break-word;
 	}
 
 	.vocab-kana {
 		font-family: var(--font-jp);
 		font-size: 13px;
 		color: var(--fg-tertiary);
+		overflow-wrap: anywhere;
+		word-break: break-word;
 	}
 
 	.vocab-romaji {
 		font-size: 12px;
 		color: var(--hinomaru-red);
 		font-weight: 700;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	.vocab-translation {
@@ -1371,6 +1432,8 @@
 		color: var(--fg-secondary);
 		font-weight: 600;
 		margin-top: 2px;
+		overflow-wrap: anywhere;
+		word-break: break-word;
 	}
 
 	.vocab-speak {
@@ -1385,7 +1448,9 @@
 		flex-shrink: 0;
 		border: none;
 		cursor: pointer;
-		transition: background 0.15s, transform 0.15s;
+		transition:
+			background 0.15s,
+			transform 0.15s;
 	}
 
 	.vocab-speak:hover {

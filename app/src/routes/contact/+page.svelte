@@ -94,7 +94,9 @@
 							<Icon icon={SparklesIcon} size={16} color="var(--brand-primary)" strokeWidth={1.8} />
 						</div>
 						<div>
-							<p class="info-row-title">{$locale === 'es' ? 'Sugerir feature' : 'Suggest feature'}</p>
+							<p class="info-row-title">
+								{$locale === 'es' ? 'Sugerir feature' : 'Suggest feature'}
+							</p>
 							<p class="info-row-sub">
 								{$locale === 'es'
 									? '¿Algo que harías diferente? Cuéntanos.'
@@ -205,7 +207,11 @@
 								></textarea>
 							</div>
 
-							<button type="submit" disabled={loading} class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg submit-btn">
+							<button
+								type="submit"
+								disabled={loading}
+								class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg submit-btn"
+							>
 								{#if loading}
 									<DotLoader color="white" />
 								{:else}
@@ -217,7 +223,9 @@
 							<p class="form-foot">
 								{$locale === 'es'
 									? 'Al enviar aceptas nuestra '
-									: 'By submitting you accept our '}<a href="/privacy">{t('privacy.title', $locale)}</a>.
+									: 'By submitting you accept our '}<a href="/privacy"
+									>{t('privacy.title', $locale)}</a
+								>.
 							</p>
 						</form>
 					{/if}
@@ -347,7 +355,7 @@
 		font-size: 11px;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		margin-bottom: 24px;
 	}
 	h1 {
@@ -423,14 +431,14 @@
 		font-size: 11px;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		opacity: 0.8;
 		margin: 0 0 6px;
 	}
 	.info-title {
 		font-size: 18px;
 		font-weight: 800;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 		line-height: 1.3;
 		margin: 0 0 8px;
 	}
@@ -484,7 +492,9 @@
 		background: rgba(255, 94, 29, 0.08);
 		border: 1px solid rgba(255, 94, 29, 0.2);
 		border-radius: 24px;
-		transition: transform 240ms var(--ease-brand), background 200ms;
+		transition:
+			transform 240ms var(--ease-brand),
+			background 200ms;
 	}
 	.kofi-card:hover {
 		transform: translateY(-2px);
@@ -543,7 +553,7 @@
 		font-size: 12px;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--fg-secondary);
 		margin-bottom: 8px;
 		padding-left: 2px;

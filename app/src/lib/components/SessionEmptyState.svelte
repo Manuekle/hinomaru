@@ -5,12 +5,12 @@
 	import { fadeUp } from '$lib/motion';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 
-	let { 
-		totalCards = 0, 
+	let {
+		totalCards = 0,
 		learnedCount = 0,
-		sessionCount = 0, 
-		deckId = '', 
-		modeLabel = '' 
+		sessionCount = 0,
+		deckId = '',
+		modeLabel = ''
 	} = $props<{
 		totalCards: number;
 		learnedCount: number;
@@ -91,7 +91,7 @@
 		font-size: 13px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		padding: 4px 12px;
 		background: var(--bg-muted);

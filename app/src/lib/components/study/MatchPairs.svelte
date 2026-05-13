@@ -98,7 +98,13 @@
 		const items: any[] = [];
 		next.forEach((c) => {
 			items.push({ id: c.id, text: c.jp, type: 'jp', romaji: c.romaji, raw: c });
-			items.push({ id: c.id, text: ($locale === 'es' ? c.es : c.en), type: 'en', romaji: c.romaji, raw: c });
+			items.push({
+				id: c.id,
+				text: $locale === 'es' ? c.es : c.en,
+				type: 'en',
+				romaji: c.romaji,
+				raw: c
+			});
 		});
 		currentSet = items.sort(() => Math.random() - 0.5);
 		matchedIds.clear();
@@ -132,7 +138,7 @@
 			selectedKey = null;
 			wrongKeys.clear();
 			playCorrect();
-			
+
 			const hadWrong = (wrongCounts.get(item.id) ?? 0) > 0;
 			if (onCardProgress) onCardProgress(item.raw, true, hadWrong);
 
@@ -194,27 +200,30 @@
 
 <div class="session-layout premium-bg" class:lesson-embed={isLesson}>
 	{#if !isLesson}
-	<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
-		<button class="close-btn" onclick={_onExit}>
-			<Icon icon={Cancel01Icon} size={24} color="currentColor" />
-		</button>
+		<div class="premium-header-minimal" use:fadeIn={{ delay: 0 }}>
+			<button class="close-btn" onclick={_onExit}>
+				<Icon icon={Cancel01Icon} size={24} color="currentColor" />
+			</button>
 
-		<div class="header-progress">
-			<span class="session-index">{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}</span>
-			<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			<div class="header-progress">
+				<span class="session-index"
+					>{Math.min(currentIndex + matchedIds.size, allCards.length)} / {allCards.length}</span
+				>
+				<span class="total-label">{t('home.cards', $locale, { n: totalCards })}</span>
+			</div>
+
+			<div style="width: 44px;"></div>
+			<!-- Spacer -->
 		</div>
-
-		<div style="width: 44px;"></div> <!-- Spacer -->
-	</div>
 	{/if}
 
 	<div class="session-container">
 		{#if allCards.length === 0}
-			<SessionEmptyState 
-				totalCards={totalCards} 
-				learnedCount={learnedCount}
-				sessionCount={0} 
-				deckId={deck?.id} 
+			<SessionEmptyState
+				{totalCards}
+				{learnedCount}
+				sessionCount={0}
+				deckId={deck?.id}
 				modeLabel={t('mode.match.title', $locale)}
 			/>
 		{:else if !finished}
@@ -254,7 +263,7 @@
 					<h2 class="well-done">{t('session.wellDone', $locale)}</h2>
 					<div class="finish-time">{formatTime(finalTime)}</div>
 					<p class="finish-desc">{allCards.length} {t('home.cards', $locale)} completadas</p>
-					
+
 					<StickyFooter>
 						<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={restart}>
 							{t('session.again', $locale)}
@@ -278,7 +287,10 @@
 		background-color: var(--bg-page);
 		min-height: 100dvh;
 	}
-	.lesson-embed { min-height: 0; background: transparent; }
+	.lesson-embed {
+		min-height: 0;
+		background: transparent;
+	}
 
 	.premium-header-minimal {
 		display: flex;
@@ -299,17 +311,18 @@
 		font-size: 17px;
 		font-weight: 900;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 	.total-label {
 		font-size: 10px;
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
-	.close-btn, .lang-btn {
+	.close-btn,
+	.lang-btn {
 		color: var(--fg-secondary);
 		background: none;
 		border: none;
@@ -318,7 +331,9 @@
 		transition: all 0.2s;
 	}
 
-	.lang-btn.active { color: var(--hinomaru-red); }
+	.lang-btn.active {
+		color: var(--hinomaru-red);
+	}
 
 	.game-area {
 		flex: 1;
@@ -351,7 +366,9 @@
 		position: relative;
 	}
 
-	.match-card.jp-card { background: var(--bg-muted); }
+	.match-card.jp-card {
+		background: var(--bg-muted);
+	}
 
 	.match-card:not(:disabled):hover {
 		transform: translateY(-2px);
@@ -377,11 +394,27 @@
 		animation: shake 0.4s;
 	}
 
-	.card-inner { text-align: center; }
-	.card-text { font-size: 14px; font-weight: 700; color: var(--fg-primary); }
-	.card-text.jp { font-size: 24px; }
-	.romaji-hint { font-size: 12px; font-weight: 700; color: var(--hinomaru-red); margin-top: 6px; }
-	.matched-icon { font-size: 28px; color: var(--success); }
+	.card-inner {
+		text-align: center;
+	}
+	.card-text {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--fg-primary);
+	}
+	.card-text.jp {
+		font-size: 24px;
+	}
+	.romaji-hint {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--hinomaru-red);
+		margin-top: 6px;
+	}
+	.matched-icon {
+		font-size: 28px;
+		color: var(--success);
+	}
 
 	.finish-overlay {
 		display: flex;
@@ -403,21 +436,50 @@
 	}
 
 	.finish-icon {
-		width: 88px; height: 88px;
+		width: 88px;
+		height: 88px;
 		background: var(--hinomaru-red);
 		border-radius: 50%;
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: 0 auto 24px;
 	}
 
-	.well-done { font-size: 28px; font-weight: 900; color: var(--fg-primary); }
-	.finish-time { font-size: 56px; font-weight: 900; color: var(--hinomaru-red); margin: 12px 0; }
-	.finish-desc { color: var(--fg-secondary); font-size: 16px; margin-bottom: 32px; }
+	.well-done {
+		font-size: 28px;
+		font-weight: 900;
+		color: var(--fg-primary);
+	}
+	.finish-time {
+		font-size: 56px;
+		font-weight: 900;
+		color: var(--hinomaru-red);
+		margin: 12px 0;
+	}
+	.finish-desc {
+		color: var(--fg-secondary);
+		font-size: 16px;
+		margin-bottom: 32px;
+	}
 
 	@keyframes shake {
-		10%, 90% { transform: translate3d(-1px, 0, 0); }
-		20%, 80% { transform: translate3d(2px, 0, 0); }
-		30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-		40%, 60% { transform: translate3d(4px, 0, 0); }
+		10%,
+		90% {
+			transform: translate3d(-1px, 0, 0);
+		}
+		20%,
+		80% {
+			transform: translate3d(2px, 0, 0);
+		}
+		30%,
+		50%,
+		70% {
+			transform: translate3d(-4px, 0, 0);
+		}
+		40%,
+		60% {
+			transform: translate3d(4px, 0, 0);
+		}
 	}
 </style>

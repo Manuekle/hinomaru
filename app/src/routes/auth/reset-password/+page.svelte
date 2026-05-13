@@ -343,7 +343,7 @@
 		font-size: 11px;
 		font-weight: 600;
 		margin-top: 4px;
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 	}
 
 	.input-error {

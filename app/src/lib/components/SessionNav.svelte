@@ -67,8 +67,8 @@
 				<div class="timer">{formatTime(elapsed)}</div>
 			{/if}
 			{#if showRomajiToggle}
-				<button 
-					class="romaji-nav-btn" 
+				<button
+					class="romaji-nav-btn"
 					class:active={$showRomaji}
 					onclick={() => showRomaji.toggle()}
 					title="Romaji"
@@ -142,7 +142,10 @@
 	}
 
 	@media (hover: hover) {
-		.close-btn:hover { background: var(--ink-100); color: var(--sumi); }
+		.close-btn:hover {
+			background: var(--ink-100);
+			color: var(--sumi);
+		}
 	}
 
 	.progress-info {
@@ -156,7 +159,7 @@
 		font-size: 10px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		line-height: 1;
 		margin-bottom: 2px;
@@ -167,7 +170,7 @@
 		font-weight: 700;
 		color: var(--sumi);
 		font-family: var(--font-ui);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 		line-height: 1;
 	}
 

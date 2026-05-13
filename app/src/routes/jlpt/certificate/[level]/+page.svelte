@@ -16,7 +16,12 @@
 	const level = $derived($page.params.level as JLPTLevel);
 	const meta = $derived(LEVEL_META[level]);
 
-	interface SectionResult { score: number; total: number; pct: number; date: string }
+	interface SectionResult {
+		score: number;
+		total: number;
+		pct: number;
+		date: string;
+	}
 
 	let results = $state<Record<string, SectionResult>>({});
 	let studentName = $state('');
@@ -45,7 +50,17 @@
 		{
 			step: '4',
 			title: t('jlpt.certificate.step4.title', $locale),
-			desc: t('jlpt.certificate.step4.desc', $locale, { level, duration: level === 'N5' || level === 'N4' ? '105' : level === 'N3' ? '140' : level === 'N2' ? '155' : '170' })
+			desc: t('jlpt.certificate.step4.desc', $locale, {
+				level,
+				duration:
+					level === 'N5' || level === 'N4'
+						? '105'
+						: level === 'N3'
+							? '140'
+							: level === 'N2'
+								? '155'
+								: '170'
+			})
 		},
 		{
 			step: '5',
@@ -55,11 +70,31 @@
 	]);
 
 	const LEVEL_INFO = $derived({
-		N5: { passing: t('jlpt.certificate.info.passing_n5', $locale), sections: t('jlpt.certificate.info.sections_std', $locale), duration: t('jlpt.certificate.info.duration_n5', $locale) },
-		N4: { passing: t('jlpt.certificate.info.passing_n4', $locale), sections: t('jlpt.certificate.info.sections_std', $locale), duration: t('jlpt.certificate.info.duration_n4', $locale) },
-		N3: { passing: t('jlpt.certificate.info.passing_n3', $locale), sections: t('jlpt.certificate.info.sections_std', $locale), duration: t('jlpt.certificate.info.duration_n3', $locale) },
-		N2: { passing: t('jlpt.certificate.info.passing_n2', $locale), sections: t('jlpt.certificate.info.sections_std', $locale), duration: t('jlpt.certificate.info.duration_n2', $locale) },
-		N1: { passing: t('jlpt.certificate.info.passing_n1', $locale), sections: t('jlpt.certificate.info.sections_std', $locale), duration: t('jlpt.certificate.info.duration_n1', $locale) }
+		N5: {
+			passing: t('jlpt.certificate.info.passing_n5', $locale),
+			sections: t('jlpt.certificate.info.sections_std', $locale),
+			duration: t('jlpt.certificate.info.duration_n5', $locale)
+		},
+		N4: {
+			passing: t('jlpt.certificate.info.passing_n4', $locale),
+			sections: t('jlpt.certificate.info.sections_std', $locale),
+			duration: t('jlpt.certificate.info.duration_n4', $locale)
+		},
+		N3: {
+			passing: t('jlpt.certificate.info.passing_n3', $locale),
+			sections: t('jlpt.certificate.info.sections_std', $locale),
+			duration: t('jlpt.certificate.info.duration_n3', $locale)
+		},
+		N2: {
+			passing: t('jlpt.certificate.info.passing_n2', $locale),
+			sections: t('jlpt.certificate.info.sections_std', $locale),
+			duration: t('jlpt.certificate.info.duration_n2', $locale)
+		},
+		N1: {
+			passing: t('jlpt.certificate.info.passing_n1', $locale),
+			sections: t('jlpt.certificate.info.sections_std', $locale),
+			duration: t('jlpt.certificate.info.duration_n1', $locale)
+		}
 	});
 	const info = $derived(LEVEL_INFO[level]);
 
@@ -72,13 +107,19 @@
 	};
 
 	const mockResult = $derived(results[`${level}_mock`]);
-	const totalScore = $derived(() => mockResult ? mockResult.pct : 0);
+	const totalScore = $derived(() => (mockResult ? mockResult.pct : 0));
 	const allDone = $derived(!!mockResult);
 
 	function formatDate(iso: string): string {
 		try {
-			return new Date(iso).toLocaleDateString($locale === 'es' ? 'es-ES' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-		} catch { return iso; }
+			return new Date(iso).toLocaleDateString($locale === 'es' ? 'es-ES' : 'en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+		} catch {
+			return iso;
+		}
 	}
 
 	function printCert() {
@@ -87,7 +128,10 @@
 
 	async function shareCert() {
 		try {
-			await navigator.share({ title: `Certificado JLPT ${level}`, text: `Completé la práctica JLPT ${level} en Hinomaru con ${totalScore()}% de acierto.` });
+			await navigator.share({
+				title: `Certificado JLPT ${level}`,
+				text: `Completé la práctica JLPT ${level} en Hinomaru con ${totalScore()}% de acierto.`
+			});
 		} catch {
 			// Ignore share errors
 		}
@@ -104,7 +148,11 @@
 		for (const lv of ['N5', 'N4', 'N3', 'N2', 'N1'] as JLPTLevel[]) {
 			const raw = localStorage.getItem(`jlpt_result_${lv}_mock`);
 			if (raw) {
-				try { r[`${lv}_mock`] = JSON.parse(raw); } catch { /* ignore */ }
+				try {
+					r[`${lv}_mock`] = JSON.parse(raw);
+				} catch {
+					/* ignore */
+				}
 			}
 		}
 		results = r;
@@ -112,11 +160,14 @@
 
 		// Sync from Supabase + load user name
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (user) {
 				// Get name from user metadata (Google, GitHub, email signup)
 				const meta = user.user_metadata;
-				studentName = meta?.full_name ?? meta?.name ?? meta?.display_name ?? user.email?.split('@')[0] ?? '';
+				studentName =
+					meta?.full_name ?? meta?.name ?? meta?.display_name ?? user.email?.split('@')[0] ?? '';
 
 				const { data: rows } = await supabase
 					.from('jlpt_results')
@@ -126,14 +177,19 @@
 					const synced = { ...r };
 					for (const row of rows) {
 						synced[`${row.level}_${row.section}`] = {
-							score: row.score, total: row.total, pct: row.pct, date: row.completed_at
+							score: row.score,
+							total: row.total,
+							pct: row.pct,
+							date: row.completed_at
 						};
 					}
 					results = synced;
 					updateIssueDate(synced);
 				}
 			}
-		} catch { /* offline */ }
+		} catch {
+			/* offline */
+		}
 	});
 </script>
 
@@ -141,12 +197,14 @@
 	<title>Certificado {level} — JLPT — Hinomaru</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-	<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap"
+		rel="stylesheet"
+	/>
 	<link href="https://fonts.cdnfonts.com/css/ocean-trace-personal-use" rel="stylesheet" />
 </svelte:head>
 
 <div class="cert-page" use:fadeUp={{ delay: 0, y: 12 }}>
-
 	<!-- ── Back Link ── -->
 	<div use:fadeUp={{ delay: 0, y: 10 }} class="no-print">
 		<a href="/jlpt" class="back-link">{t('jlpt.certificate.back', $locale)}</a>
@@ -195,14 +253,18 @@
 					{/each}
 					<div class="minimal-score total">
 						<span class="m-score-label">Total</span>
-						<span class="m-score-pct" class:pass={totalScore() >= 70} class:fail={totalScore() < 70}>{totalScore()}%</span>
+						<span class="m-score-pct" class:pass={totalScore() >= 70} class:fail={totalScore() < 70}
+							>{totalScore()}%</span
+						>
 					</div>
 				</div>
 
 				<!-- Footer seal + date -->
 				<div class="cert-footer">
 					<div class="cert-date-wrap">
-						<div class="cert-date">{t('jlpt.certificate.issued', $locale, { date: issueDate })}</div>
+						<div class="cert-date">
+							{t('jlpt.certificate.issued', $locale, { date: issueDate })}
+						</div>
 					</div>
 					<div class="seal-wrap">
 						<div class="seal-ring">
@@ -268,7 +330,6 @@
 			{t('jlpt.certificate.disclaimer', $locale)}
 		</div>
 	</div>
-
 </div>
 
 <style>
@@ -295,7 +356,13 @@
 	}
 
 	/* ── Certificate shell ── */
-	.cert-wrap { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; padding: 0 16px; }
+	.cert-wrap {
+		margin-bottom: 40px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 0 16px;
+	}
 
 	.cert-download-wrap {
 		display: flex;
@@ -303,8 +370,11 @@
 		margin-top: 24px;
 	}
 	.download-cert-link {
-		background: none; border: none;
-		font-family: inherit; font-size: 14px; font-weight: 600;
+		background: none;
+		border: none;
+		font-family: inherit;
+		font-size: 14px;
+		font-weight: 600;
 		color: var(--fg-secondary);
 		text-decoration: underline;
 		text-underline-offset: 4px;
@@ -312,19 +382,23 @@
 		transition: color 0.15s;
 		padding: 8px 16px;
 	}
-	@media (hover: hover) { .download-cert-link:hover { color: var(--sumi); } }
+	@media (hover: hover) {
+		.download-cert-link:hover {
+			color: var(--sumi);
+		}
+	}
 
 	.certificate {
 		position: relative;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
 		border-radius: 24px;
-		box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 		overflow: hidden;
 		width: 100%;
 	}
 	:global([data-theme='dark']) .certificate {
-		box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 	}
 
 	/* ── Inner padding ── */
@@ -348,7 +422,9 @@
 	}
 
 	/* ── Header ── */
-	.cert-header { margin-bottom: 32px; }
+	.cert-header {
+		margin-bottom: 32px;
+	}
 	.cert-brand-jp {
 		font-family: var(--font-jp);
 		font-size: 12px;
@@ -365,7 +441,7 @@
 	}
 	.cert-subtitle {
 		font-size: 9px;
-		letter-spacing: 0.1em;
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
 		margin-top: 2px;
@@ -376,11 +452,13 @@
 		font-size: 13px;
 		color: var(--fg-secondary);
 		margin: 0 0 12px;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	/* ── Name / Signature ── */
-	.name-wrap { margin-bottom: 16px; }
+	.name-wrap {
+		margin-bottom: 16px;
+	}
 
 	.cert-name-signed {
 		font-family: 'Ocean Trace-Personal use', sans-serif;
@@ -397,7 +475,7 @@
 		font-size: 13px;
 		color: var(--fg-secondary);
 		margin: 16px 0 20px;
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	/* ── Level badge ── */
@@ -413,7 +491,10 @@
 		color: var(--sumi);
 		line-height: 1;
 	}
-	.level-badge-sep { color: var(--ink-200); font-size: 16px; }
+	.level-badge-sep {
+		color: var(--ink-200);
+		font-size: 16px;
+	}
 	.level-badge-title {
 		font-size: 15px;
 		font-weight: 600;
@@ -439,7 +520,7 @@
 	.m-score-label {
 		font-size: 10px;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		font-weight: 700;
 	}
@@ -448,8 +529,12 @@
 		font-weight: 700;
 		color: var(--sumi);
 	}
-	.m-score-pct.pass { color: var(--success); }
-	.m-score-pct.fail { color: var(--hinomaru-red); }
+	.m-score-pct.pass {
+		color: var(--success);
+	}
+	.m-score-pct.fail {
+		color: var(--hinomaru-red);
+	}
 	.minimal-score.total .m-score-pct {
 		font-size: 22px;
 	}
@@ -471,68 +556,159 @@
 		color: var(--fg-tertiary);
 		font-weight: 500;
 	}
-	.seal-wrap { flex-shrink: 0; }
+	.seal-wrap {
+		flex-shrink: 0;
+	}
 	.seal-ring {
-		width: 44px; height: 44px;
+		width: 44px;
+		height: 44px;
 		border-radius: 50%;
 		border: 1.5px solid var(--hinomaru-red);
-		display: flex; align-items: center; justify-content: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		background: rgba(188, 0, 45, 0.05);
 	}
 	.seal-inner {
 		font-family: var(--font-jp);
-		font-size: 16px; font-weight: 700;
+		font-size: 16px;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
 
 	/* ── Instructions ── */
-	.instructions { max-width: 680px; margin: 0 auto; }
-	.instr-title { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
-	.instr-intro { font-size: 14px; color: var(--fg-secondary); margin: 0 0 20px; line-height: 1.6; }
-	.level-exam-info {
-		background: var(--bg-surface); border: 1px solid var(--ink-200);
-		border-radius: 16px; padding: 16px 20px;
-		margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px;
+	.instructions {
+		max-width: 680px;
+		margin: 0 auto;
 	}
-	.exam-info-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-	.ei-label { font-size: 13px; color: var(--fg-secondary); }
-	.ei-val { font-size: 13px; font-weight: 600; color: var(--sumi); text-align: right; }
-	.steps-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+	.instr-title {
+		font-size: 22px;
+		font-weight: 700;
+		margin: 0 0 8px;
+	}
+	.instr-intro {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		margin: 0 0 20px;
+		line-height: 1.6;
+	}
+	.level-exam-info {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 16px;
+		padding: 16px 20px;
+		margin-bottom: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.exam-info-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 12px;
+	}
+	.ei-label {
+		font-size: 13px;
+		color: var(--fg-secondary);
+	}
+	.ei-val {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--sumi);
+		text-align: right;
+	}
+	.steps-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 24px;
+	}
 	.step-card {
-		display: flex; gap: 16px;
-		background: var(--bg-surface); border: 1px solid var(--ink-200);
-		border-radius: 16px; padding: 16px 18px;
+		display: flex;
+		gap: 16px;
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 16px;
+		padding: 16px 18px;
 	}
 	.step-num {
-		width: 28px; height: 28px; border-radius: 50%;
-		background: var(--sumi); color: var(--washi);
-		font-size: 13px; font-weight: 700;
-		display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		background: var(--sumi);
+		color: var(--washi);
+		font-size: 13px;
+		font-weight: 700;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
 	}
-	.step-body { flex: 1; }
-	.step-title { font-size: 15px; font-weight: 700; color: var(--sumi); margin-bottom: 4px; }
-	.step-desc { font-size: 13px; color: var(--fg-secondary); margin: 0 0 6px; line-height: 1.6; }
-	.step-link { font-size: 13px; font-weight: 600; color: var(--hinomaru-red); text-decoration: none; }
-	@media (hover: hover) { .step-link:hover { text-decoration: underline; } }
+	.step-body {
+		flex: 1;
+	}
+	.step-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--sumi);
+		margin-bottom: 4px;
+	}
+	.step-desc {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		margin: 0 0 6px;
+		line-height: 1.6;
+	}
+	.step-link {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--hinomaru-red);
+		text-decoration: none;
+	}
+	@media (hover: hover) {
+		.step-link:hover {
+			text-decoration: underline;
+		}
+	}
 	.disclaimer {
-		font-size: 12px; color: var(--fg-tertiary);
-		background: var(--ink-50); border: 1px solid var(--ink-200);
-		border-radius: 12px; padding: 12px 16px; line-height: 1.6;
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		background: var(--ink-50);
+		border: 1px solid var(--ink-200);
+		border-radius: 12px;
+		padding: 12px 16px;
+		line-height: 1.6;
 	}
 
 	/* ── Print (PDF Export) ── */
-	.print-only { display: none; }
+	.print-only {
+		display: none;
+	}
 	@media print {
-		@page { size: portrait; margin: 15mm; }
-		.no-print, .dock-bar, .app-bar { display: none !important; }
-		.print-only { display: block; }
-		
-		body, html, .session-layout, .cert-page, .app-container { 
-			background: white !important; 
-			padding: 0 !important; 
-			margin: 0 !important; 
+		@page {
+			size: portrait;
+			margin: 15mm;
 		}
-		
+		.no-print,
+		.dock-bar,
+		.app-bar {
+			display: none !important;
+		}
+		.print-only {
+			display: block;
+		}
+
+		body,
+		html,
+		.session-layout,
+		.cert-page,
+		.app-container {
+			background: white !important;
+			padding: 0 !important;
+			margin: 0 !important;
+		}
+
 		/* Force light mode variables for the certificate to ensure crisp PDF */
 		.certificate {
 			--bg-surface: #ffffff;
@@ -543,7 +719,7 @@
 			--ink-50: #fafafa;
 			--hinomaru-red: #bc002d;
 			--success: #34c759;
-			
+
 			box-shadow: none !important;
 			border: 2px solid var(--ink-200) !important;
 			border-radius: 0 !important;
@@ -559,9 +735,19 @@
 		}
 
 		/* Scale up typography for print */
-		.cert-brand { font-size: 28px !important; }
-		.cert-name-signed { font-size: 72px !important; }
-		.level-badge-n { font-size: 24px !important; }
-		.cert-scores-grid { transform: scale(1.1); transform-origin: top center; margin-bottom: 60px !important; }
+		.cert-brand {
+			font-size: 28px !important;
+		}
+		.cert-name-signed {
+			font-size: 72px !important;
+		}
+		.level-badge-n {
+			font-size: 24px !important;
+		}
+		.cert-scores-grid {
+			transform: scale(1.1);
+			transform-origin: top center;
+			margin-bottom: 60px !important;
+		}
 	}
 </style>

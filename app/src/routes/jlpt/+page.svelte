@@ -33,7 +33,11 @@
 			for (const sec of ['vocabulary', 'grammar', 'listening'] as JLPTSectionType[]) {
 				const raw = localStorage.getItem(`jlpt_result_${lv}_${sec}`);
 				if (raw) {
-					try { r[`${lv}_${sec}`] = JSON.parse(raw); } catch { /* ignore */ }
+					try {
+						r[`${lv}_${sec}`] = JSON.parse(raw);
+					} catch {
+						/* ignore */
+					}
 				}
 			}
 		}
@@ -41,7 +45,9 @@
 
 		// Sync from Supabase (source of truth)
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (user) {
 				const { data: rows } = await supabase
 					.from('jlpt_results')
@@ -51,16 +57,28 @@
 					const synced = { ...r };
 					for (const row of rows) {
 						const key = `${row.level}_${row.section}`;
-						synced[key] = { score: row.score, total: row.total, pct: row.pct, date: row.completed_at };
+						synced[key] = {
+							score: row.score,
+							total: row.total,
+							pct: row.pct,
+							date: row.completed_at
+						};
 						// Keep localStorage in sync
 						try {
-							localStorage.setItem(`jlpt_result_${row.level}_${row.section}`, JSON.stringify(synced[key]));
-						} catch { /* ignore */ }
+							localStorage.setItem(
+								`jlpt_result_${row.level}_${row.section}`,
+								JSON.stringify(synced[key])
+							);
+						} catch {
+							/* ignore */
+						}
 					}
 					results = synced;
 				}
 			}
-		} catch { /* offline — localStorage data is fine */ }
+		} catch {
+			/* offline — localStorage data is fine */
+		}
 	});
 
 	function getResult(level: JLPTLevel, section: JLPTSectionType): SectionResult | null {
@@ -123,18 +141,23 @@
 		const secs: JLPTSectionType[] = [...(LEVEL_META[level]?.sections ?? []), 'mock'];
 		// Clear localStorage
 		for (const s of secs) {
-			try { localStorage.removeItem(`jlpt_result_${level}_${s}`); } catch { /* ignore */ }
+			try {
+				localStorage.removeItem(`jlpt_result_${level}_${s}`);
+			} catch {
+				/* ignore */
+			}
 		}
 		// Clear Supabase if logged in
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
 			if (user) {
-				await supabase.from('jlpt_results')
-					.delete()
-					.eq('user_id', user.id)
-					.eq('level', level);
+				await supabase.from('jlpt_results').delete().eq('user_id', user.id).eq('level', level);
 			}
-		} catch { /* offline */ }
+		} catch {
+			/* offline */
+		}
 		// Update reactive state
 		const updated = { ...results };
 		for (const s of secs) delete updated[`${level}_${s}`];
@@ -179,11 +202,14 @@
 
 	<!-- Progress indicator -->
 	{#if completedCount(activeLevel) > 0}
-		<p use:fadeIn={{ delay: 0.2 }} style="font-size:12px;color:var(--fg-tertiary);margin:0 0 14px;font-weight:600;">
-			{completedCount(activeLevel)}/{totalAvailable(activeLevel)} {t('jlpt.sections_completed', $locale)}
+		<p
+			use:fadeIn={{ delay: 0.2 }}
+			style="font-size:12px;color:var(--fg-tertiary);margin:0 0 14px;font-weight:600;"
+		>
+			{completedCount(activeLevel)}/{totalAvailable(activeLevel)}
+			{t('jlpt.sections_completed', $locale)}
 		</p>
 	{/if}
-
 
 	<!-- Section rows -->
 	<div class="list" use:staggerChildren={{ delay: 0.25, stagger: 0.07, y: 10 }}>
@@ -246,8 +272,10 @@
 	<!-- Completion row — same visual language as section rows -->
 	{#if levelComplete(activeLevel)}
 		{@const secs2 = LEVEL_META[activeLevel]?.sections ?? []}
-		{@const scores2 = secs2.map(s => getResult(activeLevel, s)).filter(Boolean)}
-		{@const avg2 = scores2.length ? Math.round(scores2.reduce((a, r) => a + (r?.pct ?? 0), 0) / scores2.length) : 0}
+		{@const scores2 = secs2.map((s) => getResult(activeLevel, s)).filter(Boolean)}
+		{@const avg2 = scores2.length
+			? Math.round(scores2.reduce((a, r) => a + (r?.pct ?? 0), 0) / scores2.length)
+			: 0}
 		{@const passed = mockPassed(activeLevel)}
 
 		<div class="completion-row" use:fadeIn={{ delay: 0 }}>
@@ -255,8 +283,8 @@
 			<div class="completion-row-body">
 				<div class="completion-row-top">
 					<span class="completion-row-title">
-						{passed 
-							? t('jlpt.mock.passed', $locale) 
+						{passed
+							? t('jlpt.mock.passed', $locale)
 							: t('jlpt.completed', $locale, { level: activeLevel })}
 					</span>
 				</div>
@@ -264,13 +292,17 @@
 					{#if passed}
 						{t('jlpt.ready', $locale)}
 					{:else}
-						{#if scores2.length > 0}{avg2}% {t('jlpt.average', $locale)} &middot; {/if}{t('jlpt.mock.desc', $locale)}
+						{#if scores2.length > 0}{avg2}% {t('jlpt.average', $locale)} &middot;
+						{/if}{t('jlpt.mock.desc', $locale)}
 					{/if}
 				</div>
 			</div>
 			<div class="completion-row-right">
 				{#if passed}
-					<button class="completion-cert-btn" onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}>
+					<button
+						class="completion-cert-btn"
+						onclick={() => goto(`/jlpt/certificate/${activeLevel}`)}
+					>
 						{t('jlpt.certificate', $locale)}
 					</button>
 				{:else}
@@ -298,8 +330,11 @@
 	icon={confirmIcon}
 >
 	{#snippet actions()}
-		<button class="modal-btn-cancel" onclick={() => (showConfirmModal = false)}>{t('common.cancel', $locale)}</button>
-		<button class="modal-btn-confirm" onclick={handleConfirm}>{t('exam.start_now', $locale)}</button>
+		<button class="modal-btn-cancel" onclick={() => (showConfirmModal = false)}
+			>{t('common.cancel', $locale)}</button
+		>
+		<button class="modal-btn-confirm" onclick={handleConfirm}>{t('exam.start_now', $locale)}</button
+		>
 	{/snippet}
 </ResponsiveModal>
 
@@ -359,7 +394,7 @@
 		font-size: 15px;
 		font-weight: 700;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 	.completion-row-sub {
 		font-size: 12px;
@@ -385,16 +420,18 @@
 		cursor: pointer;
 		transition: all 0.15s;
 		white-space: nowrap;
-		box-shadow: 0 3px 10px rgba(188,0,45,0.35);
+		box-shadow: 0 3px 10px rgba(188, 0, 45, 0.35);
 	}
 	@media (hover: hover) {
 		.completion-cert-btn:hover {
 			background: #a0002a;
 			transform: translateY(-1px);
-			box-shadow: 0 5px 14px rgba(188,0,45,0.45);
+			box-shadow: 0 5px 14px rgba(188, 0, 45, 0.45);
 		}
 	}
-	.completion-cert-btn:active { transform: scale(0.95); }
+	.completion-cert-btn:active {
+		transform: scale(0.95);
+	}
 	.completion-retry-btn {
 		width: 34px;
 		height: 34px;
@@ -417,8 +454,9 @@
 			border-color: var(--ink-300);
 		}
 	}
-	.completion-retry-btn:active { transform: scale(0.92); }
-
+	.completion-retry-btn:active {
+		transform: scale(0.92);
+	}
 
 	/* List */
 	.list {
@@ -512,7 +550,7 @@
 		font-size: 10px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		background: var(--ink-100);
 		padding: 2px 7px;

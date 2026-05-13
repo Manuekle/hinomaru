@@ -4,11 +4,7 @@
 	import { locale } from '$lib/stores/locale';
 	import Icon from '$lib/Icon.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import {
-		Clock01Icon,
-		Calendar02Icon,
-		BrainIcon
-	} from '@hugeicons/core-free-icons';
+	import { Clock01Icon, Calendar02Icon, BrainIcon } from '@hugeicons/core-free-icons';
 
 	import { page } from '$app/stores';
 	let { onNext } = $props();
@@ -60,7 +56,11 @@
 	</div>
 
 	<StickyFooter>
-		<button class="hm-btn hm-btn-secondary hm-btn-lg" style="flex: 1" onclick={() => handleNext(false)}>
+		<button
+			class="hm-btn hm-btn-secondary hm-btn-lg"
+			style="flex: 1"
+			onclick={() => handleNext(false)}
+		>
 			{t('onboarding.srs.later', $locale)}
 		</button>
 		<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex: 1" onclick={() => handleNext(true)}>
@@ -172,14 +172,14 @@
 		font-size: 14px;
 		font-weight: 900;
 		color: var(--hinomaru-red);
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 
 	.node-title {
 		font-size: 18px;
 		font-weight: 800;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	.node-v:not(.active) .node-time {

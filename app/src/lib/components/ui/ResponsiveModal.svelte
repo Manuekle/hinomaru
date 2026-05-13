@@ -1,9 +1,9 @@
 <script lang="ts">
-	import * as Drawer from "$lib/components/ui/drawer";
-	import { fade } from "svelte/transition";
-	import { onMount, type Snippet } from "svelte";
-	import { cn } from "$lib/utils";
-	import { fadeUp } from "$lib/motion";
+	import * as Drawer from '$lib/components/ui/drawer';
+	import { fade } from 'svelte/transition';
+	import { onMount, type Snippet } from 'svelte';
+	import { cn } from '$lib/utils';
+	import { fadeUp } from '$lib/motion';
 
 	interface Props {
 		open: boolean;
@@ -16,15 +16,15 @@
 		actionsClass?: string;
 	}
 
-	let { 
-		open = $bindable(false), 
-		title, 
-		description, 
+	let {
+		open = $bindable(false),
+		title,
+		description,
 		icon,
-		children, 
-		actions, 
-		contentClass = "",
-		actionsClass = ""
+		children,
+		actions,
+		contentClass = '',
+		actionsClass = ''
 	}: Props = $props();
 
 	let isMobile = $state(false);
@@ -32,11 +32,11 @@
 
 	onMount(() => {
 		mounted = true;
-		const mql = window.matchMedia("(max-width: 640px)");
+		const mql = window.matchMedia('(max-width: 640px)');
 		isMobile = mql.matches;
 		const handler = (e: MediaQueryListEvent) => (isMobile = e.matches);
-		mql.addEventListener("change", handler);
-		return () => mql.removeEventListener("change", handler);
+		mql.addEventListener('change', handler);
+		return () => mql.removeEventListener('change', handler);
 	});
 
 	function handleOverlayClick(e: MouseEvent) {
@@ -48,7 +48,12 @@
 
 {#if isMobile}
 	<Drawer.Root bind:open>
-		<Drawer.Content class={cn("drawer-premium px-6 pb-12 rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)]", contentClass)}>
+		<Drawer.Content
+			class={cn(
+				'drawer-premium rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)] px-6 pb-12',
+				contentClass
+			)}
+		>
 			<Drawer.Header class="px-0 pt-8 text-left">
 				<Drawer.Title class="drawer-title-premium">
 					{title}
@@ -59,27 +64,27 @@
 					</Drawer.Description>
 				{/if}
 			</Drawer.Header>
-			
-			<div class="py-6 font-ui relative z-10">
+
+			<div class="font-ui relative z-10 py-6">
 				{@render children?.()}
 			</div>
 
-			<Drawer.Footer class="px-0 pt-4 relative z-10">
-				<div class={cn("flex flex-row gap-4 w-full font-ui [&>*]:flex-1", actionsClass)}>
+			<Drawer.Footer class="relative z-10 px-0 pt-4">
+				<div class={cn('font-ui flex w-full flex-row gap-4 [&>*]:flex-1', actionsClass)}>
 					{@render actions?.()}
 				</div>
 			</Drawer.Footer>
 		</Drawer.Content>
 	</Drawer.Root>
 {:else if open}
-	<div 
-		class="modal-overlay" 
-		transition:fade={{ duration: 200 }} 
+	<div
+		class="modal-overlay"
+		transition:fade={{ duration: 200 }}
 		onclick={handleOverlayClick}
 		role="presentation"
 	>
-		<div 
-			class={cn("modal-content", contentClass)} 
+		<div
+			class={cn('modal-content', contentClass)}
 			use:fadeUp={{ delay: 0.05, y: 20 }}
 			onclick={(e) => e.stopPropagation()}
 			role="dialog"
@@ -94,12 +99,12 @@
 			{#if description}
 				<p class="modal-text">{description}</p>
 			{/if}
-			
+
 			<div class="modal-body">
 				{@render children?.()}
 			</div>
 
-			<div class={cn("flex flex-row gap-3 w-full font-ui [&>*]:flex-1", actionsClass)}>
+			<div class={cn('font-ui flex w-full flex-row gap-3 [&>*]:flex-1', actionsClass)}>
 				{@render actions?.()}
 			</div>
 		</div>
@@ -192,7 +197,10 @@
 		z-index: 0;
 	}
 
-	.modal-body, .modal-title, .modal-text, .modal-icon-box {
+	.modal-body,
+	.modal-title,
+	.modal-text,
+	.modal-icon-box {
 		position: relative;
 		z-index: 10;
 	}
@@ -234,7 +242,8 @@
 	}
 
 	/* ── PREMIUM BUTTON STYLES ── */
-	:global(.modal-btn-confirm), :global(.modal-btn-cancel) {
+	:global(.modal-btn-confirm),
+	:global(.modal-btn-cancel) {
 		padding: 18px !important;
 		border-radius: 22px !important;
 		font-size: 16px !important;
@@ -246,7 +255,7 @@
 		justify-content: center;
 		border: none !important;
 		font-family: var(--font-ui) !important;
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	:global(.modal-btn-confirm) {

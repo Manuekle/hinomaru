@@ -16,10 +16,30 @@
 	let { onSelect, onBack } = $props();
 
 	const options = $derived([
-		{ id: 'education', label: t('onboarding.motivation.education', $locale), icon: BookOpen01Icon, color: '#ff2d55' },
-		{ id: 'career', label: t('onboarding.motivation.career', $locale), icon: Briefcase01Icon, color: '#007aff' },
-		{ id: 'travel', label: t('onboarding.motivation.travel', $locale), icon: Airplane01Icon, color: '#34c759' },
-		{ id: 'fun', label: t('onboarding.motivation.fun', $locale), icon: Message01Icon, color: '#af52de' }
+		{
+			id: 'education',
+			label: t('onboarding.motivation.education', $locale),
+			icon: BookOpen01Icon,
+			color: '#ff2d55'
+		},
+		{
+			id: 'career',
+			label: t('onboarding.motivation.career', $locale),
+			icon: Briefcase01Icon,
+			color: '#007aff'
+		},
+		{
+			id: 'travel',
+			label: t('onboarding.motivation.travel', $locale),
+			icon: Airplane01Icon,
+			color: '#34c759'
+		},
+		{
+			id: 'fun',
+			label: t('onboarding.motivation.fun', $locale),
+			icon: Message01Icon,
+			color: '#af52de'
+		}
 	]);
 
 	let selected = $state('');
@@ -138,7 +158,7 @@
 		font-size: 16px;
 		font-weight: 600;
 		color: var(--fg-primary);
-		letter-spacing: -0.01em;
+		letter-spacing: -0.04em;
 	}
 
 	@media (max-width: 400px) {

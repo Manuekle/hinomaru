@@ -238,10 +238,7 @@
 <div class="login-layout">
 	<div class="login-container">
 		<!-- Brand / Logo -->
-		<div
-			bind:this={brandEl}
-			class="brand-header"
-		>
+		<div bind:this={brandEl} class="brand-header">
 			<div class="brand-logo"></div>
 			<h1 class="brand-name">Hinomaru</h1>
 			<p class="brand-subtitle">
@@ -313,10 +310,7 @@
 				</button>
 			</div>
 		{:else}
-			<div
-				bind:this={formEl}
-				class="auth-card"
-			>
+			<div bind:this={formEl} class="auth-card">
 				<!-- Tabs -->
 				{#if mode === 'signin' || mode === 'signup'}
 					<div class="tab-row">
@@ -342,7 +336,8 @@
 				<form onsubmit={handleSubmit} class="auth-form">
 					{#if globalError}
 						<div class="global-error">
-							<span class="error-icon">⚠</span> {globalError}
+							<span class="error-icon">⚠</span>
+							{globalError}
 						</div>
 					{/if}
 
@@ -517,17 +512,17 @@
 					<!-- Forgot password link -->
 					{#if mode === 'signin'}
 						<div class="forgot-password-row">
-							<button
-								type="button"
-								onclick={() => toggleMode('forgot')}
-								class="forgot-link"
-							>
+							<button type="button" onclick={() => toggleMode('forgot')} class="forgot-link">
 								{t('auth.forgotPassword', $locale)}
 							</button>
 						</div>
 					{/if}
 
-					<button type="submit" class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" disabled={loading}>
+					<button
+						type="submit"
+						class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
+						disabled={loading}
+					>
 						{#if loading}
 							<ButtonLoader size={24} />
 						{:else if mode === 'signin'}
@@ -573,11 +568,7 @@
 					<!-- Bottom options -->
 					{#if mode !== 'signin'}
 						<div class="back-to-signin">
-							<button
-								type="button"
-								onclick={() => toggleMode('signin')}
-								class="forgot-link"
-							>
+							<button type="button" onclick={() => toggleMode('signin')} class="forgot-link">
 								{t('auth.backToSigninBtn', $locale)}
 							</button>
 						</div>
@@ -813,7 +804,7 @@
 		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 	}
 
 	.social-row {
@@ -874,7 +865,7 @@
 			background: transparent;
 			padding: 0;
 		}
-		
+
 		.login-layout {
 			align-items: flex-start;
 			padding-top: 64px;

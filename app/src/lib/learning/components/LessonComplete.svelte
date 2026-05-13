@@ -34,7 +34,9 @@
 			{$locale === 'es' ? '¡Excelente trabajo!' : 'Amazing work!'}
 		</h1>
 		<p class="subtitle">
-			{$locale === 'es' ? 'Lección completada con éxito.' : 'You’ve successfully completed the lesson.'}
+			{$locale === 'es'
+				? 'Lección completada con éxito.'
+				: 'You’ve successfully completed the lesson.'}
 		</p>
 	</div>
 
@@ -143,7 +145,7 @@
 		display: flex;
 		align-items: center;
 		gap: 16px;
-		box-shadow: 0 2px 8px rgba(26,26,26,0.04);
+		box-shadow: 0 2px 8px rgba(26, 26, 26, 0.04);
 	}
 
 	.stat-icon-bg {
@@ -155,9 +157,15 @@
 		justify-content: center;
 		flex-shrink: 0;
 	}
-	.stat-icon-bg.accuracy { background: var(--success-wash); }
-	.stat-icon-bg.xp { background: rgba(255, 165, 0, 0.08); }
-	.stat-icon-bg.time { background: rgba(74, 144, 226, 0.08); }
+	.stat-icon-bg.accuracy {
+		background: var(--success-wash);
+	}
+	.stat-icon-bg.xp {
+		background: rgba(255, 165, 0, 0.08);
+	}
+	.stat-icon-bg.time {
+		background: rgba(74, 144, 226, 0.08);
+	}
 
 	.stat-content {
 		display: flex;
@@ -176,7 +184,7 @@
 		font-size: 11px;
 		font-weight: 800;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 	}
 

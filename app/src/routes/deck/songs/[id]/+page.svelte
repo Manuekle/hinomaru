@@ -64,10 +64,10 @@
 	$effect(() => {
 		if (!song?.id || !supabase) return;
 		const jpList = song.vocab?.map((w: any) => w.jp) || [];
-		
+
 		supabase.auth.getUser().then(({ data: { user } }: any) => {
 			if (!user) return;
-			
+
 			// Check completion
 			supabase
 				.from('user_song_completions')
@@ -143,9 +143,16 @@
 			if (error) {
 				if (error.code === '23505') {
 					savedVocab = new Set([...savedVocab, word.jp]);
-					svileo.info({ title: $locale === 'es' ? 'Ya está en tu vocabulario' : 'Already in your vocabulary' });
+					svileo.info({
+						title: $locale === 'es' ? 'Ya está en tu vocabulario' : 'Already in your vocabulary'
+					});
 				} else {
-					console.error('save vocab failed:', { code: error.code, message: error.message, details: error.details, hint: error.hint });
+					console.error('save vocab failed:', {
+						code: error.code,
+						message: error.message,
+						details: error.details,
+						hint: error.hint
+					});
 					svileo.error({ title: $locale === 'es' ? 'Error al guardar' : 'Save failed' });
 				}
 			} else {
@@ -580,7 +587,7 @@
 			<div class="section" use:fadeUp={{ delay: 0.25, y: 10 }}>
 				<div class="section-title">{t('songs.vocab', $locale)}</div>
 				<div class="vocab-list">
-					{#each song.vocab.map(w => ({ ...w, ...getWordMetadata(w.jp) })) as word (word.jp)}
+					{#each song.vocab.map((w) => ({ ...w, ...getWordMetadata(w.jp) })) as word (word.jp)}
 						<div class="vocab-card">
 							<div class="vocab-top">
 								<div class="vocab-jp-group">
@@ -616,7 +623,7 @@
 								<div class="vocab-romaji">{word.romaji}</div>
 							{/if}
 							<div class="vocab-meaning">{$locale === 'es' ? word.es : word.en}</div>
-							
+
 							<div class="vocab-tags">
 								{#if word.category}
 									<span class="vocab-cat-tag">
@@ -667,7 +674,7 @@
 	.level-tag {
 		font-size: 10px;
 		font-weight: 700;
-		letter-spacing: 0.04em;
+		letter-spacing: -0.04em;
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 		padding: 2px 8px;
@@ -853,7 +860,7 @@
 		cursor: pointer;
 		transition: all 150ms;
 		font-family: var(--font-ui);
-		letter-spacing: 0.02em;
+		letter-spacing: -0.04em;
 	}
 	.speed-btn.active {
 		background: var(--fg-primary);
@@ -911,7 +918,7 @@
 		font-size: 11px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin-bottom: 16px;
 		padding-bottom: 10px;
@@ -1121,7 +1128,7 @@
 		font-size: 10px;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: -0.04em;
 		background: var(--ink-100);
 		color: var(--fg-tertiary);
 		padding: 2px 8px;
