@@ -382,7 +382,10 @@
 		align-items: center;
 		justify-content: center;
 		gap: clamp(20px, 5vh, 32px);
-		padding: 24px 0 8px;
+		padding: clamp(24px, 4vh, 36px) 16px clamp(20px, 3vh, 28px);
+		width: 100%;
+		max-width: 520px;
+		margin: 0 auto;
 	}
 
 	.prompt-card {

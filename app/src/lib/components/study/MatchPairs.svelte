@@ -275,13 +275,14 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 24px 0;
+		gap: clamp(16px, 3vh, 24px);
+		padding: clamp(20px, 4vh, 32px) 16px clamp(20px, 3vh, 28px);
 	}
 
 	.match-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 10px;
+		gap: 12px;
 		width: 100%;
 		max-width: 520px;
 	}
@@ -294,7 +295,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 12px;
+		padding: 14px 12px;
 		cursor: pointer;
 		transition: all 0.2s;
 		position: relative;

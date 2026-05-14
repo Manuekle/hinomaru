@@ -340,10 +340,6 @@
 		};
 
 		tick().then(() => {
-			if (window.scrollY === 0) {
-				const currentEl = document.querySelector('.node-tile.is-current');
-				if (currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			}
 			handleScroll();
 		});
 

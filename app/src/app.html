@@ -20,21 +20,9 @@
 						theme === 'dark' ||
 						(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 					if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
-					// In PWA standalone mode, cover the body so SSR content doesn't flash before splash
-					if (
-						window.matchMedia('(display-mode: standalone)').matches ||
-						!!window.navigator.standalone
-					) {
-						document.documentElement.classList.add('pwa-booting');
-					}
 				} catch (e) {}
 			})();
 		</script>
-		<style>
-			html.pwa-booting > body {
-				opacity: 0;
-			}
-		</style>
 		<script>
 			document.addEventListener(
 				'touchstart',

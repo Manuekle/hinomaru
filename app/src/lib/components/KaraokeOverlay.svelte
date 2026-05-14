@@ -6,8 +6,8 @@
 	import { t } from '$lib/i18n';
 	import { KaraokeRecognizer } from '$lib/speaking/karaokeRecognizer';
 	import { startLevelMeter } from '$lib/speaking/audioLevel';
-	import { comparePhrase, classify, SCORE_COLORS, SCORE_LABELS, type ScoreLevel } from '$lib/speaking/compare';
-	import { normalizeJapanese, splitJpInteractive } from '$lib/speaking/normalize';
+	import { comparePhraseBest, classify, SCORE_COLORS, SCORE_LABELS, type ScoreLevel } from '$lib/speaking/compare';
+	import { forMatch, splitForKaraoke } from '$lib/speaking/normalize';
 	import { addXP } from '$lib/utils/gamification';
 	import { svileo } from '$lib/stores/toast';
 	import MicOrb from './MicOrb.svelte';
@@ -46,6 +46,10 @@
 	const getMicLevel = () => micLevelRef.value;
 	let finalBuf = $state('');
 	let interimBuf = $state('');
+	// Multi-alternative buffers: each finalized utterance keeps all alts so the
+	// scorer can pick whichever transcription best matches the current line.
+	let finalAlts = $state<string[][]>([]);
+	let interimAlts = $state<string[]>([]);
 	let scores = $state<Record<number, LineScore>>({});
 	let micError = $state<string | null>(null);
 	let summaryShown = $state(false);
@@ -96,6 +100,8 @@
 		micLevelRef.value = 0;
 		finalBuf = '';
 		interimBuf = '';
+		finalAlts = [];
+		interimAlts = [];
 		scores = {};
 		micError = null;
 		summaryShown = false;
@@ -139,10 +145,14 @@
 		recognizer = new KaraokeRecognizer();
 		await recognizer.start(
 			(r) => {
+				const alts = r.alternatives.length ? r.alternatives : [r.transcript];
 				if (r.isFinal) {
+					finalAlts.push(alts);
 					finalBuf = (finalBuf + ' ' + r.transcript).trim();
+					interimAlts = [];
 					interimBuf = '';
 				} else {
+					interimAlts = alts;
 					interimBuf = r.transcript;
 				}
 				recognizerArmed = true;
@@ -187,30 +197,63 @@
 			if (lyrics[i].time <= time + 0.15) { found = i; break; }
 		}
 		if (found !== activeIdx) {
-			// Lyric advanced: score the line we just left.
+			// Snapshot what's been heard for the line we're leaving, then defer
+			// scoring 400 ms so the recognizer's trailing transcripts still
+			// land in the correct bucket.
 			if (activeIdx >= 0 && activeIdx < lyrics.length) {
-				scoreLine(activeIdx);
+				const prev = activeIdx;
+				const snapAlts = finalAlts.slice();
+				const snapInterim = interimAlts.slice();
+				setTimeout(() => scoreLineWithAlts(prev, snapAlts, snapInterim), 400);
 			}
 			prevIdx = activeIdx;
 			activeIdx = found;
 			finalBuf = '';
 			interimBuf = '';
+			finalAlts = [];
+			interimAlts = [];
 		}
 	}
 
-	function scoreLine(idx: number) {
+	function targetsForLine(line: typeof lyrics[number]): string[] {
+		const out = [line.text];
+		if (line.romaji) out.push(line.romaji);
+		return out.filter(Boolean);
+	}
+
+	function bestAltAgainst(alts: string[], targets: string[]): { text: string; score: number } {
+		let bestText = alts[0] ?? '';
+		let bestScore = -1;
+		for (const a of alts) {
+			if (!a) continue;
+			const r = comparePhraseBest(targets, a);
+			if (r.overallScore > bestScore) { bestScore = r.overallScore; bestText = a; }
+		}
+		return { text: bestText, score: bestScore < 0 ? 0 : bestScore };
+	}
+
+	function scoreLineWithAlts(idx: number, altsList: string[][], interim: string[]) {
 		const line = lyrics[idx];
 		if (!line) return;
-		const spoken = (finalBuf + ' ' + interimBuf).trim();
+		const targets = targetsForLine(line);
+		if (!targets.length) return;
+		const parts: string[] = [];
+		for (const alts of altsList) parts.push(bestAltAgainst(alts, targets).text);
+		if (interim.length) parts.push(bestAltAgainst(interim, targets).text);
+		const spoken = parts.join(' ').trim();
 		if (!spoken) {
 			scores = { ...scores, [idx]: { score: 0, level: 'wrong', transcript: '' } };
 			return;
 		}
-		const result = comparePhrase(line.text, spoken, []);
+		const result = comparePhraseBest(targets, spoken);
 		scores = {
 			...scores,
 			[idx]: { score: result.overallScore, level: result.overallLevel, transcript: result.spokenNorm }
 		};
+	}
+
+	function scoreLine(idx: number) {
+		scoreLineWithAlts(idx, finalAlts.slice(), interimAlts.slice());
 	}
 
 	function finalizeLastLine() {
@@ -281,32 +324,41 @@
 
 	const liveTranscript = $derived((finalBuf + ' ' + interimBuf).trim());
 
-	function matchedTokens(line: string, spoken: string): { tokens: string[]; matched: number } {
-		const tokens = splitJpInteractive(line);
-		if (!tokens.length || !spoken) return { tokens, matched: 0 };
-		const sNorm = normalizeJapanese(spoken);
-		if (!sNorm) return { tokens, matched: 0 };
+	function matchedTokens(line: string, spoken: string): { tokens: string[]; matched: boolean[] } {
+		const tokens = splitForKaraoke(line);
+		const matched = new Array(tokens.length).fill(false);
+		if (!tokens.length || !spoken) return { tokens, matched };
+		const sNorm = forMatch(spoken);
+		if (!sNorm) return { tokens, matched };
+		// Walk tokens forward; for each, try to find its key from current cursor.
+		// On miss, advance to next token instead of stopping — the user may have
+		// flubbed a single word but caught the next one, and should still see it
+		// light up.
 		let si = 0;
-		let matched = 0;
-		for (const tok of tokens) {
-			const tNorm = normalizeJapanese(tok);
-			if (!tNorm) { matched++; continue; }
-			let localSi = si;
-			let ok = true;
-			for (const c of tNorm) {
-				const idx = sNorm.indexOf(c, localSi);
-				if (idx === -1) { ok = false; break; }
-				localSi = idx + 1;
+		for (let i = 0; i < tokens.length; i++) {
+			const key = forMatch(tokens[i]);
+			if (!key) { matched[i] = true; continue; }
+			const idx = sNorm.indexOf(key, si);
+			if (idx !== -1) {
+				matched[i] = true;
+				si = idx + key.length;
 			}
-			if (ok) { matched++; si = localSi; }
-			else break;
 		}
 		return { tokens, matched };
 	}
 
 	const activeMatch = $derived.by(() => {
-		if (activeIdx < 0 || activeIdx >= lyrics.length) return { tokens: [] as string[], matched: 0 };
-		return matchedTokens(lyrics[activeIdx].text, liveTranscript);
+		if (activeIdx < 0 || activeIdx >= lyrics.length) {
+			return { tokens: [] as string[], matched: [] as boolean[] };
+		}
+		// Pick the alt closest to current line for highlighting, fallback to top
+		const line = lyrics[activeIdx];
+		const targets = targetsForLine(line);
+		const allAlts = finalAlts.flat().concat(interimAlts);
+		const candidate = allAlts.length
+			? bestAltAgainst(allAlts, targets).text
+			: liveTranscript;
+		return matchedTokens(line.text, candidate || liveTranscript);
 	});
 </script>
 
@@ -343,7 +395,7 @@
 						{#if isActive}
 							<div class="jp text">
 								{#each activeMatch.tokens as tok, ti (ti)}
-									<span class="tok" class:matched={ti < activeMatch.matched}>{tok}</span>
+									<span class="tok" class:matched={activeMatch.matched[ti]}>{tok}</span>
 								{/each}
 							</div>
 						{:else}
@@ -374,15 +426,24 @@
 		{:else}
 			<!-- Summary -->
 			<div class="summary">
-				<div class="summary-avg">
-					<div class="big-pct" style="color:{SCORE_COLORS[avgLevel]};">
-						{Math.round(avgScore * 100)}%
+				<div
+					class="gauge"
+					style="--gauge-color:{SCORE_COLORS[avgLevel]}; --gauge-pct:{Math.max(0, Math.min(1, avgScore))};"
+				>
+					<svg viewBox="0 0 120 120" aria-hidden="true">
+						<circle class="g-track" cx="60" cy="60" r="52" />
+						<circle class="g-bar" cx="60" cy="60" r="52" />
+					</svg>
+					<div class="gauge-center">
+						<div class="big-pct" style="color:{SCORE_COLORS[avgLevel]};">
+							{Math.round(avgScore * 100)}<span class="pct">%</span>
+						</div>
+						<div class="big-label" style="color:{SCORE_COLORS[avgLevel]};">
+							{SCORE_LABELS[avgLevel]}
+						</div>
 					</div>
-					<div class="big-label" style="color:{SCORE_COLORS[avgLevel]};">
-						{SCORE_LABELS[avgLevel]}
-					</div>
-					<div class="muted">{t('songs.karaokeAvg', $locale)}</div>
 				</div>
+				<div class="muted">{t('songs.karaokeAvg', $locale)}</div>
 
 				<div class="actions">
 					<button class="btn primary" onclick={retry}>
@@ -399,19 +460,56 @@
 {/if}
 
 <style>
+	/* Theme-aware tokens. Light defaults; dark overrides below. */
 	.overlay {
+		--ko-bg: radial-gradient(ellipse at center, #fdf8f1 0%, #f4ece0 70%, #ece4d6 100%);
+		--ko-fg: #1a1a1a;
+		--ko-fg-soft: rgba(26, 26, 26, 0.62);
+		--ko-fg-muted: rgba(26, 26, 26, 0.42);
+		--ko-tok-rest: rgba(26, 26, 26, 0.38);
+		--ko-tok-match: #1f9d55;
+		--ko-tok-glow: rgba(31, 157, 85, 0.35);
+		--ko-close-bg: rgba(26, 26, 26, 0.05);
+		--ko-close-bg-hover: rgba(26, 26, 26, 0.1);
+		--ko-close-border: rgba(26, 26, 26, 0.12);
+		--ko-badge-bg: rgba(188, 0, 45, 0.1);
+		--ko-badge-fg: #bc002d;
+		--ko-badge-border: rgba(188, 0, 45, 0.25);
+		--ko-gauge-track: rgba(26, 26, 26, 0.08);
+		--ko-ghost-border: rgba(26, 26, 26, 0.18);
+		--ko-mask-color: #f4ece0;
+		--ko-text-shadow-active: 0 0 28px rgba(188, 0, 45, 0.12);
+
 		position: fixed;
 		inset: 0;
 		z-index: 9000;
-		background:
-			radial-gradient(ellipse at center, #1f1f1f 0%, #050505 70%, #000 100%);
-		color: #f2f2f1;
+		background: var(--ko-bg);
+		color: var(--ko-fg);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
 		animation: overlayIn 220ms ease both;
 		contain: layout paint;
+	}
+	:global([data-theme='dark']) .overlay {
+		--ko-bg: radial-gradient(ellipse at center, #1f1f1f 0%, #050505 70%, #000 100%);
+		--ko-fg: #f2f2f1;
+		--ko-fg-soft: rgba(242, 242, 241, 0.72);
+		--ko-fg-muted: rgba(242, 242, 241, 0.48);
+		--ko-tok-rest: rgba(242, 242, 241, 0.45);
+		--ko-tok-match: #4ade80;
+		--ko-tok-glow: rgba(74, 222, 128, 0.45);
+		--ko-close-bg: rgba(255, 255, 255, 0.06);
+		--ko-close-bg-hover: rgba(255, 255, 255, 0.14);
+		--ko-close-border: rgba(255, 255, 255, 0.12);
+		--ko-badge-bg: rgba(188, 0, 45, 0.18);
+		--ko-badge-fg: #ff8da0;
+		--ko-badge-border: rgba(188, 0, 45, 0.35);
+		--ko-gauge-track: rgba(255, 255, 255, 0.08);
+		--ko-ghost-border: rgba(255, 255, 255, 0.2);
+		--ko-mask-color: #000;
+		--ko-text-shadow-active: 0 0 36px rgba(255, 255, 255, 0.12);
 	}
 	@keyframes overlayIn {
 		from { opacity: 0; transform: scale(1.04); }
@@ -425,15 +523,15 @@
 		width: 40px;
 		height: 40px;
 		border-radius: 50%;
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		background: rgba(255, 255, 255, 0.06);
-		color: #f2f2f1;
+		border: 1px solid var(--ko-close-border);
+		background: var(--ko-close-bg);
+		color: inherit;
 		display: grid;
 		place-items: center;
 		cursor: pointer;
 		transition: background 150ms;
 	}
-	.close:hover { background: rgba(255, 255, 255, 0.14); }
+	.close:hover { background: var(--ko-close-bg-hover); }
 
 	.top {
 		text-align: center;
@@ -446,9 +544,9 @@
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		border-radius: 999px;
-		background: rgba(188, 0, 45, 0.18);
-		color: #ff8da0;
-		border: 1px solid rgba(188, 0, 45, 0.35);
+		background: var(--ko-badge-bg);
+		color: var(--ko-badge-fg);
+		border: 1px solid var(--ko-badge-border);
 	}
 	.title {
 		font-size: 17px;
@@ -457,7 +555,7 @@
 	}
 	.artist {
 		font-size: 12px;
-		opacity: 0.55;
+		color: var(--ko-fg-muted);
 		margin-top: 2px;
 	}
 
@@ -471,8 +569,8 @@
 		justify-content: center;
 		gap: 18px;
 		padding: 24px 0;
-		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
-		mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, var(--ko-mask-color) 18%, var(--ko-mask-color) 82%, transparent 100%);
+		mask-image: linear-gradient(to bottom, transparent 0%, var(--ko-mask-color) 18%, var(--ko-mask-color) 82%, transparent 100%);
 	}
 
 	.line {
@@ -490,35 +588,33 @@
 		font-size: 30px;
 		font-weight: 700;
 		letter-spacing: 0.01em;
-		text-shadow: 0 0 36px rgba(255, 255, 255, 0.12);
+		text-shadow: var(--ko-text-shadow-active);
 	}
-	.line.past .text {
-		font-weight: 400;
-	}
+	.line.past .text { font-weight: 400; }
 	.romaji {
 		font-size: 12px;
-		opacity: 0.55;
+		color: var(--ko-fg-muted);
 		margin-top: 6px;
 		font-style: italic;
 	}
 	.line.active .romaji {
 		font-size: 14px;
-		opacity: 0.75;
+		color: var(--ko-fg-soft);
 	}
 	.translation {
 		margin-top: 10px;
 		font-size: 13px;
-		opacity: 0.65;
+		color: var(--ko-fg-soft);
 		font-style: italic;
 	}
 	.tok {
 		display: inline-block;
-		color: rgba(242, 242, 241, 0.55);
+		color: var(--ko-tok-rest);
 		transition: color 160ms ease, text-shadow 160ms ease;
 	}
 	.tok.matched {
-		color: #4ade80;
-		text-shadow: 0 0 14px rgba(74, 222, 128, 0.45);
+		color: var(--ko-tok-match);
+		text-shadow: 0 0 14px var(--ko-tok-glow);
 	}
 
 	.bottom {
@@ -533,19 +629,18 @@
 		max-width: 560px;
 		text-align: center;
 		font-size: 14px;
-		color: #d8d8d8;
-		opacity: 0.85;
+		color: var(--ko-fg-soft);
 		padding: 0 24px;
 	}
-	.transcript.dim { opacity: 0.35; font-size: 12px; letter-spacing: 0.04em; }
+	.transcript.dim { color: var(--ko-fg-muted); font-size: 12px; letter-spacing: 0.04em; }
 	.error {
-		color: #ff8da0;
+		color: var(--hinomaru-red);
 		font-size: 13px;
 		text-align: center;
 		max-width: 360px;
 		padding: 12px 16px;
-		background: rgba(188, 0, 45, 0.12);
-		border: 1px solid rgba(188, 0, 45, 0.4);
+		background: rgba(188, 0, 45, 0.1);
+		border: 1px solid rgba(188, 0, 45, 0.35);
 		border-radius: 12px;
 	}
 
@@ -553,32 +648,69 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		align-items: center;
+		gap: 18px;
 		width: 100%;
-		max-width: 520px;
+		max-width: 360px;
 		margin: 32px auto 0;
-		padding: 24px 8px;
-		overflow-y: auto;
+		padding: 16px 8px;
 	}
-	.summary-avg {
-		text-align: center;
+	.gauge {
+		position: relative;
+		width: 220px;
+		height: 220px;
+	}
+	.gauge svg {
+		width: 100%;
+		height: 100%;
+		transform: rotate(-90deg);
+		overflow: visible;
+	}
+	.g-track {
+		fill: none;
+		stroke: var(--ko-gauge-track);
+		stroke-width: 10;
+	}
+	.g-bar {
+		fill: none;
+		stroke: var(--gauge-color);
+		stroke-width: 10;
+		stroke-linecap: round;
+		stroke-dasharray: 326.726;
+		stroke-dashoffset: calc(326.726 * (1 - var(--gauge-pct)));
+		filter: drop-shadow(0 0 14px var(--gauge-color));
+		transition: stroke-dashoffset 800ms cubic-bezier(0.2, 0.6, 0.1, 1);
+	}
+	.gauge-center {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
 	}
 	.big-pct {
-		font-size: 72px;
+		font-size: 56px;
 		font-weight: 800;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.03em;
 		line-height: 1;
 	}
-	.big-label {
-		font-size: 16px;
+	.big-pct .pct {
+		font-size: 22px;
 		font-weight: 600;
-		margin-top: 4px;
+		margin-left: 2px;
+	}
+	.big-label {
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
 	}
 	.muted {
-		font-size: 12px;
-		opacity: 0.55;
-		margin-top: 4px;
-		letter-spacing: 0.04em;
+		font-size: 11px;
+		color: var(--ko-fg-muted);
+		letter-spacing: 0.12em;
 		text-transform: uppercase;
 	}
 
@@ -587,6 +719,7 @@
 		gap: 10px;
 		justify-content: center;
 		padding: 8px 0;
+		margin-top: 8px;
 	}
 	.btn {
 		display: inline-flex;
@@ -599,21 +732,23 @@
 		border: none;
 		cursor: pointer;
 		font-family: inherit;
-		transition: transform 100ms, background 150ms;
+		transition: transform 100ms, background 150ms, box-shadow 150ms;
 	}
 	.btn:hover { transform: translateY(-1px); }
 	.btn.primary {
 		background: var(--hinomaru-red);
 		color: #fff;
+		box-shadow: 0 6px 20px rgba(188, 0, 45, 0.28);
 	}
 	.btn.ghost {
 		background: transparent;
-		color: #eee;
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: inherit;
+		border: 1px solid var(--ko-ghost-border);
 	}
 
 	@media (max-width: 480px) {
 		.line.active .text { font-size: 24px; }
-		.big-pct { font-size: 56px; }
+		.gauge { width: 180px; height: 180px; }
+		.big-pct { font-size: 46px; }
 	}
 </style>

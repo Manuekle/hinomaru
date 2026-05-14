@@ -265,7 +265,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 24px 0 24px;
+		padding: clamp(24px, 4vh, 36px) 16px clamp(24px, 4vh, 36px);
 		perspective: 1000px;
 	}
 	.card-scene {

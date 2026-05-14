@@ -383,8 +383,11 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		gap: 18px;
-		padding: 20px 0 8px;
+		gap: clamp(18px, 3vh, 24px);
+		padding: clamp(20px, 4vh, 32px) 16px clamp(20px, 3vh, 28px);
+		width: 100%;
+		max-width: 520px;
+		margin: 0 auto;
 	}
 	.prompt-card {
 		width: 100%;
@@ -420,10 +423,10 @@
 		background: var(--bg-muted);
 		border: 1.5px dashed var(--ink-200);
 		border-radius: 20px;
-		padding: 14px;
+		padding: 16px;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: 10px;
 		align-items: center;
 		justify-content: center;
 		transition: all 0.2s ease;
@@ -447,7 +450,7 @@
 	.tokens-bank {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 10px;
+		gap: 12px;
 		justify-content: center;
 		width: 100%;
 	}
@@ -456,7 +459,7 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 2px;
-		padding: 8px 14px;
+		padding: 10px 14px;
 		border-radius: 14px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);

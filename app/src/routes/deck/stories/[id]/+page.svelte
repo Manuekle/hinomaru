@@ -470,6 +470,7 @@
 
 				<div class="story-title-row">
 					<h1 class="story-display-title">
+						{#if story.emoji}<span class="story-emoji">{story.emoji}</span> {/if}
 						{$locale === 'es' ? story.title_es : story.title_en}
 					</h1>
 				</div>
@@ -599,6 +600,7 @@
 					<div class="reading-mode-content">
 						<div class="story-title-row">
 							<h1 class="story-display-title">
+								{#if story.emoji}<span class="story-emoji">{story.emoji}</span> {/if}
 								{$locale === 'es' ? story.title_es : story.title_en}
 							</h1>
 						</div>
@@ -997,6 +999,12 @@
 
 	.story-viewer-layout:not(.reading-mode) .story-display-title {
 		font-size: 24px;
+	}
+
+	.story-emoji {
+		font-style: normal;
+		font-weight: 400;
+		margin-right: 4px;
 	}
 
 	.story-body-card {

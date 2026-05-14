@@ -2598,5 +2598,519 @@ export const conversations: DialogueScenario[] = [
 				}
 			}
 		]
+	},
+
+	// ── N4 - Nuevas ──────────────────────────────────────────────────
+
+	{
+		id: 'biblioteca',
+		title_es: 'En la biblioteca',
+		title_en: 'At the library',
+		level: 'N4',
+		icon: '📚',
+		context_es: 'Quieres devolver un libro y pedir uno nuevo prestado.',
+		turns: [
+			{
+				type: 'npc',
+				jp: 'こんにちは。この本を返却（へんきゃく）されますか？',
+				romaji: 'Konnichiwa. Kono hon wo henkyaku saremasu ka?',
+				translation: 'Hola. ¿Viene a devolver este libro?'
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（はい、返します。そして新しい本を借りたいです）',
+				prompt_romaji: '(Hai, kaeshimasu. Soshite atarashii hon wo karitai desu)',
+				prompt_translation: 'Confirma la devolución y pide prestar otro',
+				choices: [
+					{
+						jp: 'はい。返却したあとで、別の本を借りたいんですが…。',
+						romaji: 'Hai. Henkyaku shita ato de, betsu no hon wo karitai n desu ga...',
+						translation: 'Sí. Después de devolverlo, me gustaría pedir prestado otro libro...',
+						correct: true,
+						feedback_es: '¡Muy bien! El uso de "～たいんですが" (quisiera...) es perfecto para introducir una petición.'
+					},
+					{
+						jp: 'いいえ、返しません。',
+						romaji: 'Iie, kaeshimasen.',
+						translation: 'No, no lo devuelvo.',
+						correct: false,
+						feedback_es: 'Si no lo devuelves no puedes pedir otro. Di "Hai, kaeshimasu".'
+					},
+					{
+						jp: '本が あります。',
+						romaji: 'Hon ga arimasu.',
+						translation: 'Hay un libro.',
+						correct: false,
+						feedback_es: 'Obvio, pero no explica tu intención de devolverlo y pedir otro.'
+					}
+				],
+				next_npc: {
+					jp: 'かしこまりました。カードはお持ちですか？',
+					romaji: 'Kashikomarimashita. Kaado wa omochi desu ka?',
+					translation: 'Entendido. ¿Trae su carnet?'
+				}
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（はい、あります。貸出期間はどのくらいですか？）',
+				prompt_romaji: '(Hai, arimasu. Kashidashi kikan wa dono kurai desu ka?)',
+				prompt_translation: 'Muestra el carnet y pregunta el periodo de préstamo',
+				choices: [
+					{
+						jp: 'はい、どうぞ。本はいつまで借りられますか？',
+						romaji: 'Hai, douzo. Hon wa itsu made kareraremasu ka?',
+						translation: 'Aquí tiene. ¿Hasta cuándo puedo tener el libro?',
+						correct: true,
+						feedback_es: '¡Excelente! "Itsu made kareraremasu ka" (¿hasta cuándo puedo pedir prestado?) es N4 total.'
+					},
+					{
+						jp: 'これは 私のカードです。',
+						romaji: 'Kore wa watashi no kaado desu.',
+						translation: 'Este es mi carnet.',
+						correct: false,
+						feedback_es: 'Un poco redundante. Mejor decir "Douzo" y preguntar el tiempo de préstamo.'
+					},
+					{
+						jp: 'いつ かえしますか？',
+						romaji: 'Itsu kaeshimasu ka?',
+						translation: '¿Cuándo lo devuelve?',
+						correct: false,
+						feedback_es: 'Eso pregunta cuándo lo devuelve el NPC. Usa "kareraremasu ka" (puedo prestarlo).'
+					}
+				],
+				next_npc: {
+					jp: '二週間（にしゅうかん）借りることができますよ。',
+					romaji: 'Ni-shuukan kariru koto ga dekimasu yo.',
+					translation: 'Puede pedirlo prestado por dos semanas.'
+				}
+			}
+		]
+	},
+
+	{
+		id: 'correo',
+		title_es: 'En el correo',
+		title_en: 'At the post office',
+		level: 'N4',
+		icon: '📮',
+		context_es: 'Vas a enviar un paquete a tu país.',
+		turns: [
+			{
+				type: 'npc',
+				jp: 'いらっしゃいませ。お荷物（にもつ）の発送（はっそう）ですか？',
+				romaji: 'Irasshaimase. Onimotsu no hassou desu ka?',
+				translation: 'Bienvenido. ¿Viene a enviar un paquete?'
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（はい、メキシコまで送りたいです）',
+				prompt_romaji: '(Hai, Mekishiko made okuritai desu)',
+				prompt_translation: 'Dile que quieres enviarlo a México',
+				choices: [
+					{
+						jp: 'はい。メキシコまで送りたいんですが、いくらかかりますか？',
+						romaji: 'Hai. Mekishiko made okuritai n desu ga, ikura kakarimasu ka?',
+						translation: 'Sí. Quiero enviarlo a México, ¿cuánto cuesta?',
+						correct: true,
+						feedback_es: '¡Perfecto! "Made okuritai" + "ikura kakarimasu ka" es la combinación ganadora.'
+					},
+					{
+						jp: 'メキシコは 遠いです。',
+						romaji: 'Mekishiko wa tooi desu.',
+						translation: 'México está lejos.',
+						correct: false,
+						feedback_es: 'Cierto, pero no ayuda al envío. Usa "okuritai" (quiero enviar).'
+					},
+					{
+						jp: '船（ふね）で 行きます。',
+						romaji: 'Fune de ikimasu.',
+						translation: 'Voy en barco.',
+						correct: false,
+						feedback_es: 'Eso significa que TÚ vas en barco. Para el paquete se dice "funabin" (envío por barco).'
+					}
+				],
+				next_npc: {
+					jp: '航空便（こうくうびん）と船便（ふなびん）、どちらにされますか？',
+					romaji: 'Koukuubin to funabin, dochira ni saremasu ka?',
+					translation: '¿Envío por avión o por barco? ¿Cuál prefiere?'
+				}
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（早く着くほうがいいです）',
+				prompt_romaji: '(Hayaku tsuku hou ga ii desu)',
+				prompt_translation: 'Prefieres que llegue rápido',
+				choices: [
+					{
+						jp: 'できるだけ早く着くようにしたいので、航空便でお願いします。',
+						romaji: 'Dekiru dake hayaku tsuku you ni shitai node, koukuubin de onegaishimasu.',
+						translation: 'Quiero que llegue lo antes posible, así que por avión, por favor.',
+						correct: true,
+						feedback_es: '¡Excelente nivel N4! "～you ni shitai" (quiero que...) es gramática avanzada muy útil.'
+					},
+					{
+						jp: '航空便が 好きです。',
+						romaji: 'Koukuubin ga suki desu.',
+						translation: 'Me gusta el correo aéreo.',
+						correct: false,
+						feedback_es: 'Raro. Usa "onegaishimasu" para elegir el servicio.'
+					},
+					{
+						jp: '船は 遅いです。',
+						romaji: 'Fune wa osoi desu.',
+						translation: 'El barco es lento.',
+						correct: false,
+						feedback_es: 'Aunque es verdad, no es una forma educada de elegir. Usa "koukuubin de".'
+					}
+				],
+				next_npc: {
+					jp: 'かしこまりました。一週間（いっしゅうかん）ほどで届くと思います。',
+					romaji: 'Kashikomarimashita. Isshuukan hodo de todoku to omoimasu.',
+					translation: 'Entendido. Creo que llegará en aproximadamente una semana.'
+				}
+			}
+		]
+	},
+
+	// ── N3 - Nuevas ──────────────────────────────────────────────────
+
+	{
+		id: 'entrevista',
+		title_es: 'Entrevista de trabajo',
+		title_en: 'Job Interview',
+		level: 'N3',
+		icon: '💼',
+		context_es: 'Estás en una entrevista para un puesto en una empresa tecnológica japonesa.',
+		turns: [
+			{
+				type: 'npc',
+				jp: '本日はお越しいただきありがとうございます。まず、弊社を志望（しぼう）した理由を教えてください。',
+				romaji: 'Honjitsu wa okoshi itadaki arigatou gozaimasu. Mazu, heisha wo shibou shita riyuu wo oshiete kudasai.',
+				translation: 'Gracias por venir hoy. Primero, por favor dígame la razón por la que solicitó unirse a nuestra empresa.'
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（貴社の技術力に惹かれ、自分の経験を活かしたいです）',
+				prompt_romaji: '(Kisha no gijutsuryoku ni hikare, jibun no keiken wo ikashitai desu)',
+				prompt_translation: 'Dile que te atrae su tecnología y quieres usar tu experiencia',
+				choices: [
+					{
+						jp: '御社（おんしゃ）の最先端（さいせんたん）技術に興味があり、これまでの開発経験を活かせると思ったからです。',
+						romaji: 'Onsha no saisentan gijutsu ni kyoumi ga ari, kore made no kaihatsu keiken wo ikaseru to omotta kara desu.',
+						translation: 'Porque me interesa la tecnología de vanguardia de su empresa y pensé que podría aprovechar mi experiencia previa en desarrollo.',
+						correct: true,
+						feedback_es: '¡Excelente! Usar "Onsha" (su empresa) y "ikaseru" (poder aprovechar) muestra un nivel N3/Keigo básico sólido.'
+					},
+					{
+						jp: '日本で働きたいからです。アニメが好きです。',
+						romaji: 'Nihon de hatarakitai kara desu. Anime ga suki desu.',
+						translation: 'Porque quiero trabajar en Japón. Me gusta el anime.',
+						correct: false,
+						feedback_es: 'Demasiado informal y poco profesional para una entrevista. Enfócate en la empresa y tus habilidades.'
+					},
+					{
+						jp: '給料（きゅうりょう）がいいと聞いたので。',
+						romaji: 'Kyuuryou ga ii to kiita node.',
+						translation: 'Porque escuché que el salario es bueno.',
+						correct: false,
+						feedback_es: '¡Sincero, pero te descartarán! Nunca menciones el salario como primera razón de motivación.'
+					}
+				],
+				next_npc: {
+					jp: 'なるほど。では、あなたの強み（つよみ）は、チームでどのように貢献（こうけん）できると考えていますか。',
+					romaji: 'Naruhodo. Dewa, anata no tsuyomi wa, chiimu de dono you ni kouken dekiru to kangaete imasu ka.',
+					translation: 'Ya veo. Entonces, ¿cómo cree que su mayor fortaleza puede contribuir al equipo?'
+				}
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（コミュニケーション能力を活かして、円滑にプロジェクトを進められます）',
+				prompt_romaji: '(Komyunikeeshon nouryoku wo ikashite, enkatsu ni purojekuto wo susumeraremasu)',
+				prompt_translation: 'Explica que tu comunicación ayuda a que los proyectos avancen fluido',
+				choices: [
+					{
+						jp: '周囲（しゅうい）と連携（れんけい）を取りながら、問題を迅速（じんそく）に解決できるのが私の強みです。',
+						romaji: 'Shuui to renkei wo tori nagara, mondai wo jinsoku ni kaiketsu dekiru no ga watashi no tsuyomi desu.',
+						translation: 'Mi fortaleza es poder resolver problemas rápidamente mientras colaboro con las personas a mi alrededor.',
+						correct: true,
+						feedback_es: '¡Perfecto! El vocabulario como "renkei" (colaboración) y "jinsoku" (rápido/pronto) es muy N3.'
+					},
+					{
+						jp: '私はプログラミングがとても速いです。',
+						romaji: 'Watashi wa puroguramingu ga totemo hayai desu.',
+						translation: 'Soy muy rápido programando.',
+						correct: false,
+						feedback_es: 'Un poco arrogante y no responde a la parte de "trabajo en equipo".'
+					},
+					{
+						jp: '一人で仕事をするのが好きです。',
+						romaji: 'Hitori de shigoto wo suru no ga suki desu.',
+						translation: 'Me gusta trabajar solo.',
+						correct: false,
+						feedback_es: 'Lo opuesto a lo que busca una empresa que valora el trabajo en equipo.'
+					}
+				],
+				next_npc: {
+					jp: '素晴らしいですね。弊社でもその力を発揮していただけることを期待しています。',
+					romaji: 'Subarashii desu ne. Heisha demo sono chikara wo hakki shite itadakeru koto wo kitai shite imasu.',
+					translation: 'Maravilloso. Esperamos que pueda demostrar esa capacidad también en nuestra empresa.'
+				}
+			}
+		]
+	},
+
+	{
+		id: 'medico',
+		title_es: 'En el médico',
+		title_en: 'At the Doctor',
+		level: 'N3',
+		icon: '🏥',
+		context_es: 'Te sientes mal desde hace unos días y vas a consulta.',
+		turns: [
+			{
+				type: 'npc',
+				jp: '今日はどうされましたか？',
+				romaji: 'Kyou wa dou saremashita ka?',
+				translation: '¿Qué le trae hoy por aquí? (¿Cómo se siente?)'
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（数日前から熱があって、喉も痛いです）',
+				prompt_romaji: '(Suujitsu mae kara netsu ga atte, nodo mo itai desu)',
+				prompt_translation: 'Explica que tienes fiebre y dolor de garganta desde hace días',
+				choices: [
+					{
+						jp: '三日（みっか）ほど前から熱が下がらず、喉（のど）の痛みもひどくなってきたんです。',
+						romaji: 'Mikka hodo mae kara netsu ga sagarazu, nodo no itami mo hidoku natte kita n desu.',
+						translation: 'Desde hace unos tres días la fiebre no baja y el dolor de garganta ha empeorado.',
+						correct: true,
+						feedback_es: '¡Excelente! Usar "～zu" (forma negativa formal) y "～te kita" (ha ido pasando) es muy N3.'
+					},
+					{
+						jp: '頭（あたま）が痛いです。病気（びょうき）かもしれません。',
+						romaji: 'Atama ga itai desu. Byouki kamoshirenai.',
+						translation: 'Me duele la cabeza. Tal vez sea una enfermedad.',
+						correct: false,
+						feedback_es: 'Un poco vago. En el médico debes ser específico con la duración y síntomas.'
+					},
+					{
+						jp: '私は 元気（げんき）じゃないです。',
+						romaji: 'Watashi wa genki janai desu.',
+						translation: 'No estoy bien.',
+						correct: false,
+						feedback_es: 'Demasiado simple para un nivel N3. Describe los síntomas físicos.'
+					}
+				],
+				next_npc: {
+					jp: 'そうですか。では、少し喉を拝見（はいけん）しますね。…あ、かなり腫（は）れていますね。',
+					romaji: 'Sou desu ka. Dewa, sukoshi nodo wo haiken shimasu ne. ...A, kanari harete imasu ne.',
+					translation: 'Ya veo. Déjeme ver su garganta... Ah, está bastante inflamada.'
+				}
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（薬は食前と食後のどちらに飲めばいいですか？）',
+				prompt_romaji: '(Kusuri wa shokuzen to shokugo no dochira ni nomeba ii desu ka?)',
+				prompt_translation: 'Pregunta si la medicina se toma antes o después de comer',
+				choices: [
+					{
+						jp: 'このお薬（くすり）は、食前（しょくぜん）と食後（しょくご）、どちらに服用（ふくよう）すべきでしょうか？',
+						romaji: 'Kono okusuri wa, shokuzen to shokugo, dochira ni fukuyou subeki deshou ka?',
+						translation: '¿Este medicamento debería tomarlo antes o después de las comidas?',
+						correct: true,
+						feedback_es: '¡Perfecto! "Fukuyou" (tomar medicina) y "subeki" (debería) son términos N3 muy apropiados.'
+					},
+					{
+						jp: 'いつ 飲みますか？',
+						romaji: 'Itsu nomimasu ka?',
+						translation: '¿Cuándo se toma?',
+						correct: false,
+						feedback_es: 'Correcto pero muy simple. "Shokuzen/shokugo" son palabras clave que debes dominar en N3.'
+					},
+					{
+						jp: 'ご飯（ごはん）を 食べたいです。',
+						romaji: 'Gohan wo tabetai desu.',
+						translation: 'Quiero comer.',
+						correct: false,
+						feedback_es: '¡Si tienes la garganta inflamada quizás te cueste! Pero no responde a la duda de la medicina.'
+					}
+				],
+				next_npc: {
+					jp: '食後（しょくご）三十分以内に飲んでください。お大事（だいじ）に。',
+					romaji: 'Shokugo sanjuppun inai ni nonde kudasai. Odaiji ni.',
+					translation: 'Tómelo dentro de los 30 minutos posteriores a la comida. ¡Que se mejore!'
+				}
+			}
+		]
+	},
+
+	{
+		id: 'mudanza',
+		title_es: 'Buscando apartamento',
+		title_en: 'Apartment Hunting',
+		level: 'N3',
+		icon: '🏠',
+		context_es: 'Estás en una inmobiliaria buscando un lugar para vivir en Japón.',
+		turns: [
+			{
+				type: 'npc',
+				jp: 'どのようなお部屋をお探しですか？ご希望（きぼう）を教えてください。',
+				romaji: 'Dono you na oheya wo osagashi desu ka? Gokibou wo oshiete kudasai.',
+				translation: '¿Qué tipo de habitación busca? Por favor, dígame sus preferencias.'
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（駅から近くて、家賃は8万円以下がいいです）',
+				prompt_romaji: '(Eki kara chikakute, yachin wa hachiman-en ika ga ii desu ka)',
+				prompt_translation: 'Quieres algo cerca de la estación y que el alquiler sea menos de 80,000 yenes',
+				choices: [
+					{
+						jp: '駅から徒歩（とほ）十分以内で、家賃（やちん）は八万円（はちまんえん）程度（ていど）に抑（おさ）えたいんですが。',
+						romaji: 'Eki kara toho juppun inai de, yachin wa hachiman-en teido ni osaetai n desu ga.',
+						translation: 'Quisiera que esté a menos de 10 minutos a pie de la estación y mantener el alquiler en unos 80,000 yenes.',
+						correct: true,
+						feedback_es: '¡Excelente! "Toho" (a pie) y "osaetai" (querer contener/limitar) son expresiones muy naturales de N3.'
+					},
+					{
+						jp: '安い 部屋（へや）が ほしいです。駅（えき）の近く。',
+						romaji: 'Yasui heya ga hoshii desu. Eki no chikaku.',
+						translation: 'Quiero una habitación barata. Cerca de la estación.',
+						correct: false,
+						feedback_es: 'Nivel N5. En N3 se espera que uses términos como "yachin" y "toho".'
+					},
+					{
+						jp: '広い 庭（にわ）が ある家（いえ）がいいです。',
+						romaji: 'Hiroi niwa ga aru ie ga ii desu.',
+						translation: 'Quiero una casa con un jardín grande.',
+						correct: false,
+						feedback_es: '¡Difícil en la ciudad con ese presupuesto! Además no mencionaste la estación ni el precio.'
+					}
+				],
+				next_npc: {
+					jp: 'それなら、こちらの物件（ぶっけん）はいかがでしょう。最近リフォームされたばかりですよ。',
+					romaji: 'Sorenara, kochira no bukken wa ikaga deshou. Saikin rifoomu sareta bakari desu yo.',
+					translation: 'En ese caso, ¿qué le parece esta propiedad? Acaba de ser reformada recientemente.'
+				}
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（ペットを飼っても大丈夫でしょうか？）',
+				prompt_romaji: '(Petto wo katte mo daijoubu deshou ka?)',
+				prompt_translation: 'Pregunta si se permiten mascotas',
+				choices: [
+					{
+						jp: 'ちなみに、このマンションはペットの飼育（しいく）は許可（きょか）されていますか？',
+						romaji: 'Chinamini, kono manshon wa petto no shiiku wa kyoka sarete imasu ka?',
+						translation: 'Por cierto, ¿está permitido tener mascotas en este apartamento?',
+						correct: true,
+						feedback_es: '¡Muy bien! "Chinamini" (por cierto) y "shiiku" (crianza de animales) demuestran un gran vocabulario.'
+					},
+					{
+						jp: '犬（いぬ）が います。いいですか？',
+						romaji: 'Inu ga imasu. Ii desu ka?',
+						translation: 'Tengo un perro. ¿Está bien?',
+						correct: false,
+						feedback_es: 'Gramaticalmente correcto, pero "shiiku ga kyoka sarete imasu ka" es mucho más profesional en una inmobiliaria.'
+					},
+					{
+						jp: '動物（どうぶつ）が 大好き（だいすき）です。',
+						romaji: 'Doubutsu ga daisuki desu.',
+						translation: 'Me encantan los animales.',
+						correct: false,
+						feedback_es: 'Información irrelevante para el contrato. Pregunta por los permisos.'
+					}
+				],
+				next_npc: {
+					jp: '残念ながら、こちらはペット禁止（きんし）となっております。他をお探ししましょうか。',
+					romaji: 'Zannen nagara, kochira wa petto kinshi to natte orimasu. Hoka wo osagashi shimashou ka.',
+					translation: 'Lamentablemente, aquí están prohibidas las mascotas. ¿Buscamos otro lugar?'
+				}
+			}
+		]
+	},
+
+	{
+		id: 'viaje',
+		title_es: 'Planeando un viaje',
+		title_en: 'Planning a Trip',
+		level: 'N3',
+		icon: '✈️',
+		context_es: 'Estás consultando en una agencia de viajes para visitar Kioto.',
+		turns: [
+			{
+				type: 'npc',
+				jp: '京都旅行をご検討中（けんとうちゅう）ですか？どのようなプランがよろしいでしょうか。',
+				romaji: 'Kyoto ryokou wo kentou-chuu desu ka? Dono you na puran ga yoroshii deshou ka.',
+				translation: '¿Está considerando un viaje a Kioto? ¿Qué tipo de plan preferiría?'
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（混雑を避けて、静かなお寺を巡りたいです）',
+				prompt_romaji: '(Konzatsu wo sakete, shizuka na otera wo meguritai desu)',
+				prompt_translation: 'Quieres evitar las multitudes y recorrer templos tranquilos',
+				choices: [
+					{
+						jp: '有名な観光地よりも、混雑（こんざつ）を避（さ）けてゆっくりできる穴場（あなば）を教えてほしいんです。',
+						romaji: 'Yuumei na kankouchi yori mo, konzatsu wo sakete yukkuri dekiru anaba wo oshiete hoshii n desu.',
+						translation: 'Más que los lugares turísticos famosos, me gustaría que me recomendara lugares poco conocidos donde pueda relajarme evitando las multitudes.',
+						correct: true,
+						feedback_es: '¡Excelente! "Anaba" (lugar poco conocido/tesoro oculto) es una palabra muy útil en N3.'
+					},
+					{
+						jp: '人が たくさん いる所（ところ）は 嫌い（きらい）です。',
+						romaji: 'Hito ga takusan iru tokoro wa kirai desu.',
+						translation: 'No me gustan los lugares con mucha gente.',
+						correct: false,
+						feedback_es: 'Un poco negativo. Es mejor expresar lo que quieres ("konzatsu wo sakete") que lo que odias.'
+					},
+					{
+						jp: '京都（きょうと）は きれいだと思います。',
+						romaji: 'Kyoto wa kirei da to omoimasu.',
+						translation: 'Creo que Kioto es hermoso.',
+						correct: false,
+						feedback_es: 'Opinión general que no ayuda a planificar el viaje. Pide recomendaciones específicas.'
+					}
+				],
+				next_npc: {
+					jp: 'それでしたら、大原（おおはら）エリアはいかがでしょう。中心部から離（はな）れているので、落ち着いて拝観（はいかん）できますよ。',
+					romaji: 'Sore deshitara, Ohara eria wa ikaga deshou. Chuushin-bu kara hanarete iru node, ochitsuite haikan dekimasu yo.',
+					translation: 'En ese caso, ¿qué tal la zona de Ohara? Al estar alejada del centro, podrá visitar los templos con tranquilidad.'
+				}
+			},
+			{
+				type: 'choice',
+				prompt_jp: '（いつ行くのが一番おすすめですか？）',
+				prompt_romaji: '(Itsu iku no ga ichiban osusume desu ka?)',
+				prompt_translation: '¿Cuándo es el mejor momento para ir?',
+				choices: [
+					{
+						jp: '紅葉（こうよう）の時期（じき）は素晴らしいと聞きましたが、いつ頃（ごろ）予約（よやく）すべきでしょうか？',
+						romaji: 'Kouyou no jiki wa subarashii to kikimashita ga, itsu-goro yoyaku subeki deshou ka?',
+						translation: 'He oído que la época de los colores de otoño es maravillosa, ¿cuándo debería hacer la reserva?',
+						correct: true,
+						feedback_es: '¡Perfecto! Combinas "Kouyou" (colores de otoño) con una pregunta sobre el tiempo de reserva.'
+					},
+					{
+						jp: 'いつが 安い（やすい）ですか？',
+						romaji: 'Itsu ga yasui desu ka?',
+						translation: '¿Cuándo es barato?',
+						correct: false,
+						feedback_es: 'Pregunta válida, pero en N3 intenta usar estructuras más completas sobre la mejor época ("jiki").'
+					},
+					{
+						jp: '秋（あき）に 行きたいです。',
+						romaji: 'Aki ni ikitai desu.',
+						translation: 'Quiero ir en otoño.',
+						correct: false,
+						feedback_es: 'Afirmación simple. Intenta preguntar por recomendaciones o consejos de reserva.'
+					}
+				],
+				next_npc: {
+					jp: '十一月下旬（げじゅん）が見頃（みごろ）ですが、非常に人気ですので、三ヶ月前には予約されたほうがいいですよ。',
+					romaji: 'Juuichi-gatsu gejun ga migoro desu ga, hijou ni ninki desu node, sankagetsu-mae ni wa yoyaku sareta hou ga ii desu yo.',
+					translation: 'El mejor momento es a finales de noviembre, pero como es muy popular, es mejor que reserve con tres meses de antelación.'
+				}
+			}
+		]
 	}
 ];

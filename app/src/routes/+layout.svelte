@@ -51,9 +51,6 @@
 		isPWA = data.isPWA || clientPWA;
 		booting = isPWA;
 
-		// Reveal body — was hidden by CSS in app.html to prevent SSR flash before splash renders
-		document.documentElement.classList.remove('pwa-booting');
-
 		const {
 			data: { subscription }
 		} = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -108,7 +105,7 @@
 		// Hide splash after a short delay if it's still showing
 		const timer = setTimeout(() => {
 			booting = false;
-		}, 500);
+		}, 900);
 
 		return () => {
 			subscription.unsubscribe();
@@ -162,10 +159,10 @@
 		}}
 	/>
 	{@render children()}
-	{#if data.session && new Set(['/', '/alphabet', '/vocabulary', '/deck/stories', '/deck/songs', '/conversation', '/jlpt']).has($page.url.pathname)}
+	{#if data.session && !booting && new Set(['/', '/alphabet', '/vocabulary', '/deck/stories', '/deck/songs', '/conversation', '/jlpt']).has($page.url.pathname)}
 		<DockBar />
 	{/if}
-	{#if !data.session && $page.url.pathname === '/'}
+	{#if !data.session && !booting && $page.url.pathname === '/'}
 		<InstallPrompt />
 	{/if}
 	<PWASplash visible={booting} />

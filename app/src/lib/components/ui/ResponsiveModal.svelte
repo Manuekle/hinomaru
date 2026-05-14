@@ -17,6 +17,7 @@
 		contentClass?: string;
 		actionsClass?: string;
 		dismissible?: boolean;
+		hideTitle?: boolean;
 	}
 
 	let {
@@ -28,7 +29,8 @@
 		actions,
 		contentClass = '',
 		actionsClass = '',
-		dismissible = true
+		dismissible = true,
+		hideTitle = false
 	}: Props = $props();
 
 	let isMobile = $state(false);
@@ -57,27 +59,36 @@
 	<Drawer.Root bind:open {dismissible}>
 		<Drawer.Content
 			class={cn(
-				'drawer-premium rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)] px-6 pb-12',
+				'drawer-premium flex max-h-[90vh] flex-col rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)] px-6',
 				contentClass
 			)}
 		>
-			<Drawer.Header class="px-0 pt-8 text-left">
-				<Drawer.Title class="drawer-title-premium">
-					{title}
-				</Drawer.Title>
-				{#if description}
-					<Drawer.Description class="drawer-desc-premium">
-						{description}
-					</Drawer.Description>
-				{/if}
-			</Drawer.Header>
+			{#if hideTitle}
+				<Drawer.Header class="sr-only">
+					<Drawer.Title>{title}</Drawer.Title>
+					{#if description}
+						<Drawer.Description>{description}</Drawer.Description>
+					{/if}
+				</Drawer.Header>
+			{:else}
+				<Drawer.Header class="shrink-0 px-0 pt-8 text-left">
+					<Drawer.Title class="drawer-title-premium">
+						{title}
+					</Drawer.Title>
+					{#if description}
+						<Drawer.Description class="drawer-desc-premium">
+							{description}
+						</Drawer.Description>
+					{/if}
+				</Drawer.Header>
+			{/if}
 
-			<div class="font-ui relative z-10 flex-1 overflow-y-auto py-6">
+			<div class="font-ui relative z-10 min-h-0 flex-1 py-6">
 				{@render children?.()}
 			</div>
 
 			{#if actions}
-				<Drawer.Footer class="relative z-10 px-0 pt-4">
+				<Drawer.Footer class="relative z-10 shrink-0 px-0 pt-4">
 					<div class={cn('font-ui flex w-full flex-row gap-4 [&>*]:flex-1', actionsClass)}>
 						{@render actions?.()}
 					</div>
@@ -103,22 +114,34 @@
 				<Icon icon={Cancel01Icon} size={20} color="currentColor" />
 			</button>
 
-			{#if icon}
-				<div class="modal-icon-box">
-					{@render icon()}
+			{#if hideTitle}
+				<h3 class="sr-only">{title}</h3>
+				{#if description}<p class="sr-only">{description}</p>{/if}
+			{:else}
+				<div class="modal-head">
+					{#if icon}
+						<div class="modal-icon-box">
+							{@render icon()}
+						</div>
+					{/if}
+					<h3 class="modal-title">{title}</h3>
+					{#if description}
+						<p class="modal-text">{description}</p>
+					{/if}
 				</div>
 			{/if}
-			<h3 class="modal-title">{title}</h3>
-			{#if description}
-				<p class="modal-text">{description}</p>
-			{/if}
 
-			<div class="modal-body custom-scrollbar">
+			<div class="modal-body">
 				{@render children?.()}
 			</div>
 
 			{#if actions}
-				<div class={cn('font-ui mt-8 flex w-full flex-row gap-3 [&>*]:flex-1', actionsClass)}>
+				<div
+					class={cn(
+						'modal-foot font-ui mt-8 flex w-full flex-row gap-3 [&>*]:flex-1',
+						actionsClass
+					)}
+				>
 					{@render actions?.()}
 				</div>
 			{/if}
@@ -191,7 +214,7 @@
 		padding: 40px 40px 32px;
 		width: 100%;
 		max-width: 560px;
-		max-height: calc(100vh - 48px);
+		max-height: 90vh;
 		text-align: center;
 		box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
 		border: 1.5px solid var(--ink-100);
@@ -203,13 +226,18 @@
 		min-height: 0;
 	}
 
+	.modal-head {
+		flex-shrink: 0;
+	}
+
 	.modal-body {
 		flex: 1 1 auto;
 		min-height: 0;
-		overflow-y: auto;
 		text-align: left;
-		padding-right: 8px;
-		margin-right: -8px;
+	}
+
+	.modal-foot {
+		flex-shrink: 0;
 	}
 
 	.modal-content::before {
@@ -224,7 +252,9 @@
 		z-index: 0;
 	}
 
+	.modal-head,
 	.modal-body,
+	.modal-foot,
 	.modal-title,
 	.modal-text,
 	.modal-icon-box {

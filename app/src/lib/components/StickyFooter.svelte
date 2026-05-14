@@ -36,7 +36,7 @@
 		z-index: 50;
 		display: flex;
 		justify-content: center;
-		padding: 8px 16px max(12px, calc(env(safe-area-inset-bottom, 0px) - 14px));
+		padding: 12px 16px max(16px, calc(env(safe-area-inset-bottom, 0px) - 10px));
 		pointer-events: none;
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
@@ -64,7 +64,7 @@
 
 	@media (min-width: 768px) {
 		.sticky-footer {
-			padding: 12px 16px 24px;
+			padding: 16px 16px 28px;
 		}
 	}
 

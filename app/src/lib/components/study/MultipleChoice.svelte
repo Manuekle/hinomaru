@@ -254,8 +254,11 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		gap: 16px;
-		padding: 20px 0 8px;
+		gap: clamp(16px, 3vh, 24px);
+		padding: clamp(20px, 4vh, 32px) 16px clamp(20px, 3vh, 28px);
+		width: 100%;
+		max-width: 520px;
+		margin: 0 auto;
 	}
 
 	.word-card {
@@ -264,11 +267,11 @@
 		border: 1px solid var(--ink-200);
 		border-radius: 20px;
 		box-shadow: 0 2px 12px rgba(26, 26, 26, 0.06);
-		padding: 20px 20px 18px;
+		padding: 22px 20px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 8px;
+		gap: 12px;
 		text-align: center;
 	}
 
@@ -307,7 +310,7 @@
 	.options-list {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 12px;
 	}
 
 	.option-item {

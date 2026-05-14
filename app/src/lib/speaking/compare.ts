@@ -1,4 +1,4 @@
-import { normalizeJapanese } from './normalize';
+import { forMatch } from './normalize';
 
 // ── Levenshtein edit distance ─────────────────────────────────────────────────
 export function levenshtein(a: string, b: string): number {
@@ -53,8 +53,8 @@ function bestWindowSimilarity(text: string, target: string): number {
 export type ScoreLevel = 'correct' | 'close' | 'wrong';
 
 export function classify(score: number): ScoreLevel {
-	if (score >= 0.8) return 'correct';
-	if (score >= 0.55) return 'close';
+	if (score >= 0.7) return 'correct';
+	if (score >= 0.45) return 'close';
 	return 'wrong';
 }
 
@@ -85,20 +85,34 @@ export interface CompareResult {
 }
 
 export function comparePhrase(target: string, spoken: string, segments: string[]): CompareResult {
-	const normSpoken = normalizeJapanese(spoken);
-	const normTarget = normalizeJapanese(target);
+	const normSpoken = forMatch(spoken);
+	const normTarget = forMatch(target);
 
-	// Overall score: compare normalized full strings
+	// Overall score: compare canonical forms (kana → romaji, fullwidth → halfwidth,
+	// kanji passes through). Callers with kanji targets should also try a romaji
+	// reference (e.g. lyric.romaji) and take the max.
 	const overallScore = similarity(normTarget, normSpoken);
 	const overallLevel = classify(overallScore);
 
 	// Per-segment scores
 	const segResults: SegmentResult[] = segments.map((seg) => {
-		const normSeg = normalizeJapanese(seg);
-		// Sliding window within spoken to find best match for this segment
+		const normSeg = forMatch(seg);
 		const score = bestWindowSimilarity(normSpoken, normSeg);
 		return { segment: seg, score, level: classify(score) };
 	});
 
 	return { overallScore, overallLevel, segments: segResults, spokenNorm: normSpoken };
+}
+
+// Best-of comparison: tries multiple target alternates (e.g. raw text + romaji
+// reading) and returns the highest score. Useful when target contains kanji
+// the recognizer may or may not return.
+export function comparePhraseBest(targets: string[], spoken: string): CompareResult {
+	let best: CompareResult | null = null;
+	for (const t of targets) {
+		if (!t) continue;
+		const r = comparePhrase(t, spoken, []);
+		if (!best || r.overallScore > best.overallScore) best = r;
+	}
+	return best ?? { overallScore: 0, overallLevel: 'wrong', segments: [], spokenNorm: forMatch(spoken) };
 }

@@ -4,6 +4,7 @@ export interface KaraokeRecognitionResult {
 	transcript: string;
 	confidence: number;
 	isFinal: boolean;
+	alternatives: string[];
 }
 
 export type KaraokeResultCallback = (r: KaraokeRecognitionResult) => void;
@@ -80,7 +81,7 @@ export class KaraokeRecognizer {
 		const rec = new SR();
 		rec.lang = 'ja-JP';
 		rec.interimResults = true;
-		rec.maxAlternatives = 1;
+		rec.maxAlternatives = 5;
 		rec.continuous = true;
 
 		rec.onstart = () => {
@@ -90,11 +91,18 @@ export class KaraokeRecognizer {
 
 		rec.onresult = (e: SpeechRecognitionEvent) => {
 			for (let i = e.resultIndex; i < e.results.length; i++) {
-				const alt = e.results[i][0];
+				const result = e.results[i];
+				const top = result[0];
+				const alts: string[] = [];
+				for (let a = 0; a < result.length; a++) {
+					const t = result[a]?.transcript;
+					if (t) alts.push(t);
+				}
 				this.onResult?.({
-					transcript: alt.transcript,
-					confidence: alt.confidence ?? 0,
-					isFinal: e.results[i].isFinal
+					transcript: top.transcript,
+					confidence: top.confidence ?? 0,
+					isFinal: result.isFinal,
+					alternatives: alts
 				});
 			}
 		};

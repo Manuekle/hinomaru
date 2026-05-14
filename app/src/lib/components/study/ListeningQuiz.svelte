@@ -88,7 +88,8 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		padding: 20px 0 8px;
+		gap: clamp(16px, 3vh, 24px);
+		padding: clamp(20px, 4vh, 32px) 16px clamp(20px, 3vh, 28px);
 		width: 100%;
 		max-width: 440px;
 		margin: 0 auto;
@@ -139,11 +140,11 @@
 		transform: scale(0.97); 
 	}
 
-	.choices-grid { 
-		display: grid; 
-		grid-template-columns: 1fr 1fr; 
-		gap: 10px; 
-		width: 100%; 
+	.choices-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
+		width: 100%;
 	}
 	
 	.choice-btn { 

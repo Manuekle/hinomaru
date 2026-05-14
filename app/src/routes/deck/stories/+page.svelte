@@ -60,7 +60,10 @@
 					<div class="row-num">{i + 1 < 10 ? '0' + (i + 1) : i + 1}</div>
 					<div class="row-body">
 						<div class="row-top">
-							<span class="row-title">{$locale === 'es' ? story.title_es : story.title_en}</span>
+							<span class="row-title">
+								{#if story.emoji}<span class="story-emoji">{story.emoji}</span> {/if}
+								{$locale === 'es' ? story.title_es : story.title_en}
+							</span>
 						</div>
 						<div class="row-sub jp">{[...story.body_jp].slice(0, 28).join('')}…</div>
 						<div class="row-date">
@@ -184,6 +187,15 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.story-emoji {
+		font-style: normal;
+		font-weight: 400;
+		flex-shrink: 0;
 	}
 
 	.row-sub {

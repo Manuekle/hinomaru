@@ -100,6 +100,7 @@
 	<ResponsiveModal
 		bind:open={sheetOpen}
 		title={selectedChar.script === 'hiragana' ? 'Hiragana' : 'Katakana'}
+		hideTitle
 		dismissible={!sheetLocked}
 	>
 		{#if selectedChar}

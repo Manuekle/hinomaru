@@ -367,20 +367,37 @@
 		{/if}
 
 	{#if card && !showAnticipation}
-		<StickyFooter>
-			{#if !checked}
-				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
-					{t('session.skip', $locale)}
-				</button>
-				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
-					{t('session.reset', $locale)}
-				</button>
-			{:else}
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-					{t('session.continue', $locale)}
-				</button>
-			{/if}
-		</StickyFooter>
+		{#if isLesson}
+			<div class="lesson-footer">
+				{#if !checked}
+					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
+						{t('session.skip', $locale)}
+					</button>
+					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
+						{t('session.reset', $locale)}
+					</button>
+				{:else}
+					<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+						{t('session.continue', $locale)}
+					</button>
+				{/if}
+			</div>
+		{:else}
+			<StickyFooter>
+				{#if !checked}
+					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
+						{t('session.skip', $locale)}
+					</button>
+					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
+						{t('session.reset', $locale)}
+					</button>
+				{:else}
+					<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+						{t('session.continue', $locale)}
+					</button>
+				{/if}
+			</StickyFooter>
+		{/if}
 	{/if}
 </StudySessionLayout>
 
@@ -388,27 +405,29 @@
 
 <style>
 
-	.write-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: 20px 0 8px; width: 100%; max-width: 500px; margin: 0 auto; }
+	.write-viewer { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: clamp(16px, 3vh, 24px); padding: clamp(20px, 4vh, 32px) 16px clamp(20px, 3vh, 28px); width: 100%; max-width: 500px; margin: 0 auto; }
 
-	.prompt-card { background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 24px; box-shadow: 0 4px 24px rgba(26,26,26,0.07); padding: 24px; display: flex; flex-direction: column; gap: 12px; }
-	.prompt-row { display: flex; align-items: center; justify-content: space-between; }
+	.prompt-card { background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 24px; box-shadow: 0 4px 24px rgba(26,26,26,0.07); padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+	.prompt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 	.meaning-text { font-size: 24px; font-weight: 900; color: var(--fg-primary); }
-	.audio-corner { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--ink-200); background: var(--bg-muted); display: flex; align-items: center; justify-content: center; color: var(--fg-secondary); }
+	.audio-corner { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--ink-200); background: var(--bg-muted); display: flex; align-items: center; justify-content: center; color: var(--fg-secondary); flex-shrink: 0; }
 	.romaji { font-weight: 700; color: var(--hinomaru-red); margin-top: -4px; }
-	.canvas-section { display: flex; flex-direction: column; gap: 16px; }
-	.canvas-header { display: flex; justify-content: space-between; padding: 0 8px; }
-	.char-progress { display: flex; gap: 6px; }
-	.char-dot { width: 30px; height: 30px; border-radius: 8px; background: var(--bg-surface); border: 1.5px solid var(--ink-200); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+	.canvas-section { display: flex; flex-direction: column; gap: clamp(14px, 2.5vh, 20px); }
+	.canvas-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 0; gap: 12px; }
+	.char-progress { display: flex; gap: 8px; flex-wrap: wrap; }
+	.char-dot { width: 34px; height: 34px; border-radius: 10px; background: var(--bg-surface); border: 1.5px solid var(--ink-200); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
 	.char-dot.active { border-color: var(--hinomaru-red); color: var(--hinomaru-red); }
 	.char-dot.done { background: var(--success-wash); border-color: var(--success); color: var(--success); }
-	.tool-btn { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid var(--ink-200); display: flex; align-items: center; justify-content: center; cursor: pointer; }
-	.canvas-wrapper { position: relative; background: var(--bg-page); border-radius: 24px; border: 1.5px solid var(--ink-200); padding: 16px; min-height: 240px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-	.canvas-wrapper.empty-data { flex-direction: column; gap: 16px; background: var(--bg-surface); text-align: center; padding: 32px 24px; }
+	.tool-btn { width: 34px; height: 34px; border-radius: 10px; border: 1.5px solid var(--ink-200); background: var(--bg-surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+	.canvas-wrapper { position: relative; background: var(--bg-page); border-radius: 24px; border: 1.5px solid var(--ink-200); padding: 20px; min-height: clamp(260px, 42vh, 380px); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+	.canvas-wrapper.empty-data { flex-direction: column; gap: 16px; background: var(--bg-surface); text-align: center; padding: 36px 24px; }
 	.empty-data-text { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); max-width: 280px; line-height: 1.4; }
-	.hanzi-container { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; width: 100%; position: relative; z-index: 1; }
+	.hanzi-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; width: 100%; position: relative; z-index: 1; }
 	:global(.kanji-box) { position: relative; background: var(--bg-surface); border-radius: 8px; border: 1px solid var(--ink-200); overflow: hidden; }
 	:global(.kanji-box::before) { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed var(--ink-200); z-index: 0; }
 	:global(.kanji-box::after) { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--ink-200); z-index: 0; }
 	:global(.kanji-box > svg) { position: relative; z-index: 1; }
 	.loader-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-surface); border-radius: 24px; z-index: 10; }
+	.lesson-footer { display: flex; gap: 12px; width: 100%; padding-top: 12px; flex-shrink: 0; }
+	.lesson-footer > * { flex: 1; }
 </style>
