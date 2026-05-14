@@ -23,6 +23,7 @@ declare global {
 			supabase?: SupabaseClient;
 			session: Session | null;
 			user: User | null;
+			isAdmin: boolean;
 			cookies?: { name: string; value: string }[];
 		}
 	}

@@ -32,14 +32,15 @@
 		EarthIcon,
 		JupiterIcon,
 		Delete02Icon,
-		BubbleChatIcon
+		BubbleChatIcon,
+		Mail01Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
 
 	let { data } = $props<{ data: PageData }>();
-	let { supabase, user } = $derived(data);
+	let { supabase, user, isAdmin } = $derived(data);
 
 	async function signOut() {
 		await supabase.auth.signOut();
@@ -327,6 +328,35 @@
 				<div class="profile-email">{user?.email}</div>
 			</div>
 		</div>
+		<!-- ── Admin ── -->
+		{#if isAdmin}
+			<div>
+				<p class="section-label">Administración</p>
+				<div class="card">
+					<a href="/admin/messages" class="pref-row">
+						<div class="pref-icon" style="background:var(--hinomaru-red-wash);color:var(--hinomaru-red);">
+							<Icon icon={Mail01Icon} size={18} color="currentColor" strokeWidth={1.8} />
+						</div>
+						<div class="pref-text">
+							<span class="pref-title">Mensajes Recibidos</span>
+							<span class="pref-sub">Ver mensajes del formulario de contacto</span>
+						</div>
+						<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg
+							>
+						</div>
+					</a>
+				</div>
+			</div>
+		{/if}
 
 		<!-- ── Tema ── -->
 		<div>
