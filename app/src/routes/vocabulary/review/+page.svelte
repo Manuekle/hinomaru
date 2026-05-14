@@ -71,7 +71,6 @@
 			setTimeout(() => {
 				done = true;
 				showAnticipation = false;
-				playFinish();
 				confettiRef?.fire();
 			}, 1500);
 			return;

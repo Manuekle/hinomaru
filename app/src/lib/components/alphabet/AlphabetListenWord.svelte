@@ -13,13 +13,18 @@
 	import { ALL_CHARS, type KanaWord } from '$lib/data/alphabetCharacters';
 	import { fadeIn, fadeUp } from '$lib/motion';
 
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
+
 	interface Props {
+		mode?: 'deck' | 'lesson';
 		word: KanaWord;
 		script: 'hiragana' | 'katakana';
 		onAnswer: (correct: boolean) => void;
 	}
 
-	let { word, script, onAnswer }: Props = $props();
+	let { mode = 'deck', word, script, onAnswer }: Props = $props();
+	const isLesson = $derived(mode === 'lesson');
 
 	interface Chip {
 		tok: string;
@@ -98,71 +103,82 @@
 	const ready = $derived(answer.length > 0 && !locked);
 </script>
 
-<div class="lw-viewer">
-	<div class="word-card" use:fadeIn>
-		<button onclick={play} class="audio-corner" aria-label="Reproducir audio">
-			<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
-		</button>
-		<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHA Y FORMA' : 'LISTEN & BUILD'}</span>
-		<p class="hint">{$locale === 'es' ? word.es : word.en}</p>
-	</div>
+<StudySessionLayout
+	{isLesson}
+	onExit={() => onAnswer(false)}
+	currentIndex={0}
+	totalCount={1}
+>
+	<div class="lw-viewer content-center">
+		<div class="word-card" use:fadeIn>
+			<button onclick={play} class="audio-corner" aria-label="Reproducir audio">
+				<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+			</button>
+			<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHA Y FORMA' : 'LISTEN & BUILD'}</span>
+			<p class="hint">{$locale === 'es' ? word.es : word.en}</p>
+		</div>
 
-	<div
-		class="answer-zone"
-		class:is-correct={result === 'correct'}
-		class:is-wrong={result === 'wrong'}
-	>
-		{#if answer.length === 0}
-			<div class="answer-placeholder">
-				{$locale === 'es' ? 'Toca los caracteres' : 'Tap characters'}
-			</div>
-		{:else}
-			{#each answer as chip (chip.uid)}
-				<button class="token-chip is-selected" disabled={locked} onclick={() => remove(chip)}>
+		<div
+			class="answer-zone"
+			class:is-correct={result === 'correct'}
+			class:is-wrong={result === 'wrong'}
+		>
+			{#if answer.length === 0}
+				<div class="answer-placeholder">
+					{$locale === 'es' ? 'Toca los caracteres' : 'Tap characters'}
+				</div>
+			{:else}
+				{#each answer as chip (chip.uid)}
+					<button class="token-chip is-selected" disabled={locked} onclick={() => remove(chip)}>
+						<span class="chip-jp jp">{chip.tok}</span>
+					</button>
+				{/each}
+			{/if}
+		</div>
+
+		<div class="tokens-bank">
+			{#each bank as chip (chip.uid)}
+				<button class="token-chip" onclick={() => add(chip)} disabled={locked}>
 					<span class="chip-jp jp">{chip.tok}</span>
 				</button>
 			{/each}
-		{/if}
-	</div>
-
-	<div class="tokens-bank">
-		{#each bank as chip (chip.uid)}
-			<button class="token-chip" onclick={() => add(chip)} disabled={locked}>
-				<span class="chip-jp jp">{chip.tok}</span>
-			</button>
-		{/each}
-	</div>
-
-	{#if result}
-		<div class="feedback-bar" class:is-correct={result === 'correct'} use:fadeUp={{ y: 10 }}>
-			<Icon
-				icon={result === 'correct' ? CheckmarkCircle01Icon : Cancel01Icon}
-				size={18}
-				color="currentColor"
-			/>
-			<span class="fb-label">
-				{result === 'correct'
-					? $locale === 'es'
-						? '¡Correcto!'
-						: 'Correct!'
-					: $locale === 'es'
-						? `Era: ${word.jp}`
-						: `Was: ${word.jp}`}
-			</span>
 		</div>
-	{/if}
 
-	<div class="inline-footer">
-		{#if !locked && answer.length > 0}
-			<button class="hm-btn hm-btn-secondary icon-btn" onclick={clearAnswer} aria-label="Limpiar">
-				<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
-			</button>
+		{#if result}
+			<div class="feedback-bar" class:is-correct={result === 'correct'} use:fadeUp={{ y: 10 }}>
+				<Icon
+					icon={result === 'correct' ? CheckmarkCircle01Icon : Cancel01Icon}
+					size={18}
+					color="currentColor"
+				/>
+				<span class="fb-label">
+					{result === 'correct'
+						? $locale === 'es'
+							? '¡Correcto!'
+							: 'Correct!'
+						: $locale === 'es'
+							? `Era: ${word.jp}`
+							: `Was: ${word.jp}`}
+				</span>
+			</div>
 		{/if}
-		<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={check} disabled={!ready}>
-			{t('session.check', $locale)}
-		</button>
 	</div>
-</div>
+
+	{#if word}
+		<StickyFooter>
+			<div class="footer-actions">
+				{#if !locked && answer.length > 0}
+					<button class="hm-btn hm-btn-secondary icon-btn" onclick={clearAnswer} aria-label="Limpiar">
+						<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
+					</button>
+				{/if}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={check} disabled={!ready}>
+					{t('session.check', $locale)}
+				</button>
+			</div>
+		</StickyFooter>
+	{/if}
+</StudySessionLayout>
 
 <style>
 	.lw-viewer {
@@ -328,11 +344,9 @@
 		flex-shrink: 0;
 	}
 
-	.inline-footer {
+	.footer-actions {
 		display: flex;
 		gap: 10px;
 		width: 100%;
-		margin-top: auto;
-		padding-top: 8px;
 	}
 </style>
