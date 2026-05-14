@@ -27,6 +27,7 @@
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { kanaToRomaji } from '$lib/utils/romaji';
 	import KaraokeOverlay from '$lib/components/KaraokeOverlay.svelte';
+	import AmbientGlow from '$lib/components/AmbientGlow.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
 	let songId = $derived(Number($page.params.id));
@@ -443,7 +444,13 @@
 		Song not found. <a href="/deck/songs" style="color:var(--hinomaru-red);">← Back</a>
 	</div>
 {:else}
+	{#if hasVideo}
+		<div class="ambient-bg">
+			<AmbientGlow youtubeId={song.youtubeId} />
+		</div>
+	{/if}
 	<div
+		class="page-wrap"
 		style="max-width:720px;margin:0 auto;min-height:100vh;padding:calc(24px + env(safe-area-inset-top)) 24px 140px;"
 	>
 		<!-- Back link -->
@@ -749,8 +756,8 @@
 		gap: 10px;
 		padding: 48px 24px;
 		text-align: center;
-		border-top: 1px solid var(--ink-100);
-		border-bottom: 1px solid var(--ink-100);
+		border-top: 1px solid var(--ink-300);
+		border-bottom: 1px solid var(--ink-300);
 		margin-bottom: 24px;
 	}
 	.cs-title {
@@ -765,6 +772,18 @@
 		margin: 0;
 		line-height: 1.5;
 		max-width: 260px;
+	}
+
+	/* Ambient bg — full-page glow behind everything */
+	.ambient-bg {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		pointer-events: none;
+	}
+	.page-wrap {
+		position: relative;
+		z-index: 1;
 	}
 
 	/* Video */
@@ -854,8 +873,10 @@
 		padding: 0 14px;
 		height: 36px;
 		border-radius: 999px;
-		border: 1.5px solid var(--ink-200);
-		background: transparent;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface-glass);
+		backdrop-filter: blur(12px) saturate(1.4);
+		-webkit-backdrop-filter: blur(12px) saturate(1.4);
 		font-size: 12px;
 		font-weight: 600;
 		color: var(--fg-secondary);
@@ -884,11 +905,13 @@
 		padding: 0 11px;
 		height: 32px;
 		border-radius: 999px;
-		border: 1.5px solid var(--ink-200);
-		background: transparent;
+		border: 1px solid var(--ink-200);
+		background: var(--bg-surface-glass);
+		backdrop-filter: blur(12px) saturate(1.4);
+		-webkit-backdrop-filter: blur(12px) saturate(1.4);
 		font-size: 11px;
 		font-weight: 700;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		cursor: pointer;
 		transition: all 150ms;
 		font-family: var(--font-ui);
@@ -922,17 +945,19 @@
 	.time {
 		font-size: 11px;
 		font-weight: 600;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		font-variant-numeric: tabular-nums;
 		min-width: 36px;
 	}
 
 	.bar {
 		flex: 1;
-		height: 3px;
-		background: var(--ink-200);
+		height: 4px;
+		background: var(--ink-300);
 		border-radius: 99px;
 		overflow: hidden;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 	}
 	.bar-fill {
 		height: 100%;
@@ -946,9 +971,16 @@
 		background: var(--hinomaru-red);
 		color: #fff;
 		border-color: transparent;
+		box-shadow: 0 2px 8px rgba(188, 0, 45, 0.1);
+		transition: all var(--dur-base) var(--ease-brand);
 	}
-	.icon-btn.karaoke-btn:hover:not(:disabled) {
-		background: #a3002b;
+	@media (hover: hover) {
+		.icon-btn.karaoke-btn:hover:not(:disabled) {
+			background: var(--hinomaru-red-ink);
+			color: #fff;
+			border-color: transparent;
+			box-shadow: 0 4px 12px rgba(188, 0, 45, 0.2);
+		}
 	}
 
 	/* Sections */
@@ -961,15 +993,15 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		margin-bottom: 16px;
 		padding-bottom: 10px;
-		border-bottom: 1px solid var(--ink-100);
+		border-bottom: 1px solid var(--ink-300);
 	}
 
 	.muted {
 		font-size: 14px;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		margin: 0;
 	}
 
@@ -1171,8 +1203,8 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
-		background: var(--ink-100);
-		color: var(--fg-tertiary);
+		background: var(--ink-200);
+		color: var(--fg-secondary);
 		padding: 2px 8px;
 		border-radius: 4px;
 	}
@@ -1181,7 +1213,7 @@
 		font-size: 10px;
 		font-weight: 600;
 		font-style: italic;
-		color: var(--fg-tertiary);
+		color: var(--fg-secondary);
 		padding: 2px 0;
 	}
 </style>

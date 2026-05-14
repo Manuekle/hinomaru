@@ -11,6 +11,7 @@
 	import { addXP } from '$lib/utils/gamification';
 	import { svileo } from '$lib/stores/toast';
 	import MicOrb from './MicOrb.svelte';
+	import AmbientGlow from './AmbientGlow.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import { Cancel01Icon, ArrowReloadHorizontalIcon } from '@hugeicons/core-free-icons';
 	import type { SongLesson } from '$lib/utils/jlptSongs';
@@ -62,6 +63,8 @@
 	let recognizer: KaraokeRecognizer | null = null;
 	let stopMeter: (() => void) | null = null;
 	let pollTimer: ReturnType<typeof setInterval> | null = null;
+	let countdown = $state<number | null>(null);
+	let countdownTimer: ReturnType<typeof setTimeout> | null = null;
 	let originalVolume = 100;
 	let currentVol = 100;
 	let lastSetVol = -1;
@@ -110,6 +113,8 @@
 		micError = null;
 		summaryShown = false;
 		xpAwarded = false;
+		countdown = null;
+		if (countdownTimer) { clearTimeout(countdownTimer); countdownTimer = null; }
 
 		if (!player || !playerReady) {
 			micError = 'Player no listo. Cierra y vuelve a abrir.';
@@ -125,27 +130,13 @@
 		lastSetVol = -1;
 		try { player.setVolume(originalVolume); } catch { /* ignore */ }
 
-		// Seek to start and play
+		// Pre-seek (paused) so the video frame is ready when countdown finishes
 		try {
 			player.seekTo(startSec, true);
-			player.playVideo();
+			player.pauseVideo();
 		} catch { /* ignore */ }
 
-		// Poll player time
-		pollTimer = setInterval(() => {
-			if (!player) return;
-			try {
-				const tNow = player.getCurrentTime();
-				syncActiveLyric(tNow);
-				if (tNow >= endSec && !summaryShown) {
-					try { player.pauseVideo(); } catch { /* ignore */ }
-					finalizeLastLine();
-					showSummary();
-				}
-			} catch { /* ignore */ }
-		}, 150);
-
-		// Mic + recognizer
+		// Mic + recognizer first — triggers permission prompt before countdown
 		recognizer = new KaraokeRecognizer();
 		await recognizer.start(
 			(r) => {
@@ -180,8 +171,6 @@
 		);
 		recognizerArmed = !!recognizer.active;
 
-		// Level meter on the recognizer's stream. Updates a mutable ref only;
-		// MicOrb reads it via rAF and the ducking lerp runs here.
 		const stream = recognizer.getMediaStream();
 		if (stream) {
 			stopMeter = startLevelMeter(stream, (rms) => {
@@ -189,9 +178,51 @@
 				updateDucking(rms);
 			}, 20);
 		}
+
+		// Run 3-2-1 countdown, then start playback
+		runCountdown(() => beginPlayback());
+	}
+
+	function runCountdown(onComplete: () => void) {
+		countdown = 3;
+		const tick = () => {
+			if (countdown === null) return;
+			if (countdown <= 1) {
+				countdown = 0;
+				countdownTimer = setTimeout(() => {
+					countdown = null;
+					countdownTimer = null;
+					onComplete();
+				}, 600);
+				return;
+			}
+			countdown = countdown - 1;
+			countdownTimer = setTimeout(tick, 900);
+		};
+		countdownTimer = setTimeout(tick, 900);
+	}
+
+	function beginPlayback() {
+		if (!player) return;
+		try { player.playVideo(); } catch { /* ignore */ }
+
+		pollTimer = setInterval(() => {
+			if (!player) return;
+			try {
+				const tNow = player.getCurrentTime();
+				syncActiveLyric(tNow);
+				if (tNow >= endSec && !summaryShown) {
+					try { player.pauseVideo(); } catch { /* ignore */ }
+					finalizeLastLine();
+					showSummary();
+				}
+			} catch { /* ignore */ }
+		}, 150);
 	}
 
 	function endSession(fullCleanup: boolean) {
+		if (countdownTimer) { clearTimeout(countdownTimer); countdownTimer = null; }
+		countdown = null;
 		if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
 		if (stopMeter) { stopMeter(); stopMeter = null; }
 		if (recognizer) { recognizer.abort(); recognizer = null; }
@@ -408,6 +439,9 @@
 
 {#if open}
 	<div class="overlay" role="dialog" aria-modal="true" aria-label={t('songs.karaoke', $locale)}>
+		{#if song?.youtubeId}
+			<AmbientGlow youtubeId={song.youtubeId} intensity={0.35} />
+		{/if}
 		<button class="close" onclick={close} aria-label={t('common.close', $locale) || 'Close'}>
 			<Icon icon={Cancel01Icon} size={20} color="currentColor" />
 		</button>
@@ -418,8 +452,21 @@
 			<div class="artist">{song.artist}</div>
 		</div>
 
+		{#if countdown !== null}
+			<div class="countdown" aria-live="assertive">
+				{#key countdown}
+					<div class="cd-number" class:go={countdown === 0}>
+						{countdown === 0 ? ($locale === 'es' ? '¡Canta!' : 'Sing!') : countdown}
+					</div>
+				{/key}
+				<div class="cd-hint">
+					{$locale === 'es' ? 'Prepárate para cantar' : 'Get ready to sing'}
+				</div>
+			</div>
+		{/if}
+
 		{#if !summaryShown}
-			<div class="lyrics-stage">
+			<div class="lyrics-stage" class:dim={countdown !== null}>
 				{#each visibleLines as v (v.idx)}
 					{@const isActive = v.pos === 0}
 					{@const past = v.pos < 0}
@@ -613,6 +660,54 @@
 		padding: 24px 0;
 		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, var(--ko-mask-color) 18%, var(--ko-mask-color) 82%, transparent 100%);
 		mask-image: linear-gradient(to bottom, transparent 0%, var(--ko-mask-color) 18%, var(--ko-mask-color) 82%, transparent 100%);
+		transition: opacity 280ms ease;
+	}
+	.lyrics-stage.dim {
+		opacity: 0.15;
+		pointer-events: none;
+	}
+
+	.countdown {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+		z-index: 5;
+		pointer-events: none;
+	}
+	.cd-number {
+		font-size: 140px;
+		font-weight: 800;
+		letter-spacing: -0.04em;
+		line-height: 1;
+		color: var(--ko-fg);
+		text-shadow: 0 0 60px rgba(188, 0, 45, 0.25);
+		animation: cdPop 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+	}
+	.cd-number.go {
+		font-size: 88px;
+		color: var(--hinomaru-red);
+		animation: cdGo 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+	}
+	.cd-hint {
+		font-size: 13px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--ko-fg-muted);
+	}
+	@keyframes cdPop {
+		0%   { opacity: 0; transform: scale(0.6); }
+		25%  { opacity: 1; transform: scale(1.05); }
+		70%  { opacity: 1; transform: scale(1); }
+		100% { opacity: 0.85; transform: scale(0.95); }
+	}
+	@keyframes cdGo {
+		0%   { opacity: 0; transform: scale(0.8); letter-spacing: 0.1em; }
+		40%  { opacity: 1; transform: scale(1.08); letter-spacing: -0.02em; }
+		100% { opacity: 1; transform: scale(1); letter-spacing: -0.04em; }
 	}
 
 	.line {
