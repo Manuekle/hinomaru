@@ -12,7 +12,6 @@
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { ALL_CHARS, type KanaWord } from '$lib/data/alphabetCharacters';
 	import { fadeIn, fadeUp } from '$lib/motion';
-	import { t } from '$lib/i18n';
 
 	interface Props {
 		word: KanaWord;
