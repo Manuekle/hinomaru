@@ -91,7 +91,6 @@
 	onExit={() => goto('/vocabulary')}
 	currentIndex={i}
 	totalCount={session.length}
-	modeBadge={`${modeLabel[mode]} ${t(`vocab.review.${mode}`, $locale)}`}
 >
 	{#if done}
 		<StudySummary 
