@@ -288,9 +288,12 @@
 	}
 	.token-chip.is-selected {
 		background: var(--fg-primary);
-		color: white;
+		color: var(--washi);
 		border-color: var(--fg-primary);
-		box-shadow: 0 3px 0 #000;
+		box-shadow: 0 3px 0 var(--ink-300);
+	}
+	.token-chip.is-selected .chip-jp {
+		color: var(--washi);
 	}
 	.token-chip:disabled {
 		opacity: 0.55;

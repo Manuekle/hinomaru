@@ -9,7 +9,6 @@
 	import { recordResult, alphabetProgress, isLearned } from '$lib/stores/alphabetProgress';
 	import Icon from '$lib/Icon.svelte';
 	import { Cancel01Icon } from '@hugeicons/core-free-icons';
-	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import AlphabetIntroduce from '$lib/components/alphabet/AlphabetIntroduce.svelte';
 	import AlphabetCharMcq from '$lib/components/alphabet/AlphabetCharMcq.svelte';
 	import AlphabetListenWord from '$lib/components/alphabet/AlphabetListenWord.svelte';
@@ -36,7 +35,6 @@
 	let stepIdx = $state(0);
 	let stepKey = $state(0);
 	let done = $state(false);
-	let showAnticipation = $state(false);
 	let correctCount = $state(0);
 
 	function shuffle<T>(arr: T[]): T[] {
@@ -108,11 +106,7 @@
 			playWrong();
 		}
 		if (stepIdx >= queue.length - 1) {
-			showAnticipation = true;
-			setTimeout(() => {
-				done = true;
-				showAnticipation = false;
-			}, 1500);
+			done = true;
 		} else {
 			stepIdx++;
 			stepKey++;
@@ -196,4 +190,3 @@
 	</StudySessionLayout>
 {/if}
 
-{#if showAnticipation}<AnticipationScreen />{/if}

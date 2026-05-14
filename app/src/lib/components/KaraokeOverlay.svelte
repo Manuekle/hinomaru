@@ -343,12 +343,19 @@
 	onDestroy(() => endSession(true));
 
 	const liveTranscript = $derived.by(() => {
-		if (activeIdx < 0) return '';
+		if (activeIdx < 0 || activeIdx >= lyrics.length) return '';
 		const finals = lineFinals[activeIdx] ?? [];
 		const interim = lineInterim[activeIdx] ?? [];
+		const targets = targetsForLine(lyrics[activeIdx]);
 		const parts: string[] = [];
-		for (const alts of finals) if (alts[0]) parts.push(alts[0]);
-		if (interim[0]) parts.push(interim[0]);
+		for (const alts of finals) {
+			const pick = targets.length ? bestAltAgainst(alts, targets).text : alts[0];
+			if (pick) parts.push(pick);
+		}
+		if (interim.length) {
+			const pick = targets.length ? bestAltAgainst(interim, targets).text : interim[0];
+			if (pick) parts.push(pick);
+		}
 		return parts.join(' ').trim();
 	});
 

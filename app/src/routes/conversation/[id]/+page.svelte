@@ -179,6 +179,11 @@
 		isRecording = false;
 	}
 
+	function toggleRecording() {
+		if (isRecording) stopRecording();
+		else startRecording();
+	}
+
 	function checkSpokenAnswer(spoken: string) {
 		if (currentTurn?.type !== 'choice') return;
 		const pool = liveAlternatives.length ? liveAlternatives : [spoken];
@@ -415,48 +420,23 @@
 							</p>
 
 							{#if roleplayMode && phase === 'choice'}
-								<!-- ROLEPLAY MODE -->
-									<div class="roleplay-box-premium">
-										<div class="mic-container" class:is-recording={isRecording}>
-											<button
-												class="mic-btn-premium"
-												class:is-recording={isRecording}
-												onmousedown={startRecording}
-												onmouseup={stopRecording}
-												ontouchstart={startRecording}
-												ontouchend={stopRecording}
-												aria-pressed={isRecording}
-												aria-label={isRecording
-													? $locale === 'es'
-														? 'Soltar para detener'
-														: 'Release to stop'
-													: $locale === 'es'
-														? 'Mantener para hablar'
-														: 'Hold to speak'}
-											>
-												<Icon icon={Mic01Icon} size={22} color="white" />
-											</button>
+								<!-- ROLEPLAY MODE — mic lives in StickyFooter; here we only surface live status -->
+								<div class="roleplay-live">
+									{#if isRecording}
+										<div class="status-indicator">
+											<span class="pulse-dot"></span>
+											<span class="status-text">{liveTranscript || ($locale === 'es' ? 'Escuchando…' : 'Listening…')}</span>
 										</div>
-
-										<div class="recording-status">
-											{#if isRecording}
-												<div class="status-indicator">
-													<span class="pulse-dot"></span>
-													<span class="status-text">{liveTranscript || ($locale === 'es' ? 'Escuchando...' : 'Listening...')}</span>
-												</div>
-											{:else}
-												<p class="instruction-text">
-													{$locale === 'es'
-														? 'Mantén presionado para hablar'
-														: 'Hold to speak your response'}
-												</p>
-											{/if}
-										</div>
-
-										{#if speechError}
-											<p class="error-text" role="alert">{speechError}</p>
-										{/if}
-									</div>
+									{:else if speechError}
+										<p class="error-text" role="alert">{speechError}</p>
+									{:else}
+										<p class="instruction-text">
+											{$locale === 'es'
+												? 'Pulsa el botón de abajo y responde'
+												: 'Tap the button below and respond'}
+										</p>
+									{/if}
+								</div>
 							{:else}
 								<!-- STANDARD MULTIPLE CHOICE -->
 								<div class="options-grid">
@@ -575,6 +555,24 @@
 				<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={restart}>
 					{t('session.repeat', $locale)}
 				</button>
+			{:else if phase === 'choice' && roleplayMode && speechOk}
+				<button
+					class="hm-btn hm-btn-full hm-btn-lg footer-mic-btn"
+					class:is-recording={isRecording}
+					onclick={toggleRecording}
+					aria-pressed={isRecording}
+				>
+					<span class="footer-mic-icon">
+						<Icon icon={Mic01Icon} size={20} color="currentColor" />
+					</span>
+					<span>
+						{#if isRecording}
+							{$locale === 'es' ? 'Escuchando… toca para parar' : 'Listening… tap to stop'}
+						{:else}
+							{$locale === 'es' ? 'Habla' : 'Speak'}
+						{/if}
+					</span>
+				</button>
 			{:else}
 				<button
 					class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg"
@@ -649,74 +647,58 @@
 		align-items: center;
 	}
 
-	.roleplay-box-premium {
+	.roleplay-live {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 16px 0;
-		gap: 12px;
-	}
-
-	.mic-container {
-		position: relative;
-		width: 64px;
-		height: 64px;
-		display: flex;
-		align-items: center;
 		justify-content: center;
+		padding: 14px 0 6px;
+		min-height: 56px;
 	}
 
-	.mic-btn-premium {
-		width: 64px;
-		height: 64px;
-		border-radius: 50%;
-		border: none;
+	.footer-mic-btn {
 		background: var(--hinomaru-red);
 		color: white;
-		position: relative;
-		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.22);
+		gap: 10px;
+		border: none;
+		box-shadow: 0 6px 18px rgba(188, 0, 45, 0.28);
 		transition:
-			transform 0.16s cubic-bezier(0.34, 1.5, 0.64, 1),
 			background 0.2s ease,
-			box-shadow 0.2s ease;
-		z-index: 10;
-		user-select: none;
-		-webkit-user-select: none;
-		touch-action: none;
+			box-shadow 0.2s ease,
+			transform 0.16s cubic-bezier(0.34, 1.5, 0.64, 1);
 	}
-
-	.mic-btn-premium:active {
-		transform: scale(0.94);
+	.footer-mic-btn:active {
+		transform: scale(0.98);
 	}
-
-	.mic-btn-premium.is-recording {
+	.footer-mic-btn.is-recording {
 		background: #1a1a1a;
-		animation: mic-soft-pulse 1.4s ease-in-out infinite;
+		animation: footer-mic-pulse 1.4s ease-in-out infinite;
+	}
+	.footer-mic-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.15);
 	}
 
-	@keyframes mic-soft-pulse {
+	@keyframes footer-mic-pulse {
 		0%,
 		100% {
 			box-shadow:
 				0 0 0 0 rgba(188, 0, 45, 0.45),
-				0 4px 12px rgba(0, 0, 0, 0.28);
+				0 6px 18px rgba(0, 0, 0, 0.32);
 		}
 		50% {
 			box-shadow:
-				0 0 0 6px rgba(188, 0, 45, 0),
-				0 4px 12px rgba(0, 0, 0, 0.28);
+				0 0 0 8px rgba(188, 0, 45, 0),
+				0 6px 18px rgba(0, 0, 0, 0.32);
 		}
-	}
-
-	.recording-status {
-		min-height: 22px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 
 	.status-indicator {
