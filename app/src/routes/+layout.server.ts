@@ -24,7 +24,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	}
 
 	const initialLocale = (cookies.get('hm-locale') as 'es' | 'en') ?? 'es';
-	const isAdmin = user?.email === ADMIN_EMAIL;
+	const isAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL?.toLowerCase();
 
 	return { session, user, profile, initialLocale, isAdmin, cookies: cookies.getAll() };
 };

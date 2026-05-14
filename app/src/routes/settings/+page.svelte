@@ -543,16 +543,21 @@
 							<span class="pref-title">{t('settings.reminderHour', $locale)}</span>
 							<span class="pref-sub">{t('settings.reminderHour.desc', $locale)}</span>
 						</div>
-						<select
-							class="hour-select"
-							value={$reminderHour}
-							onchange={(e) => setReminderHour(Number((e.target as HTMLSelectElement).value))}
-							aria-label={t('settings.reminderHour', $locale)}
-						>
-							{#each Array(24) as _, h (h)}
-								<option value={h}>{String(h).padStart(2, '0')}:00</option>
-							{/each}
-						</select>
+						<div class="custom-select-wrapper">
+							<select
+								class="hour-select"
+								value={$reminderHour}
+								onchange={(e) => setReminderHour(Number((e.target as HTMLSelectElement).value))}
+								aria-label={t('settings.reminderHour', $locale)}
+							>
+								{#each Array(24) as _, h (h)}
+									<option value={h}>{String(h).padStart(2, '0')}:00</option>
+								{/each}
+							</select>
+							<div class="select-icon" aria-hidden="true">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+							</div>
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -1181,21 +1186,49 @@
 		}
 	}
 
+	.custom-select-wrapper {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+	}
+
 	.hour-select {
 		appearance: none;
 		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
-		border-radius: var(--radius-sm);
-		padding: 6px 12px;
+		border: 1.5px solid var(--ink-200);
+		border-radius: 12px;
+		padding: 8px 36px 8px 16px;
 		font-family: inherit;
 		font-size: 14px;
-		font-weight: 600;
+		font-weight: 700;
 		color: var(--fg-primary);
 		cursor: pointer;
-		transition: border-color 150ms ease;
+		transition: all 0.2s var(--ease-brand);
+		box-shadow: var(--shadow-sm);
+	}
+	.hour-select:focus,
+	.hour-select:hover {
+		outline: none;
+		border-color: var(--ink-300);
+		background: var(--ink-50);
 	}
 	.hour-select:focus {
-		outline: none;
-		border-color: var(--brand-primary);
+		border-color: var(--hinomaru-red);
+		box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.15);
+	}
+
+	.select-icon {
+		position: absolute;
+		right: 12px;
+		color: var(--fg-tertiary);
+		pointer-events: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: color 0.2s var(--ease-brand);
+	}
+	.hour-select:focus + .select-icon {
+		color: var(--hinomaru-red);
+		transform: translateY(1px);
 	}
 </style>
