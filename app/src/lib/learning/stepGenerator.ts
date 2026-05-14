@@ -50,7 +50,7 @@ function inferContentKind(card: any): ContentKind {
 	if (cat.includes('kanji')) return 'kanji';
 	if (cat.includes('hiragana') || cat.includes('katakana') || cat.includes('kana')) return 'kana';
 	if (jp && KANA_RE.test(jp) && jp.length <= 2) return 'kana';
-	if (jp && KANJI_RE.test(jp)) return 'kanji';
+	if (jp && KANJI_RE.test(jp) && jp.length <= 4) return 'kanji';
 	return 'vocab';
 }
 

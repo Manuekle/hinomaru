@@ -105,32 +105,51 @@
 		}
 	}
 
+	const charCache = new Map<string, any>();
+
 	async function loadCharData(char: string) {
+		if (charCache.has(char)) return charCache.get(char);
+
 		const code = char.codePointAt(0)!;
 		const isKana = code >= 0x3040 && code <= 0x30ff;
+		const TIMEOUT = 1500;
+
+		let data = null;
 
 		if (isKana) {
 			try {
-				// Try jsdelivr first as it's usually faster
-				const res = await fetchWithTimeout(`https://cdn.jsdelivr.net/gh/ailectra/kana-json@main/data/${encodeURIComponent(char)}.json`);
-				if (res.ok) return res.json();
+				const res = await fetchWithTimeout(`https://cdn.jsdelivr.net/gh/ailectra/kana-json@main/data/${encodeURIComponent(char)}.json`, TIMEOUT);
+				if (res.ok) data = await res.json();
 			} catch (e) {
 				console.warn(`Primary kana source failed for ${char}, trying fallback`);
 			}
 			
-			const resRaw = await fetchWithTimeout(`https://raw.githubusercontent.com/ailectra/kana-json/main/data/${encodeURIComponent(char)}.json`);
-			if (resRaw.ok) return resRaw.json();
+			if (!data) {
+				try {
+					const resRaw = await fetchWithTimeout(`https://raw.githubusercontent.com/ailectra/kana-json/main/data/${encodeURIComponent(char)}.json`, TIMEOUT);
+					if (resRaw.ok) data = await resRaw.json();
+				} catch (e) { /* ignore */ }
+			}
+		} else {
+			try {
+				const resJp = await fetchWithTimeout(`https://cdn.jsdelivr.net/npm/hanzi-writer-data-jp/${encodeURIComponent(char)}.json`, TIMEOUT);
+				if (resJp.ok) data = await resJp.json();
+			} catch (e) {
+				console.warn(`Primary JP source failed for ${char}, trying fallback`);
+			}
+
+			if (!data) {
+				try {
+					const resCn = await fetchWithTimeout(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`, TIMEOUT);
+					if (resCn.ok) data = await resCn.json();
+				} catch (e) { /* ignore */ }
+			}
 		}
 
-		try {
-			const resJp = await fetchWithTimeout(`https://cdn.jsdelivr.net/npm/hanzi-writer-data-jp/${encodeURIComponent(char)}.json`);
-			if (resJp.ok) return resJp.json();
-		} catch (e) {
-			console.warn(`Primary JP source failed for ${char}, trying fallback`);
+		if (data) {
+			charCache.set(char, data);
+			return data;
 		}
-
-		const resCn = await fetchWithTimeout(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`);
-		if (resCn.ok) return resCn.json();
 		
 		throw new Error(`No stroke data for ${char}`);
 	}
