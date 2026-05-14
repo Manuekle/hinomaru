@@ -82,7 +82,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: calc(24px + env(safe-area-inset-top)) 24px 140px;
+		padding: calc(40px + env(safe-area-inset-top, 0px)) 24px 100px;
 		position: relative;
 		overflow: hidden;
 		width: 100%;
@@ -92,15 +92,16 @@
 
 	.pulse-bg-circle {
 		position: absolute;
-		top: 50%;
+		top: 45%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 320px;
-		height: 320px;
+		width: 300px;
+		height: 300px;
 		background: var(--hinomaru-red);
 		border-radius: 50%;
-		opacity: 0.06;
+		opacity: 0.05;
 		pointer-events: none;
+		z-index: -1;
 		animation: pulse-bg 4s ease-in-out infinite;
 	}
 

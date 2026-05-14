@@ -525,21 +525,21 @@
 	
 	:global(.kanji-box) { 
 		position: relative; 
-		background: var(--bg-surface); 
+		background: var(--washi); 
 		border-radius: 28px; 
 		border: 2px solid var(--ink-200); 
 		overflow: hidden; 
 		box-shadow: var(--shadow-lg);
 		background-image: 
-			radial-gradient(var(--ink-200) 0.5px, transparent 0.5px),
-			radial-gradient(var(--ink-200) 0.5px, var(--bg-surface) 0.5px);
+			radial-gradient(var(--ink-300) 0.5px, transparent 0.5px),
+			radial-gradient(var(--ink-300) 0.5px, var(--washi) 0.5px);
 		background-size: 20px 20px;
 		background-position: 0 0, 10px 10px;
 	}
 	
 	[data-theme='dark'] :global(.kanji-box) {
-		background: var(--bg-surface);
-		border-color: var(--ink-200);
+		background: var(--washi);
+		border-color: var(--ink-300);
 	}
 
 	:global(.kanji-box::before) { 

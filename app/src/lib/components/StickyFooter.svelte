@@ -33,10 +33,10 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 50;
+		z-index: 25000;
 		display: flex;
 		justify-content: center;
-		padding: 12px 16px max(16px, calc(env(safe-area-inset-bottom, 0px) - 10px));
+		padding: 12px 16px max(24px, env(safe-area-inset-bottom, 0px));
 		pointer-events: none;
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
