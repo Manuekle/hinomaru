@@ -4,12 +4,16 @@
 	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
 	import { updateStreak } from '$lib/utils/updateStreak';
 	import WriteKanji from '$lib/components/study/WriteKanji.svelte';
+	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
 	const supabase = createClient();
 
+	let currentIndex = $state(0);
+
 	async function handleCardProgress(c: any, gotIt: boolean, hadDifficulty: boolean = false) {
+		currentIndex++;
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
 
@@ -52,12 +56,18 @@
 	}
 </script>
 
-<WriteKanji 
-	cards={data.cards} 
-	deck={data.deck}
-	totalCards={data.totalCards}
-	learnedCount={data.learnedCount}
-	onCardProgress={handleCardProgress}
-	onComplete={handleComplete}
+<StudySessionLayout
 	onExit={() => goto(`/deck/${data.deck.id}`)}
-/>
+	totalCount={data.cards.length}
+	currentIndex={currentIndex}
+>
+	<WriteKanji 
+		cards={data.cards} 
+		deck={data.deck}
+		totalCards={data.totalCards}
+		learnedCount={data.learnedCount}
+		onCardProgress={handleCardProgress}
+		onComplete={handleComplete}
+		onExit={() => goto(`/deck/${data.deck.id}`)}
+	/>
+</StudySessionLayout>

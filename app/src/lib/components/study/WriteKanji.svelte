@@ -17,7 +17,6 @@
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
-	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { fadeIn } from '$lib/motion';
 
 	interface HanziWriterInstance {
@@ -328,106 +327,263 @@
 	}
 </script>
 
-<StudySessionLayout
-	{isLesson}
-	onExit={_onExit}
-	currentIndex={i}
-	totalCount={quizCards.length}
->
-	{#if quizCards.length === 0}
-		<SessionEmptyState totalCards={totalCards} learnedCount={learnedCount} sessionCount={0} deckId={deck?.id} modeLabel={t('mode.write.title', $locale)} />
-	{:else if card}
-			<div class="write-viewer">
-				<div class="prompt-card">
-					<div class="prompt-row">
-						<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
-						<button onclick={() => speakJapanese(card.jp)} class="audio-corner">
-							<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
-						</button>
-					</div>
-					{#if checked}
-						{@const rom = safeRomaji(card.romaji, card.jp)}
-						{#if rom}<div class="romaji">{rom}</div>{/if}
-					{/if}
-				</div>
+{#if quizCards.length === 0}
+	<SessionEmptyState totalCards={totalCards} learnedCount={learnedCount} sessionCount={0} deckId={deck?.id} modeLabel={t('mode.write.title', $locale)} />
+{:else if card}
+	<div class="write-viewer">
+		<div class="prompt-card" use:fadeIn>
+			<div class="card-header-label">
+				<span class="label-dot"></span>
+				{$locale === 'es' ? 'ESCRIBE EL CARÁCTER' : 'WRITE THE CHARACTER'}
+			</div>
+			<div class="prompt-row">
+				<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
+				<button onclick={() => speakJapanese(card.jp)} class="audio-corner" aria-label="Escuchar">
+					<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+				</button>
+			</div>
+			{#if checked}
+				{@const rom = safeRomaji(card.romaji, card.jp)}
+				{#if rom}<div class="romaji" use:fadeIn>{rom}</div>{/if}
+			{/if}
+		</div>
 
-				<div class="canvas-section">
-					{#if loadingWriters}
-						<div class="canvas-wrapper loading">
-							<div class="loader-overlay"><DotLoader /></div>
-						</div>
-					{:else if writers.length === 0}
-						<div class="canvas-wrapper empty-data">
-							<p class="empty-data-text">
-								{$locale === 'es' 
-									? 'Esta palabra no tiene Kanji, o no hay datos de trazos disponibles.' 
-									: 'This word has no Kanji, or stroke data is unavailable.'}
-							</p>
-							<button class="hm-btn hm-btn-primary" onclick={next}>
-								{t('session.continue', $locale)}
-							</button>
+		<div class="canvas-section">
+			{#if loadingWriters}
+				<div class="canvas-wrapper loading">
+					<div class="loader-overlay"><DotLoader /></div>
+				</div>
+			{:else if writers.length === 0}
+				<div class="canvas-wrapper empty-data">
+					<p class="empty-data-text">
+						{$locale === 'es' 
+							? 'Esta palabra no tiene Kanji, o no hay datos de trazos disponibles.' 
+							: 'This word has no Kanji, or stroke data is unavailable.'}
+					</p>
+					<button class="hm-btn hm-btn-primary" onclick={next}>
+						{t('session.continue', $locale)}
+					</button>
+				</div>
+			{:else}
+				<div class="canvas-header">
+					{#if writers.length > 1}
+						<div class="char-progress">
+							{#each writers as w, idx (idx)}
+								<div class="char-dot" class:active={idx === currentQuizIndex} class:done={idx < currentQuizIndex}>{w.char}</div>
+							{/each}
 						</div>
 					{:else}
-						<div class="canvas-header">
-							{#if writers.length > 1}
-								<div class="char-progress">
-									{#each writers as w, idx (idx)}
-										<div class="char-dot" class:active={idx === currentQuizIndex} class:done={idx < currentQuizIndex}>{w.char}</div>
-									{/each}
-								</div>
-							{/if}
-							<button class="tool-btn" onclick={toggleGuide}>
-								<Icon icon={showGuide ? ViewOffIcon : EyeIcon} size={16} color="currentColor" />
-							</button>
-						</div>
+						<div class="char-single-label jp">{card.jp}</div>
 					{/if}
-
-					<!-- Always render the container so bind:this works and $effect triggers -->
-					<div class="canvas-wrapper" style="display: {loadingWriters || writers.length === 0 ? 'none' : 'flex'}">
-						<div bind:this={hanziContainer} class="hanzi-container"></div>
-					</div>
+					<button class="tool-btn" class:active={showGuide} onclick={toggleGuide} aria-label="Alternar guía">
+						<Icon icon={showGuide ? ViewOffIcon : EyeIcon} size={18} color="currentColor" />
+					</button>
 				</div>
-			</div>
-		{/if}
+			{/if}
 
-		{#if checked && !showAnticipation && !autoAdvance}
-			<StickyFooter>
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-					{t('session.continue', $locale)}
-				</button>
-			</StickyFooter>
-		{/if}
-</StudySessionLayout>
+			<!-- Always render the container so bind:this works and $effect triggers -->
+			<div class="canvas-wrapper washi-texture" style="display: {loadingWriters || writers.length === 0 ? 'none' : 'flex'}">
+				<div bind:this={hanziContainer} class="hanzi-container"></div>
+				
+				<!-- Decorative grid lines (replicated in CSS for the kanji-box, but added here for the whole wrapper as well) -->
+				<div class="canvas-bg-lines"></div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if checked && !showAnticipation && !autoAdvance}
+	<StickyFooter>
+		<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+			{t('session.continue', $locale)}
+		</button>
+	</StickyFooter>
+{/if}
 
 {#if showAnticipation}<AnticipationScreen />{/if}
 
 <style>
+	.write-viewer { 
+		flex: 1; 
+		display: flex; 
+		flex-direction: column; 
+		gap: clamp(16px, 3vh, 24px); 
+		padding: 20px 0 8px; 
+		width: 100%; 
+		max-width: 500px; 
+		margin: 0 auto; 
+	}
 
-	.write-viewer { flex: 1; display: flex; flex-direction: column; gap: clamp(14px, 2.5vh, 20px); padding: 20px 0 8px; width: 100%; max-width: 500px; margin: 0 auto; }
+	.prompt-card { 
+		background: var(--bg-surface); 
+		border: 1.5px solid var(--ink-200); 
+		border-radius: 28px; 
+		box-shadow: var(--shadow-md); 
+		padding: 22px 26px; 
+		display: flex; 
+		flex-direction: column; 
+		gap: 14px;
+		position: relative;
+		overflow: hidden;
+	}
 
-	.prompt-card { background: var(--bg-surface); border: 1px solid var(--ink-200); border-radius: 24px; box-shadow: 0 4px 24px rgba(26,26,26,0.07); padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+	.prompt-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 4px;
+		height: 100%;
+		background: var(--hinomaru-red);
+	}
+
+	.card-header-label {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 10px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+
+	.label-dot {
+		width: 6px;
+		height: 6px;
+		background: var(--hinomaru-red);
+		border-radius: 50%;
+	}
+
 	.prompt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-	.meaning-text { font-size: 24px; font-weight: 900; color: var(--fg-primary); }
-	.audio-corner { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--ink-200); background: var(--bg-muted); display: flex; align-items: center; justify-content: center; color: var(--fg-secondary); flex-shrink: 0; }
-	.romaji { font-weight: 700; color: var(--hinomaru-red); margin-top: -4px; }
-	.canvas-section { display: flex; flex-direction: column; gap: clamp(14px, 2.5vh, 20px); }
-	.canvas-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 0; gap: 12px; }
-	.char-progress { display: flex; gap: 8px; flex-wrap: wrap; }
-	.char-dot { width: 34px; height: 34px; border-radius: 10px; background: var(--bg-surface); border: 1.5px solid var(--ink-200); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
-	.char-dot.active { border-color: var(--hinomaru-red); color: var(--hinomaru-red); }
-	.char-dot.done { background: var(--success-wash); border-color: var(--success); color: var(--success); }
-	.tool-btn { width: 34px; height: 34px; border-radius: 10px; border: 1.5px solid var(--ink-200); background: var(--bg-surface); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-	.canvas-wrapper { position: relative; background: var(--bg-page); border-radius: 24px; border: 1.5px solid var(--ink-200); padding: 20px; min-height: clamp(220px, 34vh, 340px); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-	.canvas-wrapper.empty-data { flex-direction: column; gap: 16px; background: var(--bg-surface); text-align: center; padding: 36px 24px; }
-	.empty-data-text { font-size: 14px; font-weight: 600; color: var(--fg-tertiary); max-width: 280px; line-height: 1.4; }
-	.hanzi-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; width: 100%; position: relative; z-index: 1; }
-	:global(.kanji-box) { position: relative; background: var(--bg-surface); border-radius: 8px; border: 1px solid var(--ink-200); overflow: hidden; }
-	:global(.kanji-box::before) { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed var(--ink-200); z-index: 0; }
-	:global(.kanji-box::after) { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--ink-200); z-index: 0; }
-	:global(.kanji-box > svg) { position: relative; z-index: 1; }
-	.loader-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-surface); border-radius: 24px; z-index: 10; }
-	.inline-footer { position: sticky; bottom: -24px; z-index: 50; display: flex; gap: 12px; width: 100%; margin-top: auto; padding-top: 12px; padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 24px); background: var(--bg-page); flex-shrink: 0; }
-	.inline-footer::before { content: ''; position: absolute; top: -20px; left: 0; right: 0; height: 20px; background: linear-gradient(to top, var(--bg-page), transparent); pointer-events: none; }
-	.inline-footer > * { flex: 1; }
+	.meaning-text { font-size: 28px; font-weight: 950; color: var(--fg-primary); letter-spacing: -0.02em; }
+	
+	.audio-corner { 
+		width: 42px; 
+		height: 42px; 
+		border-radius: 50%; 
+		border: 1.5px solid var(--ink-200); 
+		background: var(--bg-surface); 
+		display: flex; 
+		align-items: center; 
+		justify-content: center; 
+		color: var(--fg-secondary); 
+		flex-shrink: 0;
+		box-shadow: var(--shadow-sm);
+		transition: all 0.2s;
+	}
+	.audio-corner:active { transform: scale(0.9); background: var(--bg-muted); }
 
+	.romaji { font-size: 18px; font-weight: 700; color: var(--hinomaru-red); margin-top: -6px; opacity: 0.9; }
+	
+	.canvas-section { display: flex; flex-direction: column; gap: 16px; }
+	
+	.canvas-header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
+	
+	.char-progress { display: flex; gap: 8px; flex-wrap: wrap; }
+	.char-dot { 
+		width: 36px; 
+		height: 36px; 
+		border-radius: 12px; 
+		background: var(--bg-surface); 
+		border: 1.5px solid var(--ink-200); 
+		display: flex; 
+		align-items: center; 
+		justify-content: center; 
+		font-size: 14px; 
+		font-weight: 800; 
+		flex-shrink: 0;
+		transition: all 0.3s var(--ease-brand);
+	}
+	.char-dot.active { border-color: var(--hinomaru-red); color: var(--hinomaru-red); transform: scale(1.1); box-shadow: 0 4px 12px rgba(188, 0, 45, 0.15); }
+	.char-dot.done { background: var(--success-wash); border-color: var(--success); color: var(--success); opacity: 0.7; }
+	
+	.char-single-label { font-size: 18px; font-weight: 800; color: var(--fg-tertiary); opacity: 0.5; letter-spacing: 0.1em; }
+
+	.tool-btn { 
+		width: 40px; 
+		height: 40px; 
+		border-radius: 14px; 
+		border: 1.5px solid var(--ink-200); 
+		background: var(--bg-surface); 
+		display: flex; 
+		align-items: center; 
+		justify-content: center; 
+		cursor: pointer; 
+		flex-shrink: 0;
+		transition: all 0.2s;
+		color: var(--fg-secondary);
+		box-shadow: var(--shadow-sm);
+	}
+	.tool-btn.active { background: var(--hinomaru-red); border-color: var(--hinomaru-red); color: white; }
+	.tool-btn:active { transform: scale(0.9); }
+
+	.canvas-wrapper { 
+		position: relative; 
+		background: var(--washi); 
+		border-radius: 32px; 
+		border: 2px solid var(--ink-200); 
+		padding: 30px; 
+		min-height: clamp(280px, 40vh, 380px); 
+		display: flex; 
+		align-items: center; 
+		justify-content: center; 
+		overflow: hidden;
+		box-shadow: var(--shadow-lg);
+	}
+
+	.washi-texture {
+		background-image: 
+			radial-gradient(var(--ink-200) 0.5px, transparent 0.5px),
+			radial-gradient(var(--ink-200) 0.5px, var(--washi) 0.5px);
+		background-size: 20px 20px;
+		background-position: 0 0, 10px 10px;
+		background-attachment: local;
+		opacity: 0.95;
+	}
+
+	.canvas-wrapper.empty-data { flex-direction: column; gap: 16px; background: var(--bg-surface); text-align: center; padding: 48px 32px; }
+	.empty-data-text { font-size: 15px; font-weight: 600; color: var(--fg-tertiary); max-width: 300px; line-height: 1.5; }
+	
+	.hanzi-container { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; width: 100%; position: relative; z-index: 2; }
+	
+	:global(.kanji-box) { 
+		position: relative; 
+		background: rgba(255, 255, 255, 0.4); 
+		border-radius: 16px; 
+		border: 1.5px solid var(--ink-300); 
+		overflow: hidden; 
+		box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+	}
+	
+	[data-theme='dark'] :global(.kanji-box) {
+		background: rgba(0, 0, 0, 0.2);
+		border-color: var(--ink-200);
+	}
+
+	:global(.kanji-box::before) { 
+		content: ''; 
+		position: absolute; 
+		top: 50%; 
+		left: 0; 
+		right: 0; 
+		border-top: 1.5px dashed var(--ink-200); 
+		z-index: 0; 
+		opacity: 0.6;
+	}
+	
+	:global(.kanji-box::after) { 
+		content: ''; 
+		position: absolute; 
+		left: 50%; 
+		top: 0; 
+		bottom: 0; 
+		border-left: 1.5px dashed var(--ink-200); 
+		z-index: 0; 
+		opacity: 0.6;
+	}
+	
+	:global(.kanji-box > svg) { position: relative; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+	
+	.loader-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-surface); border-radius: 32px; z-index: 10; }
 </style>

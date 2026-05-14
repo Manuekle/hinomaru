@@ -52,11 +52,11 @@
 		<!-- Stats list -->
 		<div class="summary-stats-list">
 			<div class="summary-stat-item centered" use:fadeUp={{ delay: 0.55 }}>
-				<span class="summary-stat-key">{$locale === 'es' ? 'Experiencia' : 'Experience'}</span>
+				<span class="summary-stat-key">{t('summary.xp', $locale)}</span>
 				<span class="summary-stat-val xp">+{displayXP} XP</span>
 			</div>
 			<div class="summary-stat-item centered" use:fadeUp={{ delay: 0.65 }}>
-				<span class="summary-stat-key">{$locale === 'es' ? 'Precisión' : 'Accuracy'}</span>
+				<span class="summary-stat-key">{t('summary.accuracy', $locale)}</span>
 				<span class="summary-stat-val" style="color:{pct >= 70 ? 'var(--success)' : 'var(--hinomaru-red)'};">
 					{pct}%
 				</span>
@@ -82,11 +82,12 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: clamp(20px, 5vh, 40px) 24px 120px;
+		padding: calc(24px + env(safe-area-inset-top)) 24px 140px;
 		position: relative;
 		overflow: hidden;
 		width: 100%;
 		flex: 1;
+		background: var(--paper);
 	}
 
 	.pulse-bg-circle {
@@ -94,11 +95,11 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: min(320px, 80vw);
-		height: min(320px, 80vw);
-		background: var(--hinomaru-red-wash);
+		width: 320px;
+		height: 320px;
+		background: var(--hinomaru-red);
 		border-radius: 50%;
-		opacity: 0.6;
+		opacity: 0.06;
 		pointer-events: none;
 		animation: pulse-bg 4s ease-in-out infinite;
 	}
@@ -112,16 +113,16 @@
 	}
 
 	.summary-label {
-		font-size: 11px;
+		font-size: 14px;
 		font-weight: 800;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		margin-bottom: 12px;
+		margin-bottom: 16px;
 	}
 
 	.summary-score-large {
-		font-size: clamp(48px, 12vw, 64px);
+		font-size: 64px;
 		font-weight: 900;
 		color: var(--fg-primary);
 		letter-spacing: -0.04em;
@@ -135,18 +136,17 @@
 	}
 
 	.summary-msg-text {
-		font-size: 17px;
+		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-secondary);
 		margin-top: 12px;
-		margin-bottom: clamp(24px, 5vh, 40px);
-		padding: 0 20px;
+		margin-bottom: 40px;
 	}
 
 	.summary-stats-list {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 12px;
 		width: 100%;
 	}
 
@@ -154,8 +154,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 14px 18px;
-		border-radius: 18px;
+		padding: 16px 20px;
+		border-radius: 20px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		box-shadow: var(--shadow-sm);
@@ -167,13 +167,13 @@
 	}
 
 	.summary-stat-key {
-		font-size: 13px;
+		font-size: 14px;
 		color: var(--fg-secondary);
 		font-weight: 600;
 	}
 
 	.summary-stat-val {
-		font-size: 15px;
+		font-size: 16px;
 		font-weight: 800;
 		color: var(--fg-primary);
 	}
@@ -194,8 +194,8 @@
 	}
 
 	@keyframes pulse-bg {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-		50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.7; }
+		0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.06; }
+		50% { transform: translate(-50%, -50%) scale(1.06); opacity: 0.09; }
 	}
 
 	@media (prefers-reduced-motion: reduce) {
