@@ -15,6 +15,7 @@
 	import { safeRomaji } from '$lib/utils/romaji';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { fadeIn } from '$lib/motion';
@@ -287,15 +288,15 @@
 		const current = writers[currentQuizIndex];
 		current?.writer.quiz({
 			onComplete: () => {
-				setTimeout(() => {
-					if (currentQuizIndex < writers.length - 1) {
+				if (currentQuizIndex < writers.length - 1) {
+					setTimeout(() => {
 						currentQuizIndex++;
 						startQuiz();
-					} else {
-						checked = true;
-						playCorrect();
-					}
-				}, 700);
+					}, 700);
+				} else {
+					checked = true;
+					playCorrect();
+				}
 			}
 		});
 	}
@@ -382,6 +383,14 @@
 					</div>
 				</div>
 			</div>
+		{/if}
+
+		{#if checked && !showAnticipation}
+			<StickyFooter>
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+					{t('session.continue', $locale)}
+				</button>
+			</StickyFooter>
 		{/if}
 </StudySessionLayout>
 
