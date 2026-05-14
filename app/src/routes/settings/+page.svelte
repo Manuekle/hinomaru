@@ -43,12 +43,14 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 
 	let { data } = $props<{ data: PageData }>();
-	let { supabase, user, isAdmin } = $derived(data);
+	let supabase = $derived(data.supabase);
+	let user = $derived(data.user);
+	let isAdmin = $derived(data.isAdmin);
 
 	async function signOut() {
 		await supabase.auth.signOut();
 		await invalidateAll();
-		goto('/login');
+		goto('/login?signedout=1');
 	}
 
 	function setLanguage(lang: 'es' | 'en') {
@@ -567,15 +569,15 @@
 							name="reminderHour"
 							bind:value={reminderValue}
 						>
-							<Select.Trigger class="w-[120px] h-10 px-4 py-2 bg-[var(--bg-surface)] border-[1.5px] border-[var(--ink-200)] hover:border-[var(--ink-300)] rounded-xl text-[14px] font-bold text-[var(--fg-primary)] shadow-sm focus:ring-4 focus:ring-[var(--hinomaru-red)]/15 focus:border-[var(--hinomaru-red)] transition-all">
+							<Select.Trigger class="hm-select-trigger">
 								{reminderTriggerContent}
 							</Select.Trigger>
-							<Select.Content class="bg-[var(--bg-surface)] border-[var(--ink-200)] rounded-2xl shadow-xl p-1 min-w-[120px] z-[12000]">
+							<Select.Content class="hm-select-content">
 								<Select.Group>
-									<Select.Label class="text-[11px] font-bold text-[var(--fg-tertiary)] uppercase tracking-wider px-2 py-1.5">{t('settings.reminderHour', $locale)}</Select.Label>
-									<div class="max-h-[240px] overflow-y-auto overflow-x-hidden hide-scrollbar">
+									<Select.Label class="hm-select-label">{t('settings.reminderHour', $locale)}</Select.Label>
+									<div class="hm-select-scroll-area hide-scrollbar">
 										{#each reminderHoursList as hr (hr.value)}
-											<Select.Item class="rounded-xl px-2 py-2 text-[14px] font-medium text-[var(--fg-secondary)] focus:bg-[var(--ink-50)] focus:text-[var(--fg-primary)] cursor-pointer data-[state=checked]:bg-[var(--hinomaru-red-wash)] data-[state=checked]:text-[var(--hinomaru-red)] transition-colors" value={hr.value} label={hr.label}>
+											<Select.Item class="hm-select-item" value={hr.value} label={hr.label}>
 												{hr.label}
 											</Select.Item>
 										{/each}
@@ -589,19 +591,14 @@
 		</div>
 
 		<!-- ── Support ── -->
-		<div class="card support-banner">
-			<div class="support-content">
-				<div class="support-icon">
-					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-					</svg>
-				</div>
-				<div class="support-text-wrap">
-					<span class="support-title">{t('settings.support', $locale) || 'Support Hinomaru'}</span>
-					<span class="support-sub">{t('settings.support.desc', $locale)}</span>
-				</div>
-			</div>
-			<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="support-btn-new">
+		<div class="card support-card">
+			<p class="support-text">{t('settings.support.desc', $locale)}</p>
+			<a
+				href="https://ko-fi.com/manujsx"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="support-btn"
+			>
 				<img src={kofiLight} alt="Support on Ko-fi" class="kofi-light kofi-img-cropped" />
 				<img src={kofiDark} alt="Support on Ko-fi" class="kofi-dark kofi-img-cropped" />
 			</a>
@@ -1102,80 +1099,26 @@
 		display: inline-block;
 	}
 
-	/* ── Support Banner ── */
-	.support-banner {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-		padding: 20px;
-		background: linear-gradient(135deg, var(--bg-surface) 0%, var(--ink-50) 100%);
-		border: 1px solid var(--ink-200);
+	/* ── Support ── */
+	.support-card {
+		padding: 24px 20px;
+		text-align: center;
 	}
-	:global([data-theme='dark']) .support-banner {
-		background: linear-gradient(135deg, var(--ink-50) 0%, var(--ink-100) 100%);
-	}
-	
-	@media (min-width: 480px) {
-		.support-banner {
-			flex-direction: row;
-			align-items: center;
-			justify-content: space-between;
-		}
-	}
-
-	.support-content {
-		display: flex;
-		gap: 16px;
-		align-items: center;
-	}
-
-	.support-icon {
-		width: 44px;
-		height: 44px;
-		background: #FF5E5B15;
-		color: #FF5E5B;
-		border-radius: 14px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-
-	.support-text-wrap {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.support-title {
-		font-size: 15px;
-		font-weight: 800;
-		color: var(--fg-primary);
-		letter-spacing: -0.02em;
-	}
-
-	.support-sub {
+	.support-text {
 		font-size: 13px;
 		color: var(--fg-secondary);
-		line-height: 1.4;
+		line-height: 1.5;
+		margin: 0 0 16px;
 	}
-
-	.support-btn-new {
-		display: block;
-		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-		flex-shrink: 0;
-		align-self: flex-start;
+	.support-btn {
+		display: inline-block;
+		transition: transform 0.18s;
 	}
-	@media (min-width: 480px) {
-		.support-btn-new {
-			align-self: center;
-		}
-	}
-
 	.kofi-img-cropped {
-		height: 38px;
+		height: 42px;
 		display: block;
-		clip-path: inset(2px round 20px);
+		margin: 0 auto;
+		clip-path: inset(2px round 999px);
 	}
 
 	.kofi-dark {
@@ -1189,12 +1132,86 @@
 	}
 
 	@media (hover: hover) {
-		.support-btn-new:hover {
-			transform: scale(1.05) translateY(-2px);
+		.support-btn:hover {
+			transform: scale(1.04);
 		}
 	}
-	.support-btn-new:active {
-		transform: scale(0.95);
+	.support-btn:active {
+		transform: scale(0.96);
+	}
+
+	/* ── Select Customization ── */
+	:global(.hm-select-trigger) {
+		width: 120px;
+		height: 40px;
+		padding: 8px 16px;
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
+		border-radius: 12px;
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--fg-primary);
+		box-shadow: var(--shadow-sm);
+		transition: all 0.2s var(--ease-brand);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	:global(.hm-select-trigger:hover) {
+		border-color: var(--ink-300);
+	}
+	:global(.hm-select-trigger[data-state='open']),
+	:global(.hm-select-trigger:focus) {
+		outline: none;
+		border-color: var(--hinomaru-red);
+		box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.15);
+	}
+
+	:global(.hm-select-content) {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 16px;
+		box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+		padding: 4px;
+		min-width: 120px;
+		z-index: 12000;
+	}
+	:global([data-theme='dark']) :global(.hm-select-content) {
+		box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+	}
+
+	:global(.hm-select-label) {
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--fg-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		padding: 6px 8px;
+	}
+
+	:global(.hm-select-scroll-area) {
+		max-height: 240px;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+
+	:global(.hm-select-item) {
+		border-radius: 10px;
+		padding: 8px 12px;
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		transition: all 0.15s;
+		outline: none;
+	}
+	:global(.hm-select-item[data-highlighted]) {
+		background: var(--ink-50);
+		color: var(--fg-primary);
+	}
+	:global(.hm-select-item[data-state='checked']) {
+		background: var(--hinomaru-red-wash);
+		color: var(--hinomaru-red);
 	}
 
 

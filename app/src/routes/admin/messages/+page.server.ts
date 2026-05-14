@@ -13,8 +13,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// Must be logged in
 	if (!user) throw redirect(303, '/login');
 
-	// Must be the admin
-	if (user.email?.toLowerCase() !== env.ADMIN_EMAIL?.toLowerCase()) throw error(403, 'Forbidden');
+	const adminEmail = env.ADMIN_EMAIL || process.env.ADMIN_EMAIL || '';
+	if (!user.email || !adminEmail || user.email.toLowerCase() !== adminEmail.toLowerCase()) {
+		throw error(403, 'Forbidden');
+	}
 
 	// Service-role client bypasses RLS — never expose to the browser
 	const adminClient = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {

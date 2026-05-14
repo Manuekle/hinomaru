@@ -94,7 +94,10 @@
 				window.matchMedia('(display-mode: standalone)').matches ||
 				!!nav.standalone ||
 				(data as any)?.isPWA;
-			if (isPWA && !errorParam) mode = 'welcome';
+			const isSignedOut = $page.url.searchParams.has('signedout');
+			
+			if (isPWA && !errorParam && !isSignedOut) mode = 'welcome';
+			else if (isSignedOut) mode = 'signin';
 		} catch {}
 	});
 
@@ -222,9 +225,14 @@
 		if (!supabase) return;
 		loading = true;
 		try {
+			const options: any = { redirectTo: `${$page.url.origin}/auth/callback` };
+			if (provider === 'google') {
+				options.queryParams = { prompt: 'select_account' };
+			}
+
 			const { error: err } = await supabase.auth.signInWithOAuth({
 				provider,
-				options: { redirectTo: `${$page.url.origin}/auth/callback` }
+				options
 			});
 			if (err) throw err;
 		} catch (err: any) {

@@ -24,7 +24,10 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	}
 
 	const initialLocale = (cookies.get('hm-locale') as 'es' | 'en') ?? 'es';
-	const isAdmin = user?.email?.toLowerCase() === env.ADMIN_EMAIL?.toLowerCase();
+	const adminEmail = env.ADMIN_EMAIL || process.env.ADMIN_EMAIL || '';
+	const isAdmin = Boolean(user?.email && adminEmail && user.email.toLowerCase() === adminEmail.toLowerCase());
+	
+	console.log('[Auth Debug] User:', user?.email, '| Env Admin:', adminEmail, '| isAdmin:', isAdmin);
 
 	return { session, user, profile, initialLocale, isAdmin, cookies: cookies.getAll() };
 };
