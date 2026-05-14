@@ -14,6 +14,8 @@
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { JapaneseSpeechRecognizer, isSpeechSupported } from '$lib/speaking/speech';
+	import { comparePhraseBest, classify, type ScoreLevel } from '$lib/speaking/compare';
+	import { forMatch } from '$lib/speaking/normalize';
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import { fade } from 'svelte/transition';
 
@@ -65,6 +67,7 @@
 	let processing = $state(false);
 	let transcript = $state('');
 	let displayTranscript = $state('');
+	let recognizerAlternatives = $state<string[]>([]);
 	let submitted = $state(false);
 	let correct = $state(0);
 	let struggled = $state(false);
@@ -78,24 +81,6 @@
 			unsupported = true;
 		}
 	});
-
-	function levenshtein(a: string, b: string): number {
-		if (a === b) return 0;
-		if (!a.length) return b.length;
-		if (!b.length) return a.length;
-		const dp: number[] = Array(b.length + 1);
-		for (let j = 0; j <= b.length; j++) dp[j] = j;
-		for (let i = 1; i <= a.length; i++) {
-			let prev = dp[0];
-			dp[0] = i;
-			for (let j = 1; j <= b.length; j++) {
-				const tmp = dp[j];
-				dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
-				prev = tmp;
-			}
-		}
-		return dp[b.length];
-	}
 
 	const micState = $derived<'idle' | 'recording' | 'done'>(
 		submitted ? 'done' : isRecording ? 'recording' : 'idle'
@@ -119,6 +104,7 @@
 		error = null;
 		transcript = '';
 		displayTranscript = '';
+		recognizerAlternatives = [];
 		submitted = false;
 
 		if (!recognizer) {
@@ -130,6 +116,7 @@
 			(r) => {
 				transcript = r.transcript;
 				displayTranscript = r.transcript;
+				if (r.alternatives?.length) recognizerAlternatives = r.alternatives;
 				if (r.isFinal) {
 					isRecording = false;
 					processing = true;
@@ -149,41 +136,61 @@
 		);
 	}
 
-	const normalize = (s: string) =>
-		s
-			.normalize('NFKC')
-			.replace(/[、。！？.,\s]/g, '')
-			.toLowerCase();
-
-	const similarity = $derived.by(() => {
-		if (!card || !transcript) return 0;
-		const u = normalize(transcript);
-		const tgt = normalize(card.jp);
-		if (!u || !tgt) return 0;
-		const dist = levenshtein(u, tgt);
-		const maxLen = Math.max(u.length, tgt.length);
-		return Math.max(0, Math.round(((maxLen - dist) / maxLen) * 100));
+	const cardTargets = $derived.by(() => {
+		if (!card) return [] as string[];
+		return [card.jp, card.kana, card.romaji].filter(
+			(t): t is string => typeof t === 'string' && t.length > 0
+		);
 	});
 
-	const matchedIndices = $derived.by(() => {
-		if (!transcript || !card) return new Set();
-		const target = card.jp;
-		const said = transcript.replace(/\s/g, '');
-		const matched = new Set<number>();
+	const bestAlternative = $derived.by(() => {
+		if (!card || !transcript) return '';
+		const pool = recognizerAlternatives.length ? recognizerAlternatives : [transcript];
+		if (!cardTargets.length) return pool[0] ?? '';
+		let bestText = pool[0] ?? '';
+		let bestScore = -1;
+		for (const alt of pool) {
+			if (!alt) continue;
+			const r = comparePhraseBest(cardTargets, alt);
+			if (r.overallScore > bestScore) {
+				bestScore = r.overallScore;
+				bestText = alt;
+			}
+		}
+		return bestText;
+	});
 
-		let lastFoundIdx = -1;
-		for (let i = 0; i < target.length; i++) {
-			const char = target[i];
-			const foundIdx = said.indexOf(char, lastFoundIdx + 1);
-			if (foundIdx !== -1) {
+	const compareResult = $derived.by(() => {
+		if (!card || !bestAlternative) return null;
+		return comparePhraseBest(cardTargets, bestAlternative);
+	});
+
+	const score = $derived(compareResult?.overallScore ?? 0);
+	const scoreLevel = $derived<ScoreLevel>(compareResult?.overallLevel ?? 'wrong');
+	const isCorrect = $derived(scoreLevel === 'correct');
+	const isClose = $derived(scoreLevel === 'close');
+
+	const matchedIndices = $derived.by(() => {
+		const matched = new Set<number>();
+		if (!card || !bestAlternative) return matched;
+		const spokenRom = forMatch(bestAlternative);
+		const tokens = card.jp.split('');
+		let cursor = 0;
+		for (let i = 0; i < tokens.length; i++) {
+			const tokenRom = forMatch(tokens[i]);
+			if (!tokenRom) {
 				matched.add(i);
-				lastFoundIdx = foundIdx;
+				continue;
+			}
+			const found = spokenRom.indexOf(tokenRom, cursor);
+			if (found !== -1) {
+				matched.add(i);
+				cursor = found + tokenRom.length;
 			}
 		}
 		return matched;
 	});
 
-	const isCorrect = $derived(similarity >= 65);
 	const cardRomaji = $derived(card ? safeRomaji(card.romaji, card.jp) : '');
 
 	function submit() {
@@ -195,7 +202,7 @@
 			struggled = true;
 			playWrong();
 		}
-		autoAdvanceTimer = setTimeout(() => next(), 1600);
+		autoAdvanceTimer = setTimeout(() => next(), isCorrect ? 1600 : 2000);
 	}
 
 	function skip() {
@@ -211,6 +218,7 @@
 			submitted = false;
 			transcript = '';
 			displayTranscript = '';
+			recognizerAlternatives = [];
 			struggled = false;
 			queue.advance();
 		}
@@ -235,6 +243,7 @@
 			submitted = false;
 			transcript = '';
 			displayTranscript = '';
+			recognizerAlternatives = [];
 			struggled = false;
 			queue.advance();
 		}
@@ -308,49 +317,55 @@
 						<button
 							class="mic-btn"
 							data-state={micState}
+							data-verdict={submitted ? scoreLevel : null}
 							onclick={toggleRecording}
 							disabled={submitted || processing}
 							aria-label={isRecording ? t('speaking.stop', $locale) : t('speaking.speak', $locale)}
 							aria-pressed={isRecording}
 						>
-							<div class="mic-ring"></div>
-							<div class="mic-ring mic-ring-2"></div>
 							{#if micState === 'recording'}
 								<div class="wave" aria-hidden="true">
-									{#each Array(5) as _, idx (idx)}
+									{#each Array(4) as _, idx (idx)}
 										<span style="animation-delay:{idx * 0.1}s"></span>
 									{/each}
 								</div>
 							{:else if micState === 'done'}
-								<Icon icon={isCorrect ? Tick02Icon : Cancel01Icon} size={32} color="white" />
+								<Icon icon={isCorrect ? Tick02Icon : Cancel01Icon} size={22} color="white" />
 							{:else}
-								<Icon icon={Mic01Icon} size={32} color="white" />
+								<Icon icon={Mic01Icon} size={22} color="white" />
 							{/if}
 						</button>
 						<div class="mic-label" aria-hidden="true">
 							{#if micState === 'recording'}
-								{$locale === 'es' ? 'ESCUCHANDO' : 'LISTENING'}
-							{:else if micState === 'done'}
-								{isCorrect
-									? $locale === 'es'
-										? 'CORRECTO'
-										: 'CORRECT'
-									: $locale === 'es'
-										? 'INTÉNTALO'
-										: 'TRY AGAIN'}
-							{:else}
-								{$locale === 'es' ? 'TOCA PARA HABLAR' : 'TAP TO SPEAK'}
+								{$locale === 'es' ? 'Escuchando…' : 'Listening…'}
+							{:else if !submitted}
+								{$locale === 'es' ? 'Toca para hablar' : 'Tap to speak'}
 							{/if}
 						</div>
+
+						{#if submitted}
+							<div class="verdict-row" in:fade={{ duration: 180 }}>
+								<span class="verdict-chip" data-verdict={scoreLevel}>
+									{#if isCorrect}
+										{$locale === 'es' ? '✓ Correcto' : '✓ Correct'}
+									{:else if isClose}
+										{$locale === 'es' ? '~ Casi' : '~ Almost'}
+									{:else}
+										{$locale === 'es' ? '✗ Inténtalo' : '✗ Try again'}
+									{/if}
+								</span>
+								{#if transcript}
+									<span class="verdict-transcript">
+										{$locale === 'es' ? 'oíste:' : 'heard:'} <span class="jp">{transcript}</span>
+									</span>
+								{/if}
+							</div>
+						{/if}
 					</div>
 				{/if}
 
 				{#if error && !submitted}
 					<div class="error-msg" use:fadeIn>{error}</div>
-				{/if}
-
-				{#if transcript && submitted}
-					<div class="transcript-box" in:fade>"{transcript}"</div>
 				{/if}
 			</div>
 		{/if}
@@ -466,35 +481,31 @@
 		color: var(--fg-secondary);
 	}
 
-	.status-msg {
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--fg-tertiary);
-		text-align: center;
-	}
-
 	.mic-area {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 16px;
-		padding: 12px 0 4px;
+		gap: 10px;
+		padding: 8px 0 4px;
 	}
 
 	.mic-btn {
-		width: 104px;
-		height: 104px;
+		width: 64px;
+		height: 64px;
 		border-radius: 50%;
 		border: none;
-		background: linear-gradient(135deg, var(--hinomaru-red), #d4002f);
+		background: var(--hinomaru-red);
 		color: white;
 		position: relative;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 10px 32px rgba(188, 0, 45, 0.32);
-		transition: transform 0.18s cubic-bezier(0.34, 1.5, 0.64, 1);
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.22);
+		transition:
+			transform 0.16s cubic-bezier(0.34, 1.5, 0.64, 1),
+			background 0.2s ease,
+			box-shadow 0.2s ease;
 	}
 
 	.mic-btn:active {
@@ -502,53 +513,51 @@
 	}
 
 	.mic-btn[data-state='recording'] {
-		background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-		transform: scale(1.04);
+		background: #1a1a1a;
+		box-shadow:
+			0 0 0 0 rgba(188, 0, 45, 0.55),
+			0 4px 12px rgba(0, 0, 0, 0.28);
+		animation: mic-soft-pulse 1.4s ease-in-out infinite;
 	}
 
-	.mic-btn[data-state='done'] {
-		background: linear-gradient(135deg, #2e7d5b, #1f5e44);
+	.mic-btn[data-verdict='correct'] {
+		background: var(--success);
+		box-shadow: 0 4px 12px rgba(46, 125, 91, 0.28);
+	}
+	.mic-btn[data-verdict='close'] {
+		background: #d4a017;
+		box-shadow: 0 4px 12px rgba(212, 160, 23, 0.28);
+	}
+	.mic-btn[data-verdict='wrong'] {
+		background: var(--hinomaru-red);
 	}
 
-	.mic-ring {
-		position: absolute;
-		inset: -8px;
-		border-radius: 50%;
-		border: 2px solid var(--hinomaru-red);
-		opacity: 0;
-		pointer-events: none;
+	.mic-btn:disabled {
+		cursor: default;
 	}
 
-	.mic-ring-2 {
-		inset: -16px;
-	}
-
-	.mic-btn[data-state='recording'] .mic-ring {
-		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-	}
-	.mic-btn[data-state='recording'] .mic-ring-2 {
-		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
-	}
-
-	@keyframes pulse-ring {
-		0% {
-			transform: scale(0.9);
-			opacity: 0.7;
-		}
+	@keyframes mic-soft-pulse {
+		0%,
 		100% {
-			transform: scale(1.5);
-			opacity: 0;
+			box-shadow:
+				0 0 0 0 rgba(188, 0, 45, 0.45),
+				0 4px 12px rgba(0, 0, 0, 0.28);
+		}
+		50% {
+			box-shadow:
+				0 0 0 6px rgba(188, 0, 45, 0),
+				0 4px 12px rgba(0, 0, 0, 0.28);
 		}
 	}
 
 	.wave {
 		display: flex;
 		align-items: center;
-		gap: 4px;
-		height: 36px;
+		gap: 3px;
+		height: 22px;
 	}
 	.wave span {
-		width: 4px;
+		width: 3px;
 		height: 100%;
 		background: white;
 		border-radius: 2px;
@@ -564,36 +573,54 @@
 		}
 	}
 
-	.dots {
-		display: flex;
-		gap: 6px;
-	}
-	.dots span {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: white;
-		animation: dot-pulse 1s ease-in-out infinite;
-	}
-	@keyframes dot-pulse {
-		0%,
-		80%,
-		100% {
-			opacity: 0.3;
-			transform: scale(0.8);
-		}
-		40% {
-			opacity: 1;
-			transform: scale(1.1);
-		}
+	.mic-label {
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--fg-tertiary);
+		letter-spacing: -0.01em;
+		min-height: 16px;
 	}
 
-	.mic-label {
-		font-size: 11px;
+	.verdict-row {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		margin-top: 2px;
+	}
+
+	.verdict-chip {
+		font-size: 12px;
 		font-weight: 800;
+		letter-spacing: -0.01em;
+		padding: 5px 12px;
+		border-radius: 999px;
+		line-height: 1;
+	}
+	.verdict-chip[data-verdict='correct'] {
+		color: var(--success);
+		background: var(--success-wash);
+	}
+	.verdict-chip[data-verdict='close'] {
+		color: #b1830f;
+		background: rgba(212, 160, 23, 0.14);
+	}
+	.verdict-chip[data-verdict='wrong'] {
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+	}
+
+	.verdict-transcript {
+		font-size: 12px;
+		color: var(--fg-tertiary);
+		text-align: center;
+		max-width: 320px;
+	}
+	.verdict-transcript .jp {
+		font-family: var(--font-jp);
 		color: var(--fg-secondary);
-		text-transform: uppercase;
-		letter-spacing: -0.04em;
+		font-weight: 600;
+		margin-left: 2px;
 	}
 
 	.error-msg {
@@ -603,116 +630,4 @@
 		text-align: center;
 	}
 
-	.result-card {
-		width: 100%;
-		background: var(--bg-surface);
-		border-radius: 20px;
-		border: 1.5px solid var(--ink-200);
-		padding: 18px 18px 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-	}
-
-	.result-card[data-verdict='correct'] {
-		border-color: var(--success);
-		background: var(--success-wash);
-	}
-	.result-card[data-verdict='close'] {
-		border-color: #d4a017;
-		background: rgba(212, 160, 23, 0.08);
-	}
-	.result-card[data-verdict='wrong'] {
-		border-color: var(--hinomaru-red);
-		background: var(--hinomaru-red-wash);
-	}
-
-	.result-head {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-	.verdict-icon {
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-	}
-	.result-card[data-verdict='correct'] .verdict-icon {
-		background: var(--success);
-	}
-	.result-card[data-verdict='close'] .verdict-icon {
-		background: #d4a017;
-	}
-	.result-card[data-verdict='wrong'] .verdict-icon {
-		background: var(--hinomaru-red);
-	}
-
-	.verdict-text {
-		font-size: 16px;
-		font-weight: 800;
-		color: var(--fg-primary);
-		flex: 1;
-	}
-	.verdict-pct {
-		font-size: 18px;
-		font-weight: 900;
-		color: var(--fg-primary);
-	}
-
-	.result-grid {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		padding: 12px 14px;
-		background: var(--bg-muted);
-		border-radius: 12px;
-	}
-
-	.result-row {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 12px;
-	}
-	.result-label {
-		font-size: 10px;
-		font-weight: 800;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-	}
-	.result-value {
-		font-size: 15px;
-		font-weight: 700;
-		color: var(--fg-primary);
-	}
-
-	.transcript-box {
-		font-size: 15px;
-		font-family: var(--font-jp);
-		color: var(--fg-secondary);
-		font-weight: 600;
-		font-style: italic;
-		text-align: center;
-	}
-
-	.skip-link {
-		font-size: 13px;
-		font-weight: 700;
-		color: var(--fg-tertiary);
-		text-decoration: underline;
-		background: none;
-		border: none;
-		cursor: pointer;
-		opacity: 0.7;
-		transition: opacity 0.2s;
-		padding: 4px 8px;
-	}
-	.skip-link:hover {
-		opacity: 1;
-		color: var(--hinomaru-red);
-	}
 </style>

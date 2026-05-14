@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
-	import { fadeUp, popIn, animateNumber } from '$lib/motion';
+	import { fadeUp, popIn, staggerChildren, animateNumber } from '$lib/motion';
 	import { onMount } from 'svelte';
 	import { playFinish } from '$lib/utils/sounds';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
@@ -20,42 +20,49 @@
 	const pct = $derived(total > 0 ? Math.round((correct / total) * 100) : 0);
 	const xpEarned = $derived(xp || correct * 5);
 
+	const message = $derived(
+		title ||
+			(pct === 100
+				? t('summary.all', $locale)
+				: pct >= 70
+					? t('summary.solid', $locale)
+					: t('summary.retry', $locale))
+	);
+
 	let displayScore = $state(0);
+	let displayTotal = $state(0);
 	let displayXP = $state(0);
 
 	onMount(() => {
-		animateNumber((v) => (displayScore = v), correct, { duration: 0.9, delay: 0.2 });
-		animateNumber((v) => (displayXP = v), xpEarned, { duration: 1.2, delay: 0.4 });
+		animateNumber((v) => (displayScore = v), correct, { duration: 0.9, delay: 0.4 });
+		animateNumber((v) => (displayTotal = v), total, { duration: 0.7, delay: 0.3 });
+		animateNumber((v) => (displayXP = v), xpEarned, { duration: 1.2, delay: 0.6 });
 		playFinish();
 	});
 </script>
 
-<div class="summary-page-host" use:fadeUp>
-	<!-- Decorative background circle (pulsing) -->
+<div class="study-summary-host">
 	<div class="pulse-bg-circle"></div>
 
 	<div class="summary-inner">
-		<!-- Label -->
-		<div class="summary-label" use:fadeUp={{ delay: 0.1, y: 8 }}>
+		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="summary-label" style="margin-bottom:16px; font-weight: 800;">
 			{t('summary.complete', $locale)}
 		</div>
 
-		<!-- Score — animated counter -->
-		<div class="summary-score-large" use:popIn={{ delay: 0.2 }}>
-			{displayScore} <span class="total-sep">/</span> {total}
+		<div use:popIn={{ delay: 0.2 }} class="summary-score">
+			{displayScore} / {displayTotal}
 		</div>
 
-		<div class="summary-msg-text" use:fadeUp={{ delay: 0.45, y: 8 }}>
-			{title || (pct === 100 ? t('summary.all', $locale) : t('summary.solid', $locale))}
+		<div use:fadeUp={{ delay: 0.45, y: 8 }} class="summary-msg" style="margin-top:12px;">
+			{message}
 		</div>
 
-		<!-- Stats list -->
-		<div class="summary-stats-list">
-			<div class="summary-stat-item centered" use:fadeUp={{ delay: 0.55 }}>
+		<div use:staggerChildren={{ delay: 0.55, stagger: 0.1, y: 10 }} class="summary-stats-list">
+			<div class="summary-stat-item centered">
 				<span class="summary-stat-key">{t('summary.xp', $locale)}</span>
 				<span class="summary-stat-val xp">+{displayXP} XP</span>
 			</div>
-			<div class="summary-stat-item centered" use:fadeUp={{ delay: 0.65 }}>
+			<div class="summary-stat-item centered">
 				<span class="summary-stat-key">{t('summary.accuracy', $locale)}</span>
 				<span class="summary-stat-val" style="color:{pct >= 70 ? 'var(--success)' : 'var(--hinomaru-red)'};">
 					{pct}%
@@ -76,28 +83,29 @@
 </div>
 
 <style>
-	.summary-page-host {
+	.study-summary-host {
+		min-height: 100dvh;
+		background: var(--paper);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: clamp(40px, 8vh, 80px) 24px 140px;
+		justify-content: center;
+		padding: calc(24px + env(safe-area-inset-top)) 24px 140px;
 		position: relative;
 		overflow: hidden;
 		width: 100%;
-		flex: 1;
-		background: var(--paper);
 	}
 
 	.pulse-bg-circle {
 		position: absolute;
-		top: clamp(200px, 35vh, 400px);
+		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: min(80vw, 320px);
-		height: min(80vw, 320px);
+		width: 320px;
+		height: 320px;
 		background: var(--hinomaru-red);
 		border-radius: 50%;
-		opacity: 0.05;
+		opacity: 0.06;
 		pointer-events: none;
 		z-index: 0;
 		animation: pulse-bg 4s ease-in-out infinite;
@@ -109,76 +117,6 @@
 		width: 100%;
 		text-align: center;
 		z-index: 1;
-	}
-
-	.summary-label {
-		font-size: 14px;
-		font-weight: 800;
-		color: var(--fg-tertiary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-bottom: 16px;
-	}
-
-	.summary-score-large {
-		font-size: 64px;
-		font-weight: 900;
-		color: var(--fg-primary);
-		letter-spacing: -0.04em;
-		line-height: 1;
-	}
-
-	.total-sep {
-		color: var(--ink-300);
-		font-weight: 400;
-		margin: 0 4px;
-	}
-
-	.summary-msg-text {
-		font-size: 20px;
-		font-weight: 700;
-		color: var(--fg-secondary);
-		margin-top: 12px;
-		margin-bottom: 40px;
-	}
-
-	.summary-stats-list {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		width: 100%;
-	}
-
-	.summary-stat-item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px 20px;
-		border-radius: 20px;
-		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
-		box-shadow: var(--shadow-sm);
-	}
-
-	.summary-stat-item.centered {
-		justify-content: center;
-		gap: 12px;
-	}
-
-	.summary-stat-key {
-		font-size: 14px;
-		color: var(--fg-secondary);
-		font-weight: 600;
-	}
-
-	.summary-stat-val {
-		font-size: 16px;
-		font-weight: 800;
-		color: var(--fg-primary);
-	}
-
-	.summary-stat-val.xp {
-		color: #d4a017;
 	}
 
 	.summary-back-btn {

@@ -44,12 +44,16 @@
 	// only MicOrb's internal rAF reads it.
 	const micLevelRef = { value: 0 };
 	const getMicLevel = () => micLevelRef.value;
-	let finalBuf = $state('');
-	let interimBuf = $state('');
-	// Multi-alternative buffers: each finalized utterance keeps all alts so the
-	// scorer can pick whichever transcription best matches the current line.
-	let finalAlts = $state<string[][]>([]);
-	let interimAlts = $state<string[]>([]);
+	// Per-line transcript buckets. Recognizer results are routed to the line
+	// they belong to instead of a global buffer, so a late `isFinal` (Web Speech
+	// API often delays finals 0.8–1.5 s) still lands on the line the audio
+	// actually covered, not the line that just became active.
+	let lineFinals = $state<Record<number, string[][]>>({});
+	let lineInterim = $state<Record<number, string[]>>({});
+	// While `pendingPrevIdx` is set, late `isFinal` events still belong to that
+	// previous line. Cleared when the deferred scoring fires.
+	let pendingPrevIdx: number | null = null;
+	let pendingPrevUntil = 0;
 	let scores = $state<Record<number, LineScore>>({});
 	let micError = $state<string | null>(null);
 	let summaryShown = $state(false);
@@ -98,10 +102,10 @@
 		activeIdx = -1;
 		prevIdx = -1;
 		micLevelRef.value = 0;
-		finalBuf = '';
-		interimBuf = '';
-		finalAlts = [];
-		interimAlts = [];
+		lineFinals = {};
+		lineInterim = {};
+		pendingPrevIdx = null;
+		pendingPrevUntil = 0;
 		scores = {};
 		micError = null;
 		summaryShown = false;
@@ -146,14 +150,23 @@
 		await recognizer.start(
 			(r) => {
 				const alts = r.alternatives.length ? r.alternatives : [r.transcript];
+				const targetIdx =
+					r.isFinal && pendingPrevIdx !== null && Date.now() < pendingPrevUntil
+						? pendingPrevIdx
+						: activeIdx;
+				if (targetIdx < 0) {
+					recognizerArmed = true;
+					return;
+				}
 				if (r.isFinal) {
-					finalAlts.push(alts);
-					finalBuf = (finalBuf + ' ' + r.transcript).trim();
-					interimAlts = [];
-					interimBuf = '';
+					const prevBucket = lineFinals[targetIdx] ?? [];
+					lineFinals = { ...lineFinals, [targetIdx]: [...prevBucket, alts] };
+					if (lineInterim[targetIdx]?.length) {
+						const { [targetIdx]: _, ...rest } = lineInterim;
+						lineInterim = rest;
+					}
 				} else {
-					interimAlts = alts;
-					interimBuf = r.transcript;
+					lineInterim = { ...lineInterim, [targetIdx]: alts };
 				}
 				recognizerArmed = true;
 			},
@@ -190,6 +203,8 @@
 		}
 	}
 
+	const PENDING_WINDOW_MS = 1800;
+
 	function syncActiveLyric(time: number) {
 		if (!lyrics.length) return;
 		let found = -1;
@@ -197,21 +212,24 @@
 			if (lyrics[i].time <= time + 0.15) { found = i; break; }
 		}
 		if (found !== activeIdx) {
-			// Snapshot what's been heard for the line we're leaving, then defer
-			// scoring 400 ms so the recognizer's trailing transcripts still
-			// land in the correct bucket.
+			// Late finals (Web Speech API emits `isFinal` 0.8–1.5 s after the
+			// utterance actually ended) should still land on the line whose
+			// audio they describe. Open a pending window pointing at the prev
+			// line, then score it once the window expires.
 			if (activeIdx >= 0 && activeIdx < lyrics.length) {
 				const prev = activeIdx;
-				const snapAlts = finalAlts.slice();
-				const snapInterim = interimAlts.slice();
-				setTimeout(() => scoreLineWithAlts(prev, snapAlts, snapInterim), 400);
+				pendingPrevIdx = prev;
+				pendingPrevUntil = Date.now() + PENDING_WINDOW_MS;
+				setTimeout(() => {
+					scoreLineFromBuckets(prev);
+					if (pendingPrevIdx === prev) {
+						pendingPrevIdx = null;
+						pendingPrevUntil = 0;
+					}
+				}, PENDING_WINDOW_MS);
 			}
 			prevIdx = activeIdx;
 			activeIdx = found;
-			finalBuf = '';
-			interimBuf = '';
-			finalAlts = [];
-			interimAlts = [];
 		}
 	}
 
@@ -252,12 +270,14 @@
 		};
 	}
 
-	function scoreLine(idx: number) {
-		scoreLineWithAlts(idx, finalAlts.slice(), interimAlts.slice());
+	function scoreLineFromBuckets(idx: number) {
+		const finals = lineFinals[idx] ?? [];
+		const interim = lineInterim[idx] ?? [];
+		scoreLineWithAlts(idx, finals, interim);
 	}
 
 	function finalizeLastLine() {
-		if (activeIdx >= 0 && !(activeIdx in scores)) scoreLine(activeIdx);
+		if (activeIdx >= 0 && !(activeIdx in scores)) scoreLineFromBuckets(activeIdx);
 	}
 
 	function updateDucking(rms: number) {
@@ -322,7 +342,15 @@
 
 	onDestroy(() => endSession(true));
 
-	const liveTranscript = $derived((finalBuf + ' ' + interimBuf).trim());
+	const liveTranscript = $derived.by(() => {
+		if (activeIdx < 0) return '';
+		const finals = lineFinals[activeIdx] ?? [];
+		const interim = lineInterim[activeIdx] ?? [];
+		const parts: string[] = [];
+		for (const alts of finals) if (alts[0]) parts.push(alts[0]);
+		if (interim[0]) parts.push(interim[0]);
+		return parts.join(' ').trim();
+	});
 
 	function matchedTokens(line: string, spoken: string): { tokens: string[]; matched: boolean[] } {
 		const tokens = splitForKaraoke(line);
@@ -354,7 +382,9 @@
 		// Pick the alt closest to current line for highlighting, fallback to top
 		const line = lyrics[activeIdx];
 		const targets = targetsForLine(line);
-		const allAlts = finalAlts.flat().concat(interimAlts);
+		const finals = lineFinals[activeIdx] ?? [];
+		const interim = lineInterim[activeIdx] ?? [];
+		const allAlts = finals.flat().concat(interim);
 		const candidate = allAlts.length
 			? bestAltAgainst(allAlts, targets).text
 			: liveTranscript;

@@ -14,8 +14,7 @@
 	import AlphabetCharMcq from './AlphabetCharMcq.svelte';
 	import AlphabetListenWord from './AlphabetListenWord.svelte';
 	import WriteKanji from '$lib/components/study/WriteKanji.svelte';
-	import StudySummary from '$lib/components/study/StudySummary.svelte';
-	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
+	import { svileo } from '$lib/stores/toast';
 
 	type StepKind = 'sound_for_char' | 'char_for_sound' | 'write' | 'listen_word';
 
@@ -50,9 +49,21 @@
 	let stepIdx = $state(0);
 	let stepKey = $state(0);
 	let correctCount = $state(0);
-	let done = $state(false);
 
 	const current = $derived(queue[stepIdx]);
+
+	function finishSession() {
+		const total = queue.length;
+		const pct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+		const xp = correctCount * 5;
+		const title =
+			pct === 100 ? t('summary.all', $locale) : t('summary.complete', $locale);
+		svileo.success({
+			title,
+			description: `+${xp} XP · ${pct}% ${t('summary.accuracy', $locale)}`
+		});
+		onDone();
+	}
 
 	function advance(correct: boolean) {
 		recordResult(char.id, correct);
@@ -63,7 +74,7 @@
 			playWrong();
 		}
 		if (stepIdx >= queue.length - 1) {
-			done = true;
+			finishSession();
 		} else {
 			stepIdx++;
 			stepKey++;
@@ -88,13 +99,7 @@
 	});
 </script>
 
-{#if done}
-	<StudySummary
-		correct={correctCount}
-		total={queue.length}
-		onContinue={onDone}
-	/>
-{:else if current}
+{#if current}
 	<div class="practice-wrap">
 		{#key stepKey}
 			{#if current.kind === 'sound_for_char' && current.pool}

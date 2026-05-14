@@ -118,7 +118,7 @@
 			</button>
 		</div>
 	{:else if view === 'practice'}
-		<AlphabetCharPractice {char} {learnedJps} onDone={backToMenu} />
+		<AlphabetCharPractice {char} {learnedJps} onDone={onClose} />
 	{:else if view === 'word' && pickedWord}
 		<AlphabetListenWord word={pickedWord} script={char.script} onAnswer={onWordDone} />
 	{/if}

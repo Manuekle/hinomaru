@@ -24,7 +24,7 @@
 		JapaneseSpeechRecognizer,
 		type SpeechStatus
 	} from '$lib/speaking/speech';
-	import { comparePhrase } from '$lib/speaking/compare';
+	import { comparePhraseBest } from '$lib/speaking/compare';
 	import { Mic01Icon } from '@hugeicons/core-free-icons';
 	import { onDestroy } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
@@ -49,6 +49,7 @@
 	let roleplayMode = $state(false);
 	const recognizer: JapaneseSpeechRecognizer = new JapaneseSpeechRecognizer();
 	let liveTranscript = $state('');
+	let liveAlternatives: string[] = [];
 	let isRecording = $state(false);
 	let speechError = $state<string | null>(null);
 	let speechStatus = $state<SpeechStatus>({ ok: false, reason: 'no-window' });
@@ -148,11 +149,13 @@
 		if (isRecording || recognizer.active) return;
 		speechError = null;
 		liveTranscript = '';
+		liveAlternatives = [];
 		isRecording = true;
 
 		await recognizer.start(
 			(r) => {
 				liveTranscript = r.transcript;
+				if (r.alternatives?.length) liveAlternatives = r.alternatives;
 			},
 			(err) => {
 				speechError = err;
@@ -178,21 +181,27 @@
 
 	function checkSpokenAnswer(spoken: string) {
 		if (currentTurn?.type !== 'choice') return;
+		const pool = liveAlternatives.length ? liveAlternatives : [spoken];
 		let bestScore = 0;
 		let bestIdx = -1;
 
 		currentTurn.choices.forEach((choice, idx) => {
-			const c = comparePhrase(choice.jp, spoken, [choice.jp]);
-			if (c.overallScore > bestScore) {
-				bestScore = c.overallScore;
-				bestIdx = idx;
+			const targets = [choice.jp, choice.romaji].filter(
+				(t): t is string => typeof t === 'string' && t.length > 0
+			);
+			for (const alt of pool) {
+				if (!alt) continue;
+				const c = comparePhraseBest(targets, alt);
+				if (c.overallScore > bestScore) {
+					bestScore = c.overallScore;
+					bestIdx = idx;
+				}
 			}
 		});
 
 		// If score is decent enough (> 0.4), accept it as their choice
 		if (bestScore > 0.4 && bestIdx !== -1) {
 			const matchedChoice = currentTurn.choices[bestIdx];
-			// Find its original index in shuffledChoices to select the right one visually
 			const visualIdx = shuffledChoices.findIndex((sc) => sc.originalIdx === bestIdx);
 			pickChoice(matchedChoice, visualIdx !== -1 ? visualIdx : bestIdx);
 		} else {
@@ -398,7 +407,7 @@
 						</div>
 
 						<!-- Options or Recording Mode -->
-						<div use:fadeUp={{ delay: 0.18, y: 10 }} style="margin-top:32px;">
+						<div use:fadeUp={{ delay: 0.18, y: 10 }} style="margin-top:16px;">
 							<p class="question-text">
 								{$locale === 'es'
 									? 'Elige la respuesta más natural:'
@@ -425,9 +434,7 @@
 														? 'Mantener para hablar'
 														: 'Hold to speak'}
 											>
-												<div class="mic-ring"></div>
-												<div class="mic-ring mic-ring-2"></div>
-												<Icon icon={Mic01Icon} size={32} color="white" />
+												<Icon icon={Mic01Icon} size={22} color="white" />
 											</button>
 										</div>
 
@@ -646,33 +653,36 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 40px 0;
-		gap: 32px;
+		padding: 16px 0;
+		gap: 12px;
 	}
 
 	.mic-container {
 		position: relative;
-		width: 120px;
-		height: 120px;
+		width: 64px;
+		height: 64px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.mic-btn-premium {
-		width: 104px;
-		height: 104px;
+		width: 64px;
+		height: 64px;
 		border-radius: 50%;
 		border: none;
-		background: linear-gradient(135deg, var(--hinomaru-red), #d4002f);
+		background: var(--hinomaru-red);
 		color: white;
 		position: relative;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 10px 32px rgba(188, 0, 45, 0.32);
-		transition: transform 0.18s cubic-bezier(0.34, 1.5, 0.64, 1);
+		box-shadow: 0 4px 12px rgba(188, 0, 45, 0.22);
+		transition:
+			transform 0.16s cubic-bezier(0.34, 1.5, 0.64, 1),
+			background 0.2s ease,
+			box-shadow 0.2s ease;
 		z-index: 10;
 		user-select: none;
 		-webkit-user-select: none;
@@ -684,44 +694,26 @@
 	}
 
 	.mic-btn-premium.is-recording {
-		background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-		transform: scale(1.04);
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+		background: #1a1a1a;
+		animation: mic-soft-pulse 1.4s ease-in-out infinite;
 	}
 
-	.mic-ring {
-		position: absolute;
-		inset: -8px;
-		border-radius: 50%;
-		border: 2px solid var(--hinomaru-red);
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.mic-ring-2 {
-		inset: -16px;
-	}
-
-	.mic-btn-premium.is-recording .mic-ring {
-		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-	}
-	.mic-btn-premium.is-recording .mic-ring-2 {
-		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
-	}
-
-	@keyframes pulse-ring {
-		0% {
-			transform: scale(0.9);
-			opacity: 0.7;
-		}
+	@keyframes mic-soft-pulse {
+		0%,
 		100% {
-			transform: scale(1.5);
-			opacity: 0;
+			box-shadow:
+				0 0 0 0 rgba(188, 0, 45, 0.45),
+				0 4px 12px rgba(0, 0, 0, 0.28);
+		}
+		50% {
+			box-shadow:
+				0 0 0 6px rgba(188, 0, 45, 0),
+				0 4px 12px rgba(0, 0, 0, 0.28);
 		}
 	}
 
 	.recording-status {
-		height: 40px;
+		min-height: 22px;
 		display: flex;
 		align-items: center;
 		justify-content: center;

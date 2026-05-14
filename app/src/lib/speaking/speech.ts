@@ -2,6 +2,7 @@ export interface RecognitionResult {
 	transcript: string;
 	confidence: number;
 	isFinal: boolean;
+	alternatives: string[];
 }
 
 export type ResultCallback = (r: RecognitionResult) => void;
@@ -100,11 +101,18 @@ export class JapaneseSpeechRecognizer {
 
 		this.rec.onresult = (e: SpeechRecognitionEvent) => {
 			for (let i = e.resultIndex; i < e.results.length; i++) {
-				const alt = e.results[i][0];
+				const result = e.results[i];
+				const alt = result[0];
+				const alternatives: string[] = [];
+				for (let k = 0; k < result.length; k++) {
+					const a = result[k]?.transcript;
+					if (a) alternatives.push(a);
+				}
 				onResult({
 					transcript: alt.transcript,
 					confidence: alt.confidence ?? 0,
-					isFinal: e.results[i].isFinal
+					isFinal: result.isFinal,
+					alternatives
 				});
 			}
 		};
