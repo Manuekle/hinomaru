@@ -589,16 +589,21 @@
 		</div>
 
 		<!-- ── Support ── -->
-		<div class="card support-card">
-			<p class="support-text">{t('settings.support.desc', $locale)}</p>
-			<a
-				href="https://ko-fi.com/manujsx"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="support-btn"
-			>
-				<img src={kofiLight} alt="Support on Ko-fi" class="kofi-light" />
-				<img src={kofiDark} alt="Support on Ko-fi" class="kofi-dark" />
+		<div class="card support-banner">
+			<div class="support-content">
+				<div class="support-icon">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+					</svg>
+				</div>
+				<div class="support-text-wrap">
+					<span class="support-title">{t('settings.support', $locale) || 'Support Hinomaru'}</span>
+					<span class="support-sub">{t('settings.support.desc', $locale)}</span>
+				</div>
+			</div>
+			<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="support-btn-new">
+				<img src={kofiLight} alt="Support on Ko-fi" class="kofi-light kofi-img-cropped" />
+				<img src={kofiDark} alt="Support on Ko-fi" class="kofi-dark kofi-img-cropped" />
 			</a>
 		</div>
 
@@ -1097,26 +1102,82 @@
 		display: inline-block;
 	}
 
-	/* ── Support ── */
-	.support-card {
+	/* ── Support Banner ── */
+	.support-banner {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
 		padding: 20px;
-		text-align: center;
+		background: linear-gradient(135deg, var(--bg-surface) 0%, var(--ink-50) 100%);
+		border: 1px solid var(--ink-200);
 	}
-	.support-text {
-		font-size: 13px;
-		color: var(--fg-secondary);
-		line-height: 1.5;
-		margin: 0 0 14px;
-	}
-	.support-btn {
-		display: inline-block;
-		transition: transform 0.18s;
-	}
-	.support-btn img {
-		height: 42px;
-		display: block;
+	:global([data-theme='dark']) .support-banner {
+		background: linear-gradient(135deg, var(--ink-50) 0%, var(--ink-100) 100%);
 	}
 	
+	@media (min-width: 480px) {
+		.support-banner {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
+
+	.support-content {
+		display: flex;
+		gap: 16px;
+		align-items: center;
+	}
+
+	.support-icon {
+		width: 44px;
+		height: 44px;
+		background: #FF5E5B15;
+		color: #FF5E5B;
+		border-radius: 14px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.support-text-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.support-title {
+		font-size: 15px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		letter-spacing: -0.02em;
+	}
+
+	.support-sub {
+		font-size: 13px;
+		color: var(--fg-secondary);
+		line-height: 1.4;
+	}
+
+	.support-btn-new {
+		display: block;
+		transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+		flex-shrink: 0;
+		align-self: flex-start;
+	}
+	@media (min-width: 480px) {
+		.support-btn-new {
+			align-self: center;
+		}
+	}
+
+	.kofi-img-cropped {
+		height: 38px;
+		display: block;
+		clip-path: inset(2px round 20px);
+	}
+
 	.kofi-dark {
 		display: none !important;
 	}
@@ -1128,12 +1189,12 @@
 	}
 
 	@media (hover: hover) {
-		.support-btn:hover {
-			transform: scale(1.04);
+		.support-btn-new:hover {
+			transform: scale(1.05) translateY(-2px);
 		}
 	}
-	.support-btn:active {
-		transform: scale(0.96);
+	.support-btn-new:active {
+		transform: scale(0.95);
 	}
 
 
