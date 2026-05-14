@@ -331,22 +331,19 @@
 	<SessionEmptyState totalCards={totalCards} learnedCount={learnedCount} sessionCount={0} deckId={deck?.id} modeLabel={t('mode.write.title', $locale)} />
 {:else if card}
 	<div class="write-viewer">
-		<div class="prompt-card" use:fadeIn>
-			<div class="card-header-label">
-				<span class="label-dot"></span>
-				{$locale === 'es' ? 'ESCRIBE EL CARÁCTER' : 'WRITE THE CHARACTER'}
-			</div>
-			<div class="prompt-row">
-				<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
-				<button onclick={() => speakJapanese(card.jp)} class="audio-corner" aria-label="Escuchar">
-					<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
-				</button>
-			</div>
-			{#if checked}
-				{@const rom = safeRomaji(card.romaji, card.jp)}
-				{#if rom}<div class="romaji" use:fadeIn>{rom}</div>{/if}
-			{/if}
-		</div>
+					<div class="prompt-card" use:fadeIn>
+						<span class="prompt-tag">{$locale === 'es' ? 'ESCRIBE EL CARÁCTER' : 'WRITE THE CHARACTER'}</span>
+						<div class="prompt-row">
+							<div class="meaning-text">{$locale === 'es' ? card.es : card.en}</div>
+							<button onclick={() => speakJapanese(card.jp)} class="audio-corner" aria-label="Escuchar">
+								<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+							</button>
+						</div>
+						{#if checked}
+							{@const rom = safeRomaji(card.romaji, card.jp)}
+							{#if rom}<div class="romaji" use:fadeIn>{rom}</div>{/if}
+						{/if}
+					</div>
 
 		<div class="canvas-section">
 			{#if loadingWriters}
@@ -422,45 +419,28 @@
 		padding: 22px 26px; 
 		display: flex; 
 		flex-direction: column; 
-		gap: 14px;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.prompt-card::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 4px;
-		height: 100%;
-		background: var(--hinomaru-red);
-	}
-
-	.card-header-label {
-		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 12px;
+		text-align: center;
+	}
+
+	.prompt-tag {
 		font-size: 10px;
 		font-weight: 800;
-		color: var(--fg-tertiary);
+		letter-spacing: -0.04em;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		color: var(--hinomaru-red);
+		background: var(--hinomaru-red-wash);
+		padding: 4px 10px;
+		border-radius: 20px;
 	}
 
-	.label-dot {
-		width: 6px;
-		height: 6px;
-		background: var(--hinomaru-red);
-		border-radius: 50%;
-	}
-
-	.prompt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+	.prompt-row { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; }
 	.meaning-text { font-size: 28px; font-weight: 950; color: var(--fg-primary); letter-spacing: -0.02em; }
 	
 	.audio-corner { 
-		width: 42px; 
-		height: 42px; 
+		width: 40px; 
+		height: 40px; 
 		border-radius: 50%; 
 		border: 1.5px solid var(--ink-200); 
 		background: var(--bg-surface); 
@@ -474,7 +454,7 @@
 	}
 	.audio-corner:active { transform: scale(0.9); background: var(--bg-muted); }
 
-	.romaji { font-size: 18px; font-weight: 700; color: var(--hinomaru-red); margin-top: -6px; opacity: 0.9; }
+	.romaji { font-size: 18px; font-weight: 700; color: var(--hinomaru-red); margin-top: -4px; opacity: 0.9; }
 	
 	.canvas-section { display: flex; flex-direction: column; gap: 16px; }
 	
@@ -520,44 +500,45 @@
 
 	.canvas-wrapper { 
 		position: relative; 
-		background: var(--washi); 
-		border-radius: 32px; 
-		border: 2px solid var(--ink-200); 
-		padding: 30px; 
+		padding: 10px 0; 
 		min-height: clamp(280px, 40vh, 380px); 
 		display: flex; 
 		align-items: center; 
 		justify-content: center; 
 		overflow: hidden;
-		box-shadow: var(--shadow-lg);
+		width: 100%;
 	}
 
-	.washi-texture {
-		background-image: 
-			radial-gradient(var(--ink-200) 0.5px, transparent 0.5px),
-			radial-gradient(var(--ink-200) 0.5px, var(--washi) 0.5px);
-		background-size: 20px 20px;
-		background-position: 0 0, 10px 10px;
-		background-attachment: local;
-		opacity: 0.95;
+	.canvas-wrapper.empty-data { 
+		flex-direction: column; 
+		gap: 16px; 
+		background: var(--bg-surface); 
+		text-align: center; 
+		padding: 48px 32px; 
+		border-radius: 32px;
+		border: 1.5px solid var(--ink-200);
 	}
 
-	.canvas-wrapper.empty-data { flex-direction: column; gap: 16px; background: var(--bg-surface); text-align: center; padding: 48px 32px; }
 	.empty-data-text { font-size: 15px; font-weight: 600; color: var(--fg-tertiary); max-width: 300px; line-height: 1.5; }
 	
 	.hanzi-container { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; width: 100%; position: relative; z-index: 2; }
 	
 	:global(.kanji-box) { 
 		position: relative; 
-		background: rgba(255, 255, 255, 0.4); 
-		border-radius: 16px; 
-		border: 1.5px solid var(--ink-300); 
+		background: var(--bg-surface); 
+		border-radius: 28px; 
+		border: 2px solid var(--ink-200); 
 		overflow: hidden; 
-		box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+		box-shadow: var(--shadow-lg);
+		background-image: 
+			radial-gradient(var(--ink-200) 0.5px, transparent 0.5px),
+			radial-gradient(var(--ink-200) 0.5px, var(--bg-surface) 0.5px);
+		background-size: 20px 20px;
+		background-position: 0 0, 10px 10px;
 	}
 	
 	[data-theme='dark'] :global(.kanji-box) {
-		background: rgba(0, 0, 0, 0.2);
+		background: var(--bg-surface);
 		border-color: var(--ink-200);
 	}
 
@@ -569,7 +550,7 @@
 		right: 0; 
 		border-top: 1.5px dashed var(--ink-200); 
 		z-index: 0; 
-		opacity: 0.6;
+		opacity: 0.4;
 	}
 	
 	:global(.kanji-box::after) { 
@@ -580,10 +561,10 @@
 		bottom: 0; 
 		border-left: 1.5px dashed var(--ink-200); 
 		z-index: 0; 
-		opacity: 0.6;
+		opacity: 0.4;
 	}
 	
-	:global(.kanji-box > svg) { position: relative; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+	:global(.kanji-box > svg) { position: relative; z-index: 1; }
 	
 	.loader-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-surface); border-radius: 32px; z-index: 10; }
 </style>

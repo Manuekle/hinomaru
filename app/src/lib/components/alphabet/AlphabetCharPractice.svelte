@@ -96,41 +96,29 @@
 	/>
 {:else if current}
 	<div class="practice-wrap">
-		<div class="step-meta">
-			<span class="step-tag">
-				{t('session.step', $locale)}
-				{stepIdx + 1} / {queue.length}
-			</span>
-		</div>
-		<StudySessionLayout
-			isLesson={true}
-			currentIndex={stepIdx}
-			totalCount={queue.length}
-		>
-			{#key stepKey}
-				{#if current.kind === 'sound_for_char' && current.pool}
-					<AlphabetCharMcq
-						mode="lesson"
-						target={char}
-						options={shuffle([char, ...current.pool])}
-						direction="sound_for_char"
-						onAnswer={advance}
-					/>
-				{:else if current.kind === 'char_for_sound' && current.pool}
-					<AlphabetCharMcq
-						mode="lesson"
-						target={char}
-						options={shuffle([char, ...current.pool])}
-						direction="char_for_sound"
-						onAnswer={advance}
-					/>
-				{:else if current.kind === 'write'}
-					<WriteKanji mode="lesson" card={writeCard} onAnswer={advance} autoAdvance={true} />
-				{:else if current.kind === 'listen_word' && current.word}
-					<AlphabetListenWord mode="lesson" word={current.word} script={char.script} onAnswer={onWordAnswer} />
-				{/if}
-			{/key}
-		</StudySessionLayout>
+		{#key stepKey}
+			{#if current.kind === 'sound_for_char' && current.pool}
+				<AlphabetCharMcq
+					mode="lesson"
+					target={char}
+					options={shuffle([char, ...current.pool])}
+					direction="sound_for_char"
+					onAnswer={advance}
+				/>
+			{:else if current.kind === 'char_for_sound' && current.pool}
+				<AlphabetCharMcq
+					mode="lesson"
+					target={char}
+					options={shuffle([char, ...current.pool])}
+					direction="char_for_sound"
+					onAnswer={advance}
+				/>
+			{:else if current.kind === 'write'}
+				<WriteKanji mode="lesson" card={writeCard} onAnswer={advance} autoAdvance={true} />
+			{:else if current.kind === 'listen_word' && current.word}
+				<AlphabetListenWord mode="lesson" word={current.word} script={char.script} onAnswer={onWordAnswer} />
+			{/if}
+		{/key}
 	</div>
 {/if}
 
