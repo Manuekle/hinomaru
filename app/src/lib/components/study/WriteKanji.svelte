@@ -14,7 +14,6 @@
 	import { playCorrect } from '$lib/utils/sounds';
 	import { safeRomaji } from '$lib/utils/romaji';
 	import SessionEmptyState from '$lib/components/SessionEmptyState.svelte';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import StudySessionLayout from './StudySessionLayout.svelte';
@@ -363,41 +362,7 @@
 						<div bind:this={hanziContainer} class="hanzi-container"></div>
 					</div>
 				</div>
-
-				{#if isLesson && !showAnticipation}
-					<div class="inline-footer">
-						{#if !checked}
-							<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
-								{t('session.skip', $locale)}
-							</button>
-							<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
-								{t('session.reset', $locale)}
-							</button>
-						{:else}
-							<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-								{t('session.continue', $locale)}
-							</button>
-						{/if}
-					</div>
-				{/if}
 			</div>
-		{/if}
-		
-		{#if !isLesson && card && !showAnticipation}
-			<StickyFooter>
-				{#if !checked}
-					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
-						{t('session.skip', $locale)}
-					</button>
-					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
-						{t('session.reset', $locale)}
-					</button>
-				{:else}
-					<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-						{t('session.continue', $locale)}
-					</button>
-				{/if}
-			</StickyFooter>
 		{/if}
 </StudySessionLayout>
 
