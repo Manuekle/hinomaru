@@ -77,12 +77,10 @@
 
 <style>
 	.summary-page-host {
-		min-height: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: calc(40px + env(safe-area-inset-top, 0px)) 24px 100px;
+		padding: clamp(40px, 8vh, 80px) 24px 140px;
 		position: relative;
 		overflow: hidden;
 		width: 100%;
@@ -92,16 +90,16 @@
 
 	.pulse-bg-circle {
 		position: absolute;
-		top: 45%;
+		top: clamp(200px, 35vh, 400px);
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 300px;
-		height: 300px;
+		width: min(80vw, 320px);
+		height: min(80vw, 320px);
 		background: var(--hinomaru-red);
 		border-radius: 50%;
 		opacity: 0.05;
 		pointer-events: none;
-		z-index: -1;
+		z-index: 0;
 		animation: pulse-bg 4s ease-in-out infinite;
 	}
 

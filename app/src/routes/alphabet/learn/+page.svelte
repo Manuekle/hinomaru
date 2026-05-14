@@ -147,18 +147,18 @@
 	<title>{$locale === 'es' ? 'Aprender' : 'Learn'} — Hinomaru</title>
 </svelte:head>
 
-<StudySessionLayout
-	onExit={exit}
-	currentIndex={stepIdx}
-	totalCount={Math.max(queue.length, 1)}
->
-	{#if done}
-		<StudySummary 
-			correct={correctCount} 
-			total={queue.length} 
-			onContinue={exit} 
-		/>
-	{:else if current}
+{#if done}
+	<StudySummary 
+		correct={correctCount} 
+		total={queue.length} 
+		onContinue={exit} 
+	/>
+{:else if current}
+	<StudySessionLayout
+		onExit={exit}
+		currentIndex={stepIdx}
+		totalCount={Math.max(queue.length, 1)}
+	>
 		{#key stepKey}
 			{#if current.kind === 'introduce' && current.char}
 				<AlphabetIntroduce char={current.char} onContinue={() => advance(true)} />
@@ -193,7 +193,7 @@
 				<AlphabetListenWord mode="lesson" word={current.word} script={scriptParam} onAnswer={advance} />
 			{/if}
 		{/key}
-	{/if}
-</StudySessionLayout>
+	</StudySessionLayout>
+{/if}
 
 {#if showAnticipation}<AnticipationScreen />{/if}
