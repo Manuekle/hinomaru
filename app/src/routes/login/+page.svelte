@@ -85,6 +85,10 @@
 		else if (errorParam === 'link_expired') globalError = t('auth.error.linkExpired', $locale);
 
 		try {
+			if ((data as any)?.user) {
+				goto('/');
+				return;
+			}
 			const nav = window.navigator as Navigator & { standalone?: boolean };
 			const isPWA =
 				window.matchMedia('(display-mode: standalone)').matches ||
