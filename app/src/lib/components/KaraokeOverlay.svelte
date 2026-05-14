@@ -205,11 +205,16 @@
 
 	const PENDING_WINDOW_MS = 1800;
 
+	// Lead time: line activates this many seconds BEFORE its timestamp so the
+	// singer can read it before the vocal lands. 0.15 s was too tight — users
+	// reported the line popping in exactly when the lyric was sung.
+	const LYRIC_LEAD_SEC = 0.6;
+
 	function syncActiveLyric(time: number) {
 		if (!lyrics.length) return;
 		let found = -1;
 		for (let i = lyrics.length - 1; i >= 0; i--) {
-			if (lyrics[i].time <= time + 0.15) { found = i; break; }
+			if (lyrics[i].time <= time + LYRIC_LEAD_SEC) { found = i; break; }
 		}
 		if (found !== activeIdx) {
 			// Late finals (Web Speech API emits `isFinal` 0.8–1.5 s after the
@@ -424,9 +429,9 @@
 						class:past
 						style="
 							--abs: {Math.abs(v.pos)};
-							opacity: {isActive ? 1 : v.pos === -1 || v.pos === 1 ? 0.5 : 0.22};
-							filter: blur({isActive ? 0 : Math.abs(v.pos) * 1.2}px);
-							transform: translateY({v.pos * 14}px) scale({isActive ? 1 : 0.92});
+							opacity: {isActive ? 1 : v.pos === -1 || v.pos === 1 ? 0.65 : 0.4};
+							filter: blur({isActive ? 0 : Math.abs(v.pos) * 0.5}px);
+							transform: translateY({v.pos * 14}px) scale({isActive ? 1 : 0.94});
 						"
 					>
 						{#if isActive}
@@ -499,23 +504,23 @@
 <style>
 	/* Theme-aware tokens. Light defaults; dark overrides below. */
 	.overlay {
-		--ko-bg: radial-gradient(ellipse at center, #fdf8f1 0%, #f4ece0 70%, #ece4d6 100%);
-		--ko-fg: #1a1a1a;
-		--ko-fg-soft: rgba(26, 26, 26, 0.62);
-		--ko-fg-muted: rgba(26, 26, 26, 0.42);
-		--ko-tok-rest: rgba(26, 26, 26, 0.38);
+		--ko-bg: radial-gradient(ellipse at center, #ffffff 0%, #f4f5f7 65%, #e7eaee 100%);
+		--ko-fg: #14181f;
+		--ko-fg-soft: rgba(20, 24, 31, 0.62);
+		--ko-fg-muted: rgba(20, 24, 31, 0.42);
+		--ko-tok-rest: rgba(20, 24, 31, 0.38);
 		--ko-tok-match: #1f9d55;
 		--ko-tok-glow: rgba(31, 157, 85, 0.35);
-		--ko-close-bg: rgba(26, 26, 26, 0.05);
-		--ko-close-bg-hover: rgba(26, 26, 26, 0.1);
-		--ko-close-border: rgba(26, 26, 26, 0.12);
-		--ko-badge-bg: rgba(188, 0, 45, 0.1);
+		--ko-close-bg: rgba(20, 24, 31, 0.05);
+		--ko-close-bg-hover: rgba(20, 24, 31, 0.1);
+		--ko-close-border: rgba(20, 24, 31, 0.12);
+		--ko-badge-bg: rgba(188, 0, 45, 0.08);
 		--ko-badge-fg: #bc002d;
-		--ko-badge-border: rgba(188, 0, 45, 0.25);
-		--ko-gauge-track: rgba(26, 26, 26, 0.08);
-		--ko-ghost-border: rgba(26, 26, 26, 0.18);
-		--ko-mask-color: #f4ece0;
-		--ko-text-shadow-active: 0 0 28px rgba(188, 0, 45, 0.12);
+		--ko-badge-border: rgba(188, 0, 45, 0.22);
+		--ko-gauge-track: rgba(20, 24, 31, 0.08);
+		--ko-ghost-border: rgba(20, 24, 31, 0.18);
+		--ko-mask-color: #f4f5f7;
+		--ko-text-shadow-active: 0 0 28px rgba(188, 0, 45, 0.1);
 
 		position: fixed;
 		inset: 0;
@@ -617,30 +622,30 @@
 		transition: opacity 280ms ease, filter 280ms ease, transform 280ms ease;
 	}
 	.line .text {
-		font-size: 18px;
+		font-size: 22px;
 		font-weight: 500;
 		line-height: 1.35;
 	}
 	.line.active .text {
-		font-size: 30px;
+		font-size: 36px;
 		font-weight: 700;
 		letter-spacing: 0.01em;
 		text-shadow: var(--ko-text-shadow-active);
 	}
 	.line.past .text { font-weight: 400; }
 	.romaji {
-		font-size: 12px;
+		font-size: 14px;
 		color: var(--ko-fg-muted);
 		margin-top: 6px;
 		font-style: italic;
 	}
 	.line.active .romaji {
-		font-size: 14px;
+		font-size: 16px;
 		color: var(--ko-fg-soft);
 	}
 	.translation {
 		margin-top: 10px;
-		font-size: 13px;
+		font-size: 15px;
 		color: var(--ko-fg-soft);
 		font-style: italic;
 	}
@@ -686,11 +691,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 18px;
+		justify-content: center;
+		gap: 22px;
 		width: 100%;
-		max-width: 360px;
-		margin: 32px auto 0;
-		padding: 16px 8px;
+		max-width: 420px;
+		margin: 0 auto;
+		padding: 24px 16px;
+		text-align: center;
 	}
 	.gauge {
 		position: relative;
@@ -732,11 +739,14 @@
 		font-weight: 800;
 		letter-spacing: -0.03em;
 		line-height: 1;
+		display: inline-flex;
+		align-items: baseline;
+		justify-content: center;
 	}
 	.big-pct .pct {
 		font-size: 22px;
 		font-weight: 600;
-		margin-left: 2px;
+		margin-left: 3px;
 	}
 	.big-label {
 		font-size: 13px;
@@ -753,10 +763,11 @@
 
 	.actions {
 		display: flex;
-		gap: 10px;
+		gap: 12px;
 		justify-content: center;
-		padding: 8px 0;
-		margin-top: 8px;
+		align-items: center;
+		flex-wrap: wrap;
+		width: 100%;
 	}
 	.btn {
 		display: inline-flex;
@@ -784,7 +795,11 @@
 	}
 
 	@media (max-width: 480px) {
-		.line.active .text { font-size: 24px; }
+		.line .text { font-size: 19px; }
+		.line.active .text { font-size: 30px; }
+		.romaji { font-size: 13px; }
+		.line.active .romaji { font-size: 15px; }
+		.translation { font-size: 14px; }
 		.gauge { width: 180px; height: 180px; }
 		.big-pct { font-size: 46px; }
 	}

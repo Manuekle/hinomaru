@@ -221,11 +221,15 @@
 		}
 	}
 
+	// Lead time: line activates this many seconds BEFORE its timestamp so the
+	// reader sees it before the vocal lands.
+	const LYRIC_LEAD_SEC = 0.6;
+
 	function syncLyrics(time: number) {
 		if (!hasLyrics || !song) return;
 		let active = -1;
 		for (let i = song.lyrics.length - 1; i >= 0; i--) {
-			if (song.lyrics[i].time <= time + 0.15) {
+			if (song.lyrics[i].time <= time + LYRIC_LEAD_SEC) {
 				active = i;
 				break;
 			}
@@ -596,11 +600,9 @@
 							{#if $showRomaji && line.romaji}
 								<div class="lyric-romaji">{line.romaji}</div>
 							{/if}
-							{#if isActive}
-								<div class="lyric-tl">
-									{$locale === 'es' ? line.translation_es : line.translation_en}
-								</div>
-							{/if}
+							<div class="lyric-tl" aria-hidden={!isActive}>
+								{$locale === 'es' ? line.translation_es : line.translation_en}
+							</div>
 						</button>
 					{/each}
 				</div>
@@ -1001,27 +1003,25 @@
 		border: none;
 		padding: 8px 4px;
 		cursor: pointer;
-		transition:
-			opacity 350ms cubic-bezier(0.4, 0, 0.2, 1),
-			transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
-		opacity: 0.22;
-		transform: scale(0.88);
+		transition: opacity 280ms ease, transform 280ms ease;
+		opacity: 0.4;
+		transform: scale(0.92);
 		transform-origin: left center;
 		will-change: opacity, transform;
 		font-family: inherit;
 	}
 	@media (hover: hover) {
 		.lyric-line:hover {
-			opacity: 0.45;
+			opacity: 0.65;
 		}
 	}
 	.lyric-line.near {
-		opacity: 0.5;
-		transform: scale(0.94);
+		opacity: 0.7;
+		transform: scale(0.96);
 	}
 	.lyric-line.past {
-		opacity: 0.18;
-		transform: scale(0.86);
+		opacity: 0.38;
+		transform: scale(0.92);
 	}
 	.lyric-line.active {
 		opacity: 1;
@@ -1029,39 +1029,41 @@
 	}
 
 	.lyric-jp {
-		font-size: 22px;
+		font-size: 28px;
 		font-weight: 600;
 		color: var(--fg-primary);
 		line-height: 1.35;
 	}
 
 	.lyric-romaji {
-		font-size: 13px;
+		font-size: 15px;
 		color: var(--hinomaru-red);
 		margin-top: 3px;
 		line-height: 1.3;
-		opacity: 0.6;
+		opacity: 0.7;
+		transition: opacity 280ms ease;
 	}
 	.lyric-line.active .lyric-romaji {
-		opacity: 0.9;
+		opacity: 0.95;
 	}
 
 	.lyric-tl {
-		font-size: 13px;
+		font-size: 15px;
 		color: var(--fg-secondary);
-		margin-top: 5px;
 		line-height: 1.4;
-		animation: fadeUp 240ms cubic-bezier(0.4, 0, 0.2, 1) both;
+		max-height: 0;
+		opacity: 0;
+		margin-top: 0;
+		overflow: hidden;
+		transition:
+			max-height 280ms ease,
+			opacity 280ms ease,
+			margin-top 280ms ease;
 	}
-	@keyframes fadeUp {
-		from {
-			opacity: 0;
-			transform: translateY(4px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+	.lyric-line.active .lyric-tl {
+		max-height: 80px;
+		opacity: 1;
+		margin-top: 5px;
 	}
 
 	/* Vocab */

@@ -2242,5 +2242,137 @@ export const jlptSongs: SongLesson[] = [
 				es: 'caótico / desastroso'
 			}
 		]
+	},
+	{
+		id: 'ranbu-no-melody',
+		level: 'N2',
+		title: '乱舞のメロディ',
+		artist: 'SID',
+		start: '00:00',
+		end: '01:30',
+		focus: {
+			es: 'Vocabulario poético/marcial (despertar, llamas, batalla)',
+			en: 'Poetic / battle vocabulary (awakening, flames, fight)'
+		},
+		difficulty: 4,
+		youtubeId: '5emM3JGI5JA',
+		lyrics: [
+			{
+				time: 0.0,
+				text: '静かに静かに幕は切り落とし',
+				romaji: 'shizuka ni shizuka ni maku wa kiriotoshi',
+				translation_es: 'Silenciosamente, el telón cae por fin.',
+				translation_en: 'Quietly, quietly, the curtain is cut down.'
+			},
+			{
+				time: 5.3,
+				text: '覚醒の夜明けに青い炎',
+				romaji: 'kakusei no yoake ni aoi honoo',
+				translation_es: 'Una llama azul en el amanecer del despertar.',
+				translation_en: 'A blue flame at the dawn of awakening.'
+			},
+			{
+				time: 21.0,
+				text: '僕らは負けを知らない弱さを',
+				romaji: 'bokura wa make wo shiranai yowasa wo',
+				translation_es: 'Caminamos abrazando una debilidad',
+				translation_en: 'We walked, embracing a weakness'
+			},
+			{
+				time: 27.0,
+				text: '抱きしめ歩いた',
+				romaji: 'dakishime aruita',
+				translation_es: 'que no conocía la derrota.',
+				translation_en: 'that did not know defeat.'
+			},
+			{
+				time: 31.0,
+				text: '新しい牙で時代を刻め',
+				romaji: 'atarashii kiba de jidai wo kizame',
+				translation_es: 'Graba esta era con tus nuevos colmillos.',
+				translation_en: 'Carve out the era with your brand-new fangs.'
+			},
+			{
+				time: 44.0,
+				text: '静かに静かに幕は切り落とし',
+				romaji: 'shizuka ni shizuka ni maku wa kiriotoshi',
+				translation_es: 'Silenciosamente, el telón cae por fin.',
+				translation_en: 'Quietly, quietly, the curtain is cut down.'
+			},
+			{
+				time: 49.0,
+				text: '覚醒の夜明けに青い炎',
+				romaji: 'kakusei no yoake ni aoi honoo',
+				translation_es: 'Una llama azul en el amanecer del despertar.',
+				translation_en: 'A blue flame at the dawn of awakening.'
+			},
+			{
+				time: 55.0,
+				text: '守りたいあなたに出会えるその日までは',
+				romaji: 'mamoritai anata ni deaeru sono hi made wa',
+				translation_es: 'Hasta el día en que pueda encontrarme con "ti", a quien quiero proteger...',
+				translation_en: 'Until the day I can meet "the you I want to protect"...'
+			},
+			{
+				time: 60.0,
+				text: '優柔の美より目の前の敵を',
+				romaji: 'yuujuu no bi yori me no mae no teki wo',
+				translation_es: 'En lugar de una belleza indecisa, enfrentaré al enemigo ante mis ojos.',
+				translation_en: 'Rather than a vacillating beauty, I\'ll take the enemy before me.'
+			},
+			{
+				time: 64.0,
+				text: '愛しくて愛しくて他には何もなくて',
+				romaji: 'itoshikute itoshikute hoka ni wa nani mo nakute',
+				translation_es: 'Tan amado, tan amado, no hay nada más para mí.',
+				translation_en: 'So dear, so dear, there is nothing else for me.'
+			},
+			{
+				time: 69.0,
+				text: 'ここから見渡した景色全部',
+				romaji: 'koko kara miwatashita keshiki zenbu',
+				translation_es: 'Todo el paisaje que contemplé desde aquí...',
+				translation_en: 'All the scenery I viewed from here...'
+			},
+			{
+				time: 74.0,
+				text: 'まとめて連れて行ってあげるさ離さないで',
+				romaji: 'matomete tsureteitte ageru sa hanasanaide',
+				translation_es: 'Lo llevaré todo conmigo, así que no me sueltes.',
+				translation_en: "I'll take it all with me, so don't let go."
+			},
+			{
+				time: 80.0,
+				text: 'ずっと鳴り止まぬ乱舞のメロディ',
+				romaji: 'zutto nariyamanu ranbu no merodi',
+				translation_es: 'La melodía de la danza salvaje que nunca deja de sonar.',
+				translation_en: 'The melody of the wild dance that never stops ringing.'
+			}
+		],
+		vocab: [
+			{ jp: '静か', kana: 'しずか', romaji: 'shizuka', en: 'quiet / still', es: 'silencioso / tranquilo' },
+			{ jp: '幕', kana: 'まく', romaji: 'maku', en: 'curtain / act', es: 'telón / acto' },
+			{ jp: '覚醒', kana: 'かくせい', romaji: 'kakusei', en: 'awakening', es: 'despertar' },
+			{ jp: '夜明け', kana: 'よあけ', romaji: 'yoake', en: 'dawn', es: 'amanecer' },
+			{ jp: '炎', kana: 'ほのお', romaji: 'honoo', en: 'flame', es: 'llama' },
+			{ jp: '闇', kana: 'やみ', romaji: 'yami', en: 'darkness', es: 'oscuridad' },
+			{ jp: '手探り', kana: 'てさぐり', romaji: 'tesaguri', en: 'groping / fumbling', es: 'a tientas' },
+			{ jp: '弱さ', kana: 'よわさ', romaji: 'yowasa', en: 'weakness', es: 'debilidad' },
+			{ jp: '抱きしめる', kana: 'だきしめる', romaji: 'dakishimeru', en: 'to embrace', es: 'abrazar fuerte' },
+			{ jp: '牙', kana: 'きば', romaji: 'kiba', en: 'fang', es: 'colmillo' },
+			{ jp: '時代', kana: 'じだい', romaji: 'jidai', en: 'era / age', es: 'era / época' },
+			{ jp: '刻む', kana: 'きざむ', romaji: 'kizamu', en: 'to carve / engrave', es: 'grabar / esculpir' },
+			{ jp: '守る', kana: 'まもる', romaji: 'mamoru', en: 'to protect', es: 'proteger' },
+			{ jp: '出会う', kana: 'であう', romaji: 'deau', en: 'to meet / encounter', es: 'encontrarse con' },
+			{ jp: '勇者', kana: 'ゆうしゃ', romaji: 'yuusha', en: 'brave warrior / hero', es: 'valiente / héroe' },
+			{ jp: '敵', kana: 'てき', romaji: 'teki', en: 'enemy', es: 'enemigo' },
+			{ jp: '苦しい', kana: 'くるしい', romaji: 'kurushii', en: 'painful', es: 'doloroso' },
+			{ jp: '逃げる', kana: 'にげる', romaji: 'nigeru', en: 'to flee', es: 'huir' },
+			{ jp: '未来', kana: 'みらい', romaji: 'mirai', en: 'future', es: 'futuro' },
+			{ jp: '景色', kana: 'けしき', romaji: 'keshiki', en: 'scenery / view', es: 'paisaje' },
+			{ jp: '離す', kana: 'はなす', romaji: 'hanasu', en: 'to let go / separate', es: 'soltar / separar' },
+			{ jp: '乱舞', kana: 'らんぶ', romaji: 'ranbu', en: 'wild dance', es: 'danza salvaje' },
+			{ jp: '鳴り止む', kana: 'なりやむ', romaji: 'nariyamu', en: 'to stop ringing/sounding', es: 'dejar de sonar' }
+		]
 	}
 ];
