@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { ADMIN_EMAIL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 const EXACT_PUBLIC = new Set(['/', '/login', '/terms', '/privacy', '/contact', '/jlpt/N5/listening']);
 const PREFIX_PUBLIC = ['/auth/callback', '/auth/reset-password'];
@@ -24,7 +24,7 @@ export const load: LayoutServerLoad = async ({ locals, url, cookies }) => {
 	}
 
 	const initialLocale = (cookies.get('hm-locale') as 'es' | 'en') ?? 'es';
-	const isAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL?.toLowerCase();
+	const isAdmin = user?.email?.toLowerCase() === env.ADMIN_EMAIL?.toLowerCase();
 
 	return { session, user, profile, initialLocale, isAdmin, cookies: cookies.getAll() };
 };

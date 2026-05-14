@@ -38,6 +38,7 @@
 	import type { PageData } from './$types';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
 	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
+	import * as Select from '$lib/components/ui/select/index.js';
 
 	let { data } = $props<{ data: PageData }>();
 	let { supabase, user, isAdmin } = $derived(data);
@@ -154,6 +155,22 @@
 			scheduleReminder(supabase, user.id, safe, $notificationsEnabled);
 		}
 	}
+
+	let reminderValue = $state(String($reminderHour));
+	$effect(() => {
+		if (reminderValue !== String($reminderHour)) {
+			setReminderHour(Number(reminderValue));
+		}
+	});
+
+	const reminderHoursList = Array.from({ length: 24 }, (_, i) => ({
+		value: String(i),
+		label: `${String(i).padStart(2, '0')}:00`
+	}));
+
+	const reminderTriggerContent = $derived(
+		reminderHoursList.find((h) => h.value === reminderValue)?.label ?? "00:00"
+	);
 
 	let showDeleteConfirm = $state(false);
 	let deleteStep = $state<'confirm' | 'otp'>('confirm');
@@ -543,21 +560,25 @@
 							<span class="pref-title">{t('settings.reminderHour', $locale)}</span>
 							<span class="pref-sub">{t('settings.reminderHour.desc', $locale)}</span>
 						</div>
-						<div class="custom-select-wrapper">
-							<select
-								class="hour-select"
-								value={$reminderHour}
-								onchange={(e) => setReminderHour(Number((e.target as HTMLSelectElement).value))}
-								aria-label={t('settings.reminderHour', $locale)}
-							>
-								{#each Array(24) as _, h (h)}
-									<option value={h}>{String(h).padStart(2, '0')}:00</option>
-								{/each}
-							</select>
-							<div class="select-icon" aria-hidden="true">
-								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-							</div>
-						</div>
+						<Select.Root
+							type="single"
+							name="reminderHour"
+							bind:value={reminderValue}
+						>
+							<Select.Trigger class="w-[120px] bg-surface border-ink-200">
+								{reminderTriggerContent}
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Group>
+									<Select.Label>{t('settings.reminderHour', $locale)}</Select.Label>
+									{#each reminderHoursList as hr (hr.value)}
+										<Select.Item value={hr.value} label={hr.label}>
+											{hr.label}
+										</Select.Item>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+						</Select.Root>
 					</div>
 				{/if}
 			</div>
@@ -1186,49 +1207,5 @@
 		}
 	}
 
-	.custom-select-wrapper {
-		position: relative;
-		display: inline-flex;
-		align-items: center;
-	}
 
-	.hour-select {
-		appearance: none;
-		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
-		border-radius: 12px;
-		padding: 8px 36px 8px 16px;
-		font-family: inherit;
-		font-size: 14px;
-		font-weight: 700;
-		color: var(--fg-primary);
-		cursor: pointer;
-		transition: all 0.2s var(--ease-brand);
-		box-shadow: var(--shadow-sm);
-	}
-	.hour-select:focus,
-	.hour-select:hover {
-		outline: none;
-		border-color: var(--ink-300);
-		background: var(--ink-50);
-	}
-	.hour-select:focus {
-		border-color: var(--hinomaru-red);
-		box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.15);
-	}
-
-	.select-icon {
-		position: absolute;
-		right: 12px;
-		color: var(--fg-tertiary);
-		pointer-events: none;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: color 0.2s var(--ease-brand);
-	}
-	.hour-select:focus + .select-icon {
-		color: var(--hinomaru-red);
-		transform: translateY(1px);
-	}
 </style>
