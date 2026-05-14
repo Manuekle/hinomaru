@@ -361,18 +361,6 @@
 							<span class="pref-title">Buzón</span>
 							<span class="pref-sub">Ver mensajes del formulario de contacto</span>
 						</div>
-						<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
-							<svg
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg
-							>
-						</div>
 					</a>
 			</div>
 		{/if}
@@ -595,12 +583,8 @@
 					<img src={kofiSymbol} alt="Ko-fi" style="width: 18px; height: 18px; object-fit: contain;" />
 				</div>
 				<div class="pref-text">
-					<span class="pref-title">{t('settings.support.desc', $locale)}</span>
-				</div>
-				<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M9 18l6-6-6-6" />
-					</svg>
+					<span class="pref-title">{t('settings.support.title', $locale)}</span>
+					<span class="pref-sub">{t('settings.support.desc', $locale)}</span>
 				</div>
 			</a>
 		</div>
@@ -613,7 +597,7 @@
 				</div>
 				<div class="pref-text">
 					<span class="pref-title" style="color:var(--hinomaru-red);">{t('nav.signout', $locale)}</span>
-					<span class="pref-sub">{t('settings.signout.desc', $locale) || 'Cerrar la sesión de forma segura'}</span>
+					<span class="pref-sub">{t('settings.signout.desc', $locale)}</span>
 				</div>
 			</button>
 		</div>
@@ -629,18 +613,6 @@
 						>{t('settings.deleteAccount', $locale)}</span
 					>
 					<span class="pref-sub">{t('settings.deleteAccount.desc', $locale)}</span>
-				</div>
-				<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg
-					>
 				</div>
 			</button>
 		</div>
@@ -1182,11 +1154,9 @@
 	/* ── Danger Zone ── */
 	.danger-card {
 		border-color: transparent;
-		background: rgba(255, 59, 48, 0.02);
 	}
 	:global([data-theme='dark']) .danger-card {
 		border-color: transparent;
-		background: rgba(255, 59, 48, 0.05);
 	}
 
 	.arrow-right {

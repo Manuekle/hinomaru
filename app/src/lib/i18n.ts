@@ -192,6 +192,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.dark': 'Dark',
 		'settings.showRomaji': 'Show Romaji',
 		'settings.preferences': 'Preferences',
+		'settings.signout.desc': 'Sign out of your account securely',
 
 		'pwa.install.title': 'Install Hinomaru',
 		'pwa.install.desc': 'Study offline and with a better experience.',
@@ -468,8 +469,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'wotd.save': '+ Save to my vocabulary',
 		'wotd.saved': 'Saved ✓',
 		'settings.support.title': 'Support the project',
-		'settings.support.desc':
-			'Hinomaru is a personal project. If you like it, you can support me to keep improving the app.',
+		'settings.support.desc': 'Buy me a coffee to keep improving Hinomaru.',
 		'vocab.search': 'Search word...',
 		'vocab.empty': 'No saved words yet.',
 		'vocab.listen': 'Listen',
@@ -781,6 +781,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.dark': 'Oscuro',
 		'settings.showRomaji': 'Mostrar Romaji',
 		'settings.preferences': 'Preferencias',
+		'settings.signout.desc': 'Cerrar la sesión de forma segura',
 
 		'pwa.install.title': 'Instalar Hinomaru',
 		'pwa.install.desc': 'Estudia sin conexión y con una mejor experiencia.',
@@ -1017,8 +1018,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'wotd.save': '+ Guardar en mi vocabulario',
 		'wotd.saved': 'Guardado ✓',
 		'settings.support.title': 'Apoyar el proyecto',
-		'settings.support.desc':
-			'Hinomaru es un proyecto personal. Si te gusta, puedes apoyarme para seguir mejorando la app.',
+		'settings.support.desc': 'Cómprame un café para seguir mejorando Hinomaru.',
 		'vocab.search': 'Buscar palabra...',
 		'vocab.empty': 'No hay palabras guardadas aún.',
 		'vocab.listen': 'Escuchar',
