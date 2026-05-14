@@ -18,7 +18,8 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { preloadVoicevox } from '$lib/services/voicevox';
 	import Icon from '$lib/Icon.svelte';
-	import supportImg from '$lib/assets/support.png';
+	import kofiDark from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
+	import kofiLight from '$lib/assets/kofi_brandasset/support_me_on_kofi_beige.png';
 	import {
 		SiriIcon,
 		ComputerPhoneSyncIcon,
@@ -33,7 +34,8 @@
 		JupiterIcon,
 		Delete02Icon,
 		BubbleChatIcon,
-		Mail01Icon
+		Mail01Icon,
+		Logout03Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
 	import * as InputOTP from '$lib/components/ui/input-otp/index.js';
@@ -355,7 +357,7 @@
 							<Icon icon={Mail01Icon} size={18} color="currentColor" strokeWidth={1.8} />
 						</div>
 						<div class="pref-text">
-							<span class="pref-title">Mensajes Recibidos</span>
+							<span class="pref-title">Buzón</span>
 							<span class="pref-sub">Ver mensajes del formulario de contacto</span>
 						</div>
 						<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
@@ -565,17 +567,19 @@
 							name="reminderHour"
 							bind:value={reminderValue}
 						>
-							<Select.Trigger class="w-[120px] bg-surface border-ink-200">
+							<Select.Trigger class="w-[120px] h-10 px-4 py-2 bg-[var(--bg-surface)] border-[1.5px] border-[var(--ink-200)] hover:border-[var(--ink-300)] rounded-xl text-[14px] font-bold text-[var(--fg-primary)] shadow-sm focus:ring-4 focus:ring-[var(--hinomaru-red)]/15 focus:border-[var(--hinomaru-red)] transition-all">
 								{reminderTriggerContent}
 							</Select.Trigger>
-							<Select.Content>
+							<Select.Content class="bg-[var(--bg-surface)] border-[var(--ink-200)] rounded-2xl shadow-xl p-1 min-w-[120px] z-[12000]">
 								<Select.Group>
-									<Select.Label>{t('settings.reminderHour', $locale)}</Select.Label>
-									{#each reminderHoursList as hr (hr.value)}
-										<Select.Item value={hr.value} label={hr.label}>
-											{hr.label}
-										</Select.Item>
-									{/each}
+									<Select.Label class="text-[11px] font-bold text-[var(--fg-tertiary)] uppercase tracking-wider px-2 py-1.5">{t('settings.reminderHour', $locale)}</Select.Label>
+									<div class="max-h-[240px] overflow-y-auto overflow-x-hidden hide-scrollbar">
+										{#each reminderHoursList as hr (hr.value)}
+											<Select.Item class="rounded-xl px-2 py-2 text-[14px] font-medium text-[var(--fg-secondary)] focus:bg-[var(--ink-50)] focus:text-[var(--fg-primary)] cursor-pointer data-[state=checked]:bg-[var(--hinomaru-red-wash)] data-[state=checked]:text-[var(--hinomaru-red)] transition-colors" value={hr.value} label={hr.label}>
+												{hr.label}
+											</Select.Item>
+										{/each}
+									</div>
 								</Select.Group>
 							</Select.Content>
 						</Select.Root>
@@ -593,13 +597,21 @@
 				rel="noopener noreferrer"
 				class="support-btn"
 			>
-				<img src={supportImg} alt="Support on Ko-fi" />
+				<img src={kofiLight} alt="Support on Ko-fi" class="kofi-light" />
+				<img src={kofiDark} alt="Support on Ko-fi" class="kofi-dark" />
 			</a>
 		</div>
 
 		<!-- ── Sign out ── -->
-		<div>
-			<button onclick={signOut} class="signout-btn">{t('nav.signout', $locale)}</button>
+		<div class="card" style="border-color: var(--ink-200);">
+			<button class="pref-row" onclick={signOut}>
+				<div class="pref-icon" style="background:var(--hinomaru-red-wash);color:var(--hinomaru-red);">
+					<Icon icon={Logout03Icon} size={18} color="currentColor" strokeWidth={1.8} />
+				</div>
+				<div class="pref-text">
+					<span class="pref-title" style="color:var(--hinomaru-red);">{t('nav.signout', $locale)}</span>
+				</div>
+			</button>
 		</div>
 
 		<!-- ── Danger Zone ── -->
@@ -1104,6 +1116,17 @@
 		height: 42px;
 		display: block;
 	}
+	
+	.kofi-dark {
+		display: none !important;
+	}
+	:global([data-theme='dark']) .kofi-light {
+		display: none !important;
+	}
+	:global([data-theme='dark']) .kofi-dark {
+		display: block !important;
+	}
+
 	@media (hover: hover) {
 		.support-btn:hover {
 			transform: scale(1.04);
@@ -1113,32 +1136,7 @@
 		transform: scale(0.96);
 	}
 
-	/* ── Sign out ── */
-	.signout-btn {
-		width: 100%;
-		height: 52px;
-		background: var(--bg-surface);
-		border: 1.5px solid var(--ink-200);
-		border-radius: 20px;
-		color: var(--hinomaru-red);
-		font-weight: 800;
-		font-size: 15px;
-		cursor: pointer;
-		letter-spacing: -0.04em;
-		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
-		box-shadow: var(--shadow-sm);
-	}
-	@media (hover: hover) {
-		.signout-btn:hover {
-			background: var(--hinomaru-red-wash);
-			border-color: var(--hinomaru-red);
-			transform: translateY(-2px);
-			box-shadow: var(--shadow-md);
-		}
-	}
-	.signout-btn:active {
-		transform: scale(0.97) translateY(0);
-	}
+
 
 	/* ── Danger Zone ── */
 	.danger-card {
