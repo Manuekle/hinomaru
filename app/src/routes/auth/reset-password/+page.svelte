@@ -4,6 +4,37 @@
 	import { locale } from '$lib/stores/locale';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import { z } from 'zod';
+	import { onMount } from 'svelte';
+	import { animate } from 'motion';
+
+	let blob1El = $state<HTMLElement | null>(null);
+	let blob2El = $state<HTMLElement | null>(null);
+	let blob3El = $state<HTMLElement | null>(null);
+
+	onMount(() => {
+		try {
+			if (blob1El)
+				animate(
+					blob1El,
+					{ transform: ['translate(0px, 0px)', 'translate(20px, -24px)', 'translate(0px, 0px)'] },
+					{ duration: 11, ease: 'easeInOut', repeat: Infinity }
+				);
+			if (blob2El)
+				animate(
+					blob2El,
+					{ transform: ['translate(0px, 0px)', 'translate(-24px, 18px)', 'translate(0px, 0px)'] },
+					{ duration: 13, ease: 'easeInOut', repeat: Infinity }
+				);
+			if (blob3El)
+				animate(
+					blob3El,
+					{ transform: ['translate(0px, 0px)', 'translate(16px, 22px)', 'translate(0px, 0px)'] },
+					{ duration: 9, ease: 'easeInOut', repeat: Infinity }
+				);
+		} catch (e) {
+			console.error('Animation error:', e);
+		}
+	});
 
 	let { data } = $props();
 	const supabase = $derived(data.supabase!);
@@ -93,20 +124,22 @@
 	}
 </script>
 
-<div
-	style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));"
->
-	<div style="width:100%;max-width:400px;">
+<div class="reset-layout">
+	<div class="login-bg" aria-hidden="true">
+		<div bind:this={blob1El} class="blob blob-1"></div>
+		<div bind:this={blob2El} class="blob blob-2"></div>
+		<div bind:this={blob3El} class="blob blob-3"></div>
+	</div>
+	<div class="reset-container">
 		<div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:40px;">
-			<span
-				style="width:48px;height:48px;background:var(--hinomaru-red);border-radius:50%;display:block;box-shadow:0 4px 16px rgba(188,0,45,0.25);"
-			></span>
+			<span class="brand-logo"></span>
 			<div style="font-size:24px;font-weight:700;letter-spacing:-0.02em;">Hinomaru</div>
 		</div>
 
 		{#if done}
 			<div
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:32px;text-align:center;"
+				class="reset-card"
+				style="padding:32px;text-align:center;"
 			>
 				<div
 					style="width:56px;height:56px;background:var(--success-wash);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;"
@@ -123,7 +156,8 @@
 		{:else}
 			<form
 				onsubmit={submit}
-				style="background:var(--bg-surface);border:1px solid var(--ink-200);border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:16px;"
+				class="reset-card"
+				style="padding:28px;display:flex;flex-direction:column;gap:16px;"
 			>
 				<div>
 					<div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px;">
@@ -349,5 +383,129 @@
 	.input-error {
 		border-color: var(--hinomaru-red) !important;
 		box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.1);
+	}
+
+	.reset-layout {
+		position: relative;
+		min-height: 100dvh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		background:
+			radial-gradient(ellipse at top, rgba(188, 0, 45, 0.04) 0%, transparent 50%),
+			var(--bg-page);
+		padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
+	}
+
+	.login-bg {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 0;
+		overflow: hidden;
+	}
+
+	.blob {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(80px);
+		will-change: transform;
+	}
+
+	.blob-1 {
+		top: -120px;
+		left: -120px;
+		width: 420px;
+		height: 420px;
+		background: rgba(188, 0, 45, 0.18);
+	}
+
+	.blob-2 {
+		bottom: -140px;
+		right: -100px;
+		width: 380px;
+		height: 380px;
+		background: rgba(154, 0, 37, 0.14);
+	}
+
+	.blob-3 {
+		top: 20%;
+		left: 40%;
+		width: 280px;
+		height: 280px;
+		background: rgba(255, 107, 138, 0.12);
+	}
+
+	.reset-container {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		max-width: 400px;
+	}
+
+	.brand-logo {
+		width: 48px;
+		height: 48px;
+		background: radial-gradient(circle at 30% 30%, #ff3b5c 0%, var(--hinomaru-red) 60%, #7a0019 100%);
+		border-radius: 50%;
+		display: block;
+		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.35);
+	}
+
+	.reset-card {
+		background: rgba(255, 255, 255, 0.72);
+		backdrop-filter: blur(24px) saturate(180%);
+		-webkit-backdrop-filter: blur(24px) saturate(180%);
+		border: 1px solid rgba(255, 255, 255, 0.6);
+		border-radius: 24px;
+		box-shadow: var(--shadow-lg);
+	}
+
+	:global(.dark) .reset-card {
+		background: rgba(28, 28, 28, 0.72);
+		border-color: rgba(255, 255, 255, 0.08);
+	}
+
+	:global(.dark) .blob-1 {
+		background: rgba(188, 0, 45, 0.28);
+	}
+
+	:global(.dark) .blob-2 {
+		background: rgba(154, 0, 37, 0.22);
+	}
+
+	:global(.dark) .blob-3 {
+		background: rgba(255, 107, 138, 0.18);
+	}
+
+	@media (max-width: 480px) {
+		.reset-card {
+			border: none;
+			box-shadow: none;
+			background: transparent;
+			backdrop-filter: none;
+			-webkit-backdrop-filter: none;
+		}
+
+		.reset-layout {
+			align-items: flex-start;
+			padding-top: 64px;
+		}
+
+		.blob-1 {
+			width: 320px;
+			height: 320px;
+		}
+
+		.blob-2 {
+			width: 300px;
+			height: 300px;
+		}
+
+		.blob-3 {
+			width: 220px;
+			height: 220px;
+		}
 	}
 </style>

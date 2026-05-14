@@ -17,6 +17,9 @@
 
 	let brandEl = $state<HTMLElement | null>(null);
 	let formEl = $state<HTMLElement | null>(null);
+	let blob1El = $state<HTMLElement | null>(null);
+	let blob2El = $state<HTMLElement | null>(null);
+	let blob3El = $state<HTMLElement | null>(null);
 
 	onMount(() => {
 		try {
@@ -31,6 +34,24 @@
 					formEl,
 					{ opacity: [0, 1], y: [28, 0] },
 					{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }
+				);
+			if (blob1El)
+				animate(
+					blob1El,
+					{ transform: ['translate(0px, 0px)', 'translate(20px, -24px)', 'translate(0px, 0px)'] },
+					{ duration: 11, ease: 'easeInOut', repeat: Infinity }
+				);
+			if (blob2El)
+				animate(
+					blob2El,
+					{ transform: ['translate(0px, 0px)', 'translate(-24px, 18px)', 'translate(0px, 0px)'] },
+					{ duration: 13, ease: 'easeInOut', repeat: Infinity }
+				);
+			if (blob3El)
+				animate(
+					blob3El,
+					{ transform: ['translate(0px, 0px)', 'translate(16px, 22px)', 'translate(0px, 0px)'] },
+					{ duration: 9, ease: 'easeInOut', repeat: Infinity }
 				);
 		} catch (e) {
 			console.error('Animation error:', e);
@@ -236,6 +257,11 @@
 </svelte:head>
 
 <div class="login-layout">
+	<div class="login-bg" aria-hidden="true">
+		<div bind:this={blob1El} class="blob blob-1"></div>
+		<div bind:this={blob2El} class="blob blob-2"></div>
+		<div bind:this={blob3El} class="blob blob-3"></div>
+	</div>
 	<div class="login-container">
 		<!-- Brand / Logo -->
 		<div bind:this={brandEl} class="brand-header">
@@ -581,15 +607,60 @@
 
 <style>
 	.login-layout {
+		position: relative;
 		min-height: 100dvh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--bg-page);
+		overflow: hidden;
+		background:
+			radial-gradient(ellipse at top, rgba(188, 0, 45, 0.04) 0%, transparent 50%),
+			var(--bg-page);
 		padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
 	}
 
+	.login-bg {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 0;
+		overflow: hidden;
+	}
+
+	.blob {
+		position: absolute;
+		border-radius: 50%;
+		filter: blur(80px);
+		will-change: transform;
+	}
+
+	.blob-1 {
+		top: -120px;
+		left: -120px;
+		width: 420px;
+		height: 420px;
+		background: rgba(188, 0, 45, 0.18);
+	}
+
+	.blob-2 {
+		bottom: -140px;
+		right: -100px;
+		width: 380px;
+		height: 380px;
+		background: rgba(154, 0, 37, 0.14);
+	}
+
+	.blob-3 {
+		top: 20%;
+		left: 40%;
+		width: 280px;
+		height: 280px;
+		background: rgba(255, 107, 138, 0.12);
+	}
+
 	.login-container {
+		position: relative;
+		z-index: 1;
 		width: 100%;
 		max-width: 400px;
 		display: flex;
@@ -607,9 +678,9 @@
 	.brand-logo {
 		width: 48px;
 		height: 48px;
-		background: var(--hinomaru-red);
+		background: radial-gradient(circle at 30% 30%, #ff3b5c 0%, var(--hinomaru-red) 60%, #7a0019 100%);
 		border-radius: 50%;
-		box-shadow: 0 4px 16px rgba(188, 0, 45, 0.25);
+		box-shadow: 0 8px 24px rgba(188, 0, 45, 0.35);
 	}
 
 	.brand-name {
@@ -629,14 +700,34 @@
 
 	.auth-card,
 	.feedback-card {
-		background: var(--bg-surface);
-		border: 1px solid var(--ink-200);
+		background: rgba(255, 255, 255, 0.72);
+		backdrop-filter: blur(24px) saturate(180%);
+		-webkit-backdrop-filter: blur(24px) saturate(180%);
+		border: 1px solid rgba(255, 255, 255, 0.6);
 		border-radius: 28px;
 		padding: 28px;
 		display: flex;
 		flex-direction: column;
 		gap: 20px;
 		box-shadow: var(--shadow-lg);
+	}
+
+	:global(.dark) .auth-card,
+	:global(.dark) .feedback-card {
+		background: rgba(28, 28, 28, 0.72);
+		border-color: rgba(255, 255, 255, 0.08);
+	}
+
+	:global(.dark) .blob-1 {
+		background: rgba(188, 0, 45, 0.28);
+	}
+
+	:global(.dark) .blob-2 {
+		background: rgba(154, 0, 37, 0.22);
+	}
+
+	:global(.dark) .blob-3 {
+		background: rgba(255, 107, 138, 0.18);
 	}
 
 	.feedback-card {
@@ -863,12 +954,29 @@
 			border: none;
 			box-shadow: none;
 			background: transparent;
+			backdrop-filter: none;
+			-webkit-backdrop-filter: none;
 			padding: 0;
 		}
 
 		.login-layout {
 			align-items: flex-start;
 			padding-top: 64px;
+		}
+
+		.blob-1 {
+			width: 320px;
+			height: 320px;
+		}
+
+		.blob-2 {
+			width: 300px;
+			height: 300px;
+		}
+
+		.blob-3 {
+			width: 220px;
+			height: 220px;
 		}
 	}
 </style>
