@@ -88,14 +88,14 @@
 	});
 </script>
 
-<div class="practice-wrap">
-	{#if done}
-		<StudySummary
-			correct={correctCount}
-			total={queue.length}
-			onContinue={onDone}
-		/>
-	{:else if current}
+{#if done}
+	<StudySummary
+		correct={correctCount}
+		total={queue.length}
+		onContinue={onDone}
+	/>
+{:else if current}
+	<div class="practice-wrap">
 		<div class="step-meta">
 			<span class="step-tag">
 				{t('session.step', $locale)}
@@ -131,8 +131,8 @@
 				{/if}
 			{/key}
 		</StudySessionLayout>
-	{/if}
-</div>
+	</div>
+{/if}
 
 <style>
 	.practice-wrap {

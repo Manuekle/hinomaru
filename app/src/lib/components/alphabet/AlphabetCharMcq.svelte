@@ -8,8 +8,6 @@
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import type { KanaChar } from '$lib/data/alphabetCharacters';
 
-	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
-
 	type Direction = 'sound_for_char' | 'char_for_sound';
 
 	interface Props {
@@ -54,89 +52,82 @@
 	}
 </script>
 
-<StudySessionLayout
-	{isLesson}
-	onExit={() => onAnswer(false)}
-	currentIndex={0}
-	totalCount={1}
->
-	<div class="mcq-viewer content-center">
-		<div class="word-card" use:fadeIn>
-			<button onclick={playTarget} class="audio-corner" aria-label="Play pronunciation">
-				<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
-			</button>
-			<span class="prompt-tag">
-				{#if direction === 'sound_for_char'}
-					{$locale === 'es' ? '¿QUÉ SONIDO?' : 'WHICH SOUND?'}
-				{:else}
-					{$locale === 'es' ? '¿QUÉ CARÁCTER?' : 'WHICH CHARACTER?'}
-				{/if}
-			</span>
+<div class="mcq-viewer content-center">
+	<div class="word-card" use:fadeIn>
+		<button onclick={playTarget} class="audio-corner" aria-label="Play pronunciation">
+			<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
+		</button>
+		<span class="prompt-tag">
 			{#if direction === 'sound_for_char'}
-				<div class="jp char-big">{target.jp}</div>
+				{$locale === 'es' ? '¿QUÉ SONIDO?' : 'WHICH SOUND?'}
 			{:else}
-				<div class="rom-prompt">"{target.romaji}"</div>
+				{$locale === 'es' ? '¿QUÉ CARÁCTER?' : 'WHICH CHARACTER?'}
 			{/if}
-		</div>
-
-		<div class="options-list">
-			{#each options as opt, idx (opt.id)}
-				{@const isThisCorrect = opt.id === target.id}
-				{@const isThisPicked = opt.id === picked}
-				<button
-					onclick={() => pick(opt)}
-					class="option-item"
-					class:is-correct={picked && isThisPicked && isThisCorrect}
-					class:is-wrong={picked && isThisPicked && !isThisCorrect}
-					class:is-dimmed={picked && !isThisPicked}
-					disabled={!!picked}
-				>
-					<div class="opt-marker">
-						{#if picked && isThisPicked && isThisCorrect}
-							<Icon icon={CheckmarkCircle01Icon} size={14} color="white" />
-						{:else if picked && isThisPicked && !isThisCorrect}
-							<Icon icon={Cancel01Icon} size={14} color="white" />
-						{:else}
-							{String.fromCharCode(65 + idx)}
-						{/if}
-					</div>
-					<div class="opt-content">
-						{#if direction === 'sound_for_char'}
-							<span class="opt-text">{opt.romaji}</span>
-						{:else}
-							<span class="opt-text jp opt-text-big">{opt.jp}</span>
-						{/if}
-					</div>
-					{#if direction === 'sound_for_char'}
-						<span
-							class="opt-audio"
-							aria-label="play sound"
-							role="button"
-							tabindex="0"
-							onclick={(e) => playOpt(e, opt)}
-							onkeydown={(e) => e.key === 'Enter' && playOpt(e, opt)}
-						>
-							<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
-						</span>
-					{/if}
-				</button>
-			{/each}
-		</div>
-
-		{#if picked}
-			<div class="feedback-bar" class:is-correct={isCorrect} use:fadeUp={{ y: 10 }}>
-				<Icon
-					icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
-					size={18}
-					color="currentColor"
-				/>
-				<span class="fb-label">
-					{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
-				</span>
-			</div>
+		</span>
+		{#if direction === 'sound_for_char'}
+			<div class="jp char-big">{target.jp}</div>
+		{:else}
+			<div class="rom-prompt">"{target.romaji}"</div>
 		{/if}
 	</div>
-</StudySessionLayout>
+
+	<div class="options-list">
+		{#each options as opt, idx (opt.id)}
+			{@const isThisCorrect = opt.id === target.id}
+			{@const isThisPicked = opt.id === picked}
+			<button
+				onclick={() => pick(opt)}
+				class="option-item"
+				class:is-correct={picked && isThisPicked && isThisCorrect}
+				class:is-wrong={picked && isThisPicked && !isThisCorrect}
+				class:is-dimmed={picked && !isThisPicked}
+				disabled={!!picked}
+			>
+				<div class="opt-marker">
+					{#if picked && isThisPicked && isThisCorrect}
+						<Icon icon={CheckmarkCircle01Icon} size={14} color="white" />
+					{:else if picked && isThisPicked && !isThisCorrect}
+						<Icon icon={Cancel01Icon} size={14} color="white" />
+					{:else}
+						{String.fromCharCode(65 + idx)}
+					{/if}
+				</div>
+				<div class="opt-content">
+					{#if direction === 'sound_for_char'}
+						<span class="opt-text">{opt.romaji}</span>
+					{:else}
+						<span class="opt-text jp opt-text-big">{opt.jp}</span>
+					{/if}
+				</div>
+				{#if direction === 'sound_for_char'}
+					<span
+						class="opt-audio"
+						aria-label="play sound"
+						role="button"
+						tabindex="0"
+						onclick={(e) => playOpt(e, opt)}
+						onkeydown={(e) => e.key === 'Enter' && playOpt(e, opt)}
+					>
+						<Icon icon={VolumeHighIcon} size={14} color="currentColor" />
+					</span>
+				{/if}
+			</button>
+		{/each}
+	</div>
+
+	{#if picked}
+		<div class="feedback-bar" class:is-correct={isCorrect} use:fadeUp={{ y: 10 }}>
+			<Icon
+				icon={isCorrect ? CheckmarkCircle01Icon : Cancel01Icon}
+				size={18}
+				color="currentColor"
+			/>
+			<span class="fb-label">
+				{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
+			</span>
+		</div>
+	{/if}
+</div>
 
 <style>
 	.mcq-viewer {

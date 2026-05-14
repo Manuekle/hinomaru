@@ -14,7 +14,6 @@
 	import { fadeIn, fadeUp } from '$lib/motion';
 
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
-	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 
 	interface Props {
 		mode?: 'deck' | 'lesson';
@@ -103,82 +102,68 @@
 	const ready = $derived(answer.length > 0 && !locked);
 </script>
 
-<StudySessionLayout
-	{isLesson}
-	onExit={() => onAnswer(false)}
-	currentIndex={0}
-	totalCount={1}
->
-	<div class="lw-viewer content-center">
-		<div class="word-card" use:fadeIn>
-			<button onclick={play} class="audio-corner" aria-label="Reproducir audio">
-				<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
-			</button>
-			<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHA Y FORMA' : 'LISTEN & BUILD'}</span>
-			<p class="hint">{$locale === 'es' ? word.es : word.en}</p>
-		</div>
+<div class="lw-viewer content-center">
+	<div class="word-card" use:fadeIn>
+		<button onclick={play} class="audio-corner" aria-label="Reproducir audio">
+			<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+		</button>
+		<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHA Y FORMA' : 'LISTEN & BUILD'}</span>
+		<p class="hint">{$locale === 'es' ? word.es : word.en}</p>
+	</div>
 
-		<div
-			class="answer-zone"
-			class:is-correct={result === 'correct'}
-			class:is-wrong={result === 'wrong'}
-		>
-			{#if answer.length === 0}
-				<div class="answer-placeholder">
-					{$locale === 'es' ? 'Toca los caracteres' : 'Tap characters'}
-				</div>
-			{:else}
-				{#each answer as chip (chip.uid)}
-					<button class="token-chip is-selected" disabled={locked} onclick={() => remove(chip)}>
-						<span class="chip-jp jp">{chip.tok}</span>
-					</button>
-				{/each}
-			{/if}
-		</div>
-
-		<div class="tokens-bank">
-			{#each bank as chip (chip.uid)}
-				<button class="token-chip" onclick={() => add(chip)} disabled={locked}>
+	<div
+		class="answer-zone"
+		class:is-correct={result === 'correct'}
+		class:is-wrong={result === 'wrong'}
+	>
+		{#if answer.length === 0}
+			<div class="answer-placeholder">
+				{$locale === 'es' ? 'Toca los caracteres' : 'Tap characters'}
+			</div>
+		{:else}
+			{#each answer as chip (chip.uid)}
+				<button class="token-chip is-selected" disabled={locked} onclick={() => remove(chip)}>
 					<span class="chip-jp jp">{chip.tok}</span>
 				</button>
 			{/each}
-		</div>
-
-		{#if result}
-			<div class="feedback-bar" class:is-correct={result === 'correct'} use:fadeUp={{ y: 10 }}>
-				<Icon
-					icon={result === 'correct' ? CheckmarkCircle01Icon : Cancel01Icon}
-					size={18}
-					color="currentColor"
-				/>
-				<span class="fb-label">
-					{result === 'correct'
-						? $locale === 'es'
-							? '¡Correcto!'
-							: 'Correct!'
-						: $locale === 'es'
-							? `Era: ${word.jp}`
-							: `Was: ${word.jp}`}
-				</span>
-			</div>
 		{/if}
 	</div>
 
-	{#if word}
-		<StickyFooter>
-			<div class="footer-actions">
-				{#if !locked && answer.length > 0}
-					<button class="hm-btn hm-btn-secondary icon-btn" onclick={clearAnswer} aria-label="Limpiar">
-						<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
-					</button>
-				{/if}
-				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={check} disabled={!ready}>
-					{t('session.check', $locale)}
-				</button>
-			</div>
-		</StickyFooter>
+	<div class="tokens-bank">
+		{#each bank as chip (chip.uid)}
+			<button class="token-chip" onclick={() => add(chip)} disabled={locked}>
+				<span class="chip-jp jp">{chip.tok}</span>
+			</button>
+		{/each}
+	</div>
+
+	{#if result}
+		<div class="feedback-bar" class:is-correct={result === 'correct'} use:fadeUp={{ y: 10 }}>
+			<Icon
+				icon={result === 'correct' ? CheckmarkCircle01Icon : Cancel01Icon}
+				size={18}
+				color="currentColor"
+			/>
+			<span class="fb-label">
+				{result === 'correct'
+					? $locale === 'es'
+						? '¡Correcto!'
+						: 'Correct!'
+					: $locale === 'es'
+						? `Era: ${word.jp}`
+						: `Was: ${word.jp}`}
+			</span>
+		</div>
 	{/if}
-</StudySessionLayout>
+</div>
+
+{#if word}
+	<StickyFooter onBack={(!locked && answer.length > 0) ? clearAnswer : undefined}>
+		<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={check} disabled={!ready}>
+			{t('session.check', $locale)}
+		</button>
+	</StickyFooter>
+{/if}
 
 <style>
 	.lw-viewer {
@@ -276,17 +261,18 @@
 	.tokens-bank {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 10px;
+		gap: 8px;
 		justify-content: center;
 		width: 100%;
+		padding: 0 4px;
 	}
 
 	.token-chip {
 		display: flex;
 		align-items: center;
-		gap: 2px;
-		padding: 10px 16px;
-		border-radius: 14px;
+		justify-content: center;
+		padding: 8px 14px;
+		border-radius: 12px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		color: var(--fg-primary);
@@ -294,6 +280,7 @@
 		box-shadow: 0 3px 0 var(--ink-200);
 		transition: all 0.1s;
 		font-family: inherit;
+		min-width: 44px;
 	}
 	.token-chip:not(:disabled):active {
 		transform: translateY(2px);
@@ -310,9 +297,9 @@
 		cursor: default;
 	}
 	.chip-jp {
-		font-size: 22px;
+		font-size: 20px;
 		font-weight: 700;
-		line-height: 1.1;
+		line-height: 1;
 		font-family: var(--font-jp);
 	}
 
