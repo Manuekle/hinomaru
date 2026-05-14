@@ -59,7 +59,7 @@
 	<Drawer.Root bind:open {dismissible}>
 		<Drawer.Content
 			class={cn(
-				'drawer-premium flex max-h-[90vh] flex-col rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)] px-6',
+				'drawer-premium flex max-h-[90vh] flex-col rounded-t-[40px] px-6',
 				contentClass
 			)}
 		>
@@ -217,7 +217,6 @@
 		max-height: 90vh;
 		text-align: center;
 		box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
-		border: 1.5px solid var(--ink-100);
 		font-family: var(--font-ui);
 		position: relative;
 		overflow: hidden;

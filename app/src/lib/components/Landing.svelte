@@ -805,7 +805,7 @@
 	.float-lines .bar {
 		height: 4px;
 		background: rgba(0, 0, 0, 0.1);
-		border-radius: 2px;
+		border-radius: var(--radius-full);
 	}
 	:global(.dark) .float-lines .bar {
 		background: rgba(255, 255, 255, 0.2);
@@ -945,8 +945,8 @@
 	.deck-level-pill {
 		background: var(--brand-primary);
 		color: #fff;
-		padding: 2px 8px;
-		border-radius: 6px;
+		padding: 2px 10px;
+		border-radius: var(--radius-full);
 		font-weight: 700;
 		font-size: 11px;
 		text-transform: uppercase;
@@ -1332,7 +1332,7 @@
 	.kofi-link-badge img {
 		height: 40px;
 		display: block;
-		border-radius: 8px;
+		border-radius: var(--radius-sm);
 	}
 	.kofi-link-badge:hover {
 		transform: translateX(4px);
@@ -1369,7 +1369,8 @@
 		gap: 6px;
 		background: var(--bg-surface);
 		border: 1px solid var(--ink-200);
-		border-radius: 8px;
+		border-radius: 12px;
+		box-shadow: var(--shadow-sm);
 		color: var(--fg-secondary);
 		cursor: pointer;
 		font-size: 11px;

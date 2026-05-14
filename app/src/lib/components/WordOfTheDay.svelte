@@ -192,8 +192,8 @@
 		color: var(--paper);
 		font-size: 10px;
 		font-weight: 600;
-		padding: 2px 8px;
-		border-radius: 6px;
+		padding: 2px 10px;
+		border-radius: var(--radius-full);
 	}
 
 	.wotd-main {
