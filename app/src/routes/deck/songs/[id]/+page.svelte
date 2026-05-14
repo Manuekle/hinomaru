@@ -13,7 +13,8 @@
 		PlayIcon,
 		PauseIcon,
 		ArrowReloadHorizontalIcon,
-		VolumeHighIcon
+		VolumeHighIcon,
+		MusicNote01Icon
 	} from '@hugeicons/core-free-icons';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { svileo } from '$lib/stores/toast';
@@ -25,6 +26,7 @@
 	import { getWordMetadata } from '$lib/utils/vocab_registry';
 	import InteractiveText from '$lib/components/InteractiveText.svelte';
 	import { kanaToRomaji } from '$lib/utils/romaji';
+	import KaraokeOverlay from '$lib/components/KaraokeOverlay.svelte';
 
 	// ── Song data ──────────────────────────────────────────────────
 	let songId = $derived(Number($page.params.id));
@@ -53,6 +55,9 @@
 	let isCompletedInDB = $state(false);
 	let fireConfetti = $state(false);
 	let trackInterval: ReturnType<typeof setInterval> | null = null;
+
+	// ── Karaoke ───────────────────────────────────────────────────
+	let karaokeOpen = $state(false);
 
 	// ── Vocab saving ───────────────────────────────────────────────
 	const supabase = $derived($page.data.supabase);
@@ -194,6 +199,7 @@
 		stopTracking();
 		trackInterval = setInterval(() => {
 			if (!player) return;
+			if (karaokeOpen) return;
 			try {
 				const t = player.getCurrentTime();
 				currentTime = t;
@@ -496,6 +502,19 @@
 						<span>{t('songs.replay', $locale)}</span>
 					</button>
 
+					{#if hasLyrics}
+						<button
+							class="icon-btn karaoke-btn"
+							onclick={() => (karaokeOpen = true)}
+							disabled={!playerReady}
+							aria-label={t('songs.karaoke', $locale)}
+							title={t('songs.karaoke', $locale)}
+						>
+							<Icon icon={MusicNote01Icon} size={16} />
+							<span>{t('songs.karaoke', $locale)}</span>
+						</button>
+					{/if}
+
 					<div class="speed-wrap">
 						<button class="speed-btn" class:active={speed === 0.75} onclick={() => setSpeed(0.75)}
 							>0.75×</button
@@ -535,6 +554,17 @@
 
 			{#if fireConfetti}
 				<Confetti fireOnMount={true} />
+			{/if}
+
+			{#if hasLyrics}
+				<KaraokeOverlay
+					{song}
+					{player}
+					{playerReady}
+					{startSec}
+					{endSec}
+					bind:open={karaokeOpen}
+				/>
 			{/if}
 		{/if}
 
@@ -907,6 +937,16 @@
 		background: var(--hinomaru-red);
 		border-radius: 99px;
 		transition: width 100ms linear;
+	}
+
+	/* Karaoke trigger styled as red accent inline icon-btn */
+	.icon-btn.karaoke-btn {
+		background: var(--hinomaru-red);
+		color: #fff;
+		border-color: transparent;
+	}
+	.icon-btn.karaoke-btn:hover:not(:disabled) {
+		background: #a3002b;
 	}
 
 	/* Sections */

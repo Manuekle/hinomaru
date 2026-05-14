@@ -34,10 +34,6 @@
 				<span class="brand-dot"></span>
 				<span class="brand-name">Hinomaru</span>
 			</a>
-			<a href="/" class="hm-btn hm-btn-sm hm-btn-secondary header-back">
-				<Icon icon={ArrowLeft01Icon} size={14} color="currentColor" />
-				<span>{t('deck.back', $locale)}</span>
-			</a>
 		</div>
 	</header>
 

@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { t } from '$lib/i18n';
 	import { locale } from '$lib/stores/locale';
+	import { resolvedTheme } from '$lib/stores/theme';
 	import DotLoader from '$lib/components/DotLoader.svelte';
 	import Icon from '$lib/Icon.svelte';
 	import {
@@ -14,11 +15,15 @@
 		Coffee02Icon,
 		FlashIcon
 	} from '@hugeicons/core-free-icons';
-	import kofiImg from '$lib/assets/kofi_brandasset/support_me_on_kofi_red.png';
+	import kofiDark from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
+	import kofiBeige from '$lib/assets/kofi_brandasset/support_me_on_kofi_beige.png';
 	import type { ActionData } from './$types';
 
 	let { form } = $props<{ form: ActionData }>();
 	let loading = $state(false);
+
+	let isDark = $derived($resolvedTheme === 'dark');
+	let kofiImg = $derived(isDark ? kofiBeige : kofiDark);
 </script>
 
 <svelte:head>
@@ -31,10 +36,6 @@
 			<a href="/" class="brand-link">
 				<span class="brand-dot"></span>
 				<span class="brand-name">Hinomaru</span>
-			</a>
-			<a href="/" class="hm-btn hm-btn-sm hm-btn-secondary header-back">
-				<Icon icon={ArrowLeft01Icon} size={14} color="currentColor" />
-				<span>{t('deck.back', $locale)}</span>
 			</a>
 		</div>
 	</header>

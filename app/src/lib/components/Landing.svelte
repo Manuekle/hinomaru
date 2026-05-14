@@ -6,7 +6,8 @@
 	import { locale } from '$lib/stores/locale';
 	import { theme, resolvedTheme } from '$lib/stores/theme';
 	import Icon from '$lib/Icon.svelte';
-	import kofiImg from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
+	import kofiDark from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
+	import kofiBeige from '$lib/assets/kofi_brandasset/support_me_on_kofi_beige.png';
 	import {
 		BrainIcon,
 		Target01Icon,
@@ -54,6 +55,7 @@
 
 	// Determine if dark mode is active
 	let isDark = $derived($resolvedTheme === 'dark');
+	let kofiImg = $derived(isDark ? kofiBeige : kofiDark);
 
 	// Select a few N5 decks for preview
 	const previewDecks = $derived(decks.filter((d: any) => d.level === 'N5').slice(0, 3));
@@ -244,6 +246,27 @@
 		<!-- Decorative blurred blobs -->
 		<div class="hero-blob blob-1"></div>
 		<div class="hero-blob blob-2"></div>
+
+		<!-- Falling sakura petals + faint kana -->
+		<div class="hero-petals" aria-hidden="true">
+			<span class="petal petal-1"></span>
+			<span class="petal petal-2"></span>
+			<span class="petal petal-3"></span>
+			<span class="petal petal-4"></span>
+			<span class="petal petal-5"></span>
+			<span class="petal petal-6"></span>
+			<span class="petal petal-7"></span>
+			<span class="petal petal-8"></span>
+			<span class="petal petal-9"></span>
+			<span class="petal petal-10"></span>
+			<span class="kana kana-1">桜</span>
+			<span class="kana kana-2">あ</span>
+			<span class="kana kana-3">ん</span>
+			<span class="kana kana-4">こ</span>
+			<span class="kana kana-5">日</span>
+			<span class="kana kana-6">本</span>
+			<span class="kana kana-7">の</span>
+		</div>
 	</section>
 
 	<section class="levels-section">
@@ -636,16 +659,47 @@
 		margin: 0 auto;
 		position: relative;
 		perspective: 1200px;
+		isolation: isolate;
+	}
+	.hero-phone-container::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		bottom: -8px;
+		width: 72%;
+		height: 22px;
+		transform: translateX(-50%);
+		background: radial-gradient(
+			ellipse at center,
+			rgba(40, 0, 8, 0.45) 0%,
+			rgba(40, 0, 8, 0.2) 45%,
+			rgba(40, 0, 8, 0) 75%
+		);
+		filter: blur(6px);
+		z-index: 0;
+		pointer-events: none;
+	}
+	:global(.dark) .hero-phone-container::after {
+		background: radial-gradient(
+			ellipse at center,
+			rgba(0, 0, 0, 0.6) 0%,
+			rgba(0, 0, 0, 0.25) 50%,
+			rgba(0, 0, 0, 0) 80%
+		);
 	}
 	.iphone-16-mockup {
 		position: relative;
+		z-index: 1;
 		width: 100%;
 		max-width: 320px;
 		margin: 0 auto;
 		display: flex;
 		flex-direction: column;
-		filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
+		filter: drop-shadow(0 10px 16px rgba(40, 0, 8, 0.32));
 		transition: transform 0.4s var(--ease-brand);
+	}
+	:global(.dark) .iphone-16-mockup {
+		filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.55));
 	}
 	.iphone-16-mockup:hover {
 		transform: translateY(-4px) scale(1.01);
@@ -677,18 +731,20 @@
 
 	.hero-float-card {
 		position: absolute;
-		padding: 16px 20px;
-		border-radius: 24px;
+		padding: 14px 18px;
+		border-radius: 22px;
 		display: flex;
 		align-items: center;
 		gap: 12px;
 		z-index: 10;
 		color: var(--fg-primary);
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(24px);
-		-webkit-backdrop-filter: blur(24px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(24px) saturate(140%);
+		-webkit-backdrop-filter: blur(24px) saturate(140%);
+		border: 1px solid rgba(255, 255, 255, 0.7);
+		box-shadow:
+			0 10px 26px rgba(70, 0, 14, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.6);
 		transition: transform 0.3s ease;
 	}
 	:global(.dark) .hero-float-card {
@@ -1183,14 +1239,15 @@
 
 	/* ── FOOTER ── */
 	.landing-footer {
-		background: #0a0a0a;
-		color: #fff;
+		background: var(--bg-muted);
+		color: var(--fg-secondary);
 		padding: 64px 24px 40px;
 		position: relative;
 		overflow: hidden;
+		border-top: 1px solid var(--ink-100);
 	}
 	:global(.dark) .landing-footer {
-		background: #050505;
+		background: var(--bg-surface);
 	}
 	.landing-footer::after {
 		content: '';
@@ -1229,14 +1286,14 @@
 		font-size: 24px;
 		font-weight: 800;
 		letter-spacing: -0.02em;
-		color: #fff;
+		color: var(--fg-primary);
 	}
 	.brand-tagline {
 		font-size: 15px;
-		opacity: 0.6;
+		opacity: 0.7;
 		line-height: 1.6;
 		margin-bottom: 24px;
-		color: #fff;
+		color: var(--fg-secondary);
 		max-width: 240px;
 	}
 
@@ -1254,14 +1311,14 @@
 	}
 	.footer-links-col a {
 		display: block;
-		color: rgba(255, 255, 255, 0.6);
+		color: var(--fg-secondary);
 		text-decoration: none;
 		margin-bottom: 14px;
 		font-size: 15px;
 		transition: all 240ms var(--ease-brand);
 	}
 	.footer-links-col a:hover {
-		color: #fff;
+		color: var(--brand-primary);
 		transform: translateX(4px);
 	}
 
@@ -1286,14 +1343,14 @@
 		max-width: 1200px;
 		margin: 0 auto;
 		padding-top: 24px;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-top: 1px solid var(--ink-100);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 16px;
 		flex-wrap: wrap;
 		font-size: 13px;
-		color: rgba(255, 255, 255, 0.4);
+		color: var(--fg-tertiary);
 		position: relative;
 		z-index: 2;
 	}
@@ -1310,10 +1367,10 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
 		border-radius: 8px;
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--fg-secondary);
 		cursor: pointer;
 		font-size: 11px;
 		font-weight: 700;
@@ -1324,9 +1381,12 @@
 			color 200ms;
 		line-height: 1;
 	}
-	.footer-ctrl-btn:hover {
-		background: rgba(255, 255, 255, 0.16);
-		color: #fff;
+	@media (hover: hover) {
+		.footer-ctrl-btn:hover {
+			background: var(--ink-100);
+			border-color: var(--ink-300);
+			color: var(--fg-primary);
+		}
 	}
 
 	/* ── RESPONSIVE ── */
@@ -1661,6 +1721,218 @@
 	.app-screenshot {
 		aspect-ratio: 430 / 932;
 		object-fit: cover;
+	}
+
+	/* ── Falling Sakura Petals + Kana ── */
+	.hero-petals {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
+		z-index: 1;
+	}
+	.petal,
+	.kana {
+		position: absolute;
+		top: -60px;
+		display: block;
+		will-change: transform, opacity;
+	}
+	.petal {
+		width: 14px;
+		height: 14px;
+		background: radial-gradient(
+			ellipse at 50% 35%,
+			rgba(255, 255, 255, 0.95) 0%,
+			rgba(255, 210, 220, 0.7) 55%,
+			rgba(255, 180, 200, 0) 85%
+		);
+		border-radius: 70% 10% 70% 10% / 60% 10% 60% 10%;
+		filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+		opacity: 0;
+	}
+	.kana {
+		font-family: var(--font-jp);
+		font-weight: 700;
+		color: rgba(255, 255, 255, 0.16);
+		letter-spacing: 0;
+		font-size: 38px;
+		text-shadow: 0 2px 12px rgba(255, 255, 255, 0.08);
+		opacity: 0;
+	}
+	:global(.dark) .kana {
+		color: rgba(255, 255, 255, 0.08);
+	}
+	:global(.dark) .petal {
+		background: radial-gradient(
+			ellipse at 50% 35%,
+			rgba(255, 220, 230, 0.6) 0%,
+			rgba(255, 180, 200, 0.35) 55%,
+			rgba(255, 180, 200, 0) 85%
+		);
+	}
+
+	@keyframes petal-fall-a {
+		0% {
+			transform: translate3d(0, 0, 0) rotate(0deg);
+			opacity: 0;
+		}
+		8% {
+			opacity: 1;
+		}
+		90% {
+			opacity: 0.9;
+		}
+		100% {
+			transform: translate3d(60px, 105vh, 0) rotate(540deg);
+			opacity: 0;
+		}
+	}
+	@keyframes petal-fall-b {
+		0% {
+			transform: translate3d(0, 0, 0) rotate(0deg);
+			opacity: 0;
+		}
+		10% {
+			opacity: 1;
+		}
+		50% {
+			transform: translate3d(-40px, 50vh, 0) rotate(-180deg);
+		}
+		100% {
+			transform: translate3d(20px, 105vh, 0) rotate(-420deg);
+			opacity: 0;
+		}
+	}
+	@keyframes petal-fall-c {
+		0% {
+			transform: translate3d(0, 0, 0) rotate(0deg);
+			opacity: 0;
+		}
+		12% {
+			opacity: 0.95;
+		}
+		50% {
+			transform: translate3d(35px, 50vh, 0) rotate(220deg);
+		}
+		100% {
+			transform: translate3d(-30px, 105vh, 0) rotate(480deg);
+			opacity: 0;
+		}
+	}
+
+	.petal-1 {
+		left: 6%;
+		animation: petal-fall-a 13s linear infinite;
+		animation-delay: -1s;
+	}
+	.petal-2 {
+		left: 14%;
+		width: 10px;
+		height: 10px;
+		animation: petal-fall-b 16s linear infinite;
+		animation-delay: -5s;
+	}
+	.petal-3 {
+		left: 22%;
+		width: 16px;
+		height: 16px;
+		animation: petal-fall-c 14s linear infinite;
+		animation-delay: -9s;
+	}
+	.petal-4 {
+		left: 34%;
+		animation: petal-fall-a 15s linear infinite;
+		animation-delay: -3s;
+	}
+	.petal-5 {
+		left: 46%;
+		width: 12px;
+		height: 12px;
+		animation: petal-fall-b 12s linear infinite;
+		animation-delay: -7s;
+	}
+	.petal-6 {
+		left: 58%;
+		width: 18px;
+		height: 18px;
+		animation: petal-fall-c 17s linear infinite;
+		animation-delay: -2s;
+	}
+	.petal-7 {
+		left: 70%;
+		animation: petal-fall-a 14s linear infinite;
+		animation-delay: -11s;
+	}
+	.petal-8 {
+		left: 80%;
+		width: 11px;
+		height: 11px;
+		animation: petal-fall-b 13s linear infinite;
+		animation-delay: -6s;
+	}
+	.petal-9 {
+		left: 88%;
+		width: 15px;
+		height: 15px;
+		animation: petal-fall-c 16s linear infinite;
+		animation-delay: -4s;
+	}
+	.petal-10 {
+		left: 94%;
+		animation: petal-fall-a 12s linear infinite;
+		animation-delay: -8s;
+	}
+
+	.kana-1 {
+		left: 8%;
+		font-size: 48px;
+		animation: petal-fall-b 22s linear infinite;
+		animation-delay: -2s;
+	}
+	.kana-2 {
+		left: 28%;
+		font-size: 34px;
+		animation: petal-fall-c 26s linear infinite;
+		animation-delay: -14s;
+	}
+	.kana-3 {
+		left: 44%;
+		font-size: 40px;
+		animation: petal-fall-a 24s linear infinite;
+		animation-delay: -6s;
+	}
+	.kana-4 {
+		left: 60%;
+		font-size: 30px;
+		animation: petal-fall-b 28s linear infinite;
+		animation-delay: -18s;
+	}
+	.kana-5 {
+		left: 74%;
+		font-size: 44px;
+		animation: petal-fall-c 25s linear infinite;
+		animation-delay: -10s;
+	}
+	.kana-6 {
+		left: 86%;
+		font-size: 36px;
+		animation: petal-fall-a 27s linear infinite;
+		animation-delay: -22s;
+	}
+	.kana-7 {
+		left: 18%;
+		font-size: 32px;
+		animation: petal-fall-c 23s linear infinite;
+		animation-delay: -16s;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.petal,
+		.kana {
+			animation: none !important;
+			opacity: 0 !important;
+		}
 	}
 
 	/* Decorative Blobs */
