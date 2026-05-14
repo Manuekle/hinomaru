@@ -6,13 +6,18 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import StudySessionLayout from './StudySessionLayout.svelte';
+
 	interface Props {
+		mode?: 'deck' | 'lesson';
 		card: any;
 		distractors: any[];
 		onAnswer: (correct: boolean) => void;
 	}
 
-	let { card, distractors, onAnswer }: Props = $props();
+	let { mode = 'deck', card, distractors, onAnswer }: Props = $props();
+	const isLesson = $derived(mode === 'lesson');
 
 	let choices = $state<any[]>([]);
 	let selectedChoice = $state<string | null>(null);
@@ -56,31 +61,52 @@
 	}
 </script>
 
-<div class="content-center listening-viewer">
-	<div class="quiz-card">
-		<div class="quiz-prompt-label">{t('vocab.review.listenHint', $locale)}</div>
-		<button class="big-listen-btn" onclick={() => speakJapanese(card.jp)} aria-label="Play word">
-			<Icon icon={VolumeHighIcon} size={32} color="currentColor" />
-			<span>{card.jp}</span>
-		</button>
-		<div class="choices-grid">
-			{#each choices as ch (ch.id)}
-				<button class="choice-btn"
-					class:correct={choiceRevealed && choiceIsCorrect(ch)}
-					class:wrong={choiceIsWrong(ch)}
-					class:revealed={choiceRevealed}
-					onclick={() => selectChoice(ch)}>
-					{getMeaning(ch)}
-				</button>
-			{/each}
-		</div>
-		{#if choiceRevealed}
-			<div class="feedback-row" class:feedback-ok={getMeaning(card) === selectedChoice}>
-				<span>{getMeaning(card) === selectedChoice ? t('vocab.review.correct', $locale) : `${t('vocab.review.incorrect', $locale)} — ${getMeaning(card)}`}</span>
+<StudySessionLayout
+	{isLesson}
+	onExit={() => onAnswer(false)}
+	currentIndex={0}
+	totalCount={1}
+>
+	<div class="content-center listening-viewer">
+		<div class="quiz-card">
+			<div class="quiz-prompt-label">{t('vocab.review.listenHint', $locale)}</div>
+			<button class="big-listen-btn" onclick={() => speakJapanese(card.jp)} aria-label="Play word">
+				<Icon icon={VolumeHighIcon} size={32} color="currentColor" />
+				<span>{card.jp}</span>
+			</button>
+			<div class="choices-grid">
+				{#each choices as ch (ch.id)}
+					<button class="choice-btn"
+						class:correct={choiceRevealed && choiceIsCorrect(ch)}
+						class:wrong={choiceIsWrong(ch)}
+						class:revealed={choiceRevealed}
+						onclick={() => selectChoice(ch)}>
+						{getMeaning(ch)}
+					</button>
+				{/each}
 			</div>
-		{/if}
+			{#if choiceRevealed}
+				<div class="feedback-row" class:feedback-ok={getMeaning(card) === selectedChoice}>
+					<span>{getMeaning(card) === selectedChoice ? t('vocab.review.correct', $locale) : `${t('vocab.review.incorrect', $locale)} — ${getMeaning(card)}`}</span>
+				</div>
+			{/if}
+		</div>
 	</div>
-</div>
+
+	{#if card}
+		<StickyFooter>
+			{#if !choiceRevealed}
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => onAnswer(false)}>
+					{t('session.skip', $locale)}
+				</button>
+			{:else}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => onAnswer(getMeaning(card) === selectedChoice)}>
+					{t('session.continue', $locale)}
+				</button>
+			{/if}
+		</StickyFooter>
+	{/if}
+</StudySessionLayout>
 
 <style>
 	.listening-viewer {

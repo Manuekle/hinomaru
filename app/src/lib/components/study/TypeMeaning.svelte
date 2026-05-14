@@ -8,12 +8,17 @@
 	import { fade } from 'svelte/transition';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 
+	import StickyFooter from '$lib/components/StickyFooter.svelte';
+	import StudySessionLayout from './StudySessionLayout.svelte';
+
 	interface Props {
+		mode?: 'deck' | 'lesson';
 		card: any;
 		onAnswer: (correct: boolean) => void;
 	}
 
-	let { card, onAnswer }: Props = $props();
+	let { mode = 'deck', card, onAnswer }: Props = $props();
+	const isLesson = $derived(mode === 'lesson');
 
 	let typedAnswer = $state('');
 	let typingRevealed = $state(false);
@@ -49,36 +54,57 @@
 	}
 </script>
 
-<div class="content-center typing-viewer">
-	<div class="quiz-card">
-		<div class="quiz-prompt-label">{t('vocab.review.typing', $locale)}</div>
-		<div class="jp quiz-word" style="font-size:{getFontSize(card.jp)};">{card.jp}</div>
-		{#if rom}<div class="romaji-hint">{rom}</div>{/if}
-		<button onclick={() => speakJapanese(card.jp)} class="audio-btn" aria-label="Play">
-			<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
-		</button>
-		<input
-			class="hm-input typing-input"
-			class:input-correct={typingRevealed && typingCorrect}
-			class:input-wrong={typingRevealed && !typingCorrect}
-			placeholder={t('vocab.review.typeHere', $locale)}
-			bind:value={typedAnswer}
-			disabled={typingRevealed}
-			onkeydown={(e) => e.key === 'Enter' && !typingRevealed && typedAnswer.trim() && checkTyping()}
-		/>
-		{#if typingRevealed}
-			<div class="feedback-row" class:feedback-ok={typingCorrect} in:fade={{ duration: 150 }}>
-				{#if typingCorrect}
-					<Icon icon={CheckmarkCircle01Icon} size={18} color="currentColor" />
-					<span>{t('vocab.review.correct', $locale)}</span>
-				{:else}
-					<Icon icon={Cancel02Icon} size={18} color="currentColor" />
-					<span>{t('vocab.review.incorrect', $locale)} — {getMeaning(card)}</span>
-				{/if}
-			</div>
-		{/if}
+<StudySessionLayout
+	{isLesson}
+	onExit={() => onAnswer(false)}
+	currentIndex={0}
+	totalCount={1}
+>
+	<div class="content-center typing-viewer">
+		<div class="quiz-card">
+			<div class="quiz-prompt-label">{t('vocab.review.typing', $locale)}</div>
+			<div class="jp quiz-word" style="font-size:{getFontSize(card.jp)};">{card.jp}</div>
+			{#if rom}<div class="romaji-hint">{rom}</div>{/if}
+			<button onclick={() => speakJapanese(card.jp)} class="audio-btn" aria-label="Play">
+				<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
+			</button>
+			<input
+				class="hm-input typing-input"
+				class:input-correct={typingRevealed && typingCorrect}
+				class:input-wrong={typingRevealed && !typingCorrect}
+				placeholder={t('vocab.review.typeHere', $locale)}
+				bind:value={typedAnswer}
+				disabled={typingRevealed}
+				onkeydown={(e) => e.key === 'Enter' && !typingRevealed && typedAnswer.trim() && checkTyping()}
+			/>
+			{#if typingRevealed}
+				<div class="feedback-row" class:feedback-ok={typingCorrect} in:fade={{ duration: 150 }}>
+					{#if typingCorrect}
+						<Icon icon={CheckmarkCircle01Icon} size={18} color="currentColor" />
+						<span>{t('vocab.review.correct', $locale)}</span>
+					{:else}
+						<Icon icon={Cancel02Icon} size={18} color="currentColor" />
+						<span>{t('vocab.review.incorrect', $locale)} — {getMeaning(card)}</span>
+					{/if}
+				</div>
+			{/if}
+		</div>
 	</div>
-</div>
+
+	{#if card}
+		<StickyFooter>
+			{#if !typingRevealed}
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => onAnswer(false)}>
+					{t('session.skip', $locale)}
+				</button>
+			{:else}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={() => onAnswer(typingCorrect)}>
+					{t('session.continue', $locale)}
+				</button>
+			{/if}
+		</StickyFooter>
+	{/if}
+</StudySessionLayout>
 
 <style>
 	.typing-viewer {

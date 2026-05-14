@@ -113,12 +113,45 @@
 			{:else if mode === 'quiz'}
 				<MultipleChoice mode="lesson" card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
 			{:else if mode === 'listening'}
-				<ListeningQuiz card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
+				<ListeningQuiz mode="lesson" card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
 			{:else if mode === 'typing'}
-				<TypeMeaning card={word} onAnswer={advance} />
+				<TypeMeaning mode="lesson" card={word} onAnswer={advance} />
 			{/if}
 		{/key}
 	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}<AnticipationScreen />{/if}
+
+<style>
+	.empty-state-wrapper {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 20px;
+		padding: 40px 24px;
+		text-align: center;
+	}
+
+	.empty-emoji {
+		font-size: 64px;
+		margin-bottom: 8px;
+	}
+
+	.empty-title {
+		font-size: 28px;
+		font-weight: 800;
+		color: var(--fg-primary);
+		margin: 0;
+	}
+
+	.empty-desc {
+		font-size: 17px;
+		color: var(--fg-secondary);
+		max-width: 320px;
+		margin: 0;
+		line-height: 1.5;
+	}
+</style>
