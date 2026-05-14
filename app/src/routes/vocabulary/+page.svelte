@@ -144,7 +144,7 @@
 		<div class="header-row">
 			<h1
 				use:fadeUp={{ delay: 0.06, y: 16 }}
-				style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;color:var(--sumi);"
+				style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0;color:var(--sumi);"
 			>
 				{t('nav.vocabulary', $locale) || 'Mi Vocabulario'}
 			</h1>
@@ -365,10 +365,11 @@
 
 	.header-row {
 		display: flex;
-		align-items: baseline;
+		align-items: center;
 		justify-content: space-between;
 		gap: 16px;
 		width: 100%;
+		margin-bottom: 8px;
 	}
 
 	.search-container {

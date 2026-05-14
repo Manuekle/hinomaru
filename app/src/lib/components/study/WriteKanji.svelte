@@ -363,26 +363,27 @@
 						<div bind:this={hanziContainer} class="hanzi-container"></div>
 					</div>
 				</div>
-			</div>
-		{/if}
 
-	{#if card && !showAnticipation}
-		{#if isLesson}
-			<div class="inline-footer">
-				{#if !checked}
-					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
-						{t('session.skip', $locale)}
-					</button>
-					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
-						{t('session.reset', $locale)}
-					</button>
-				{:else}
-					<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
-						{t('session.continue', $locale)}
-					</button>
+				{#if isLesson && !showAnticipation}
+					<div class="inline-footer">
+						{#if !checked}
+							<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
+								{t('session.skip', $locale)}
+							</button>
+							<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
+								{t('session.reset', $locale)}
+							</button>
+						{:else}
+							<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+								{t('session.continue', $locale)}
+							</button>
+						{/if}
+					</div>
 				{/if}
 			</div>
-		{:else}
+		{/if}
+		
+		{#if !isLesson && card && !showAnticipation}
 			<StickyFooter>
 				{#if !checked}
 					<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
@@ -428,7 +429,8 @@
 	:global(.kanji-box::after) { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--ink-200); z-index: 0; }
 	:global(.kanji-box > svg) { position: relative; z-index: 1; }
 	.loader-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-surface); border-radius: 24px; z-index: 10; }
-	.inline-footer { display: flex; gap: 12px; width: 100%; margin-top: auto; padding-top: 12px; flex-shrink: 0; }
+	.inline-footer { position: sticky; bottom: -24px; z-index: 50; display: flex; gap: 12px; width: 100%; margin-top: auto; padding-top: 12px; padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 24px); background: var(--bg-page); flex-shrink: 0; }
+	.inline-footer::before { content: ''; position: absolute; top: -20px; left: 0; right: 0; height: 20px; background: linear-gradient(to top, var(--bg-page), transparent); pointer-events: none; }
 	.inline-footer > * { flex: 1; }
 
 </style>

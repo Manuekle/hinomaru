@@ -83,7 +83,7 @@
 				</Drawer.Header>
 			{/if}
 
-			<div class="font-ui relative z-10 min-h-0 flex-1 overflow-y-auto py-6">
+			<div class="font-ui relative z-10 min-h-0 flex-1 overflow-y-auto py-6 flex flex-col">
 				{@render children?.()}
 			</div>
 
