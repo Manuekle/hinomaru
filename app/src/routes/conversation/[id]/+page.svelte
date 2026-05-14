@@ -407,54 +407,49 @@
 
 							{#if roleplayMode && phase === 'choice'}
 								<!-- ROLEPLAY MODE -->
-								<div class="roleplay-box">
-									<p
-										style="font-size:14px;color:var(--fg-secondary);margin:0 0 16px;text-align:center;"
-									>
-										{$locale === 'es'
-											? 'Mantén presionado para hablar tu respuesta'
-											: 'Hold to speak your response'}
-									</p>
-
-									<button
-										class="hm-btn hm-btn-lg roleplay-mic-btn"
-										class:is-recording={isRecording}
-										onmousedown={startRecording}
-										onmouseup={stopRecording}
-										ontouchstart={startRecording}
-										ontouchend={stopRecording}
-										aria-pressed={isRecording}
-										aria-label={isRecording
-											? $locale === 'es'
-												? 'Soltar para detener'
-												: 'Release to stop'
-											: $locale === 'es'
-												? 'Mantener para hablar'
-												: 'Hold to speak'}
-									>
-										{#if isRecording}
-											<span class="rec-dot"></span>
-											<span class="rec-text"
-												>{liveTranscript || ($locale === 'es' ? 'Escuchando…' : 'Listening…')}</span
+									<div class="roleplay-box-premium">
+										<div class="mic-container" class:is-recording={isRecording}>
+											<button
+												class="mic-btn-premium"
+												class:is-recording={isRecording}
+												onmousedown={startRecording}
+												onmouseup={stopRecording}
+												ontouchstart={startRecording}
+												ontouchend={stopRecording}
+												aria-pressed={isRecording}
+												aria-label={isRecording
+													? $locale === 'es'
+														? 'Soltar para detener'
+														: 'Release to stop'
+													: $locale === 'es'
+														? 'Mantener para hablar'
+														: 'Hold to speak'}
 											>
-										{:else}
-											<Icon icon={Mic01Icon} size={24} color="currentColor" />
-											<span>{$locale === 'es' ? 'Hablar' : 'Speak'}</span>
-										{/if}
-									</button>
-
-									{#if isRecording}
-										<div class="mic-wave" aria-hidden="true">
-											{#each Array(5) as _, idx (idx)}
-												<span style="animation-delay:{idx * 0.1}s"></span>
-											{/each}
+												<div class="mic-ring"></div>
+												<div class="mic-ring mic-ring-2"></div>
+												<Icon icon={Mic01Icon} size={32} color="white" />
+											</button>
 										</div>
-									{/if}
 
-									{#if speechError}
-										<p class="error-text" style="margin-top:12px;" role="alert">{speechError}</p>
-									{/if}
-								</div>
+										<div class="recording-status">
+											{#if isRecording}
+												<div class="status-indicator">
+													<span class="pulse-dot"></span>
+													<span class="status-text">{liveTranscript || ($locale === 'es' ? 'Escuchando...' : 'Listening...')}</span>
+												</div>
+											{:else}
+												<p class="instruction-text">
+													{$locale === 'es'
+														? 'Mantén presionado para hablar'
+														: 'Hold to speak your response'}
+												</p>
+											{/if}
+										</div>
+
+										{#if speechError}
+											<p class="error-text" role="alert">{speechError}</p>
+										{/if}
+									</div>
 							{:else}
 								<!-- STANDARD MULTIPLE CHOICE -->
 								<div class="options-grid">
@@ -565,14 +560,13 @@
 		<StickyFooter>
 			{#if phase === 'result'}
 				<button
-					class="hm-btn hm-btn-secondary hm-btn-lg"
-					style="flex:1;"
+					class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg"
 					onclick={() => goto('/conversation')}
 				>
-					{$locale === 'es' ? 'Otros escenarios' : 'Other scenarios'}
+					{t('conversation.others', $locale)}
 				</button>
-				<button class="hm-btn hm-btn-dark hm-btn-lg" style="flex:1;" onclick={restart}>
-					{$locale === 'es' ? 'Repetir' : 'Repeat'}
+				<button class="hm-btn hm-btn-dark hm-btn-full hm-btn-lg" onclick={restart}>
+					{t('session.repeat', $locale)}
 				</button>
 			{:else}
 				<button
@@ -584,12 +578,8 @@
 						{$locale === 'es' ? 'Elige una respuesta' : 'Choose a response'}
 					{:else}
 						{turnIndex >= (scenario?.turns.length ?? 0) - 1
-							? $locale === 'es'
-								? 'Terminar'
-								: 'Finish'
-							: $locale === 'es'
-								? 'Continuar'
-								: 'Continue'} →
+							? t('session.finish', $locale)
+							: t('session.continue', $locale)} →
 					{/if}
 				</button>
 			{/if}
@@ -652,87 +642,135 @@
 		align-items: center;
 	}
 
-	.roleplay-mic-btn {
-		background: var(--bg-surface);
-		color: var(--sumi);
-		border: 2px solid var(--ink-200);
-		width: 100%;
-		max-width: 280px;
-		height: 64px;
-		border-radius: 32px;
+	.roleplay-box-premium {
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
 		align-items: center;
-		gap: 12px;
-		font-size: 18px;
-		font-weight: 700;
-		transition: all 0.2s;
+		padding: 40px 0;
+		gap: 32px;
+	}
+
+	.mic-container {
+		position: relative;
+		width: 120px;
+		height: 120px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.mic-btn-premium {
+		width: 104px;
+		height: 104px;
+		border-radius: 50%;
+		border: none;
+		background: linear-gradient(135deg, var(--hinomaru-red), #d4002f);
+		color: white;
+		position: relative;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 10px 32px rgba(188, 0, 45, 0.32);
+		transition: transform 0.18s cubic-bezier(0.34, 1.5, 0.64, 1);
+		z-index: 10;
 		user-select: none;
 		-webkit-user-select: none;
+		touch-action: none;
 	}
 
-	.roleplay-mic-btn:active {
-		transform: scale(0.96);
+	.mic-btn-premium:active {
+		transform: scale(0.94);
+	}
+
+	.mic-btn-premium.is-recording {
+		background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+		transform: scale(1.04);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+	}
+
+	.mic-ring {
+		position: absolute;
+		inset: -8px;
+		border-radius: 50%;
+		border: 2px solid var(--hinomaru-red);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.mic-ring-2 {
+		inset: -16px;
+	}
+
+	.mic-btn-premium.is-recording .mic-ring {
+		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+	}
+	.mic-btn-premium.is-recording .mic-ring-2 {
+		animation: pulse-ring 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
+	}
+
+	@keyframes pulse-ring {
+		0% {
+			transform: scale(0.9);
+			opacity: 0.7;
+		}
+		100% {
+			transform: scale(1.5);
+			opacity: 0;
+		}
+	}
+
+	.recording-status {
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.status-indicator {
+		display: flex;
+		align-items: center;
+		gap: 12px;
 		background: var(--ink-100);
+		padding: 8px 18px;
+		border-radius: 99px;
+		animation: fade-in 0.3s ease-out;
 	}
 
-	.roleplay-mic-btn.is-recording {
-		background: var(--sumi);
-		color: var(--paper);
-		border-color: var(--sumi);
-	}
-
-	.rec-dot {
-		width: 10px;
-		height: 10px;
+	.pulse-dot {
+		width: 8px;
+		height: 8px;
 		border-radius: 50%;
 		background: var(--hinomaru-red);
-		flex-shrink: 0;
-		animation: pulse-btn 0.7s infinite alternate;
+		animation: pulse-dot-anim 0.8s infinite alternate;
 	}
 
-	.rec-text {
-		max-width: 180px;
+	.status-text {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--sumi);
+		max-width: 200px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	.mic-wave {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 4px;
-		height: 24px;
-		margin-top: 12px;
+	.instruction-text {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		font-weight: 500;
+		margin: 0;
+		opacity: 0.7;
 	}
-	.mic-wave span {
-		display: block;
-		width: 4px;
-		height: 100%;
-		background: var(--hinomaru-red);
-		border-radius: 2px;
-		animation: mic-wave-bounce 0.9s ease-in-out infinite;
-		transform-origin: center;
+
+	@keyframes pulse-dot-anim {
+		from { opacity: 1; transform: scale(1); }
+		to { opacity: 0.4; transform: scale(0.8); }
 	}
-	@keyframes mic-wave-bounce {
-		0%,
-		100% {
-			transform: scaleY(0.3);
-			opacity: 0.5;
-		}
-		50% {
-			transform: scaleY(1);
-			opacity: 1;
-		}
-	}
-	@keyframes pulse-btn {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0.5;
-		}
+
+	@keyframes fade-in {
+		from { opacity: 0; transform: translateY(10px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 
 	.error-text {

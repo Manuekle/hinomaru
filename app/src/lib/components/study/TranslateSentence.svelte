@@ -19,6 +19,16 @@
 	import StudySessionLayout from './StudySessionLayout.svelte';
 	import { fadeIn, fadeUp } from '$lib/motion';
 	import { buildSentence, type BuiltSentence } from '$lib/learning/sentenceBuilder';
+	import { splitJpInteractive } from '$lib/speaking/normalize';
+
+	function shuffleArr<T>(arr: T[]): T[] {
+		const a = [...arr];
+		for (let i = a.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[a[i], a[j]] = [a[j], a[i]];
+		}
+		return a;
+	}
 
 	interface Props {
 		mode?: 'deck' | 'lesson';
@@ -65,14 +75,44 @@
 					$locale === 'es'
 						? currentCard.example_es
 						: currentCard.example_en || currentCard.example_es;
+				const hasKanji = (s: string) => /[㐀-䶿一-鿿]/.test(s);
+				// Prefer a kana-only reading so every chip has a romaji.
+				let source = exampleJp;
+				if (hasKanji(source)) {
+					if (currentCard.kana && !hasKanji(String(currentCard.kana))) {
+						source = String(currentCard.kana);
+					} else if (currentCard.jp && !hasKanji(String(currentCard.jp))) {
+						source = String(currentCard.jp);
+					}
+				}
+				// If we still have kanji, we can't build a clean kana-chip exercise.
+				// Returning null triggers the auto-advance effect.
+				if (hasKanji(source)) return null;
+				const tokens = splitJpInteractive(source);
+				const distractorPool: string[] = [];
+				const seen = new Set(tokens);
+				for (const c of initialCards) {
+					if (!c || c.id === currentCard.id) continue;
+					const candidates = [c.kana, c.jp].map((v) => String(v || ''));
+					const src = candidates.find((s) => s && !hasKanji(s)) ?? '';
+					if (!src) continue;
+					for (const tok of splitJpInteractive(src)) {
+						if (hasKanji(tok)) continue;
+						if (!seen.has(tok)) {
+							seen.add(tok);
+							distractorPool.push(tok);
+						}
+					}
+				}
+				const distractors = shuffleArr(distractorPool).slice(0, Math.max(2, 6 - tokens.length));
 				return {
 					templateId: 'fallback-example',
-					tokens: [exampleJp],
-					shuffled: [exampleJp],
+					tokens,
+					shuffled: shuffleArr([...tokens, ...distractors]),
 					suffix: '',
 					translation: String(exampleTr),
 					primarySlot: '',
-					primaryToken: exampleJp,
+					primaryToken: tokens[0] ?? source,
 					primaryCard: currentCard,
 					primaryCategory: ''
 				} as unknown as BuiltSentence;
@@ -96,6 +136,7 @@
 	let struggled = $state(false);
 	let showAnticipation = $state(false);
 
+	let lastSpokenCardId = $state<string | null>(null);
 	$effect(() => {
 		if (sentence) {
 			bank = sentence.shuffled.map((tok, i) => ({
@@ -107,6 +148,11 @@
 			typed = '';
 			submitted = false;
 			struggled = false;
+			const cid = currentCard?.id ?? null;
+			if (cid && cid !== lastSpokenCardId) {
+				lastSpokenCardId = cid;
+				speakJapanese(sentence.tokens.join('') + (sentence.suffix ?? ''));
+			}
 		}
 	});
 
@@ -139,6 +185,7 @@
 		if (submitted) return;
 		answer = [...answer, chip];
 		bank = bank.filter((c) => c.uid !== chip.uid);
+		speakJapanese(chip.tok);
 	}
 
 	function removeFromAnswer(chip: Chip) {
@@ -304,6 +351,26 @@
 				{/if}
 			</div>
 		{/if}
+
+	{#if sentence && !showAnticipation}
+		<StickyFooter>
+			{#if !submitted}
+				<button class="hm-btn hm-btn-secondary icon-btn" onclick={toggleKeyboard} aria-label="Toggle keyboard">
+					<Icon icon={useKeyboard ? ArrowLeft02Icon : KeyboardIcon} size={24} color="currentColor" />
+				</button>
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => nextCard()}>
+					{t('session.skip', $locale)}
+				</button>
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" disabled={!ready} onclick={check}>
+					{t('session.check', $locale)}
+				</button>
+			{:else}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={nextCard}>
+					{t('session.continue', $locale)}
+				</button>
+			{/if}
+		</StickyFooter>
+	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}

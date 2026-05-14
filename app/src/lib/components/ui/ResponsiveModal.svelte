@@ -1,9 +1,11 @@
 <script lang="ts">
 	import * as Drawer from '$lib/components/ui/drawer';
-	import { fade } from 'svelte/transition';
+	import { fade, scale } from 'svelte/transition';
 	import { onMount, type Snippet } from 'svelte';
 	import { cn } from '$lib/utils';
 	import { fadeUp } from '$lib/motion';
+	import Icon from '$lib/Icon.svelte';
+	import { Cancel01Icon } from '@hugeicons/core-free-icons';
 
 	interface Props {
 		open: boolean;
@@ -46,7 +48,9 @@
 	}
 </script>
 
-{#if isMobile}
+{#if !mounted}
+	<!-- defer render until viewport class resolved to avoid modal→drawer flip -->
+{:else if isMobile}
 	<Drawer.Root bind:open>
 		<Drawer.Content
 			class={cn(
@@ -65,15 +69,17 @@
 				{/if}
 			</Drawer.Header>
 
-			<div class="font-ui relative z-10 py-6">
+			<div class="font-ui relative z-10 flex-1 overflow-y-auto py-6">
 				{@render children?.()}
 			</div>
 
-			<Drawer.Footer class="relative z-10 px-0 pt-4">
-				<div class={cn('font-ui flex w-full flex-row gap-4 [&>*]:flex-1', actionsClass)}>
-					{@render actions?.()}
-				</div>
-			</Drawer.Footer>
+			{#if actions}
+				<Drawer.Footer class="relative z-10 px-0 pt-4">
+					<div class={cn('font-ui flex w-full flex-row gap-4 [&>*]:flex-1', actionsClass)}>
+						{@render actions?.()}
+					</div>
+				</Drawer.Footer>
+			{/if}
 		</Drawer.Content>
 	</Drawer.Root>
 {:else if open}
@@ -85,11 +91,15 @@
 	>
 		<div
 			class={cn('modal-content', contentClass)}
-			use:fadeUp={{ delay: 0.05, y: 20 }}
+			transition:scale={{ duration: 300, start: 0.95, opacity: 0 }}
 			onclick={(e) => e.stopPropagation()}
 			role="dialog"
 			aria-modal="true"
 		>
+			<button class="modal-close-btn" onclick={() => (open = false)} aria-label="Cerrar">
+				<Icon icon={Cancel01Icon} size={20} color="currentColor" />
+			</button>
+
 			{#if icon}
 				<div class="modal-icon-box">
 					{@render icon()}
@@ -100,13 +110,15 @@
 				<p class="modal-text">{description}</p>
 			{/if}
 
-			<div class="modal-body">
+			<div class="modal-body custom-scrollbar">
 				{@render children?.()}
 			</div>
 
-			<div class={cn('font-ui flex w-full flex-row gap-3 [&>*]:flex-1', actionsClass)}>
-				{@render actions?.()}
-			</div>
+			{#if actions}
+				<div class={cn('font-ui mt-8 flex w-full flex-row gap-3 [&>*]:flex-1', actionsClass)}>
+					{@render actions?.()}
+				</div>
+			{/if}
 		</div>
 	</div>
 {/if}
@@ -120,7 +132,6 @@
 	:global(.drawer-premium) {
 		background: linear-gradient(to bottom, var(--bg-surface), var(--paper)) !important;
 		box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1) !important;
-		overflow: hidden;
 	}
 
 	:global(.drawer-premium)::before {
@@ -164,7 +175,7 @@
 		background: rgba(0, 0, 0, 0.4);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
-		z-index: 1000;
+		z-index: 20000;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -173,16 +184,29 @@
 
 	.modal-content {
 		background: linear-gradient(to bottom, var(--bg-surface), var(--paper));
-		border-radius: 48px;
-		padding: 64px 48px;
+		border-radius: 40px;
+		padding: 40px 40px 32px;
 		width: 100%;
-		max-width: 480px;
+		max-width: 560px;
+		max-height: calc(100vh - 48px);
 		text-align: center;
 		box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
 		border: 1.5px solid var(--ink-100);
 		font-family: var(--font-ui);
 		position: relative;
 		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+
+	.modal-body {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-y: auto;
+		text-align: left;
+		padding-right: 8px;
+		margin-right: -8px;
 	}
 
 	.modal-content::before {
@@ -210,6 +234,30 @@
 		border-color: var(--ink-200);
 	}
 
+	.modal-close-btn {
+		position: absolute;
+		top: 24px;
+		right: 24px;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-surface);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-secondary);
+		cursor: pointer;
+		transition: all 0.2s;
+		z-index: 50;
+	}
+
+	.modal-close-btn:hover {
+		background: var(--bg-muted);
+		color: var(--hinomaru-red);
+		border-color: var(--hinomaru-red);
+	}
+
 	.modal-icon-box {
 		width: 64px;
 		height: 64px;
@@ -224,12 +272,12 @@
 
 	.modal-title {
 		font-family: var(--font-ui);
-		font-size: 28px;
+		font-size: 32px;
 		font-weight: 900;
 		color: var(--sumi);
-		margin-bottom: 14px;
-		letter-spacing: -0.03em;
-		line-height: 1.1;
+		margin-bottom: 16px;
+		letter-spacing: -0.04em;
+		line-height: 1;
 	}
 
 	.modal-text {

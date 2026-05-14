@@ -26,7 +26,7 @@
 </script>
 
 <div class="complete-layout">
-	<div class="hero-section" in:fadeUp={{ y: 20 }}>
+	<div class="hero-section" use:fadeUp={{ y: 20 }}>
 		<div class="trophy-wrapper">
 			<Icon icon={Award01Icon} size={64} color="var(--hinomaru-red)" />
 		</div>
@@ -41,7 +41,7 @@
 	</div>
 
 	<div class="stats-grid">
-		<div class="stat-card" in:fadeUp={{ y: 20, delay: 200 }}>
+		<div class="stat-card" use:fadeUp={{ y: 20, delay: 0.2 }}>
 			<div class="stat-icon-bg accuracy">
 				<Icon icon={Target02Icon} size={20} color="var(--success)" />
 			</div>
@@ -51,7 +51,7 @@
 			</div>
 		</div>
 
-		<div class="stat-card" in:fadeUp={{ y: 20, delay: 300 }}>
+		<div class="stat-card" use:fadeUp={{ y: 20, delay: 0.3 }}>
 			<div class="stat-icon-bg xp">
 				<Icon icon={ZapIcon} size={20} color="#FFA500" />
 			</div>
@@ -61,7 +61,7 @@
 			</div>
 		</div>
 
-		<div class="stat-card" in:fadeUp={{ y: 20, delay: 400 }}>
+		<div class="stat-card" use:fadeUp={{ y: 20, delay: 0.4 }}>
 			<div class="stat-icon-bg time">
 				<Icon icon={Timer02Icon} size={20} color="#4A90E2" />
 			</div>

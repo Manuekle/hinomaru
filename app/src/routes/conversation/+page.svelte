@@ -174,10 +174,11 @@
 	}
 
 	.row-title {
-		font-size: 17px;
-		font-weight: 700;
+		font-size: 20px;
+		font-weight: 600;
 		color: var(--fg-primary);
 		line-height: 1.2;
+		letter-spacing: -0.04em;
 		transition: color 150ms;
 		white-space: nowrap;
 		overflow: hidden;

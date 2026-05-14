@@ -535,10 +535,11 @@
 		margin-bottom: 3px;
 	}
 	.row-title {
-		font-size: 18px;
+		font-size: 20px;
 		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.2;
+		letter-spacing: -0.04em;
 		transition: color 150ms;
 	}
 	.row-romaji {

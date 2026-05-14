@@ -7,6 +7,7 @@
 		ArrowLeft02Icon
 	} from '@hugeicons/core-free-icons';
 	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { ALL_CHARS, type KanaWord } from '$lib/data/alphabetCharacters';
@@ -60,6 +61,7 @@
 		if (locked) return;
 		answer = [...answer, c];
 		bank = bank.filter((x) => x.uid !== c.uid);
+		speakJapanese(c.tok);
 	}
 
 	function remove(c: Chip) {
@@ -99,10 +101,10 @@
 
 <div class="lw-viewer content-center">
 	<div class="word-card" use:fadeIn>
-		<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHA Y FORMA' : 'LISTEN & BUILD'}</span>
-		<button onclick={play} class="big-audio-btn" aria-label="Reproducir audio">
-			<Icon icon={VolumeHighIcon} size={36} color="white" />
+		<button onclick={play} class="audio-corner" aria-label="Reproducir audio">
+			<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
 		</button>
+		<span class="prompt-tag">{$locale === 'es' ? 'ESCUCHA Y FORMA' : 'LISTEN & BUILD'}</span>
 		<p class="hint">{$locale === 'es' ? word.es : word.en}</p>
 	</div>
 
@@ -152,18 +154,16 @@
 	{/if}
 </div>
 
-<StickyFooter>
-	<div class="footer-row">
+	<StickyFooter>
 		{#if !locked && answer.length > 0}
 			<button class="hm-btn hm-btn-secondary icon-btn" onclick={clearAnswer} aria-label="Limpiar">
 				<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
 			</button>
 		{/if}
 		<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={check} disabled={!ready}>
-			{$locale === 'es' ? 'Comprobar' : 'Check'}
+			{t('session.check', $locale)}
 		</button>
-	</div>
-</StickyFooter>
+	</StickyFooter>
 
 <style>
 	.lw-viewer {
@@ -200,21 +200,25 @@
 		border-radius: 20px;
 	}
 
-	.big-audio-btn {
-		width: 96px;
-		height: 96px;
+	.audio-corner {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 36px;
+		height: 36px;
 		border-radius: 50%;
-		background: linear-gradient(135deg, var(--hinomaru-red), #d4002f);
-		border: none;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--fg-secondary);
 		cursor: pointer;
-		box-shadow: 0 10px 28px rgba(188, 0, 45, 0.3);
-		color: white;
+		-webkit-tap-highlight-color: transparent;
+		transition: transform 0.1s;
 	}
-	.big-audio-btn:active {
-		transform: scale(0.94);
+	.audio-corner:active {
+		transform: scale(0.92);
 	}
 
 	.hint {

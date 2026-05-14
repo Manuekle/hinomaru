@@ -37,3 +37,30 @@ export function tokenize(text: string): string[] {
 	}
 	return tokens;
 }
+
+// Mora-level tokenizer for interactive UI chips. Unlike `tokenize()`, this
+// preserves the original script (no katakana → hiragana conversion) so the
+// tokens can be shown back to the user. Groups yōon (kana + small kana) into
+// a single chip in both scripts. Kanji and other graphemes each become one
+// token. Strips common punctuation but keeps the rest verbatim.
+const SMALL_KANA = /[ぁぃぅぇぉっゃゅょァィゥェォッャュョ]/;
+const CHOONPU = 'ー';
+export function splitJpInteractive(text: string): string[] {
+	if (!text) return [];
+	const stripped = text
+		.normalize('NFC')
+		.replace(/[。、！？.!?,，・〜～\s]/g, '');
+	const tokens: string[] = [];
+	let i = 0;
+	while (i < stripped.length) {
+		const next = stripped[i + 1];
+		if (next && (SMALL_KANA.test(next) || next === CHOONPU)) {
+			tokens.push(stripped.slice(i, i + 2));
+			i += 2;
+		} else {
+			tokens.push(stripped[i]);
+			i++;
+		}
+	}
+	return tokens;
+}

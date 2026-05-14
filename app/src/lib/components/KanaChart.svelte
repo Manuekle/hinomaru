@@ -18,6 +18,12 @@
 	import { fadeUp } from '$lib/motion';
 	import { locale } from '$lib/stores/locale';
 
+	interface Props {
+		onSelect?: (item: KanaItem, script: 'hiragana' | 'katakana') => void;
+	}
+
+	let { onSelect }: Props = $props();
+
 	let mode = $state<'hiragana' | 'katakana'>('hiragana');
 
 	const sections = $derived<
@@ -57,8 +63,13 @@
 				]
 	);
 
-	function play(char: string | null) {
-		if (char) speakJapanese(char);
+	function handleCell(item: KanaItem) {
+		if (!item.jp) return;
+		if (onSelect) {
+			onSelect(item, mode);
+		} else {
+			speakJapanese(item.jp);
+		}
 	}
 </script>
 
@@ -94,7 +105,7 @@
 			<div class="kana-grid" style="grid-template-columns: repeat({section.cols}, 1fr);">
 				{#each section.data as item, i (i)}
 					{#if item.jp}
-						<button class="kana-cell" onclick={() => play(item.jp)}>
+						<button class="kana-cell" onclick={() => handleCell(item)}>
 							<span class="kana-char">{item.jp}</span>
 							<span class="kana-romaji">{item.romaji}</span>
 						</button>

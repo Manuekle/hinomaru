@@ -51,17 +51,12 @@
 			icon: '🎙️'
 		}
 	];
-
 </script>
 
 <div
 	style="max-width:720px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 24px calc(100px + env(safe-area-inset-bottom));"
 >
-	<a
-		use:fadeIn={{ delay: 0 }}
-		href="/"
-		class="back-link"
-	>
+	<a use:fadeIn={{ delay: 0 }} href="/" class="back-link">
 		← {t('deck.back', $locale)}
 	</a>
 
@@ -88,7 +83,10 @@
 	<!-- Progress bar -->
 	<div use:fadeUp={{ delay: 0.2, y: 8 }} style="margin-top:28px;">
 		<div class="hm-progress" style="height:6px;">
-			<div class="hm-progress-bar" style="width:{pct}%;height:6px; box-shadow: 0 0 15px rgba(188, 0, 45, 0.4), 0 0 5px rgba(188, 0, 45, 0.6);"></div>
+			<div
+				class="hm-progress-bar"
+				style="width:{pct}%;height:6px; box-shadow: 0 0 15px rgba(188, 0, 45, 0.4), 0 0 5px rgba(188, 0, 45, 0.6);"
+			></div>
 		</div>
 		<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
 			<span class="label-meta">
@@ -100,14 +98,18 @@
 		</div>
 	</div>
 
-
 	<!-- Mode list with stagger -->
-	<div class="list" style="margin-top:32px;" use:staggerChildren={{ delay: 0.3, stagger: 0.06, y: 8 }}>
+	<div
+		class="list"
+		style="margin-top:32px;"
+		use:staggerChildren={{ delay: 0.3, stagger: 0.06, y: 8 }}
+	>
 		{#each modes as mode (mode.id)}
 			<button
 				class="row"
 				onclick={() => {
-					const url = mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`;
+					const url =
+						mode.id === 'stories/today' ? '/deck/stories/today' : `/deck/${deck.id}/${mode.id}`;
 					goto(url);
 				}}
 			>
@@ -191,9 +193,6 @@
 		transform: scale(0.9) translateX(2px);
 	}
 
-
-
-
 	.row-body {
 		flex: 1;
 		min-width: 0;
@@ -213,10 +212,11 @@
 	}
 
 	.row-title {
-		font-size: 17px;
+		font-size: 20px;
 		font-weight: 600;
 		color: var(--fg-primary);
 		line-height: 1.2;
+		letter-spacing: -0.04em;
 		transition: color 150ms;
 		white-space: nowrap;
 		overflow: hidden;

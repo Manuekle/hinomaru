@@ -464,5 +464,91 @@ export const WORDS: Record<string, KanaWord[]> = {
 	'h-w': [
 		{ jp: 'わたし', romaji: 'watashi', es: 'yo', en: 'I', chars: ['わ', 'た', 'し'] },
 		{ jp: 'ほん', romaji: 'hon', es: 'libro', en: 'book', chars: ['ほ', 'ん'] }
+	],
+	'h-g': [
+		{ jp: 'かぎ', romaji: 'kagi', es: 'llave', en: 'key', chars: ['か', 'ぎ'] },
+		{ jp: 'ねぎ', romaji: 'negi', es: 'cebolla verde', en: 'green onion', chars: ['ね', 'ぎ'] },
+		{ jp: 'いご', romaji: 'igo', es: 'go (juego)', en: 'go (game)', chars: ['い', 'ご'] }
+	],
+	'h-z': [
+		{ jp: 'みず', romaji: 'mizu', es: 'agua', en: 'water', chars: ['み', 'ず'] },
+		{ jp: 'かぜ', romaji: 'kaze', es: 'viento', en: 'wind', chars: ['か', 'ぜ'] }
+	],
+	'h-d': [
+		{ jp: 'どこ', romaji: 'doko', es: 'dónde', en: 'where', chars: ['ど', 'こ'] },
+		{ jp: 'からだ', romaji: 'karada', es: 'cuerpo', en: 'body', chars: ['か', 'ら', 'だ'] }
+	],
+	'h-b': [
+		{ jp: 'そば', romaji: 'soba', es: 'soba', en: 'soba', chars: ['そ', 'ば'] },
+		{ jp: 'ぼく', romaji: 'boku', es: 'yo (masc.)', en: 'I (masc.)', chars: ['ぼ', 'く'] }
+	],
+	'h-p': [
+		{ jp: 'さんぽ', romaji: 'sanpo', es: 'paseo', en: 'walk', chars: ['さ', 'ん', 'ぽ'] },
+		{ jp: 'えんぴつ', romaji: 'enpitsu', es: 'lápiz', en: 'pencil', chars: ['え', 'ん', 'ぴ', 'つ'] }
 	]
 };
+
+// Flat list of all known hiragana words (existing groups + extras), used for
+// free-practice word filtering by {target ∪ learned}.
+export const HIRAGANA_WORDS: KanaWord[] = Object.values(WORDS).flat();
+
+// Katakana words used for free-practice. Chosen to avoid the chōonpu (ー) and
+// small yōon kana since those are not present in ALL_CHARS as standalone tokens.
+export const KATAKANA_WORDS: KanaWord[] = [
+	{ jp: 'アイ', romaji: 'ai', es: 'amor', en: 'love', chars: ['ア', 'イ'] },
+	{ jp: 'カキ', romaji: 'kaki', es: 'caqui', en: 'persimmon', chars: ['カ', 'キ'] },
+	{ jp: 'ココア', romaji: 'kokoa', es: 'cacao', en: 'cocoa', chars: ['コ', 'コ', 'ア'] },
+	{ jp: 'カメラ', romaji: 'kamera', es: 'cámara', en: 'camera', chars: ['カ', 'メ', 'ラ'] },
+	{ jp: 'アメリカ', romaji: 'amerika', es: 'Estados Unidos', en: 'America', chars: ['ア', 'メ', 'リ', 'カ'] },
+	{ jp: 'ミルク', romaji: 'miruku', es: 'leche', en: 'milk', chars: ['ミ', 'ル', 'ク'] },
+	{ jp: 'マスク', romaji: 'masuku', es: 'mascarilla', en: 'mask', chars: ['マ', 'ス', 'ク'] },
+	{ jp: 'ホテル', romaji: 'hoteru', es: 'hotel', en: 'hotel', chars: ['ホ', 'テ', 'ル'] },
+	{ jp: 'テレビ', romaji: 'terebi', es: 'televisión', en: 'TV', chars: ['テ', 'レ', 'ビ'] },
+	{ jp: 'バナナ', romaji: 'banana', es: 'plátano', en: 'banana', chars: ['バ', 'ナ', 'ナ'] },
+	{ jp: 'パン', romaji: 'pan', es: 'pan', en: 'bread', chars: ['パ', 'ン'] },
+	{ jp: 'ペン', romaji: 'pen', es: 'pluma', en: 'pen', chars: ['ペ', 'ン'] },
+	{ jp: 'ピザ', romaji: 'piza', es: 'pizza', en: 'pizza', chars: ['ピ', 'ザ'] },
+	{ jp: 'ガム', romaji: 'gamu', es: 'chicle', en: 'gum', chars: ['ガ', 'ム'] },
+	{ jp: 'ベル', romaji: 'beru', es: 'campana', en: 'bell', chars: ['ベ', 'ル'] }
+];
+
+function shuffleArr<T>(arr: T[]): T[] {
+	const a = [...arr];
+	for (let i = a.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[a[i], a[j]] = [a[j], a[i]];
+	}
+	return a;
+}
+
+export function shuffle<T>(arr: T[]): T[] {
+	return shuffleArr(arr);
+}
+
+// Returns up to `n` random distractor chars from the same script as `c`.
+export function poolFor(c: KanaChar, n = 3): KanaChar[] {
+	const same = ALL_CHARS.filter((x) => x.script === c.script && x.id !== c.id);
+	return shuffleArr(same).slice(0, n);
+}
+
+// Returns words composed only of chars in `{targetJp} ∪ learnedJps`, that
+// contain `targetJp` at least once. Source pool is filtered by script.
+export function wordsForCharSet(
+	targetJp: string,
+	learnedJps: Set<string>,
+	script: 'hiragana' | 'katakana'
+): KanaWord[] {
+	const pool = script === 'hiragana' ? HIRAGANA_WORDS : KATAKANA_WORDS;
+	const allowed = new Set<string>(learnedJps);
+	allowed.add(targetJp);
+	const seen = new Set<string>();
+	const out: KanaWord[] = [];
+	for (const w of pool) {
+		if (seen.has(w.jp)) continue;
+		if (!w.chars.includes(targetJp)) continue;
+		if (!w.chars.every((c) => allowed.has(c))) continue;
+		seen.add(w.jp);
+		out.push(w);
+	}
+	return out;
+}

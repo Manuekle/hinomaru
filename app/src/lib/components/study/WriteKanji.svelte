@@ -340,7 +340,7 @@
 									: 'This word has no Kanji, or stroke data is unavailable.'}
 							</p>
 							<button class="hm-btn hm-btn-primary" onclick={next}>
-								{$locale === 'es' ? 'Continuar' : 'Continue'}
+								{t('session.continue', $locale)}
 							</button>
 						</div>
 					{:else}
@@ -365,6 +365,23 @@
 				</div>
 			</div>
 		{/if}
+
+	{#if card && !showAnticipation}
+		<StickyFooter>
+			{#if !checked}
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
+					{t('session.skip', $locale)}
+				</button>
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => writers.forEach(w => w.writer.quiz())}>
+					{t('session.reset', $locale)}
+				</button>
+			{:else}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+					{t('session.continue', $locale)}
+				</button>
+			{/if}
+		</StickyFooter>
+	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}<AnticipationScreen />{/if}

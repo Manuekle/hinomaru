@@ -4,15 +4,45 @@
 	import { t } from '$lib/i18n';
 	import { fadeUp, fadeIn } from '$lib/motion';
 	import KanaChart from '$lib/components/KanaChart.svelte';
-	import { ALL_CHARS } from '$lib/data/alphabetCharacters';
+	import { ALL_CHARS, type KanaChar } from '$lib/data/alphabetCharacters';
 	import { alphabetProgress, isLearned } from '$lib/stores/alphabetProgress';
 	import Icon from '$lib/Icon.svelte';
 	import { ArrowRight02Icon } from '@hugeicons/core-free-icons';
+	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
+	import AlphabetCharSheet from '$lib/components/alphabet/AlphabetCharSheet.svelte';
+	import type { KanaItem } from '$lib/data/kana';
+	import { speakJapanese } from '$lib/utils/tts';
 
 	const totals = $derived.by(() => {
 		const learned = ALL_CHARS.filter((c) => isLearned($alphabetProgress[c.id])).length;
 		return { learned, total: ALL_CHARS.length };
 	});
+
+	const learnedJps = $derived.by(() => {
+		const set = new Set<string>();
+		for (const c of ALL_CHARS) {
+			if (isLearned($alphabetProgress[c.id])) set.add(c.jp);
+		}
+		return set;
+	});
+
+	let selectedChar = $state<KanaChar | null>(null);
+	let sheetOpen = $state(false);
+
+	function handleSelect(item: KanaItem, script: 'hiragana' | 'katakana') {
+		if (!item.jp) return;
+		const kc = ALL_CHARS.find((c) => c.jp === item.jp && c.script === script);
+		if (!kc) {
+			speakJapanese(item.jp);
+			return;
+		}
+		selectedChar = kc;
+		sheetOpen = true;
+	}
+
+	function closeSheet() {
+		sheetOpen = false;
+	}
 
 	const nextUnlearned = $derived(
 		ALL_CHARS.find((c) => !isLearned($alphabetProgress[c.id])) ?? ALL_CHARS[0]
@@ -20,7 +50,9 @@
 
 	function startLearn() {
 		if (nextUnlearned) {
-			goto(`/alphabet/learn?start=${encodeURIComponent(nextUnlearned.id)}&script=${nextUnlearned.script}`);
+			goto(
+				`/alphabet/learn?start=${encodeURIComponent(nextUnlearned.id)}&script=${nextUnlearned.script}`
+			);
 		}
 	}
 </script>
@@ -30,22 +62,19 @@
 </svelte:head>
 
 <div
-	style="max-width:720px;margin:0 auto;padding:calc(32px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));"
+	style="max-width:720px;margin:0 auto;min-height:100vh;padding:calc(32px + env(safe-area-inset-top)) 24px calc(140px + env(safe-area-inset-bottom));"
 >
 	<h1
 		use:fadeUp={{ delay: 0.06, y: 16 }}
-		style="font-family:var(--font-display);font-size:clamp(28px,5.5vw,40px);font-weight:900;color:var(--fg-primary);text-align:center;margin:0 0 8px;letter-spacing:-0.02em;"
+		style="font-size:40px;font-weight:700;letter-spacing:-0.02em;margin:0 0 8px;cursor:default;display:flex;align-items:center;gap:12px;"
 	>
 		{t('alphabet.title', $locale) || 'Kana Chart'}
 	</h1>
-	<p
-		use:fadeUp={{ delay: 0.12, y: 12 }}
-		style="text-align:center;color:var(--fg-tertiary);font-size:15px;margin:0 0 24px;"
-	>
+	<p use:fadeUp={{ delay: 0.12, y: 12 }} style="font-size:16px;color:var(--fg-secondary);margin:0;">
 		{t('alphabet.subtitle', $locale) || 'Aprende y repasa Hiragana y Katakana.'}
 	</p>
 
-	<div use:fadeUp={{ delay: 0.16, y: 12 }} style="margin-bottom:24px;">
+	<div use:fadeUp={{ delay: 0.16, y: 12 }} style="margin-bottom:24px;" class="pt-6">
 		<button class="learn-btn" onclick={startLearn}>
 			<span>
 				{totals.learned === 0
@@ -62,9 +91,26 @@
 	</div>
 
 	<div class="chart-section" use:fadeUp={{ delay: 0.22, y: 20 }}>
-		<KanaChart />
+		<KanaChart onSelect={handleSelect} />
 	</div>
 </div>
+
+{#if selectedChar}
+	<ResponsiveModal
+		bind:open={sheetOpen}
+		title={`${selectedChar.jp}  ${selectedChar.romaji}`}
+	>
+		{#if selectedChar}
+			{#key selectedChar.id}
+				<AlphabetCharSheet
+					char={selectedChar}
+					learnedJps={learnedJps}
+					onClose={closeSheet}
+				/>
+			{/key}
+		{/if}
+	</ResponsiveModal>
+{/if}
 
 <style>
 	.chart-section {

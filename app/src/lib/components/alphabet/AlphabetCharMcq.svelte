@@ -2,6 +2,7 @@
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon, CheckmarkCircle01Icon, Cancel01Icon } from '@hugeicons/core-free-icons';
 	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { fadeIn, fadeUp } from '$lib/motion';
@@ -120,13 +121,7 @@
 				color="currentColor"
 			/>
 			<span class="fb-label">
-				{isCorrect
-					? $locale === 'es'
-						? '¡Correcto!'
-						: 'Correct!'
-					: $locale === 'es'
-						? 'Incorrecto'
-						: 'Incorrect'}
+				{isCorrect ? t('session.correct', $locale) : t('session.wrong', $locale)}
 			</span>
 		</div>
 	{/if}

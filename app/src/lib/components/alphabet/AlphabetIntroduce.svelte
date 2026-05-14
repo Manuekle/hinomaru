@@ -2,6 +2,7 @@
 	import Icon from '$lib/Icon.svelte';
 	import { VolumeHighIcon, ArrowRight02Icon } from '@hugeicons/core-free-icons';
 	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import { speakJapanese } from '$lib/utils/tts';
 	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn } from '$lib/motion';
@@ -42,7 +43,7 @@
 
 <StickyFooter>
 	<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={onContinue}>
-		<span>{$locale === 'es' ? 'Continuar' : 'Continue'}</span>
+		{t('session.continue', $locale)}
 		<Icon icon={ArrowRight02Icon} size={18} color="currentColor" />
 	</button>
 </StickyFooter>

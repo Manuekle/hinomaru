@@ -16,7 +16,9 @@
 	} from '@hugeicons/core-free-icons';
 	import { createClient } from '$lib/supabase';
 	import { speakJapanese } from '$lib/utils/tts';
-	import InteractiveText from '$lib/components/InteractiveText.svelte';
+	import { safeRomaji } from '$lib/utils/romaji';
+	import ResponsiveModal from '$lib/components/ui/ResponsiveModal.svelte';
+	import DotLoader from '$lib/components/DotLoader.svelte';
 	import type { RoadmapUnit, Lesson } from '$lib/data/roadmap';
 
 	interface Props {
@@ -182,7 +184,6 @@
 		return e.secciones.length > 0 && e.secciones.every((s) => seccionCompleted(s));
 	}
 
-	// Per lesson unlock: cascading by level, then by sección, then by lesson order within sección
 	const unlockedSet = $derived.by(() => {
 		const set = new Set<string>();
 		let prevEtapaDone = true;
@@ -191,7 +192,6 @@
 			let prevSeccionDone = true;
 			for (const s of etapa.secciones) {
 				if (!prevSeccionDone) break;
-				// First lesson unlocked, then sequential
 				if (s.lessons.length > 0) set.add(s.lessons[0].id);
 				for (let i = 1; i < s.lessons.length; i++) {
 					if (lessonCompleted(s.lessons[i - 1])) set.add(s.lessons[i].id);
@@ -218,7 +218,6 @@
 		return 'available';
 	}
 
-	// Deterministic pseudo-random offset per lesson id
 	function seededOffset(id: string): number {
 		let h = 0;
 		for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
@@ -249,7 +248,6 @@
 		let lockedReached = false;
 		etapas.forEach((etapa, ei) => {
 			if (lockedReached) return;
-			// If this etapa is fully locked (prev not done), only show preview from previous
 			const etapaUnlocked = etapa.secciones.some((s) =>
 				s.lessons.some((l) => unlockedSet.has(l.id))
 			);
@@ -270,12 +268,10 @@
 					y += li === seccion.lessons.length - 1 ? NODE_SPACING - 30 : NODE_SPACING;
 				});
 			});
-			// If etapa fully completed AND next etapa exists, show preview unlocking it
 			if (etapaCompleted(etapa) && ei < etapas.length - 1) {
 				items.push({ kind: 'preview', etapa, nextEtapa: etapas[ei + 1], y });
 				y += PREVIEW_HEIGHT;
 			} else if (!etapaCompleted(etapa) && ei < etapas.length - 1) {
-				// Etapa unlocked but not completed → show preview at end and stop
 				items.push({ kind: 'preview', etapa, nextEtapa: etapas[ei + 1], y });
 				lockedReached = true;
 			}
@@ -317,7 +313,6 @@
 		const handleScroll = () => {
 			if (!units.length) return;
 			const banners = document.querySelectorAll('.seccion-banner');
-			// Pick last banner whose top is <= threshold (already crossed sticky line)
 			const threshold = 140;
 			let activeEtapaKey = '';
 			let activeSeccionKey = '';
@@ -328,7 +323,6 @@
 					activeSeccionKey = el.getAttribute('data-seccion-key') || '';
 				}
 			});
-			// Fallback: if no banner yet crossed threshold, use first banner
 			if (!activeEtapaKey && banners.length > 0) {
 				activeEtapaKey = banners[0].getAttribute('data-etapa-key') || '';
 				activeSeccionKey = banners[0].getAttribute('data-seccion-key') || '';
@@ -372,44 +366,6 @@
 			activeLessonId = null;
 			drawerOpen = false;
 		}
-	}
-
-	function drawerSlide(_: HTMLElement, { duration = 320 }: { duration?: number } = {}) {
-		return {
-			duration,
-			easing: cubicOut,
-			css: (t: number) => `transform: translateY(${(1 - t) * 100}%);`
-		};
-	}
-
-	let drawerEl = $state<HTMLDivElement | null>(null);
-	let dragStartY = 0;
-	let dragOffset = $state(0);
-	let dragging = false;
-
-	function dragStart(e: PointerEvent) {
-		if (!drawerEl) return;
-		dragging = true;
-		dragStartY = e.clientY;
-		dragOffset = 0;
-		(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
-	}
-
-	function dragMove(e: PointerEvent) {
-		if (!dragging) return;
-		const dy = e.clientY - dragStartY;
-		dragOffset = Math.max(0, dy);
-	}
-
-	function dragEnd(e: PointerEvent) {
-		if (!dragging) return;
-		dragging = false;
-		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-		const threshold = drawerEl ? drawerEl.offsetHeight * 0.25 : 120;
-		if (dragOffset > threshold) {
-			drawerOpen = false;
-		}
-		dragOffset = 0;
 	}
 </script>
 
@@ -628,97 +584,59 @@
 	{/if}
 </div>
 
-{#if drawerOpen}
-	{@const dc = drawerSeccion ? SECTION_COLORS[drawerSeccion.colorIdx] : SECTION_COLORS[0]}
-	<button
-		class="drawer-backdrop"
-		onclick={closeDrawer}
-		aria-label="Cerrar"
-		in:fade={{ duration: 180 }}
-		out:fade={{ duration: 150 }}
-	></button>
-	<div
-		class="drawer"
-		role="dialog"
-		aria-modal="true"
-		bind:this={drawerEl}
-		class:dragging
-		style={dragOffset > 0 ? `transform: translateY(${dragOffset}px);` : ''}
-		transition:drawerSlide={{ duration: 320 }}
-	>
-		<div
-			class="drawer-handle-zone"
-			onpointerdown={dragStart}
-			onpointermove={dragMove}
-			onpointerup={dragEnd}
-			onpointercancel={dragEnd}
-			role="presentation"
-		>
-			<div class="drawer-handle"></div>
-		</div>
-		<div class="drawer-header" style="--accent: {dc.bg};">
-			<div class="drawer-emoji">{drawerSeccion?.emoji || '📚'}</div>
-			<div class="drawer-info">
-				<div class="drawer-eyebrow">{$locale === 'es' ? 'Palabras clave' : 'Key vocabulary'}</div>
-				<div class="drawer-title">
-					{drawerSeccion
-						? $locale === 'es'
-							? drawerSeccion.title_es
-							: drawerSeccion.title_en
-						: ''}
-				</div>
-			</div>
-			<button class="drawer-close" onclick={closeDrawer} aria-label="Cerrar">
-				<Icon icon={Cancel01Icon} size={20} color="currentColor" />
-			</button>
-		</div>
-
-		<div class="drawer-body">
+<ResponsiveModal
+	bind:open={drawerOpen}
+	title={drawerSeccion ? ($locale === 'es' ? drawerSeccion.title_es : drawerSeccion.title_en) : ''}
+	description={$locale === 'es' ? 'Vocabulario clave de esta sección' : 'Key vocabulary for this section'}
+>
+		<div class="drawer-body-premium">
 			{#if drawerLoading}
-				<div class="drawer-loading">…</div>
+				<div class="drawer-loading">
+					<DotLoader color="var(--hinomaru-red)" />
+				</div>
 			{:else if drawerCards.length === 0}
 				<div class="drawer-empty">
 					{$locale === 'es' ? 'Sin palabras todavía.' : 'No words yet.'}
 				</div>
 			{:else}
-				<ul class="vocab-list">
-					{#each drawerCards as c (c.id)}
-						<li class="vocab-item">
-							<div class="vocab-row">
-								<div class="vocab-main">
-									<div class="vocab-jp">
-										<InteractiveText text={c.jp || c.kanji || c.kana || ''} vocab={drawerCards} />
-									</div>
-									{#if c.kana && c.kana !== c.jp}
-										<div class="vocab-kana">{c.kana}</div>
-									{/if}
-									{#if c.romaji}
-										<div class="vocab-romaji">{c.romaji}</div>
-									{/if}
-									<div class="vocab-translation">
-										<InteractiveText
-											text={$locale === 'es'
-												? c.es || c.translation_es || ''
-												: c.en || c.translation_en || ''}
-											vocab={drawerCards}
-										/>
-									</div>
+				<div class="vocab-list">
+					{#each drawerCards as c, idx (c.id)}
+						{@const rom = safeRomaji(c.romaji, c.jp || c.kana)}
+						<div
+							class="vocab-item-premium"
+							use:fadeUp={{ delay: 0.05 * Math.min(idx, 8), y: 12 }}
+						>
+							<div class="vocab-main">
+								<div class="vocab-jp-premium">
+									<span class="jp">{c.jp || c.kanji || c.kana || ''}</span>
 								</div>
-								<button
-									class="vocab-speak"
-									aria-label="Reproducir"
-									onclick={() => speakJapanese(c.jp || c.kana || '')}
-								>
-									<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
-								</button>
+								<div class="vocab-details">
+									{#if c.kana && c.kana !== c.jp}
+										<span class="vocab-kana-tag">{c.kana}</span>
+									{/if}
+									{#if rom}
+										<span class="vocab-romaji-premium">{rom}</span>
+									{/if}
+									<span class="vocab-translation-premium">
+										{$locale === 'es'
+											? c.es || c.translation_es || ''
+											: c.en || c.translation_en || ''}
+									</span>
+								</div>
 							</div>
-						</li>
+							<button
+								class="vocab-speak-btn"
+								aria-label="Reproducir"
+								onclick={() => speakJapanese(c.jp || c.kana || '')}
+							>
+								<Icon icon={VolumeHighIcon} size={20} color="currentColor" />
+							</button>
+						</div>
 					{/each}
-				</ul>
+				</div>
 			{/if}
 		</div>
-	</div>
-{/if}
+</ResponsiveModal>
 
 <style>
 	.roadmap-wrapper {
@@ -856,7 +774,6 @@
 		transform: scale(0.94);
 	}
 
-	/* Sección banner — only dashed-line description */
 	.seccion-banner {
 		position: absolute;
 		left: 0;
@@ -893,7 +810,6 @@
 		padding: 0 4px;
 	}
 
-	/* End-of-etapa preview card */
 	.etapa-preview-wrap {
 		position: absolute;
 		left: 0;
@@ -1095,7 +1011,7 @@
 		position: absolute;
 		top: 110%;
 		left: 50%;
-		width: 240px;
+		width: 200px;
 		z-index: 90;
 		pointer-events: none;
 	}
@@ -1106,9 +1022,9 @@
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
 		border: 1px solid rgba(0, 0, 0, 0.08);
-		border-radius: 20px;
-		padding: 16px;
-		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+		border-radius: 16px;
+		padding: 12px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 		pointer-events: auto;
 		text-align: center;
 	}
@@ -1120,36 +1036,29 @@
 	}
 
 	.popover-type {
-		font-size: 10px;
+		font-size: 9px;
 		font-weight: 900;
-		letter-spacing: -0.04em;
+		letter-spacing: -0.02em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
-		margin-bottom: 4px;
-	}
-
-	.popover-title {
-		font-size: 15px;
-		font-weight: 800;
-		color: var(--fg-primary);
+		margin-bottom: 6px;
 		line-height: 1.2;
-		margin: 0 0 14px;
 	}
 
 	.popover-btn {
 		width: 100%;
-		height: 44px;
-		border-radius: 14px;
+		height: 36px;
+		border-radius: 12px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0 16px;
+		padding: 0 12px;
 		background: #10b981;
 		color: white;
 		border: none;
 		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 		font-family: inherit;
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 800;
 		cursor: pointer;
 	}
@@ -1164,11 +1073,11 @@
 	}
 
 	.xp-badge {
-		font-size: 10px;
+		font-size: 9px;
 		font-weight: 800;
 		background: rgba(255, 255, 255, 0.2);
-		padding: 2px 8px;
-		border-radius: 8px;
+		padding: 2px 6px;
+		border-radius: 6px;
 	}
 
 	.popover-arrow {
@@ -1199,262 +1108,121 @@
 		.roadmap-wrapper {
 			max-width: 100%;
 		}
-		.lesson-popover {
-			width: calc(100vw - 40px);
-			max-width: 320px;
-		}
 	}
 
-	/* Drawer */
-	.drawer-backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.45);
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-		border: none;
-		padding: 0;
-		z-index: 11500;
-		cursor: pointer;
-	}
-
-	.drawer {
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 11501;
-		max-height: 80dvh;
-		background: var(--bg-surface);
-		border-radius: 28px 28px 0 0;
-		box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.16);
+	/* ── PREMIUM VOCAB STYLES ── */
+	.drawer-body-premium {
 		display: flex;
 		flex-direction: column;
-		overflow: hidden;
-		transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.drawer.dragging {
-		transition: none;
-	}
-
-	@media (min-width: 720px) {
-		.drawer {
-			left: 50%;
-			right: auto;
-			width: 520px;
-			margin-left: -260px;
-			border-radius: 28px;
-			bottom: 24px;
-			max-height: min(80dvh, 720px);
-		}
-	}
-
-	.drawer-handle-zone {
-		padding: 8px 0 4px;
-		display: flex;
-		justify-content: center;
-		cursor: grab;
-		touch-action: none;
-		flex-shrink: 0;
-	}
-
-	.drawer-handle-zone:active {
-		cursor: grabbing;
-	}
-
-	.drawer-handle {
-		width: 44px;
-		height: 5px;
-		background: var(--ink-300);
-		border-radius: 99px;
-		pointer-events: none;
-	}
-
-	.drawer-header {
-		display: flex;
-		align-items: center;
-		gap: 14px;
-		padding: 12px 18px 16px;
-		border-bottom: 1px solid var(--ink-100);
-		flex-shrink: 0;
-	}
-
-	.drawer-emoji {
-		width: 44px;
-		height: 44px;
-		border-radius: 14px;
-		background: color-mix(in srgb, var(--accent) 18%, transparent);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 22px;
-		flex-shrink: 0;
-	}
-
-	.drawer-info {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.drawer-eyebrow {
-		font-size: 10px;
-		font-weight: 900;
-		letter-spacing: -0.04em;
-		text-transform: uppercase;
-		color: var(--accent);
-		margin-bottom: 2px;
-	}
-
-	.drawer-title {
-		font-size: 17px;
-		font-weight: 800;
-		color: var(--fg-primary);
-		line-height: 1.25;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-		overflow-wrap: anywhere;
-		word-break: break-word;
-	}
-
-	.drawer-close {
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: var(--ink-100);
-		color: var(--fg-secondary);
-		border: none;
-		cursor: pointer;
-		transition: background 0.2s;
-		flex-shrink: 0;
-	}
-
-	.drawer-close:hover {
-		background: var(--ink-200);
-	}
-
-	.drawer-body {
-		flex: 1;
-		overflow-y: auto;
-		padding: 8px 12px max(24px, env(safe-area-inset-bottom) + 16px);
-		-webkit-overflow-scrolling: touch;
-	}
-
-	@media (max-width: 360px) {
-		.drawer-body {
-			padding-left: 8px;
-			padding-right: 8px;
-		}
-		.drawer-header {
-			padding: 12px 14px 16px;
-			gap: 10px;
-		}
-	}
-
-	.drawer-loading,
-	.drawer-empty {
-		text-align: center;
-		padding: 60px 20px;
-		color: var(--fg-tertiary);
-		font-size: 14px;
+		gap: 16px;
+		padding-bottom: 24px;
 	}
 
 	.vocab-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: 12px;
 	}
 
-	.vocab-item {
-		list-style: none;
-	}
-
-	.vocab-row {
-		width: 100%;
+	.vocab-item-premium {
+		background: var(--bg-surface);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		padding: 16px 20px;
 		display: flex;
-		align-items: flex-start;
+		align-items: center;
 		justify-content: space-between;
-		gap: 14px;
-		padding: 12px 14px;
-		background: transparent;
-		border: 1px solid var(--ink-100);
-		border-radius: 14px;
-		text-align: left;
-		font-family: inherit;
+		gap: 16px;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: var(--shadow-sm);
+	}
+
+	@media (hover: hover) {
+		.vocab-item-premium:hover {
+			border-color: var(--hinomaru-red);
+			transform: translateY(-2px);
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+		}
 	}
 
 	.vocab-main {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 4px;
 		min-width: 0;
-		flex: 1;
 	}
 
-	.vocab-jp {
+	.vocab-jp-premium {
 		font-family: var(--font-jp);
-		font-size: 20px;
-		font-weight: 700;
+		font-size: 22px;
+		font-weight: 800;
 		color: var(--fg-primary);
-		line-height: 1.15;
-		overflow-wrap: anywhere;
-		word-break: break-word;
+		line-height: 1.1;
 	}
 
-	.vocab-kana {
-		font-family: var(--font-jp);
-		font-size: 13px;
-		color: var(--fg-tertiary);
-		overflow-wrap: anywhere;
-		word-break: break-word;
+	.vocab-details {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
 	}
 
-	.vocab-romaji {
+	.vocab-kana-tag {
+		font-size: 10px;
+		font-weight: 800;
+		color: var(--fg-secondary);
+		background: var(--bg-muted);
+		padding: 2px 8px;
+		border-radius: 6px;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+	}
+
+	.vocab-romaji-premium {
 		font-size: 12px;
-		color: var(--hinomaru-red);
 		font-weight: 700;
-		letter-spacing: -0.04em;
+		color: var(--hinomaru-red);
 	}
 
-	.vocab-translation {
-		font-size: 13px;
+	.vocab-translation-premium {
+		font-size: 15px;
 		color: var(--fg-secondary);
 		font-weight: 600;
-		margin-top: 2px;
-		overflow-wrap: anywhere;
-		word-break: break-word;
 	}
 
-	.vocab-speak {
-		width: 36px;
-		height: 36px;
+	.vocab-speak-btn {
+		width: 48px;
+		height: 48px;
 		border-radius: 50%;
-		background: var(--ink-100);
-		color: var(--fg-secondary);
+		background: var(--bg-surface);
+		border: 1.5px solid var(--ink-200);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		flex-shrink: 0;
-		border: none;
+		color: var(--sumi);
 		cursor: pointer;
-		transition:
-			background 0.15s,
-			transform 0.15s;
+		transition: all 0.2s;
+		flex-shrink: 0;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 	}
 
-	.vocab-speak:hover {
-		background: var(--ink-200);
-	}
-
-	.vocab-speak:active {
+	.vocab-speak-btn:active {
 		transform: scale(0.92);
+		background: var(--ink-50);
+	}
+
+	.drawer-loading {
+		display: flex;
+		justify-content: center;
+		padding: 60px 0;
+	}
+
+	.drawer-empty {
+		text-align: center;
+		padding: 60px 0;
+		color: var(--fg-tertiary);
+		font-size: 16px;
+		font-weight: 500;
 	}
 </style>

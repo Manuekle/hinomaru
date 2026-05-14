@@ -51,10 +51,13 @@ export function getAllCategories(locale: 'en' | 'es' = 'en'): string[] {
     return Array.from(cats).sort();
 }
 
+// Cache the sorted words list for performance
+const sortedWords = Array.from(vocabMap.keys()).sort((a, b) => b.length - a.length);
+
 /**
  * Returns a list of all Japanese words in the registry, sorted by length (descending)
  * to facilitate greedy matching during tokenization.
  */
 export function getAllRegistryWords(): string[] {
-    return Array.from(vocabMap.keys()).sort((a, b) => b.length - a.length);
+    return sortedWords;
 }

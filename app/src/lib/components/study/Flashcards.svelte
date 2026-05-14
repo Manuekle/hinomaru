@@ -170,7 +170,6 @@
 				>
 					<div class="card-body" class:flipped>
 						<div class="card-face card-front">
-							<span class="card-tag">{deck?.title || t('nav.vocabulary', $locale)}</span>
 							<div class="word-center">
 								<div
 									class="jp card-text"
@@ -191,17 +190,6 @@
 										aria-label="Play normal speed"
 									>
 										<Icon icon={VolumeHighIcon} size={18} color="currentColor" />
-									</button>
-									<button
-										onclick={(e) => {
-											e.stopPropagation();
-											speak(card.jp, true);
-										}}
-										class="audio-btn slow-btn"
-										aria-label="Play slow speed"
-									>
-										<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
-										<span class="slow-label" aria-hidden="true">0.7×</span>
 									</button>
 								</div>
 							</div>
@@ -375,15 +363,7 @@
 		outline: 2px solid var(--hinomaru-red);
 		outline-offset: 2px;
 	}
-	.slow-btn {
-		border-color: var(--hinomaru-red);
-		color: var(--hinomaru-red);
-		background: var(--hinomaru-red-wash);
-	}
-	.slow-label {
-		font-size: 11px;
-		font-weight: 800;
-	}
+
 	.tap-hint {
 		font-size: 11px;
 		font-weight: 700;

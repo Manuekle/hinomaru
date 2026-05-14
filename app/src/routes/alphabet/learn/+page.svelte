@@ -15,6 +15,7 @@
 	import AlphabetListenWord from '$lib/components/alphabet/AlphabetListenWord.svelte';
 	import MatchPairs from '$lib/components/study/MatchPairs.svelte';
 	import WriteKanji from '$lib/components/study/WriteKanji.svelte';
+	import StudySummary from '$lib/components/study/StudySummary.svelte';
 	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 
 	type StepKind = 'introduce' | 'write' | 'sound_for_char' | 'char_for_sound' | 'match_pairs' | 'listen_word';
@@ -35,6 +36,7 @@
 	let stepIdx = $state(0);
 	let stepKey = $state(0);
 	let done = $state(false);
+	let showAnticipation = $state(false);
 	let correctCount = $state(0);
 
 	function shuffle<T>(arr: T[]): T[] {
@@ -106,7 +108,11 @@
 			playWrong();
 		}
 		if (stepIdx >= queue.length - 1) {
-			done = true;
+			showAnticipation = true;
+			setTimeout(() => {
+				done = true;
+				showAnticipation = false;
+			}, 1500);
 		} else {
 			stepIdx++;
 			stepKey++;
@@ -148,17 +154,11 @@
 >
 	<div class="session-container">
 		{#if done}
-			<div class="finish content-center" use:fadeIn>
-				<div class="finish-icon">✓</div>
-				<h2>{$locale === 'es' ? '¡Buen trabajo!' : 'Great job!'}</h2>
-				<p>
-					{correctCount}
-					{$locale === 'es' ? 'aciertos' : 'correct'} / {queue.length}
-				</p>
-				<button class="hm-btn hm-btn-primary hm-btn-lg" onclick={exit}>
-					{$locale === 'es' ? 'Volver al alfabeto' : 'Back to alphabet'}
-				</button>
-			</div>
+			<StudySummary 
+				correct={correctCount} 
+				total={queue.length} 
+				onContinue={exit} 
+			/>
 		{:else if current}
 			{#key stepKey}
 				{#if current.kind === 'introduce' && current.char}
@@ -196,6 +196,8 @@
 	</div>
 </StudySessionLayout>
 
+{#if showAnticipation}<AnticipationScreen />{/if}
+
 <style>
 	.session-container {
 		flex: 1;
@@ -203,32 +205,5 @@
 		flex-direction: column;
 		padding: 0 20px 100px;
 		overflow-y: auto;
-	}
-
-	.finish {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 16px;
-		text-align: center;
-		padding: 40px 20px;
-	}
-	.finish-icon {
-		width: 88px;
-		height: 88px;
-		border-radius: 50%;
-		background: var(--success);
-		color: white;
-		font-size: 48px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.finish h2 {
-		font-size: 28px;
-		font-weight: 900;
-		margin: 0;
 	}
 </style>

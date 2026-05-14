@@ -12,6 +12,7 @@
 	import Confetti from '$lib/components/Confetti.svelte';
 	import type { PageData } from './$types';
 	
+	import StudySummary from '$lib/components/study/StudySummary.svelte';
 	import StudySessionLayout from '$lib/components/study/StudySessionLayout.svelte';
 	import Flashcards from '$lib/components/study/Flashcards.svelte';
 	import MultipleChoice from '$lib/components/study/MultipleChoice.svelte';
@@ -32,7 +33,8 @@
 
 	let session = $state(buildSession(words));
 	let i = $state(0);
-	let correct = $state(0);
+	let correctCount = $state(0);
+	let done = $state(false);
 	let showAnticipation = $state(false);
 	let confettiRef = $state<{ fire: () => void } | null>(null);
 
@@ -52,18 +54,24 @@
 	async function saveSession() {
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return;
-		await supabase.from('sessions').insert({ user_id: user.id, mode: 'vocabulary_review', correct, total: session.length });
+		await supabase.from('sessions').insert({ user_id: user.id, mode: 'vocabulary_review', correct: correctCount, total: session.length });
 		await updateStreak(supabase, user.id);
-		await addXP(supabase, user.id, correct * 5);
+		await addXP(supabase, user.id, correctCount * 5);
 	}
 
 	async function advance(gotIt: boolean) {
-		if (gotIt) { correct++; }
+		if (gotIt) { correctCount++; }
 		updateWordProgress(word, gotIt, !gotIt);
 		
 		if (i >= session.length - 1) {
-			playFinish(); confettiRef?.fire(); saveSession(); showAnticipation = true;
-			setTimeout(() => goto('/vocabulary'), 1600);
+			showAnticipation = true;
+			saveSession();
+			setTimeout(() => {
+				done = true;
+				showAnticipation = false;
+				playFinish();
+				confettiRef?.fire();
+			}, 1500);
 			return;
 		}
 		
@@ -84,7 +92,14 @@
 	modeBadge={`${modeLabel[mode]} ${t(`vocab.review.${mode}`, $locale)}`}
 >
 	<div class="session-container">
-		{#if session.length === 0}
+		{#if done}
+			<StudySummary 
+				correct={correctCount} 
+				total={session.length} 
+				xp={correctCount * 5}
+				onContinue={() => goto('/vocabulary')} 
+			/>
+		{:else if session.length === 0}
 			<div class="empty-state-wrapper">
 				<div class="empty-emoji">✨</div>
 				<h2 class="empty-title">{t('home.complete', $locale)}</h2>

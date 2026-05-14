@@ -228,6 +228,20 @@
 				{/if}
 			</div>
 		{/if}
+
+	{#if card && !showAnticipation}
+		<StickyFooter>
+			{#if !picked}
+				<button class="hm-btn hm-btn-secondary hm-btn-full hm-btn-lg" onclick={() => next()}>
+					{t('session.skip', $locale)}
+				</button>
+			{:else}
+				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
+					{t('session.continue', $locale)}
+				</button>
+			{/if}
+		</StickyFooter>
+	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}

@@ -41,7 +41,7 @@
 	>
 		<Settings class="h-4 w-4" />
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
+	<DropdownMenu.Content class="z-[20000] min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
 		{#each speeds as s (s)}
 			<DropdownMenu.Item
 				onclick={() => setSpeed(s)}
