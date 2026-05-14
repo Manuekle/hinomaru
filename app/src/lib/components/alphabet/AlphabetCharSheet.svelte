@@ -126,6 +126,7 @@
 
 <style>
 	.sheet-body {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		gap: 14px;

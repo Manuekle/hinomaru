@@ -11,8 +11,8 @@
 	import { speakJapanese } from '$lib/utils/tts';
 	import { playCorrect, playWrong } from '$lib/utils/sounds';
 	import { ALL_CHARS, type KanaWord } from '$lib/data/alphabetCharacters';
-	import StickyFooter from '$lib/components/StickyFooter.svelte';
 	import { fadeIn, fadeUp } from '$lib/motion';
+	import { t } from '$lib/i18n';
 
 	interface Props {
 		word: KanaWord;
@@ -99,7 +99,7 @@
 	const ready = $derived(answer.length > 0 && !locked);
 </script>
 
-<div class="lw-viewer content-center">
+<div class="lw-viewer">
 	<div class="word-card" use:fadeIn>
 		<button onclick={play} class="audio-corner" aria-label="Reproducir audio">
 			<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
@@ -152,9 +152,8 @@
 			</span>
 		</div>
 	{/if}
-</div>
 
-	<StickyFooter>
+	<div class="inline-footer">
 		{#if !locked && answer.length > 0}
 			<button class="hm-btn hm-btn-secondary icon-btn" onclick={clearAnswer} aria-label="Limpiar">
 				<Icon icon={ArrowLeft02Icon} size={20} color="currentColor" />
@@ -163,16 +162,17 @@
 		<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={check} disabled={!ready}>
 			{t('session.check', $locale)}
 		</button>
-	</StickyFooter>
+	</div>
+</div>
 
 <style>
 	.lw-viewer {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 		gap: 16px;
-		padding: 20px 0 8px;
+		padding: 4px 0 0;
+		min-height: 420px;
 	}
 
 	.word-card {
@@ -319,13 +319,6 @@
 		font-weight: 800;
 	}
 
-	.footer-row {
-		display: flex;
-		gap: 10px;
-		max-width: 480px;
-		margin: 0 auto;
-		width: 100%;
-	}
 	.icon-btn {
 		width: 54px;
 		height: 54px;
@@ -334,5 +327,13 @@
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
+	}
+
+	.inline-footer {
+		display: flex;
+		gap: 10px;
+		width: 100%;
+		margin-top: auto;
+		padding-top: 8px;
 	}
 </style>

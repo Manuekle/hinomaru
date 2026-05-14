@@ -127,10 +127,11 @@
 
 <style>
 	.practice-wrap {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
-		min-height: 380px;
+		min-height: 420px;
 	}
 
 	.step-meta {
