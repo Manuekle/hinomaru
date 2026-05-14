@@ -38,6 +38,7 @@
 		learnedCount?: number;
 		card?: any;
 		onAnswer?: (correct: boolean) => void;
+		autoAdvance?: boolean;
 	}
 
 	let {
@@ -50,7 +51,8 @@
 		totalCards = 0,
 		learnedCount = 0,
 		card: lessonCard,
-		onAnswer
+		onAnswer,
+		autoAdvance = false
 	}: Props = $props();
 
 	const isLesson = $derived(mode === 'lesson');
@@ -296,6 +298,9 @@
 				} else {
 					checked = true;
 					playCorrect();
+					if (autoAdvance) {
+						setTimeout(() => next(), 800);
+					}
 				}
 			}
 		});
@@ -385,7 +390,7 @@
 			</div>
 		{/if}
 
-		{#if checked && !showAnticipation}
+		{#if checked && !showAnticipation && !autoAdvance}
 			<StickyFooter>
 				<button class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg" onclick={next}>
 					{t('session.continue', $locale)}

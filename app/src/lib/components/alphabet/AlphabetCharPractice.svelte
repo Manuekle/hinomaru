@@ -117,7 +117,7 @@
 					onAnswer={advance}
 				/>
 			{:else if current.kind === 'write'}
-				<WriteKanji mode="lesson" card={writeCard} onAnswer={advance} />
+				<WriteKanji mode="lesson" card={writeCard} onAnswer={advance} autoAdvance={true} />
 			{:else if current.kind === 'listen_word' && current.word}
 				<AlphabetListenWord word={current.word} script={char.script} onAnswer={onWordAnswer} />
 			{/if}
