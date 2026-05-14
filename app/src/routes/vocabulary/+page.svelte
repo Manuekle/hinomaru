@@ -406,8 +406,22 @@
 		gap: 8px;
 		margin-bottom: 24px;
 		overflow-x: auto;
-		padding-bottom: 8px; /* space for scrollbar/shadows */
+		padding: 4px 20px;
 		-webkit-overflow-scrolling: touch;
+		mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 8%,
+			black 88%,
+			transparent 100%
+		);
+		-webkit-mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 8%,
+			black 88%,
+			transparent 100%
+		);
 	}
 
 	.cat-tab {

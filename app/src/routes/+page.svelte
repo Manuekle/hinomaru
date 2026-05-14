@@ -242,7 +242,6 @@
 					decks={data.decks}
 					units={allUnits}
 					lessonProgress={data.lessonProgress}
-					bind:activeLevel
 					onLevelChange={(lvl) => {
 						if (viewMode === 'roadmap') activeLevel = lvl;
 					}}
@@ -539,8 +538,21 @@
 		align-items: center;
 		gap: 8px;
 		overflow-x: auto;
-		padding-bottom: 4px;
-		mask-image: linear-gradient(to right, black 85%, transparent 100%);
+		padding: 4px 20px;
+		mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 8%,
+			black 88%,
+			transparent 100%
+		);
+		-webkit-mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 8%,
+			black 88%,
+			transparent 100%
+		);
 	}
 
 	.nav-divider {
