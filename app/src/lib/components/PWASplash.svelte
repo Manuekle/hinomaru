@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { animate } from 'motion';
 	import { fade } from 'svelte/transition';
 
 	let { visible = true } = $props<{ visible: boolean }>();
@@ -10,38 +9,7 @@
 	let containerEl = $state<HTMLElement | null>(null);
 
 	onMount(() => {
-		try {
-			if (logoEl) {
-				animate(
-					logoEl,
-					{
-						scale: [0.9, 1.05, 1],
-						opacity: [0, 1]
-					},
-					{
-						duration: 0.5,
-						ease: [0.22, 1, 0.36, 1]
-					}
-				);
-			}
-
-			if (textEl) {
-				animate(
-					textEl,
-					{
-						opacity: [0, 1],
-						y: [8, 0]
-					},
-					{
-						duration: 0.4,
-						delay: 0.15,
-						ease: [0.22, 1, 0.36, 1]
-					}
-				);
-			}
-		} catch (e) {
-			console.error('Splash animation error:', e);
-		}
+		// JS animations removed in favor of CSS to prevent hydration double-splash
 	});
 
 	$effect(() => {
@@ -59,6 +27,7 @@
 	>
 		<div
 			bind:this={logoEl}
+			class="splash-logo-anim"
 			style="width:80px;height:80px;background:var(--hinomaru-red);border-radius:50%;
                box-shadow:0 8px 32px rgba(188,0,45,0.2);
                display:flex;align-items:center;justify-content:center;"
@@ -70,7 +39,7 @@
 			></div>
 		</div>
 
-		<div bind:this={textEl} style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+		<div bind:this={textEl} class="splash-text-anim" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
 			<div style="font-size:24px;font-weight:700;letter-spacing:-0.03em;color:var(--sumi);">
 				Hinomaru
 			</div>
@@ -117,5 +86,23 @@
 			transform: scale(1);
 			opacity: 0.75;
 		}
+	}
+	.splash-logo-anim {
+		animation: splash-logo-kf 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+		opacity: 0;
+	}
+	@keyframes splash-logo-kf {
+		0% { transform: scale(0.9); opacity: 0; }
+		50% { transform: scale(1.05); }
+		100% { transform: scale(1); opacity: 1; }
+	}
+	.splash-text-anim {
+		animation: splash-text-kf 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+		animation-delay: 0.15s;
+		opacity: 0;
+	}
+	@keyframes splash-text-kf {
+		0% { transform: translateY(8px); opacity: 0; }
+		100% { transform: translateY(0); opacity: 1; }
 	}
 </style>

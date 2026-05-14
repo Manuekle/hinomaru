@@ -100,83 +100,56 @@
 	currentIndex={stepsDone}
 	totalCount={stepsTotal}
 >
-	<!-- Step content -->
-	<div class="lesson-step-host">
-		{#if currentStep && currentCard}
-			{#key stepKey}
-				<div class="step-wrap content-center">
-					{#if currentStep.kind === 'recognize'}
-						<Flashcards mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
-					{:else if currentStep.kind === 'listen'}
-						<StepListen card={currentCard} {distractors} onAnswer={onStepAnswer} />
-					{:else if currentStep.kind === 'listen_select'}
-						<MultipleChoice
-							mode="lesson"
-							card={currentCard}
-							{distractors}
-							onAnswer={onStepAnswer}
-						/>
-					{:else if currentStep.kind === 'speak'}
-						<Pronunciation
-							mode="lesson"
-							card={currentCard}
-							onAnswer={onStepAnswer}
-							onDisableSpeak={() => (canSpeak = false)}
-						/>
-					{:else if currentStep.kind === 'write'}
-						<WriteKanji mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
-					{:else if currentStep.kind === 'fill_sentence'}
-						<StepFillSentence
-							card={currentCard}
-							pool={cards}
-							retries={currentStep.retries}
-							onAnswer={onStepAnswer}
-						/>
-					{:else if currentStep.kind === 'build_sentence'}
-						<StepBuildSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
-					{:else if currentStep.kind === 'translate_sentence'}
-						<TranslateSentence
-							mode="lesson"
-							card={currentCard}
-							pool={cards}
-							onAnswer={onStepAnswer}
-						/>
-					{:else if currentStep.kind === 'match_pairs'}
-						<MatchPairs
-							mode="lesson"
-							card={currentCard}
-							pool={distractors}
-							onAnswer={onStepAnswer}
-						/>
-					{/if}
-				</div>
-			{/key}
-		{/if}
-	</div>
+	{#if currentStep && currentCard}
+		{#key stepKey}
+			{#if currentStep.kind === 'recognize'}
+				<Flashcards mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
+			{:else if currentStep.kind === 'listen'}
+				<StepListen card={currentCard} {distractors} onAnswer={onStepAnswer} />
+			{:else if currentStep.kind === 'listen_select'}
+				<MultipleChoice
+					mode="lesson"
+					card={currentCard}
+					{distractors}
+					onAnswer={onStepAnswer}
+				/>
+			{:else if currentStep.kind === 'speak'}
+				<Pronunciation
+					mode="lesson"
+					card={currentCard}
+					onAnswer={onStepAnswer}
+					onDisableSpeak={() => (canSpeak = false)}
+				/>
+			{:else if currentStep.kind === 'write'}
+				<WriteKanji mode="lesson" card={currentCard} onAnswer={onStepAnswer} />
+			{:else if currentStep.kind === 'fill_sentence'}
+				<StepFillSentence
+					card={currentCard}
+					pool={cards}
+					retries={currentStep.retries}
+					onAnswer={onStepAnswer}
+				/>
+			{:else if currentStep.kind === 'build_sentence'}
+				<StepBuildSentence card={currentCard} pool={cards} onAnswer={onStepAnswer} />
+			{:else if currentStep.kind === 'translate_sentence'}
+				<TranslateSentence
+					mode="lesson"
+					card={currentCard}
+					pool={cards}
+					onAnswer={onStepAnswer}
+				/>
+			{:else if currentStep.kind === 'match_pairs'}
+				<MatchPairs
+					mode="lesson"
+					card={currentCard}
+					pool={distractors}
+					onAnswer={onStepAnswer}
+				/>
+			{/if}
+		{/key}
+	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}
 	<AnticipationScreen />
 {/if}
-
-<style>
-
-	.lesson-step-host {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		overflow-y: auto;
-		/* No horizontal padding here — each lesson-mode study component
-		   wraps in its own .session-container which already provides
-		   horizontal padding via the global rule in app.css. Only reserve
-		   bottom space so the step content isn't hidden behind StickyFooter. */
-		padding-bottom: 100px;
-	}
-
-	.step-wrap {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding-top: 24px;
-	}
-</style>

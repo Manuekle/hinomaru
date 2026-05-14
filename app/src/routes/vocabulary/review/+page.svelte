@@ -10,6 +10,8 @@
 	import { playFinish } from '$lib/utils/sounds';
 	import AnticipationScreen from '$lib/components/ui/AnticipationScreen.svelte';
 	import Confetti from '$lib/components/Confetti.svelte';
+	import { calculateNextReview, mapPerformanceToQuality } from '$lib/srs';
+	import { updateStreak } from '$lib/utils/updateStreak';
 	import type { PageData } from './$types';
 	
 	import StudySummary from '$lib/components/study/StudySummary.svelte';
@@ -31,7 +33,7 @@
 		return ws.map((w, i) => ({ word: w, mode: modes[i % modes.length] as ReviewMode }));
 	}
 
-	let session = $state(buildSession(words));
+	const session = $derived(buildSession(words));
 	let i = $state(0);
 	let correctCount = $state(0);
 	let done = $state(false);
@@ -91,44 +93,33 @@
 	totalCount={session.length}
 	modeBadge={`${modeLabel[mode]} ${t(`vocab.review.${mode}`, $locale)}`}
 >
-	<div class="session-container">
-		{#if done}
-			<StudySummary 
-				correct={correctCount} 
-				total={session.length} 
-				xp={correctCount * 5}
-				onContinue={() => goto('/vocabulary')} 
-			/>
-		{:else if session.length === 0}
-			<div class="empty-state-wrapper">
-				<div class="empty-emoji">✨</div>
-				<h2 class="empty-title">{t('home.complete', $locale)}</h2>
-				<p class="empty-desc">{t('summary.all', $locale)}</p>
-				<button class="hm-btn hm-btn-primary hm-btn-lg" onclick={() => goto('/vocabulary')}>{t('deck.back', $locale)}</button>
-			</div>
-		{:else if word}
-			{#key i}
-				{#if mode === 'flashcard'}
-					<Flashcards mode="lesson" card={word} onAnswer={advance} />
-				{:else if mode === 'quiz'}
-					<MultipleChoice mode="lesson" card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
-				{:else if mode === 'listening'}
-					<ListeningQuiz card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
-				{:else if mode === 'typing'}
-					<TypeMeaning card={word} onAnswer={advance} />
-				{/if}
-			{/key}
-		{/if}
-	</div>
+	{#if done}
+		<StudySummary 
+			correct={correctCount} 
+			total={session.length} 
+			xp={correctCount * 5}
+			onContinue={() => goto('/vocabulary')} 
+		/>
+	{:else if session.length === 0}
+		<div class="empty-state-wrapper">
+			<div class="empty-emoji">✨</div>
+			<h2 class="empty-title">{t('home.complete', $locale)}</h2>
+			<p class="empty-desc">{t('summary.all', $locale)}</p>
+			<button class="hm-btn hm-btn-primary hm-btn-lg" onclick={() => goto('/vocabulary')}>{t('deck.back', $locale)}</button>
+		</div>
+	{:else if word}
+		{#key i}
+			{#if mode === 'flashcard'}
+				<Flashcards mode="lesson" card={word} onAnswer={advance} />
+			{:else if mode === 'quiz'}
+				<MultipleChoice mode="lesson" card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
+			{:else if mode === 'listening'}
+				<ListeningQuiz card={word} distractors={words.filter(w => w.id !== word.id)} onAnswer={advance} />
+			{:else if mode === 'typing'}
+				<TypeMeaning card={word} onAnswer={advance} />
+			{/if}
+		{/key}
+	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}<AnticipationScreen />{/if}
-
-<style>
-	.session-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 0 20px 100px;
-	}
-</style>

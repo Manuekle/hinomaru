@@ -152,58 +152,46 @@
 	currentIndex={stepIdx}
 	totalCount={Math.max(queue.length, 1)}
 >
-	<div class="session-container">
-		{#if done}
-			<StudySummary 
-				correct={correctCount} 
-				total={queue.length} 
-				onContinue={exit} 
-			/>
-		{:else if current}
-			{#key stepKey}
-				{#if current.kind === 'introduce' && current.char}
-					<AlphabetIntroduce char={current.char} onContinue={() => advance(true)} />
-				{:else if current.kind === 'sound_for_char' && current.char && current.pool}
-					<AlphabetCharMcq
-						target={current.char}
-						options={shuffle([current.char, ...current.pool])}
-						direction="sound_for_char"
-						onAnswer={advance}
-					/>
-				{:else if current.kind === 'char_for_sound' && current.char && current.pool}
-					<AlphabetCharMcq
-						target={current.char}
-						options={shuffle([current.char, ...current.pool])}
-						direction="char_for_sound"
-						onAnswer={advance}
-					/>
-				{:else if current.kind === 'match_pairs' && current.pool}
-					{@const cards = toMatchCards(current.pool)}
-					<MatchPairs
-						mode="lesson"
-						card={cards[0]}
-						pool={cards.slice(1)}
-						onAnswer={onMatchAnswer}
-					/>
-				{:else if current.kind === 'write' && current.char}
-					{@const card = { jp: current.char.jp, romaji: current.char.romaji, es: current.char.romaji, en: current.char.romaji }}
-					<WriteKanji mode="lesson" {card} onAnswer={advance} />
-				{:else if current.kind === 'listen_word' && current.word}
-					<AlphabetListenWord word={current.word} script={scriptParam} onAnswer={advance} />
-				{/if}
-			{/key}
-		{/if}
-	</div>
+	{#if done}
+		<StudySummary 
+			correct={correctCount} 
+			total={queue.length} 
+			onContinue={exit} 
+		/>
+	{:else if current}
+		{#key stepKey}
+			{#if current.kind === 'introduce' && current.char}
+				<AlphabetIntroduce char={current.char} onContinue={() => advance(true)} />
+			{:else if current.kind === 'sound_for_char' && current.char && current.pool}
+				<AlphabetCharMcq
+					target={current.char}
+					options={shuffle([current.char, ...current.pool])}
+					direction="sound_for_char"
+					onAnswer={advance}
+				/>
+			{:else if current.kind === 'char_for_sound' && current.char && current.pool}
+				<AlphabetCharMcq
+					target={current.char}
+					options={shuffle([current.char, ...current.pool])}
+					direction="char_for_sound"
+					onAnswer={advance}
+				/>
+			{:else if current.kind === 'match_pairs' && current.pool}
+				{@const cards = toMatchCards(current.pool)}
+				<MatchPairs
+					mode="lesson"
+					card={cards[0]}
+					pool={cards.slice(1)}
+					onAnswer={onMatchAnswer}
+				/>
+			{:else if current.kind === 'write' && current.char}
+				{@const card = { jp: current.char.jp, romaji: current.char.romaji, es: current.char.romaji, en: current.char.romaji }}
+				<WriteKanji mode="lesson" {card} onAnswer={advance} />
+			{:else if current.kind === 'listen_word' && current.word}
+				<AlphabetListenWord word={current.word} script={scriptParam} onAnswer={advance} />
+			{/if}
+		{/key}
+	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}<AnticipationScreen />{/if}
-
-<style>
-	.session-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 0 20px 100px;
-		overflow-y: auto;
-	}
-</style>

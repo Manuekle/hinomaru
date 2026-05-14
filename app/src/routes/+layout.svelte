@@ -31,7 +31,7 @@
 		locale.set(initial);
 	});
 
-	let booting = $derived(data.isPWA ?? false);
+	let booting = $state(data.isPWA ?? false);
 	let isPWA = $state(false);
 
 	onMount(() => {
