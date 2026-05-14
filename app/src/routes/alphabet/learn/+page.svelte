@@ -164,6 +164,7 @@
 				<AlphabetIntroduce char={current.char} onContinue={() => advance(true)} />
 			{:else if current.kind === 'sound_for_char' && current.char && current.pool}
 				<AlphabetCharMcq
+					mode="lesson"
 					target={current.char}
 					options={shuffle([current.char, ...current.pool])}
 					direction="sound_for_char"
@@ -171,6 +172,7 @@
 				/>
 			{:else if current.kind === 'char_for_sound' && current.char && current.pool}
 				<AlphabetCharMcq
+					mode="lesson"
 					target={current.char}
 					options={shuffle([current.char, ...current.pool])}
 					direction="char_for_sound"
@@ -188,7 +190,7 @@
 				{@const card = { jp: current.char.jp, romaji: current.char.romaji, es: current.char.romaji, en: current.char.romaji }}
 				<WriteKanji mode="lesson" {card} onAnswer={advance} autoAdvance={true} />
 			{:else if current.kind === 'listen_word' && current.word}
-				<AlphabetListenWord word={current.word} script={scriptParam} onAnswer={advance} />
+				<AlphabetListenWord mode="lesson" word={current.word} script={scriptParam} onAnswer={advance} />
 			{/if}
 		{/key}
 	{/if}

@@ -82,7 +82,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 40px 24px 140px;
+		padding: clamp(20px, 5vh, 40px) 24px 120px;
 		position: relative;
 		overflow: hidden;
 		width: 100%;
@@ -94,11 +94,11 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		width: 320px;
-		height: 320px;
-		background: var(--hinomaru-red);
+		width: min(320px, 80vw);
+		height: min(320px, 80vw);
+		background: var(--hinomaru-red-wash);
 		border-radius: 50%;
-		opacity: 0.06;
+		opacity: 0.6;
 		pointer-events: none;
 		animation: pulse-bg 4s ease-in-out infinite;
 	}
@@ -112,16 +112,16 @@
 	}
 
 	.summary-label {
-		font-size: 14px;
+		font-size: 11px;
 		font-weight: 800;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		margin-bottom: 16px;
+		margin-bottom: 12px;
 	}
 
 	.summary-score-large {
-		font-size: 64px;
+		font-size: clamp(48px, 12vw, 64px);
 		font-weight: 900;
 		color: var(--fg-primary);
 		letter-spacing: -0.04em;
@@ -135,17 +135,18 @@
 	}
 
 	.summary-msg-text {
-		font-size: 20px;
+		font-size: 17px;
 		font-weight: 700;
 		color: var(--fg-secondary);
 		margin-top: 12px;
-		margin-bottom: 40px;
+		margin-bottom: clamp(24px, 5vh, 40px);
+		padding: 0 20px;
 	}
 
 	.summary-stats-list {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 10px;
 		width: 100%;
 	}
 
@@ -153,8 +154,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 16px 20px;
-		border-radius: 20px;
+		padding: 14px 18px;
+		border-radius: 18px;
 		background: var(--bg-surface);
 		border: 1.5px solid var(--ink-200);
 		box-shadow: var(--shadow-sm);
@@ -166,13 +167,13 @@
 	}
 
 	.summary-stat-key {
-		font-size: 14px;
+		font-size: 13px;
 		color: var(--fg-secondary);
 		font-weight: 600;
 	}
 
 	.summary-stat-val {
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: 800;
 		color: var(--fg-primary);
 	}
@@ -193,8 +194,8 @@
 	}
 
 	@keyframes pulse-bg {
-		0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.06; }
-		50% { transform: translate(-50%, -50%) scale(1.06); opacity: 0.09; }
+		0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+		50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.7; }
 	}
 
 	@media (prefers-reduced-motion: reduce) {
