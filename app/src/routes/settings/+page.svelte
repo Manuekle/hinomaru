@@ -20,6 +20,7 @@
 	import Icon from '$lib/Icon.svelte';
 	import kofiDark from '$lib/assets/kofi_brandasset/support_me_on_kofi_dark.png';
 	import kofiLight from '$lib/assets/kofi_brandasset/support_me_on_kofi_beige.png';
+	import kofiSymbol from '$lib/assets/kofi_brandasset/kofi_symbol.svg';
 	import {
 		SiriIcon,
 		ComputerPhoneSyncIcon,
@@ -351,9 +352,7 @@
 		</div>
 		<!-- ── Admin ── -->
 		{#if isAdmin}
-			<div>
-				<p class="section-label">Administración</p>
-				<div class="card">
+			<div class="card">
 					<a href="/admin/messages" class="pref-row">
 						<div class="pref-icon" style="background:var(--hinomaru-red-wash);color:var(--hinomaru-red);">
 							<Icon icon={Mail01Icon} size={18} color="currentColor" strokeWidth={1.8} />
@@ -375,7 +374,6 @@
 							>
 						</div>
 					</a>
-				</div>
 			</div>
 		{/if}
 
@@ -591,27 +589,31 @@
 		</div>
 
 		<!-- ── Support ── -->
-		<div class="card support-card">
-			<p class="support-text">{t('settings.support.desc', $locale)}</p>
-			<a
-				href="https://ko-fi.com/manujsx"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="support-btn"
-			>
-				<img src={kofiLight} alt="Support on Ko-fi" class="kofi-light kofi-img-cropped" />
-				<img src={kofiDark} alt="Support on Ko-fi" class="kofi-dark kofi-img-cropped" />
+		<div class="card" style="border-color: transparent;">
+			<a href="https://ko-fi.com/manujsx" target="_blank" rel="noopener noreferrer" class="pref-row">
+				<div class="pref-icon" style="background:#29abe015;color:#29abe0;">
+					<img src={kofiSymbol} alt="Ko-fi" style="width: 18px; height: 18px; object-fit: contain;" />
+				</div>
+				<div class="pref-text">
+					<span class="pref-title">{t('settings.support.desc', $locale)}</span>
+				</div>
+				<div class="arrow-right" style="color: var(--fg-tertiary); opacity: 0.5;">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M9 18l6-6-6-6" />
+					</svg>
+				</div>
 			</a>
 		</div>
 
 		<!-- ── Sign out ── -->
-		<div class="card" style="border-color: var(--ink-200);">
+		<div class="card" style="border-color: transparent;">
 			<button class="pref-row" onclick={signOut}>
 				<div class="pref-icon" style="background:var(--hinomaru-red-wash);color:var(--hinomaru-red);">
 					<Icon icon={Logout03Icon} size={18} color="currentColor" strokeWidth={1.8} />
 				</div>
 				<div class="pref-text">
 					<span class="pref-title" style="color:var(--hinomaru-red);">{t('nav.signout', $locale)}</span>
+					<span class="pref-sub">{t('settings.signout.desc', $locale) || 'Cerrar la sesión de forma segura'}</span>
 				</div>
 			</button>
 		</div>
@@ -1099,46 +1101,7 @@
 		display: inline-block;
 	}
 
-	/* ── Support ── */
-	.support-card {
-		padding: 24px 20px;
-		text-align: center;
-	}
-	.support-text {
-		font-size: 13px;
-		color: var(--fg-secondary);
-		line-height: 1.5;
-		margin: 0 0 16px;
-	}
-	.support-btn {
-		display: inline-block;
-		transition: transform 0.18s;
-	}
-	.kofi-img-cropped {
-		height: 42px;
-		display: block;
-		margin: 0 auto;
-		clip-path: inset(2px round 999px);
-	}
 
-	.kofi-dark {
-		display: none !important;
-	}
-	:global([data-theme='dark']) .kofi-light {
-		display: none !important;
-	}
-	:global([data-theme='dark']) .kofi-dark {
-		display: block !important;
-	}
-
-	@media (hover: hover) {
-		.support-btn:hover {
-			transform: scale(1.04);
-		}
-	}
-	.support-btn:active {
-		transform: scale(0.96);
-	}
 
 	/* ── Select Customization ── */
 	:global(.hm-select-trigger) {
@@ -1218,12 +1181,12 @@
 
 	/* ── Danger Zone ── */
 	.danger-card {
-		border-color: #ff3b3020;
-		margin-top: 8px;
+		border-color: transparent;
+		background: rgba(255, 59, 48, 0.02);
 	}
 	:global([data-theme='dark']) .danger-card {
-		background: #ff3b3008;
-		border-color: #ff3b3030;
+		border-color: transparent;
+		background: rgba(255, 59, 48, 0.05);
 	}
 
 	.arrow-right {

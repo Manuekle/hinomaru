@@ -77,6 +77,8 @@
 	let forgotDone = $state(false);
 	let magicDone = $state(false);
 
+	let isPwaApp = $state(false);
+
 	// URL Errors + PWA welcome
 	onMount(() => {
 		const errorParam = $page.url.searchParams.get('error');
@@ -90,13 +92,13 @@
 				return;
 			}
 			const nav = window.navigator as Navigator & { standalone?: boolean };
-			const isPWA =
+			isPwaApp =
 				window.matchMedia('(display-mode: standalone)').matches ||
 				!!nav.standalone ||
 				(data as any)?.isPWA;
 			const isSignedOut = $page.url.searchParams.has('signedout');
 			
-			if (isPWA && !errorParam && !isSignedOut) mode = 'welcome';
+			if (isPwaApp && !errorParam && !isSignedOut) mode = 'welcome';
 			else if (isSignedOut) mode = 'signin';
 		} catch {}
 	});
@@ -311,7 +313,7 @@
 		<button
 			type="button"
 			class="back-to-welcome"
-			onclick={() => toggleMode('welcome')}
+			onclick={() => isPwaApp ? toggleMode('welcome') : goto('/')}
 			aria-label="Back"
 		>
 			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
