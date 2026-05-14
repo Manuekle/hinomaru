@@ -59,7 +59,7 @@
 	});
 
 	// ── State ─────────────────────────────────────────────────
-	type Mode = 'signin' | 'signup' | 'forgot';
+	type Mode = 'welcome' | 'signin' | 'signup' | 'forgot';
 	let mode = $state<Mode>('signin');
 
 	let email = $state('');
@@ -77,12 +77,21 @@
 	let forgotDone = $state(false);
 	let magicDone = $state(false);
 
-	// URL Errors
+	// URL Errors + PWA welcome
 	onMount(() => {
 		const errorParam = $page.url.searchParams.get('error');
 		if (errorParam === 'confirmation_failed')
 			globalError = t('auth.error.confirmationFailed', $locale);
 		else if (errorParam === 'link_expired') globalError = t('auth.error.linkExpired', $locale);
+
+		try {
+			const nav = window.navigator as Navigator & { standalone?: boolean };
+			const isPWA =
+				window.matchMedia('(display-mode: standalone)').matches ||
+				!!nav.standalone ||
+				(data as any)?.isPWA;
+			if (isPWA && !errorParam) mode = 'welcome';
+		} catch {}
 	});
 
 	// ── Validation ────────────────────────────────────────────
@@ -256,13 +265,48 @@
 	<title>{pageTitle}</title>
 </svelte:head>
 
-<div class="login-layout">
+<div class="login-layout" class:welcome={mode === 'welcome'}>
 	<div class="login-bg" aria-hidden="true">
 		<div bind:this={blob1El} class="blob blob-1"></div>
 		<div bind:this={blob2El} class="blob blob-2"></div>
 		<div bind:this={blob3El} class="blob blob-3"></div>
 	</div>
+
+	{#if mode === 'welcome'}
+		<div bind:this={brandEl} class="welcome-screen">
+			<div class="welcome-hero">
+				<div class="brand-logo brand-logo-lg"></div>
+				<h1 class="brand-name brand-name-lg">Hinomaru</h1>
+			</div>
+			<div class="welcome-actions">
+				<p class="welcome-tagline">{t('auth.signin.subtitle', $locale)}</p>
+				<button
+					onclick={() => toggleMode('signin')}
+					class="hm-btn hm-btn-primary hm-btn-full"
+				>
+					{t('auth.signin', $locale)}
+				</button>
+				<button
+					onclick={() => toggleMode('signup')}
+					class="hm-btn hm-btn-secondary hm-btn-full"
+				>
+					{t('auth.signup', $locale)}
+				</button>
+			</div>
+		</div>
+	{:else}
 	<div class="login-container">
+		<button
+			type="button"
+			class="back-to-welcome"
+			onclick={() => toggleMode('welcome')}
+			aria-label="Back"
+		>
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M19 12H5" />
+				<path d="M12 19l-7-7 7-7" />
+			</svg>
+		</button>
 		<!-- Brand / Logo -->
 		<div bind:this={brandEl} class="brand-header">
 			<div class="brand-logo"></div>
@@ -603,6 +647,7 @@
 			</div>
 		{/if}
 	</div>
+	{/if}
 </div>
 
 <style>
@@ -714,8 +759,11 @@
 
 	:global(.dark) .auth-card,
 	:global(.dark) .feedback-card {
-		background: rgba(28, 28, 28, 0.72);
-		border-color: rgba(255, 255, 255, 0.08);
+		background: transparent;
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+		border-color: transparent;
+		box-shadow: none;
 	}
 
 	:global(.dark) .blob-1 {
@@ -959,7 +1007,7 @@
 			padding: 0;
 		}
 
-		.login-layout {
+		.login-layout:not(.welcome) {
 			align-items: flex-start;
 			padding-top: 64px;
 		}
@@ -978,5 +1026,129 @@
 			width: 220px;
 			height: 220px;
 		}
+	}
+
+	.back-to-welcome {
+		align-self: flex-start;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		margin-bottom: 16px;
+		background: rgba(255, 255, 255, 0.6);
+		border: 1px solid var(--ink-200);
+		border-radius: 50%;
+		color: var(--fg-primary);
+		cursor: pointer;
+		transition: background 150ms, transform 150ms;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+
+	.back-to-welcome:hover {
+		background: rgba(255, 255, 255, 0.85);
+		transform: translateX(-2px);
+	}
+
+	:global(.dark) .back-to-welcome {
+		background: rgba(255, 255, 255, 0.06);
+		border-color: rgba(255, 255, 255, 0.1);
+	}
+
+	:global(.dark) .back-to-welcome:hover {
+		background: rgba(255, 255, 255, 0.12);
+	}
+
+	/* ── Welcome / splash screen ────────────────────────────── */
+	.login-layout.welcome {
+		align-items: stretch;
+		padding: 0;
+	}
+
+	.login-layout.welcome .blob-1 {
+		top: -80px;
+		left: -60px;
+		width: 520px;
+		height: 520px;
+		background: rgba(188, 0, 45, 0.32);
+	}
+
+	.login-layout.welcome .blob-2 {
+		top: 18%;
+		right: -120px;
+		bottom: auto;
+		width: 460px;
+		height: 460px;
+		background: rgba(154, 0, 37, 0.26);
+	}
+
+	.login-layout.welcome .blob-3 {
+		top: 35%;
+		left: 30%;
+		width: 360px;
+		height: 360px;
+		background: rgba(255, 107, 138, 0.22);
+	}
+
+	:global(.dark) .login-layout.welcome .blob-1 {
+		background: rgba(188, 0, 45, 0.42);
+	}
+
+	:global(.dark) .login-layout.welcome .blob-2 {
+		background: rgba(154, 0, 37, 0.34);
+	}
+
+	:global(.dark) .login-layout.welcome .blob-3 {
+		background: rgba(255, 107, 138, 0.26);
+	}
+
+	.welcome-screen {
+		position: relative;
+		z-index: 1;
+		flex: 1;
+		width: 100%;
+		max-width: 480px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		padding: calc(24px + env(safe-area-inset-top)) 28px calc(32px + env(safe-area-inset-bottom));
+		min-height: 100dvh;
+	}
+
+	.welcome-hero {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 20px;
+		padding-bottom: 40px;
+	}
+
+	.brand-logo-lg {
+		width: 96px;
+		height: 96px;
+		box-shadow: 0 16px 48px rgba(188, 0, 45, 0.45);
+	}
+
+	.brand-name-lg {
+		font-size: 40px;
+		letter-spacing: -0.03em;
+		color: var(--fg-primary);
+	}
+
+	.welcome-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.welcome-tagline {
+		font-size: 14px;
+		color: var(--fg-secondary);
+		text-align: center;
+		margin-bottom: 12px;
+		line-height: 1.5;
 	}
 </style>

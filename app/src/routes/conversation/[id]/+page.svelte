@@ -144,34 +144,49 @@
 		phase = first?.type === 'choice' ? 'choice' : 'npc';
 	}
 
+	let starting = false;
+	let finalChunks: string[] = [];
+
 	async function startRecording() {
 		if (phase !== 'choice' || !speechOk) return;
-		if (isRecording || recognizer.active) return;
+		if (isRecording || starting || recognizer.active) return;
+		starting = true;
 		speechError = null;
 		liveTranscript = '';
 		liveAlternatives = [];
+		finalChunks = [];
 		isRecording = true;
 
 		await recognizer.start(
 			(r) => {
-				liveTranscript = r.transcript;
 				if (r.alternatives?.length) liveAlternatives = r.alternatives;
+				if (r.isFinal) {
+					if (r.transcript) finalChunks.push(r.transcript);
+					liveTranscript = (finalChunks.join(' ') ).trim();
+				} else {
+					liveTranscript = (finalChunks.join(' ') + ' ' + r.transcript).trim();
+				}
 			},
 			(err) => {
 				speechError = err;
 				isRecording = false;
+				starting = false;
 			},
 			() => {
 				isRecording = false;
-				if (!liveTranscript && !speechError) {
+				starting = false;
+				const final = (finalChunks.join(' ') || liveTranscript).trim();
+				if (!final && !speechError) {
 					speechError = t('speaking.noSpeech', $locale);
 					return;
 				}
-				if (liveTranscript && currentTurn?.type === 'choice') {
-					checkSpokenAnswer(liveTranscript);
+				if (final && currentTurn?.type === 'choice') {
+					checkSpokenAnswer(final);
 				}
-			}
+			},
+			{ continuous: true }
 		);
+		starting = false;
 	}
 
 	function stopRecording() {
@@ -181,7 +196,7 @@
 
 	function toggleRecording() {
 		if (isRecording) stopRecording();
-		else startRecording();
+		else if (!starting && !recognizer.active) startRecording();
 	}
 
 	function checkSpokenAnswer(spoken: string) {

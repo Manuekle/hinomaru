@@ -27,6 +27,10 @@ export function isSpeechSupported(): boolean {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySpeechRecognition = any;
 
+export interface StartOptions {
+	continuous?: boolean;
+}
+
 export class JapaneseSpeechRecognizer {
 	private rec: AnySpeechRecognition = null;
 	private _active = false;
@@ -36,7 +40,12 @@ export class JapaneseSpeechRecognizer {
 
 	get active() { return this._active || this._starting; }
 
-	public async start(onResult: ResultCallback, onError: ErrorCallback, onEnd: EndCallback) {
+	public async start(
+		onResult: ResultCallback,
+		onError: ErrorCallback,
+		onEnd: EndCallback,
+		opts: StartOptions = {}
+	) {
 		if (this._starting || this._active) {
 			this.abort();
 		}
@@ -91,8 +100,8 @@ export class JapaneseSpeechRecognizer {
 		this.rec = new SR();
 		this.rec.lang = 'ja-JP';
 		this.rec.interimResults = true;
-		this.rec.maxAlternatives = 3;
-		this.rec.continuous = false;
+		this.rec.maxAlternatives = 5;
+		this.rec.continuous = opts.continuous === true;
 
 		this.rec.onstart = () => {
 			this._starting = false;

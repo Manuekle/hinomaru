@@ -27,6 +27,7 @@
 
 	interface Chip {
 		tok: string;
+		romaji?: string;
 		uid: number;
 	}
 
@@ -53,7 +54,10 @@
 			distractors.push(x.jp);
 		}
 		const all = shuffle([...tokens, ...distractors]);
-		bank = all.map((tok, i) => ({ tok, uid: i }));
+		bank = all.map((tok, i) => {
+			const kc = ALL_CHARS.find((c) => c.jp === tok && c.script === script);
+			return { tok, romaji: kc?.romaji, uid: i };
+		});
 		answer = [];
 		locked = false;
 		result = null;
@@ -124,6 +128,7 @@
 			{#each answer as chip (chip.uid)}
 				<button class="token-chip is-selected" disabled={locked} onclick={() => remove(chip)}>
 					<span class="chip-jp jp">{chip.tok}</span>
+					{#if chip.romaji}<span class="chip-romaji">{chip.romaji}</span>{/if}
 				</button>
 			{/each}
 		{/if}
@@ -133,6 +138,7 @@
 		{#each bank as chip (chip.uid)}
 			<button class="token-chip" onclick={() => add(chip)} disabled={locked}>
 				<span class="chip-jp jp">{chip.tok}</span>
+				{#if chip.romaji}<span class="chip-romaji">{chip.romaji}</span>{/if}
 			</button>
 		{/each}
 	</div>
@@ -269,8 +275,10 @@
 
 	.token-chip {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		gap: 2px;
 		padding: 8px 14px;
 		border-radius: 12px;
 		background: var(--bg-surface);
@@ -304,6 +312,17 @@
 		font-weight: 700;
 		line-height: 1;
 		font-family: var(--font-jp);
+	}
+	.chip-romaji {
+		font-size: 11px;
+		font-weight: 600;
+		opacity: 0.75;
+		color: var(--hinomaru-red);
+		line-height: 1;
+	}
+	.token-chip.is-selected .chip-romaji {
+		color: var(--washi);
+		opacity: 0.7;
 	}
 
 	.feedback-bar {
