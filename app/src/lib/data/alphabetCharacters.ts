@@ -488,9 +488,41 @@ export const WORDS: Record<string, KanaWord[]> = {
 	]
 };
 
-// Flat list of all known hiragana words (existing groups + extras), used for
+// Extra hiragana words to cover characters under-represented in the grouped
+// WORDS table (e.g. ぬ, へ, む, も, せ, ろ, れ, を, ん).
+const EXTRA_HIRAGANA_WORDS: KanaWord[] = [
+	{ jp: 'いぬ', romaji: 'inu', es: 'perro', en: 'dog', chars: ['い', 'ぬ'] },
+	{ jp: 'ぬの', romaji: 'nuno', es: 'tela', en: 'cloth', chars: ['ぬ', 'の'] },
+	{ jp: 'へや', romaji: 'heya', es: 'habitación', en: 'room', chars: ['へ', 'や'] },
+	{ jp: 'へそ', romaji: 'heso', es: 'ombligo', en: 'navel', chars: ['へ', 'そ'] },
+	{ jp: 'むし', romaji: 'mushi', es: 'insecto', en: 'bug', chars: ['む', 'し'] },
+	{ jp: 'むら', romaji: 'mura', es: 'aldea', en: 'village', chars: ['む', 'ら'] },
+	{ jp: 'もも', romaji: 'momo', es: 'durazno', en: 'peach', chars: ['も', 'も'] },
+	{ jp: 'くも', romaji: 'kumo', es: 'nube', en: 'cloud', chars: ['く', 'も'] },
+	{ jp: 'せかい', romaji: 'sekai', es: 'mundo', en: 'world', chars: ['せ', 'か', 'い'] },
+	{ jp: 'みせ', romaji: 'mise', es: 'tienda', en: 'shop', chars: ['み', 'せ'] },
+	{ jp: 'ろば', romaji: 'roba', es: 'burro', en: 'donkey', chars: ['ろ', 'ば'] },
+	{ jp: 'ふろ', romaji: 'furo', es: 'baño', en: 'bath', chars: ['ふ', 'ろ'] },
+	{ jp: 'はれ', romaji: 'hare', es: 'soleado', en: 'sunny', chars: ['は', 'れ'] },
+	{ jp: 'すれ', romaji: 'sure', es: 'roce', en: 'rub', chars: ['す', 'れ'] },
+	{ jp: 'ほん', romaji: 'hon', es: 'libro', en: 'book', chars: ['ほ', 'ん'] },
+	{ jp: 'みかん', romaji: 'mikan', es: 'mandarina', en: 'mandarin', chars: ['み', 'か', 'ん'] },
+	{ jp: 'ねこ', romaji: 'neko', es: 'gato', en: 'cat', chars: ['ね', 'こ'] },
+	{ jp: 'はち', romaji: 'hachi', es: 'abeja/ocho', en: 'bee/eight', chars: ['は', 'ち'] },
+	{ jp: 'みち', romaji: 'michi', es: 'camino', en: 'road', chars: ['み', 'ち'] },
+	{ jp: 'なつ', romaji: 'natsu', es: 'verano', en: 'summer', chars: ['な', 'つ'] },
+	{ jp: 'ふゆ', romaji: 'fuyu', es: 'invierno', en: 'winter', chars: ['ふ', 'ゆ'] },
+	{ jp: 'あき', romaji: 'aki', es: 'otoño', en: 'autumn', chars: ['あ', 'き'] },
+	{ jp: 'みず', romaji: 'mizu', es: 'agua', en: 'water', chars: ['み', 'ず'] },
+	{ jp: 'おちゃ', romaji: 'ocha', es: 'té', en: 'tea', chars: ['お', 'ち', 'ゃ'] }
+];
+
+// Flat list of all known hiragana words (grouped WORDS + extras), used for
 // free-practice word filtering by {target ∪ learned}.
-export const HIRAGANA_WORDS: KanaWord[] = Object.values(WORDS).flat();
+export const HIRAGANA_WORDS: KanaWord[] = [
+	...Object.values(WORDS).flat(),
+	...EXTRA_HIRAGANA_WORDS
+];
 
 // Katakana words used for free-practice. Chosen to avoid the chōonpu (ー) and
 // small yōon kana since those are not present in ALL_CHARS as standalone tokens.
@@ -533,6 +565,9 @@ export function poolFor(c: KanaChar, n = 3): KanaChar[] {
 
 // Returns words composed only of chars in `{targetJp} ∪ learnedJps`, that
 // contain `targetJp` at least once. Source pool is filtered by script.
+// If no word satisfies the strict subset rule, falls back to any word in
+// the same script that contains `targetJp` — so the UI always has at least
+// one practice option when one exists in the dataset.
 export function wordsForCharSet(
 	targetJp: string,
 	learnedJps: Set<string>,
@@ -541,14 +576,20 @@ export function wordsForCharSet(
 	const pool = script === 'hiragana' ? HIRAGANA_WORDS : KATAKANA_WORDS;
 	const allowed = new Set<string>(learnedJps);
 	allowed.add(targetJp);
-	const seen = new Set<string>();
-	const out: KanaWord[] = [];
+	const strict: KanaWord[] = [];
+	const relaxed: KanaWord[] = [];
+	const seenStrict = new Set<string>();
+	const seenRelaxed = new Set<string>();
 	for (const w of pool) {
-		if (seen.has(w.jp)) continue;
 		if (!w.chars.includes(targetJp)) continue;
-		if (!w.chars.every((c) => allowed.has(c))) continue;
-		seen.add(w.jp);
-		out.push(w);
+		if (!seenRelaxed.has(w.jp)) {
+			seenRelaxed.add(w.jp);
+			relaxed.push(w);
+		}
+		if (w.chars.every((c) => allowed.has(c)) && !seenStrict.has(w.jp)) {
+			seenStrict.add(w.jp);
+			strict.push(w);
+		}
 	}
-	return out;
+	return strict.length > 0 ? strict : relaxed;
 }

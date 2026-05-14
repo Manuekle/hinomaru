@@ -16,6 +16,7 @@
 		actions?: Snippet;
 		contentClass?: string;
 		actionsClass?: string;
+		dismissible?: boolean;
 	}
 
 	let {
@@ -26,7 +27,8 @@
 		children,
 		actions,
 		contentClass = '',
-		actionsClass = ''
+		actionsClass = '',
+		dismissible = true
 	}: Props = $props();
 
 	let isMobile = $state(false);
@@ -42,6 +44,7 @@
 	});
 
 	function handleOverlayClick(e: MouseEvent) {
+		if (!dismissible) return;
 		if (e.target === e.currentTarget) {
 			open = false;
 		}
@@ -51,7 +54,7 @@
 {#if !mounted}
 	<!-- defer render until viewport class resolved to avoid modal→drawer flip -->
 {:else if isMobile}
-	<Drawer.Root bind:open>
+	<Drawer.Root bind:open {dismissible}>
 		<Drawer.Content
 			class={cn(
 				'drawer-premium rounded-t-[40px] border-t-[1.5px] border-[var(--ink-200)] px-6 pb-12',

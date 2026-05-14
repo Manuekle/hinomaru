@@ -24,13 +24,18 @@
 		char: KanaChar;
 		learnedJps: Set<string>;
 		onClose: () => void;
+		onLockChange?: (locked: boolean) => void;
 	}
 
-	let { char, learnedJps, onClose }: Props = $props();
+	let { char, learnedJps, onClose, onLockChange }: Props = $props();
 
 	type View = 'menu' | 'practice' | 'word';
 	let view = $state<View>('menu');
 	let pickedWord = $state<KanaWord | null>(null);
+
+	$effect(() => {
+		onLockChange?.(view !== 'menu');
+	});
 
 	const availableWords = $derived(wordsForCharSet(char.jp, learnedJps, char.script));
 	const canFormWord = $derived(availableWords.length > 0);
@@ -67,11 +72,12 @@
 
 <div class="sheet-body">
 	{#if view === 'menu'}
-		<div class="char-row" use:fadeIn>
-			<span class="char-romaji">{char.romaji}</span>
-			<button class="audio-mini" onclick={play} aria-label="Reproducir">
-				<Icon icon={VolumeHighIcon} size={16} color="currentColor" />
+		<div class="char-card" use:fadeIn>
+			<button class="audio-corner" onclick={play} aria-label="Reproducir">
+				<Icon icon={VolumeHighIcon} size={15} color="currentColor" />
 			</button>
+			<span class="jp char-glyph">{char.jp}</span>
+			<span class="char-romaji">{char.romaji}</span>
 		</div>
 
 		<div class="actions" use:fadeUp={{ y: 12, delay: 0.05 }}>
@@ -126,41 +132,54 @@
 		padding-bottom: 8px;
 	}
 
-	.char-row {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		padding: 12px 16px;
-		border-radius: 16px;
-		background: var(--hinomaru-red-wash);
-		border: 1.5px solid var(--hinomaru-red);
-	}
-
-	.char-romaji {
-		flex: 1;
-		font-size: 24px;
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		color: var(--hinomaru-red);
-	}
-
-	.audio-mini {
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		border: 1.5px solid var(--hinomaru-red);
+	.char-card {
+		position: relative;
 		background: var(--bg-surface);
-		color: var(--hinomaru-red);
+		border: 1px solid var(--ink-200);
+		border-radius: 20px;
+		box-shadow: 0 2px 12px rgba(26, 26, 26, 0.06);
+		padding: 28px 20px 20px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		text-align: center;
+	}
+
+	.audio-corner {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		border: 1.5px solid var(--ink-200);
+		background: var(--bg-muted);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--fg-secondary);
 		cursor: pointer;
 		-webkit-tap-highlight-color: transparent;
 		transition: transform 0.1s;
-		flex-shrink: 0;
 	}
-	.audio-mini:active {
+	.audio-corner:active {
 		transform: scale(0.92);
+	}
+
+	.char-glyph {
+		font-family: var(--font-jp);
+		font-size: clamp(88px, 22vw, 120px);
+		font-weight: 700;
+		color: var(--fg-primary);
+		line-height: 1;
+	}
+
+	.char-romaji {
+		font-size: 20px;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		color: var(--hinomaru-red);
 	}
 
 	.actions {

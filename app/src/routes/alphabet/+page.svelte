@@ -28,6 +28,7 @@
 
 	let selectedChar = $state<KanaChar | null>(null);
 	let sheetOpen = $state(false);
+	let sheetLocked = $state(false);
 
 	function handleSelect(item: KanaItem, script: 'hiragana' | 'katakana') {
 		if (!item.jp) return;
@@ -98,7 +99,8 @@
 {#if selectedChar}
 	<ResponsiveModal
 		bind:open={sheetOpen}
-		title={`${selectedChar.jp}  ${selectedChar.romaji}`}
+		title={selectedChar.script === 'hiragana' ? 'Hiragana' : 'Katakana'}
+		dismissible={!sheetLocked}
 	>
 		{#if selectedChar}
 			{#key selectedChar.id}
@@ -106,6 +108,7 @@
 					char={selectedChar}
 					learnedJps={learnedJps}
 					onClose={closeSheet}
+					onLockChange={(v) => (sheetLocked = v)}
 				/>
 			{/key}
 		{/if}
