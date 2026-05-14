@@ -399,7 +399,6 @@
 				{/if}
 			</StickyFooter>
 		{/if}
-	{/if}
 </StudySessionLayout>
 
 {#if showAnticipation}<AnticipationScreen />{/if}
