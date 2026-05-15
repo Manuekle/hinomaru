@@ -649,7 +649,9 @@
 	}
 
 	.lyrics-stage {
-		flex: 1;
+		flex: 1 1 0;
+		min-height: 0;
+		overflow: hidden;
 		width: 100%;
 		max-width: 720px;
 		display: flex;
@@ -714,12 +716,20 @@
 		position: relative;
 		text-align: center;
 		max-width: 90%;
-		transition: opacity 280ms ease, filter 280ms ease, transform 280ms ease;
+		transition: opacity 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			filter 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
 	}
 	.line .text {
 		font-size: 22px;
 		font-weight: 500;
 		line-height: 1.35;
+		letter-spacing: 0;
+		text-shadow: 0 0 0 transparent;
+		transition: font-size 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+			font-weight 420ms ease,
+			letter-spacing 420ms ease,
+			text-shadow 420ms ease;
 	}
 	.line.active .text {
 		font-size: 36px;
@@ -733,6 +743,7 @@
 		color: var(--ko-fg-muted);
 		margin-top: 6px;
 		font-style: italic;
+		transition: font-size 420ms cubic-bezier(0.22, 0.61, 0.36, 1), color 320ms ease;
 	}
 	.line.active .romaji {
 		font-size: 16px;
@@ -743,6 +754,11 @@
 		font-size: 15px;
 		color: var(--ko-fg-soft);
 		font-style: italic;
+		animation: translationIn 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+	}
+	@keyframes translationIn {
+		from { opacity: 0; transform: translateY(4px); }
+		to   { opacity: 1; transform: translateY(0); }
 	}
 	.tok {
 		display: inline-block;
@@ -755,6 +771,7 @@
 	}
 
 	.bottom {
+		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
