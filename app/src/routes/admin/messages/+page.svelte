@@ -188,7 +188,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-weight: 800;
+		font-weight: 700;
 		font-size: 14px;
 		flex-shrink: 0;
 	}

@@ -141,7 +141,7 @@
 
 	.empty-title {
 		font-size: 28px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-primary);
 		margin: 0;
 	}

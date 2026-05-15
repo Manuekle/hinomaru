@@ -435,7 +435,7 @@
 	}
 	.cert-brand {
 		font-size: 22px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.02em;
 		color: var(--sumi);
 	}
@@ -487,7 +487,7 @@
 	}
 	.level-badge-n {
 		font-size: 18px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--sumi);
 		line-height: 1;
 	}

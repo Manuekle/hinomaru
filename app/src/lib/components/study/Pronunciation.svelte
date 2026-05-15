@@ -426,7 +426,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -451,7 +451,7 @@
 	.word-text {
 		color: var(--fg-primary);
 		line-height: 1.05;
-		font-weight: 800;
+		font-weight: 700;
 		padding: 8px 0;
 		display: flex;
 		gap: 2px;
@@ -591,7 +591,7 @@
 
 	.verdict-chip {
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.01em;
 		padding: 5px 12px;
 		border-radius: 999px;

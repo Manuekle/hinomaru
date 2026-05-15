@@ -117,7 +117,7 @@
 
 	.title {
 		font-size: 32px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		margin: 0;
 		letter-spacing: -0.02em;
@@ -175,14 +175,14 @@
 
 	.stat-value {
 		font-size: 20px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.1;
 	}
 
 	.stat-label {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);

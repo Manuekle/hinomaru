@@ -136,7 +136,7 @@
 	
 	.quiz-prompt-label { 
 		font-size: 11px; 
-		font-weight: 800; 
+		font-weight: 700; 
 		text-transform: uppercase; 
 		letter-spacing: -0.02em; 
 		color: var(--fg-tertiary); 

@@ -199,7 +199,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -259,7 +259,7 @@
 	}
 	.hint-tag {
 		font-size: 10px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 		background: white;
 		padding: 2px 8px;
@@ -326,7 +326,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 11px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
 	}
@@ -367,7 +367,7 @@
 	}
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 
 	:global(.sentence-display .word-link) {

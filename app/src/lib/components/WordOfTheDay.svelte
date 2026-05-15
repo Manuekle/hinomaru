@@ -272,7 +272,7 @@
 		border: none;
 		border-radius: 16px;
 		font-size: 14px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--sumi);
 		cursor: pointer;
 		transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);

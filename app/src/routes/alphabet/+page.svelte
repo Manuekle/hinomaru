@@ -140,7 +140,7 @@
 		border-radius: 16px;
 		font-family: inherit;
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 		cursor: pointer;
 		box-shadow: 0 6px 18px rgba(188, 0, 45, 0.22);
 		transition: all 0.15s;
@@ -155,7 +155,7 @@
 	}
 	.learn-count {
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 		background: rgba(255, 255, 255, 0.22);
 		padding: 4px 10px;
 		border-radius: 99px;

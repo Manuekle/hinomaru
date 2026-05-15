@@ -383,12 +383,12 @@
 
 	.well-done {
 		font-size: 28px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 	}
 	.finish-time {
 		font-size: 56px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 		margin: 12px 0;
 	}

@@ -324,7 +324,7 @@
 	}
 	.card-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
@@ -395,7 +395,7 @@
 	}
 	.meaning-large {
 		font-size: clamp(28px, 7vw, 38px);
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.1;
 	}

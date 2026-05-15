@@ -422,8 +422,8 @@
 							<Icon icon={Mailbox01Icon} size={18} color="currentColor" strokeWidth={1.8} />
 						</div>
 						<div class="pref-text">
-							<span class="pref-title">Buzón</span>
-							<span class="pref-sub">Ver mensajes del formulario de contacto</span>
+							<span class="pref-title">{t('settings.admin.inbox.title', $locale)}</span>
+							<span class="pref-sub">{t('settings.admin.inbox.desc', $locale)}</span>
 						</div>
 					</a>
 			</div>
@@ -1181,7 +1181,7 @@
 
 	:global(.hm-select-label) {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;

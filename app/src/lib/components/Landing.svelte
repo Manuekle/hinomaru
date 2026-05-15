@@ -538,7 +538,7 @@
 		height: 60px;
 		padding: 0 40px;
 		font-size: 17px;
-		font-weight: 800;
+		font-weight: 700;
 		border-radius: 20px;
 		text-decoration: none;
 		cursor: pointer;
@@ -642,7 +642,7 @@
 	}
 	.hero-section h1 {
 		font-size: clamp(32px, 8vw, 72px);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1.05;
 		letter-spacing: -0.04em;
 		margin: 0 0 20px;
@@ -903,7 +903,7 @@
 	.level-name {
 		color: var(--brand-primary);
 		font-size: 16px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 	.level-label {
 		font-size: 13px;
@@ -980,7 +980,7 @@
 		color: var(--fg-tertiary);
 	}
 	.deck-preview-title {
-		font-weight: 800;
+		font-weight: 700;
 		font-size: 18px;
 		line-height: 1.3;
 		color: var(--sumi);
@@ -1043,7 +1043,7 @@
 	}
 	.stat-value {
 		font-size: 40px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--sumi);
 		margin-bottom: 8px;
 		letter-spacing: -0.02em;
@@ -1071,7 +1071,7 @@
 	}
 	.features-section h2 {
 		font-size: clamp(32px, 6vw, 48px);
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--sumi);
 		margin-bottom: 64px;
 	}
@@ -1104,7 +1104,7 @@
 	}
 	.feature-content h3 {
 		font-size: 32px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		color: var(--sumi);
 		margin-bottom: 20px;
@@ -1209,7 +1209,7 @@
 	}
 	.final-content h2 {
 		font-size: 40px;
-		font-weight: 800;
+		font-weight: 700;
 		margin-bottom: 16px;
 	}
 	.final-content p {
@@ -1307,7 +1307,7 @@
 	}
 	.brand-name {
 		font-size: 24px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.02em;
 		color: var(--fg-primary);
 	}
@@ -1443,7 +1443,7 @@
 		}
 		.feature-content h3 {
 			font-size: 24px;
-			font-weight: 900;
+			font-weight: 700;
 			margin-bottom: 12px;
 		}
 		.feature-content p {

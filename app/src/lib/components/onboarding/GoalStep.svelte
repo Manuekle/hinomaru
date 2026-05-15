@@ -139,7 +139,7 @@
 		background: var(--hinomaru-red);
 		color: #fff;
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		padding: 4px 12px;
 		border-radius: 99px;
 		text-transform: uppercase;
@@ -149,7 +149,7 @@
 
 	.value {
 		font-size: clamp(32px, 9vw, 48px);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1;
 		color: var(--fg-primary);
 		transition: color 0.2s ease;

@@ -426,7 +426,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -471,14 +471,14 @@
 		align-items: center; 
 		justify-content: center; 
 		font-size: 14px; 
-		font-weight: 800; 
+		font-weight: 700; 
 		flex-shrink: 0;
 		transition: all 0.3s var(--ease-brand);
 	}
 	.char-dot.active { border-color: var(--hinomaru-red); color: var(--hinomaru-red); transform: scale(1.1); box-shadow: 0 4px 12px rgba(188, 0, 45, 0.15); }
 	.char-dot.done { background: var(--success-wash); border-color: var(--success); color: var(--success); opacity: 0.7; }
 	
-	.char-single-label { font-size: 18px; font-weight: 800; color: var(--fg-tertiary); opacity: 0.5; letter-spacing: 0.1em; }
+	.char-single-label { font-size: 18px; font-weight: 700; color: var(--fg-tertiary); opacity: 0.5; letter-spacing: 0.1em; }
 
 	.tool-btn { 
 		width: 40px; 

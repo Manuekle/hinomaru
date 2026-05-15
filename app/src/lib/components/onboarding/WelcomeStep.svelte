@@ -43,7 +43,7 @@
 
 	.title {
 		font-size: var(--step-title, clamp(28px, 8vw, 38px));
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.05em;
 		margin: 0;
 		color: var(--fg-primary);

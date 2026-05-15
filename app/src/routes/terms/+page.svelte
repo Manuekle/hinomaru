@@ -146,7 +146,7 @@
 		box-shadow: 0 0 16px rgba(188, 0, 45, 0.5);
 	}
 	.brand-name {
-		font-weight: 800;
+		font-weight: 700;
 		font-size: 17px;
 		letter-spacing: -0.02em;
 	}
@@ -183,7 +183,7 @@
 		position: absolute;
 		font-family: var(--font-jp);
 		font-size: clamp(180px, 30vw, 280px);
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		opacity: 0.04;
 		line-height: 1;
@@ -213,7 +213,7 @@
 		color: var(--brand-primary);
 		border-radius: 999px;
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
 		margin-bottom: 24px;
@@ -222,7 +222,7 @@
 		position: relative;
 		z-index: 1;
 		font-size: clamp(40px, 8vw, 68px);
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		line-height: 1.05;
 		margin: 0 0 20px;
@@ -254,7 +254,7 @@
 	}
 	.toc-label {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.12em;
 		color: var(--fg-tertiary, var(--fg-secondary));
@@ -290,7 +290,7 @@
 	}
 	.toc-num {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--brand-primary);
 		letter-spacing: -0.04em;
 		flex-shrink: 0;
@@ -339,13 +339,13 @@
 	}
 	.section-num {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--brand-primary);
 		letter-spacing: 0.12em;
 	}
 	h2 {
 		font-size: 21px;
-		font-weight: 800;
+		font-weight: 700;
 		margin: 0;
 		color: var(--fg-primary);
 		letter-spacing: -0.015em;

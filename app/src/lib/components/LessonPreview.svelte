@@ -198,7 +198,7 @@
 	}
 	.lp-type-tag {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		color: var(--lp-color);
 		margin-bottom: 4px;
@@ -206,7 +206,7 @@
 	.lp-title {
 		margin: 0 0 8px;
 		font-size: 22px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--sumi);
 		letter-spacing: -0.02em;
 	}
@@ -235,7 +235,7 @@
 	}
 	.lp-xp {
 		color: var(--lp-color);
-		font-weight: 800;
+		font-weight: 700;
 	}
 	.lp-progress-wrap {
 		width: 100%;
@@ -266,7 +266,7 @@
 		background: var(--lp-color);
 		color: white;
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 		border: none;
 		border-radius: 16px;
 		cursor: pointer;

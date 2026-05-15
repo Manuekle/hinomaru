@@ -120,7 +120,7 @@
 
 	.mode-text {
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-secondary);
 		text-transform: uppercase;
 		letter-spacing: 0.02em;
@@ -141,7 +141,7 @@
 
 	.progress-pill .current {
 		font-size: 15px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 	}
 

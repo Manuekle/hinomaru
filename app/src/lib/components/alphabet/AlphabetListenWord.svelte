@@ -197,7 +197,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -340,7 +340,7 @@
 	}
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 
 	.icon-btn {

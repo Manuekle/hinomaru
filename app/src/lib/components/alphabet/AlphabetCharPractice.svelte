@@ -143,7 +143,7 @@
 
 	.step-tag {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.02em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);

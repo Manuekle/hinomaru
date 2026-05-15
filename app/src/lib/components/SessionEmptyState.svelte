@@ -80,7 +80,7 @@
 
 	.title {
 		font-size: 28px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		margin: 0;
 		letter-spacing: -0.04em;

@@ -197,6 +197,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.dark': 'Dark',
 		'settings.showRomaji': 'Show Romaji',
 		'settings.preferences': 'Preferences',
+		'settings.admin.inbox.title': 'Inbox',
+		'settings.admin.inbox.desc': 'View contact form messages',
 		'settings.signout.desc': 'Sign out of your account securely',
 		
 		'admin.messages.title': 'Messages',
@@ -822,6 +824,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.theme.dark': 'Oscuro',
 		'settings.showRomaji': 'Mostrar Romaji',
 		'settings.preferences': 'Preferencias',
+		'settings.admin.inbox.title': 'Buzón',
+		'settings.admin.inbox.desc': 'Ver mensajes del formulario de contacto',
 		'settings.signout.desc': 'Cerrar la sesión de forma segura',
 
 		'admin.messages.title': 'Mensajes',

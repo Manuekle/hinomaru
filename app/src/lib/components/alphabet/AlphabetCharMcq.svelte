@@ -172,7 +172,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -191,7 +191,7 @@
 
 	.rom-prompt {
 		font-size: clamp(40px, 9vw, 56px);
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		letter-spacing: -0.04em;
 	}
@@ -252,7 +252,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 11px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
 	}
@@ -275,7 +275,7 @@
 	}
 	.opt-text {
 		font-size: 18px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-primary);
 	}
 	.opt-text-big {
@@ -313,6 +313,6 @@
 	}
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 </style>

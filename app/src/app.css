@@ -28,7 +28,7 @@
 	--color-success-wash: #e9f3ee;
 	--color-warning: #a8741a;
 
-	--font-ui: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
+	--font-ui: 'Inter Tight Variable', 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
 	--font-jp: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
@@ -62,7 +62,7 @@
 	--bg-page: var(--paper);
 	--bg-surface: var(--washi);
 	--bg-muted: var(--ink-100);
-	--font-ui: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
+	--font-ui: 'Inter Tight Variable', 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
 	--font-jp: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
 	--fs-xs: 12px;
 	--fs-sm: 14px;
@@ -271,7 +271,7 @@ body {
 	padding: 0 var(--space-8);
 	font-family: var(--font-ui);
 	font-size: var(--fs-base);
-	font-weight: 800;
+	font-weight: 700;
 	border-radius: 20px;
 	border: none;
 	cursor: pointer;
@@ -649,7 +649,7 @@ body {
 
 .result-score-pct {
 	font-size: 42px;
-	font-weight: 800;
+	font-weight: 700;
 	line-height: 1;
 	color: var(--sumi);
 	letter-spacing: -0.04em;
@@ -693,7 +693,7 @@ body {
 
 .result-stat-num {
 	font-size: 24px;
-	font-weight: 800;
+	font-weight: 700;
 	color: var(--sumi);
 	line-height: 1;
 }
@@ -777,7 +777,7 @@ body {
 
 .premium-label-pill {
 	font-size: 11px;
-	font-weight: 800;
+	font-weight: 700;
 	color: var(--hinomaru-red);
 	background: var(--hinomaru-red-wash);
 	padding: 4px 10px;

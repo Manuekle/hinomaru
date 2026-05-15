@@ -160,10 +160,10 @@
 	<meta property="og:url" content="https://hinomaru.app{$page.url.pathname}" />
 	<meta property="og:title" content={t('seo.title', $locale)} />
 	<meta property="og:description" content={t('seo.description', $locale)} />
-	<meta property="og:image" content="https://hinomaru.app/landing/hero_es_light.webp" />
+	<meta property="og:image" content="https://hinomaru.app/og-image.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:type" content="image/webp" />
+	<meta property="og:image:type" content="image/png" />
 	<meta property="og:image:alt" content={t('seo.title', $locale)} />
 	<meta property="og:locale" content={$locale === 'en' ? 'en_US' : 'es_ES'} />
 	<meta property="og:locale:alternate" content={$locale === 'en' ? 'es_ES' : 'en_US'} />
@@ -173,7 +173,7 @@
 	<meta property="twitter:url" content="https://hinomaru.app{$page.url.pathname}" />
 	<meta property="twitter:title" content={t('seo.title', $locale)} />
 	<meta property="twitter:description" content={t('seo.description', $locale)} />
-	<meta property="twitter:image" content="https://hinomaru.app/landing/hero_es_light.webp" />
+	<meta property="twitter:image" content="https://hinomaru.app/og-image.png" />
 	<meta property="twitter:image:alt" content={t('seo.title', $locale)} />
 
 	<!-- hreflang: same URL serves both locales via cookie + Accept-Language negotiation -->

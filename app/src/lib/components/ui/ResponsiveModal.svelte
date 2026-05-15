@@ -234,7 +234,7 @@
 	:global(.drawer-title-premium) {
 		font-family: var(--font-ui) !important;
 		font-size: 28px !important;
-		font-weight: 900 !important;
+		font-weight: 700 !important;
 		color: var(--sumi) !important;
 		line-height: 1.1 !important;
 		letter-spacing: -0.03em !important;
@@ -364,7 +364,7 @@
 	.modal-title {
 		font-family: var(--font-ui);
 		font-size: 32px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--sumi);
 		margin-bottom: 16px;
 		letter-spacing: -0.04em;
@@ -386,7 +386,7 @@
 		padding: 18px !important;
 		border-radius: 22px !important;
 		font-size: 16px !important;
-		font-weight: 800 !important;
+		font-weight: 700 !important;
 		cursor: pointer;
 		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 		display: flex;

@@ -145,7 +145,7 @@
 
 		<h1
 			use:fadeUp={{ delay: 0.06, y: 16 }}
-			style="font-size:36px;font-weight:800;letter-spacing:-0.03em;margin:0 0 4px;"
+			style="font-size:36px;font-weight: 700;letter-spacing:-0.03em;margin:0 0 4px;"
 		>
 			{t('home.title', $locale)}
 		</h1>
@@ -658,7 +658,7 @@
 	}
 
 	.dash-level-label {
-		font-weight: 800;
+		font-weight: 700;
 		font-size: 14px;
 		color: var(--sumi);
 		letter-spacing: -0.04em;
@@ -717,7 +717,7 @@
 
 	.dash-streak-num {
 		font-size: 13px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		line-height: 1;
 	}

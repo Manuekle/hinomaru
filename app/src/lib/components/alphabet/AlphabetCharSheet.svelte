@@ -177,7 +177,7 @@
 
 	.char-romaji {
 		font-size: 20px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.03em;
 		color: var(--hinomaru-red);
 	}
@@ -236,7 +236,7 @@
 
 	.action-title {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.02em;
 		color: var(--fg-primary);
 	}

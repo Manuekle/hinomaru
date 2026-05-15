@@ -680,7 +680,7 @@
 	}
 	.cd-number {
 		font-size: 140px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		line-height: 1;
 		color: var(--ko-fg);
@@ -831,7 +831,7 @@
 	}
 	.big-pct {
 		font-size: 56px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.03em;
 		line-height: 1;
 		display: inline-flex;

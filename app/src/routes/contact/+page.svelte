@@ -295,7 +295,7 @@
 		box-shadow: 0 0 16px rgba(188, 0, 45, 0.5);
 	}
 	.brand-name {
-		font-weight: 800;
+		font-weight: 700;
 		font-size: 17px;
 		letter-spacing: -0.02em;
 	}
@@ -332,7 +332,7 @@
 		position: absolute;
 		font-family: var(--font-jp);
 		font-size: clamp(180px, 30vw, 280px);
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-primary);
 		opacity: 0.04;
 		line-height: 1;
@@ -362,7 +362,7 @@
 		color: var(--brand-primary);
 		border-radius: 999px;
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
 		margin-bottom: 24px;
@@ -371,7 +371,7 @@
 		position: relative;
 		z-index: 1;
 		font-size: clamp(40px, 8vw, 68px);
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		line-height: 1.05;
 		margin: 0 0 16px;
@@ -438,7 +438,7 @@
 	}
 	.info-label {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
 		opacity: 0.8;
@@ -446,7 +446,7 @@
 	}
 	.info-title {
 		font-size: 18px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		line-height: 1.3;
 		margin: 0 0 8px;
@@ -538,7 +538,7 @@
 	}
 	.form-head h2 {
 		font-size: 24px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.02em;
 		margin: 0 0 6px;
 		color: var(--fg-primary);
@@ -560,7 +560,7 @@
 	.field label {
 		display: block;
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: -0.04em;
 		color: var(--fg-secondary);
@@ -651,7 +651,7 @@
 	}
 	.success-title {
 		font-size: 26px;
-		font-weight: 800;
+		font-weight: 700;
 		margin: 0;
 		color: var(--fg-primary);
 		letter-spacing: -0.02em;

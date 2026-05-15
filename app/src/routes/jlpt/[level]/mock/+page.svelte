@@ -547,7 +547,7 @@
 	}
 	.intro-title {
 		font-size: 34px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--sumi);
 		margin: 0 0 6px;
 		letter-spacing: -0.02em;
@@ -645,7 +645,7 @@
 
 	.exam-label-pill {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 		padding: 4px 10px;
@@ -662,7 +662,7 @@
 	}
 	.step-curr {
 		font-size: 18px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--sumi);
 	}
 	.step-divider {
@@ -778,7 +778,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 14px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-secondary);
 		flex-shrink: 0;
 	}
@@ -847,7 +847,7 @@
 	}
 	.feedback-title {
 		font-size: 16px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 
 	/* ── RESULT SCREEN ── */
@@ -913,7 +913,7 @@
 	}
 	.score-big {
 		font-size: 52px;
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1;
 	}
 	.score-small {
@@ -924,7 +924,7 @@
 
 	.hero-main-title {
 		font-size: 26px;
-		font-weight: 800;
+		font-weight: 700;
 		margin: 0 0 8px;
 		letter-spacing: -0.02em;
 	}
@@ -967,7 +967,7 @@
 	}
 	.stat-v {
 		font-size: 14px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--sumi);
 	}
 	.stat-l {

@@ -94,7 +94,7 @@
 					? t('home.complete', $locale)
 					: t('home.learned', $locale, { a: deck.learned ?? 0, b: deck.card_count })}
 			</span>
-			<span style="font-size:13px;font-weight:800;color:var(--hinomaru-red);">{pct}%</span>
+			<span style="font-size:13px;font-weight: 700;color:var(--hinomaru-red);">{pct}%</span>
 		</div>
 	</div>
 

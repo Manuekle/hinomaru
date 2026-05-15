@@ -45,7 +45,7 @@
 	<div class="pulse-bg-circle"></div>
 
 	<div class="summary-inner">
-		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="summary-label" style="margin-bottom:16px; font-weight: 800;">
+		<div use:fadeUp={{ delay: 0.1, y: 8 }} class="summary-label" style="margin-bottom:16px; font-weight: 700;">
 			{t('summary.complete', $locale)}
 		</div>
 

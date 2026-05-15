@@ -726,7 +726,7 @@
 
 	.topic-eyebrow {
 		font-size: 9px;
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.78);
@@ -735,7 +735,7 @@
 
 	.topic-title {
 		font-size: 14px;
-		font-weight: 800;
+		font-weight: 700;
 		color: white;
 		white-space: nowrap;
 		overflow: hidden;
@@ -831,7 +831,7 @@
 
 	.preview-eyebrow {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		color: var(--fg-tertiary);
 		margin-bottom: 12px;
@@ -852,7 +852,7 @@
 
 	.preview-title {
 		font-size: 17px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-secondary);
 	}
 
@@ -1033,7 +1033,7 @@
 
 	.popover-type {
 		font-size: 9px;
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: -0.02em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
@@ -1055,7 +1055,7 @@
 		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 		font-family: inherit;
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 		cursor: pointer;
 	}
 
@@ -1070,7 +1070,7 @@
 
 	.xp-badge {
 		font-size: 9px;
-		font-weight: 800;
+		font-weight: 700;
 		background: rgba(255, 255, 255, 0.2);
 		padding: 2px 6px;
 		border-radius: 6px;
@@ -1152,7 +1152,7 @@
 	.vocab-jp-premium {
 		font-family: var(--font-jp);
 		font-size: 22px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1.1;
 	}
@@ -1166,7 +1166,7 @@
 
 	.vocab-kana-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-secondary);
 		background: var(--bg-muted);
 		padding: 2px 8px;

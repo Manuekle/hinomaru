@@ -84,7 +84,7 @@
 
 	.title {
 		font-size: var(--step-title, clamp(28px, 8vw, 38px));
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.05em;
 		line-height: 1.1;
 		margin: 0;
@@ -170,14 +170,14 @@
 
 	.node-time {
 		font-size: 14px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 		letter-spacing: -0.04em;
 	}
 
 	.node-title {
 		font-size: 18px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-primary);
 		letter-spacing: -0.04em;
 	}

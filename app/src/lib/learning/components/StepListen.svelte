@@ -183,7 +183,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -212,7 +212,7 @@
 
 	.play-hint {
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-secondary);
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
@@ -220,7 +220,7 @@
 
 	.result-jp {
 		font-size: 28px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-primary);
 		font-family: var(--font-jp);
 	}
@@ -282,7 +282,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 11px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
 	}
@@ -328,7 +328,7 @@
 	}
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 
 	:global(.result-jp .word-link) {

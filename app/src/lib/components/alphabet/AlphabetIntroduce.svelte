@@ -91,7 +91,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -110,7 +110,7 @@
 
 	.romaji-line {
 		font-size: clamp(20px, 5vw, 26px);
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 		letter-spacing: -0.04em;
 	}

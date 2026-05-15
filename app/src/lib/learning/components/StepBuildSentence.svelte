@@ -228,7 +228,7 @@
 
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -343,7 +343,7 @@
 	}
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 		flex: 1;
 	}
 	.audio-mini {

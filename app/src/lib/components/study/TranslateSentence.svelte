@@ -403,7 +403,7 @@
 	}
 	.prompt-tag {
 		font-size: 10px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--hinomaru-red);
@@ -505,7 +505,7 @@
 	}
 	.kb-label {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		letter-spacing: -0.04em;
 		text-transform: uppercase;
 		color: var(--fg-tertiary);
@@ -551,7 +551,7 @@
 	}
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 		flex: 1;
 	}
 	.audio-mini {

@@ -176,7 +176,7 @@
 
 	.section-title {
 		font-size: 13px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 		text-transform: uppercase;
 		letter-spacing: -0.04em;

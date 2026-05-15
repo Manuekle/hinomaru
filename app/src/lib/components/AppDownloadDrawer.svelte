@@ -104,7 +104,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 12px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 	.step-icon-ios {
 		width: 36px;

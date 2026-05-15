@@ -295,7 +295,7 @@
 
 	.word-big {
 		font-size: clamp(36px, 10vw, 56px);
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--fg-primary);
 		line-height: 1;
 		padding: 0 36px;
@@ -365,7 +365,7 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 11px;
-		font-weight: 900;
+		font-weight: 700;
 		color: var(--fg-tertiary);
 		flex-shrink: 0;
 	}
@@ -422,7 +422,7 @@
 
 	.fb-label {
 		font-size: 15px;
-		font-weight: 800;
+		font-weight: 700;
 	}
 
 	.example-hint {

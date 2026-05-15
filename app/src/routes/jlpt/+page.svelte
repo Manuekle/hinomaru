@@ -513,7 +513,7 @@
 
 	.row-icon-jp {
 		font-size: 11px;
-		font-weight: 800;
+		font-weight: 700;
 		color: var(--hinomaru-red);
 		background: var(--hinomaru-red-wash);
 		min-width: 28px;
