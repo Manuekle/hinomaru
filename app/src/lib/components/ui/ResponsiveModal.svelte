@@ -1,11 +1,13 @@
 <script lang="ts">
 	import * as Drawer from '$lib/components/ui/drawer';
 	import { fade, scale } from 'svelte/transition';
-	import { onMount, type Snippet } from 'svelte';
+	import { onMount, tick, type Snippet } from 'svelte';
 	import { cn } from '$lib/utils';
 	import { fadeUp } from '$lib/motion';
 	import Icon from '$lib/Icon.svelte';
 	import { Cancel01Icon } from '@hugeicons/core-free-icons';
+	import { t } from '$lib/i18n';
+	import { locale } from '$lib/stores/locale';
 
 	interface Props {
 		open: boolean;
@@ -35,6 +37,8 @@
 
 	let isMobile = $state(false);
 	let mounted = $state(false);
+	let modalEl = $state<HTMLDivElement | null>(null);
+	let prevFocus: HTMLElement | null = null;
 
 	onMount(() => {
 		mounted = true;
@@ -51,7 +55,54 @@
 			open = false;
 		}
 	}
+
+	function focusables(root: HTMLElement): HTMLElement[] {
+		const sel =
+			'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+		return Array.from(root.querySelectorAll<HTMLElement>(sel)).filter(
+			(el) => !el.hasAttribute('hidden') && el.offsetParent !== null
+		);
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (!open || !modalEl) return;
+		if (e.key === 'Escape' && dismissible) {
+			e.preventDefault();
+			open = false;
+			return;
+		}
+		if (e.key !== 'Tab') return;
+		const f = focusables(modalEl);
+		if (f.length === 0) return;
+		const first = f[0];
+		const last = f[f.length - 1];
+		const active = document.activeElement as HTMLElement | null;
+		if (e.shiftKey && active === first) {
+			e.preventDefault();
+			last.focus();
+		} else if (!e.shiftKey && active === last) {
+			e.preventDefault();
+			first.focus();
+		}
+	}
+
+	$effect(() => {
+		if (!mounted || isMobile) return;
+		if (open) {
+			prevFocus = document.activeElement as HTMLElement | null;
+			tick().then(() => {
+				if (!modalEl) return;
+				const f = focusables(modalEl);
+				(f[0] ?? modalEl).focus();
+			});
+		} else if (prevFocus) {
+			prevFocus.focus();
+			prevFocus = null;
+		}
+	});
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 {#if !mounted}
 	<!-- defer render until viewport class resolved to avoid modal→drawer flip -->
@@ -103,14 +154,22 @@
 		onclick={handleOverlayClick}
 		role="presentation"
 	>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
+			bind:this={modalEl}
 			class={cn('modal-content', contentClass)}
 			transition:scale={{ duration: 300, start: 0.95, opacity: 0 }}
 			onclick={(e) => e.stopPropagation()}
 			role="dialog"
 			aria-modal="true"
+			aria-label={title}
+			tabindex="-1"
 		>
-			<button class="modal-close-btn" onclick={() => (open = false)} aria-label="Cerrar">
+			<button
+				class="modal-close-btn"
+				onclick={() => (open = false)}
+				aria-label={t('common.close', $locale)}
+			>
 				<Icon icon={Cancel01Icon} size={20} color="currentColor" />
 			</button>
 

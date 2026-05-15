@@ -166,7 +166,10 @@
 </script>
 
 <svelte:head>
-	<title>{t('jlpt.title', $locale)} — Hinomaru</title>
+	<title>{t('seo.jlpt.title', $locale)}</title>
+	<meta name="description" content={t('seo.jlpt.description', $locale)} />
+	<meta property="og:title" content={t('seo.jlpt.title', $locale)} />
+	<meta property="og:description" content={t('seo.jlpt.description', $locale)} />
 </svelte:head>
 
 <div

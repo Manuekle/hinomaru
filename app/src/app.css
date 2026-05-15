@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/inter-tight';
+@import '@fontsource/noto-sans-jp/400.css';
+@import '@fontsource/noto-sans-jp/500.css';
+@import '@fontsource/noto-sans-jp/700.css';
 @import '@fontsource-variable/noto-sans';
 @import '@fontsource-variable/playfair-display';
 
@@ -53,7 +56,7 @@
 	--error-wash: var(--hinomaru-red-wash);
 	--fg-primary: var(--sumi);
 	--fg-secondary: var(--ink-500);
-	--fg-tertiary: var(--ink-400);
+	--fg-tertiary: var(--ink-500);
 	--fg-inverse: var(--washi);
 	--fg-accent: var(--hinomaru-red);
 	--bg-page: var(--paper);
@@ -284,7 +287,8 @@ body {
 }
 
 .hm-btn-sm {
-	height: 42px;
+	height: 44px;
+	min-width: 44px;
 	padding: 0 20px;
 	font-size: var(--fs-sm);
 	border-radius: 16px;
@@ -895,5 +899,58 @@ body {
 		margin-right: auto;
 		padding-left: 0;
 		padding-right: 0;
+	}
+}
+
+/* ── A11Y: visually-hidden but readable by screen readers ── */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ── A11Y: Global :focus-visible ── */
+:where(button, a, [role='button'], [role='link'], [role='menuitem'], [role='tab'], [role='option'], [role='switch'], [tabindex]:not([tabindex='-1']), input, select, textarea, summary):focus-visible {
+	outline: 2px solid var(--hinomaru-red, #BC002D);
+	outline-offset: 2px;
+	border-radius: 6px;
+}
+
+.hm-input:focus-visible {
+	outline: 2px solid var(--hinomaru-red);
+	outline-offset: 2px;
+}
+
+/* ── A11Y: Password toggle hit-area ── */
+.pw-toggle {
+	position: relative;
+	min-width: 44px;
+	min-height: 44px;
+}
+.pw-toggle::after {
+	content: '';
+	position: absolute;
+	inset: -8px;
+}
+
+/* ── A11Y: Reduced motion global ── */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+	.card-body.flipped,
+	.card-scene {
+		transform: none !important;
 	}
 }

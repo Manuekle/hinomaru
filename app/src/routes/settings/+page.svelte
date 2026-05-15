@@ -9,7 +9,7 @@
 		reminderHour
 	} from '$lib/stores/settings';
 	import { scheduleReminder, clearReminder } from '$lib/utils/reminders';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { svileo } from '$lib/stores/toast';
 	import { t } from '$lib/i18n';
 	import { fadeUp } from '$lib/motion';
@@ -35,7 +35,7 @@
 		JupiterIcon,
 		Delete02Icon,
 		BubbleChatIcon,
-		Mail01Icon,
+		Mailbox01Icon,
 		Logout03Icon
 	} from '@hugeicons/core-free-icons';
 	import type { PageData } from './$types';
@@ -86,6 +86,8 @@
 		'🍱'
 	];
 	let showEmojiPicker = $state(false);
+	let emojiActiveIndex = $state(0);
+	let emojiGridEl = $state<HTMLDivElement | null>(null);
 
 	async function setAvatar(emoji: string) {
 		if (!user) return;
@@ -100,9 +102,65 @@
 		showEmojiPicker = false;
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape' && showEmojiPicker) showEmojiPicker = false;
+	function focusEmojiOption(idx: number) {
+		const total = japaneseEmojis.length;
+		const next = ((idx % total) + total) % total;
+		emojiActiveIndex = next;
+		const btns = emojiGridEl?.querySelectorAll<HTMLButtonElement>('button.emoji-btn');
+		btns?.[next]?.focus();
 	}
+
+	function handleEmojiKeydown(e: KeyboardEvent) {
+		if (!showEmojiPicker) return;
+		const total = japaneseEmojis.length;
+		const cols = 4;
+		switch (e.key) {
+			case 'ArrowRight':
+				e.preventDefault();
+				focusEmojiOption(emojiActiveIndex + 1);
+				break;
+			case 'ArrowLeft':
+				e.preventDefault();
+				focusEmojiOption(emojiActiveIndex - 1);
+				break;
+			case 'ArrowDown':
+				e.preventDefault();
+				focusEmojiOption(emojiActiveIndex + cols);
+				break;
+			case 'ArrowUp':
+				e.preventDefault();
+				focusEmojiOption(emojiActiveIndex - cols);
+				break;
+			case 'Home':
+				e.preventDefault();
+				focusEmojiOption(0);
+				break;
+			case 'End':
+				e.preventDefault();
+				focusEmojiOption(total - 1);
+				break;
+			case 'Enter':
+			case ' ':
+				e.preventDefault();
+				setAvatar(japaneseEmojis[emojiActiveIndex]);
+				break;
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && showEmojiPicker) {
+			showEmojiPicker = false;
+			(document.querySelector('button.avatar') as HTMLButtonElement | null)?.focus();
+			return;
+		}
+		handleEmojiKeydown(e);
+	}
+
+	$effect(() => {
+		if (showEmojiPicker) {
+			tick().then(() => focusEmojiOption(0));
+		}
+	});
 
 	function handleOutsideClick(e: MouseEvent) {
 		const target = e.target as HTMLElement;
@@ -324,22 +382,28 @@
 					<div
 						class="emoji-picker-popover"
 						transition:fly={{ duration: 240, y: 12, opacity: 0 }}
-						role="menu"
 					>
-						<div class="emoji-picker-header">
+						<div class="emoji-picker-header" id="emoji-picker-header">
 							{t('settings.avatar', $locale)}
 						</div>
-						<div class="emoji-grid">
-							{#snippet emojiBtn(emoji: string)}
+						<div
+							class="emoji-grid"
+							bind:this={emojiGridEl}
+							role="listbox"
+							aria-labelledby="emoji-picker-header"
+							aria-activedescendant={`emoji-opt-${emojiActiveIndex}`}
+						>
+							{#each japaneseEmojis as emoji, i (emoji)}
 								<button
+									id={`emoji-opt-${i}`}
 									class="emoji-btn"
 									onclick={() => setAvatar(emoji)}
 									type="button"
+									role="option"
+									aria-selected={i === emojiActiveIndex}
+									tabindex={i === emojiActiveIndex ? 0 : -1}
 									aria-label={emoji}>{emoji}</button
 								>
-							{/snippet}
-							{#each japaneseEmojis as emoji (emoji)}
-								{@render emojiBtn(emoji)}
 							{/each}
 						</div>
 					</div>
@@ -355,7 +419,7 @@
 			<div class="card">
 					<a href="/admin/messages" class="pref-row">
 						<div class="pref-icon" style="background:var(--hinomaru-red-wash);color:var(--hinomaru-red);">
-							<Icon icon={Mail01Icon} size={18} color="currentColor" strokeWidth={1.8} />
+							<Icon icon={Mailbox01Icon} size={18} color="currentColor" strokeWidth={1.8} />
 						</div>
 						<div class="pref-text">
 							<span class="pref-title">Buzón</span>

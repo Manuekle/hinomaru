@@ -59,7 +59,10 @@
 </script>
 
 <svelte:head>
-	<title>{t('alphabet.title', $locale) || 'Alfabeto'} — Hinomaru</title>
+	<title>{t('seo.alphabet.title', $locale)}</title>
+	<meta name="description" content={t('seo.alphabet.description', $locale)} />
+	<meta property="og:title" content={t('seo.alphabet.title', $locale)} />
+	<meta property="og:description" content={t('seo.alphabet.description', $locale)} />
 </svelte:head>
 
 <div

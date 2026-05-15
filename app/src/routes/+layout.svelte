@@ -11,7 +11,7 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import PWASplash from '$lib/components/PWASplash.svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
-	import DockBar from '$lib/components/DockBar.svelte';
+	import type { Component } from 'svelte';
 	import { inject } from '@vercel/analytics';
 	import { dev } from '$app/environment';
 	import { Toaster } from 'svileo';
@@ -33,6 +33,25 @@
 
 	let booting = $state(data.isPWA ?? false);
 	let isPWA = $state(false);
+	let DockBar = $state<Component | null>(null);
+
+	const DOCK_PATHS = new Set([
+		'/',
+		'/alphabet',
+		'/vocabulary',
+		'/deck/stories',
+		'/deck/songs',
+		'/conversation',
+		'/jlpt'
+	]);
+
+	$effect(() => {
+		if (data.session && !booting && DOCK_PATHS.has($page.url.pathname) && !DockBar) {
+			import('$lib/components/DockBar.svelte').then((m) => {
+				DockBar = m.default;
+			});
+		}
+	});
 
 	onMount(() => {
 		inject({ mode: dev ? 'development' : 'production' });
@@ -43,6 +62,12 @@
 		const isAndroid = /Android/.test(ua);
 		document.documentElement.classList.toggle('is-ios', isIOS);
 		document.documentElement.classList.toggle('is-android', isAndroid);
+
+		// Prevent edge-swipe back navigation on iOS (left-edge touch).
+		const edgeSwipe = (e: TouchEvent) => {
+			if (e.touches[0] && e.touches[0].clientX < 25) e.preventDefault();
+		};
+		document.addEventListener('touchstart', edgeSwipe, { passive: false });
 
 		// Detect PWA mode first, set booting state before revealing body
 		const nav = window.navigator as Navigator & { standalone?: boolean };
@@ -111,6 +136,7 @@
 			subscription.unsubscribe();
 			clearTimeout(timer);
 			clearReminder();
+			document.removeEventListener('touchstart', edgeSwipe);
 		};
 	});
 
@@ -134,20 +160,53 @@
 	<meta property="og:url" content="https://hinomaru.app{$page.url.pathname}" />
 	<meta property="og:title" content={t('seo.title', $locale)} />
 	<meta property="og:description" content={t('seo.description', $locale)} />
-	<meta property="og:image" content="https://hinomaru.app/landing_hero.png" />
+	<meta property="og:image" content="https://hinomaru.app/landing/hero_es_light.webp" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:type" content="image/webp" />
+	<meta property="og:image:alt" content={t('seo.title', $locale)} />
+	<meta property="og:locale" content={$locale === 'en' ? 'en_US' : 'es_ES'} />
+	<meta property="og:locale:alternate" content={$locale === 'en' ? 'es_ES' : 'en_US'} />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
 	<meta property="twitter:url" content="https://hinomaru.app{$page.url.pathname}" />
 	<meta property="twitter:title" content={t('seo.title', $locale)} />
 	<meta property="twitter:description" content={t('seo.description', $locale)} />
-	<meta property="twitter:image" content="https://hinomaru.app/landing_hero.png" />
+	<meta property="twitter:image" content="https://hinomaru.app/landing/hero_es_light.webp" />
+	<meta property="twitter:image:alt" content={t('seo.title', $locale)} />
+
+	<!-- hreflang: same URL serves both locales via cookie + Accept-Language negotiation -->
+	<link rel="alternate" hreflang="x-default" href="https://hinomaru.app{$page.url.pathname}" />
+
+	<!-- JSON-LD: EducationalApplication -->
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'EducationalApplication',
+		name: 'Hinomaru',
+		alternateName: 'Hinomaru Japanese',
+		description: t('seo.description', $locale),
+		url: 'https://hinomaru.app',
+		applicationCategory: 'EducationApplication',
+		operatingSystem: 'Web, iOS, Android',
+		inLanguage: ['es', 'en', 'ja'],
+		educationalUse: 'Self-study',
+		teaches: 'Japanese language (JLPT N5–N1)',
+		offers: {
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'USD'
+		}
+	})}</` + `script>`}
 
 	{#if pwaInfo}
 		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html pwaInfo.webManifest.linkTag}
 	{/if}
 </svelte:head>
+
+<a href="#main-content" class="skip-link">{t('a11y.skipToContent', $locale)}</a>
 
 <div class="app-container" use:swipeBack>
 	<Toaster
@@ -158,9 +217,12 @@
 			autopilot: true,
 		}}
 	/>
-	{@render children()}
-	{#if data.session && !booting && new Set(['/', '/alphabet', '/vocabulary', '/deck/stories', '/deck/songs', '/conversation', '/jlpt']).has($page.url.pathname)}
-		<DockBar />
+	<main id="main-content" tabindex="-1">
+		{@render children()}
+	</main>
+	{#if data.session && !booting && DockBar && DOCK_PATHS.has($page.url.pathname)}
+		{@const Dock = DockBar}
+		<Dock />
 	{/if}
 	{#if !data.session && !booting && $page.url.pathname === '/'}
 		<InstallPrompt />
@@ -169,4 +231,31 @@
 </div>
 
 <style>
+	.skip-link {
+		position: fixed;
+		inset-inline-start: -9999px;
+		top: 0;
+		z-index: 100000;
+		padding: 12px 20px;
+		background: var(--ink, #1a1a1a);
+		color: var(--paper, #f7f5f2);
+		font-family: var(--font-ui, system-ui);
+		font-weight: 700;
+		font-size: 15px;
+		border-radius: 0 0 12px 0;
+		text-decoration: none;
+		transition: inset-inline-start 0.15s ease;
+	}
+	.skip-link:focus,
+	.skip-link:focus-visible {
+		inset-inline-start: 0;
+		outline: 2px solid var(--hinomaru-red, #BC002D);
+		outline-offset: 2px;
+	}
+	main#main-content {
+		display: contents;
+	}
+	main#main-content:focus {
+		outline: none;
+	}
 </style>

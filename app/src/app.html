@@ -4,7 +4,7 @@
 		<meta charset="utf-8" />
 		<meta
 			name="viewport"
-			content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
 		/>
 		<meta name="theme-color" content="#BC002D" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -13,41 +13,22 @@
 		<meta name="mobile-web-app-capable" content="yes" />
 
 		<script>
+			// FOUC prevention only — must run sync before paint.
 			(function () {
 				try {
-					var theme = localStorage.getItem('hm-theme') || 'system';
-					var isDark =
-						theme === 'dark' ||
-						(theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-					if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+					var t = localStorage.getItem('hm-theme') || 'system';
+					if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) {
+						document.documentElement.setAttribute('data-theme', 'dark');
+					}
 				} catch (e) {}
 			})();
-		</script>
-		<script>
-			document.addEventListener(
-				'touchstart',
-				function (e) {
-					if (e.touches[0].clientX < 25) {
-						e.preventDefault();
-					}
-				},
-				{ passive: false }
-			);
 		</script>
 
 		<!-- Favicons -->
 		<link rel="icon" type="image/png" href="/favicon.png" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
-			rel="stylesheet"
-		/>
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
-	</body>
+	<body data-sveltekit-preload-data="hover">%sveltekit.body%</body>
 </html>

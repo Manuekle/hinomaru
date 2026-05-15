@@ -204,9 +204,23 @@
 								src={getFeatureImg('hero', $locale, isDark)}
 								alt="Hinomaru App"
 								class="app-screenshot"
+								width="390"
+								height="844"
+								loading="eager"
+								fetchpriority="high"
+								decoding="async"
 							/>
 						</div>
-						<img src="/mockups/iphone16pro_frame.png" alt="iPhone 16 Pro" class="device-frame" />
+						<img
+							src="/mockups/iphone16pro_frame.png"
+							alt=""
+							role="presentation"
+							class="device-frame"
+							width="430"
+							height="932"
+							loading="eager"
+							decoding="async"
+						/>
 					</div>
 				</div>
 				<div class="hero-float-card left" use:fadeUp={{ delay: 0.6, y: 20 }}>
@@ -358,12 +372,21 @@
 										src={getFeatureImg(feature.id, $locale, isDark)}
 										alt={feature.title}
 										class="app-screenshot"
+										width="390"
+										height="844"
+										loading="lazy"
+										decoding="async"
 									/>
 								</div>
 								<img
 									src="/mockups/iphone16pro_frame.png"
-									alt="iPhone 16 Pro"
+									alt=""
+									role="presentation"
 									class="device-frame"
+									width="430"
+									height="932"
+									loading="lazy"
+									decoding="async"
 								/>
 							</div>
 						</div>

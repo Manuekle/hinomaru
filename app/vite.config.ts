@@ -10,29 +10,57 @@ export default defineConfig({
 		SvelteKitPWA({
 			registerType: 'autoUpdate',
 			manifest: {
+				id: '/',
 				name: 'Hinomaru Japanese',
 				short_name: 'Hinomaru',
-				description: 'Master Japanese with Hinomaru',
+				description: 'Master Japanese with Hinomaru — JLPT N5 to N1',
+				lang: 'es',
+				dir: 'ltr',
 				theme_color: '#BC002D',
 				background_color: '#f7f5f2',
 				display: 'standalone',
+				orientation: 'portrait',
 				start_url: '/?pwa=1',
+				scope: '/',
+				categories: ['education', 'productivity', 'books'],
 				icons: [
 					{
 						src: 'icon-192.png',
 						sizes: '192x192',
-						type: 'image/png'
+						type: 'image/png',
+						purpose: 'any'
 					},
 					{
 						src: 'icon-512.png',
 						sizes: '512x512',
-						type: 'image/png'
+						type: 'image/png',
+						purpose: 'any'
 					},
 					{
 						src: 'icon-512.png',
 						sizes: '512x512',
 						type: 'image/png',
 						purpose: 'maskable'
+					}
+				],
+				shortcuts: [
+					{
+						name: 'Repasar hoy',
+						short_name: 'Repasar',
+						url: '/?action=review',
+						icons: [{ src: 'icon-192.png', sizes: '192x192' }]
+					},
+					{
+						name: 'Alfabeto',
+						short_name: 'Kana',
+						url: '/alphabet',
+						icons: [{ src: 'icon-192.png', sizes: '192x192' }]
+					},
+					{
+						name: 'JLPT',
+						short_name: 'JLPT',
+						url: '/jlpt',
+						icons: [{ src: 'icon-192.png', sizes: '192x192' }]
 					}
 				]
 			}

@@ -27,7 +27,10 @@
 </script>
 
 <svelte:head>
-	<title>{t('contact.title', $locale)} | Hinomaru</title>
+	<title>{t('seo.contact.title', $locale)}</title>
+	<meta name="description" content={t('seo.contact.description', $locale)} />
+	<meta property="og:title" content={t('seo.contact.title', $locale)} />
+	<meta property="og:description" content={t('seo.contact.description', $locale)} />
 </svelte:head>
 
 <div class="legal-page">
@@ -165,7 +168,7 @@
 							}}
 						>
 							{#if form?.error}
-								<div class="form-error">
+								<div class="form-error" role="alert" aria-live="assertive">
 									{t(form.error, $locale)}
 								</div>
 							{/if}
@@ -178,6 +181,7 @@
 										id="name"
 										name="name"
 										required
+										autocomplete="name"
 										placeholder={t('contact.placeholder.name', $locale)}
 										class="form-input"
 									/>
@@ -190,6 +194,7 @@
 										id="email"
 										name="email"
 										required
+										autocomplete="email"
 										placeholder={t('contact.placeholder.email', $locale)}
 										class="form-input"
 									/>
@@ -203,6 +208,7 @@
 									name="message"
 									required
 									rows="5"
+									autocomplete="off"
 									placeholder={t('contact.placeholder.message', $locale)}
 									class="form-input form-textarea"
 								></textarea>
@@ -211,10 +217,12 @@
 							<button
 								type="submit"
 								disabled={loading}
+								aria-busy={loading}
 								class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg submit-btn"
 							>
 								{#if loading}
 									<DotLoader color="white" />
+									<span class="sr-only">{t('auth.loading', $locale)}</span>
 								{:else}
 									<Icon icon={MailSend01Icon} size={18} color="currentColor" strokeWidth={1.8} />
 									<span>{t('contact.send', $locale)}</span>

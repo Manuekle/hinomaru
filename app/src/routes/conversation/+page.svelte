@@ -15,7 +15,10 @@
 </script>
 
 <svelte:head>
-	<title>Conversaciones — Hinomaru</title>
+	<title>{t('seo.conversation.title', $locale)}</title>
+	<meta name="description" content={t('seo.conversation.description', $locale)} />
+	<meta property="og:title" content={t('seo.conversation.title', $locale)} />
+	<meta property="og:description" content={t('seo.conversation.description', $locale)} />
 </svelte:head>
 
 <div

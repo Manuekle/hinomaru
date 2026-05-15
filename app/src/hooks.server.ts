@@ -36,9 +36,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return sessionUserCache;
 	};
 
+	const cookieLocale = event.cookies.get('hm-locale') as 'es' | 'en' | undefined;
+	let locale: 'es' | 'en' = cookieLocale ?? 'es';
+	if (!cookieLocale) {
+		const accept = event.request.headers.get('accept-language') ?? '';
+		const langs = accept
+			.split(',')
+			.map((l) => l.split(';')[0].trim().toLowerCase().slice(0, 2));
+		if (langs.includes('en') && !langs.includes('es')) locale = 'en';
+	}
+
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range' || name === 'x-supabase-api-version';
-		}
+		},
+		transformPageChunk: ({ html }) => html.replace('<html lang="es"', `<html lang="${locale}"`)
 	});
 };

@@ -8,6 +8,9 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.magic.subtitle': 'Receive a magic link in your email to sign in without a password.',
 		'auth.email': 'Email',
 		'auth.password': 'Password',
+		'auth.showPassword': 'Show password',
+		'auth.hidePassword': 'Hide password',
+		'auth.loading': 'Loading…',
 		'auth.confirmPassword': 'Confirm password',
 		'auth.confirmPassword.placeholder': 'Repeat your password',
 		'auth.signin': 'Sign in',
@@ -177,6 +180,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'exam.start_now': 'Start',
 		'exam.back_to_levels': 'Back to levels',
 		'common.cancel': 'Cancel',
+		'common.close': 'Close',
+		'a11y.skipToContent': 'Skip to main content',
 		'exam.type.multiple_choice': 'Multiple choice',
 		'exam.type.type_answer': 'Type',
 		'exam.type.context': 'Context',
@@ -193,6 +198,13 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.showRomaji': 'Show Romaji',
 		'settings.preferences': 'Preferences',
 		'settings.signout.desc': 'Sign out of your account securely',
+		
+		'admin.messages.title': 'Messages',
+		'admin.messages.back': '← Settings',
+		'admin.messages.empty': 'No messages received',
+		'admin.messages.copied': 'Copied',
+		'admin.messages.copyEmail': 'Copy email',
+		'admin.messages.reply': 'Reply',
 
 		'pwa.install.title': 'Install Hinomaru',
 		'pwa.install.desc': 'Study offline and with a better experience.',
@@ -321,6 +333,30 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'seo.title': 'Hinomaru Japanese — Master Kanji, Grammar & Vocabulary',
 		'seo.description':
 			'Master Japanese with Hinomaru. The premium, minimalist tool for JLPT N5-N1. Smart SRS reviews, handwriting practice, and dynamic quizzes.',
+		'seo.alphabet.title': 'Hiragana & Katakana Chart — Hinomaru',
+		'seo.alphabet.description':
+			'Interactive Japanese kana chart. Learn hiragana, katakana and dakuten with stroke order, audio and quizzes.',
+		'seo.vocabulary.title': 'Japanese Vocabulary — Hinomaru',
+		'seo.vocabulary.description':
+			'Browse curated JLPT vocabulary lists with SRS reviews, audio and example sentences.',
+		'seo.jlpt.title': 'JLPT N5–N1 Practice — Hinomaru',
+		'seo.jlpt.description':
+			'Practice every JLPT level with timed exams, vocab and grammar — Hinomaru.',
+		'seo.conversation.title': 'Japanese Conversation — Hinomaru',
+		'seo.conversation.description':
+			'Practice natural Japanese conversations across daily-life scenarios with audio and translation.',
+		'seo.stories.title': 'Japanese Stories — Hinomaru',
+		'seo.stories.description':
+			'Read short Japanese stories with translation, audio and vocabulary lookup.',
+		'seo.songs.title': 'Japanese Songs — Hinomaru',
+		'seo.songs.description':
+			'Learn Japanese through songs with synced lyrics and translations.',
+		'seo.login.title': 'Sign in — Hinomaru',
+		'seo.login.description':
+			'Sign in or create an account to save your Japanese learning progress.',
+		'seo.contact.title': 'Contact — Hinomaru',
+		'seo.contact.description':
+			'Reach out to Hinomaru. Suggestions, feedback or support.',
 		'support.title': 'Support Hinomaru',
 		'support.desc':
 			'Hinomaru is a solo project built with love. Your support helps keep the servers running and new features coming.',
@@ -597,6 +633,9 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'auth.magic.subtitle': 'Recibe un enlace mágico en tu correo para entrar sin contraseña.',
 		'auth.email': 'Correo',
 		'auth.password': 'Contraseña',
+		'auth.showPassword': 'Mostrar contraseña',
+		'auth.hidePassword': 'Ocultar contraseña',
+		'auth.loading': 'Cargando…',
 		'auth.confirmPassword': 'Confirmar contraseña',
 		'auth.confirmPassword.placeholder': 'Repite tu contraseña',
 		'auth.signin': 'Entrar',
@@ -766,6 +805,8 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'exam.start_now': 'Empezar',
 		'exam.back_to_levels': 'Volver a niveles',
 		'common.cancel': 'Cancelar',
+		'common.close': 'Cerrar',
+		'a11y.skipToContent': 'Saltar al contenido principal',
 		'exam.type.multiple_choice': 'Opción múltiple',
 		'exam.type.type_answer': 'Escribir',
 		'exam.type.context': 'Contexto',
@@ -782,6 +823,13 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'settings.showRomaji': 'Mostrar Romaji',
 		'settings.preferences': 'Preferencias',
 		'settings.signout.desc': 'Cerrar la sesión de forma segura',
+
+		'admin.messages.title': 'Mensajes',
+		'admin.messages.back': '← Ajustes',
+		'admin.messages.empty': 'No hay mensajes recibidos',
+		'admin.messages.copied': 'Copiado',
+		'admin.messages.copyEmail': 'Copiar email',
+		'admin.messages.reply': 'Responder',
 
 		'pwa.install.title': 'Instalar Hinomaru',
 		'pwa.install.desc': 'Estudia sin conexión y con una mejor experiencia.',
@@ -871,6 +919,30 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'seo.title': 'Hinomaru Japanese — Domina el Kanji, la Gramática y el Vocabulario',
 		'seo.description':
 			'Domina el japonés con Hinomaru. La herramienta minimalista premium para JLPT N5-N1. Repasos SRS inteligentes, práctica de escritura y cuestionarios dinámicos.',
+		'seo.alphabet.title': 'Hiragana y Katakana — Hinomaru',
+		'seo.alphabet.description':
+			'Tabla interactiva de kana japonés. Aprende hiragana, katakana y dakuten con orden de trazo, audio y cuestionarios.',
+		'seo.vocabulary.title': 'Vocabulario Japonés — Hinomaru',
+		'seo.vocabulary.description':
+			'Listas de vocabulario JLPT con repasos SRS, audio y frases de ejemplo.',
+		'seo.jlpt.title': 'Práctica JLPT N5–N1 — Hinomaru',
+		'seo.jlpt.description':
+			'Practica todos los niveles JLPT con exámenes cronometrados, vocabulario y gramática — Hinomaru.',
+		'seo.conversation.title': 'Conversación Japonés — Hinomaru',
+		'seo.conversation.description':
+			'Practica conversaciones naturales en japonés sobre situaciones cotidianas con audio y traducción.',
+		'seo.stories.title': 'Historias Japonesas — Hinomaru',
+		'seo.stories.description':
+			'Lee historias cortas en japonés con traducción, audio y consulta de vocabulario.',
+		'seo.songs.title': 'Canciones Japonesas — Hinomaru',
+		'seo.songs.description':
+			'Aprende japonés con canciones, letras sincronizadas y traducciones.',
+		'seo.login.title': 'Iniciar sesión — Hinomaru',
+		'seo.login.description':
+			'Inicia sesión o crea una cuenta para guardar tu progreso aprendiendo japonés.',
+		'seo.contact.title': 'Contacto — Hinomaru',
+		'seo.contact.description':
+			'Contacta con Hinomaru. Sugerencias, comentarios o soporte.',
 		'support.title': 'Apoya Hinomaru',
 		'support.desc':
 			'Hinomaru es un proyecto personal creado con amor. Tu apoyo ayuda a mantener los servidores y a desarrollar nuevas funciones.',

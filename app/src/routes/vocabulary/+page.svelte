@@ -136,7 +136,10 @@
 </script>
 
 <svelte:head>
-	<title>{t('nav.vocabulary', $locale) || 'Mi Vocabulario'} — Hinomaru</title>
+	<title>{t('seo.vocabulary.title', $locale)}</title>
+	<meta name="description" content={t('seo.vocabulary.description', $locale)} />
+	<meta property="og:title" content={t('seo.vocabulary.title', $locale)} />
+	<meta property="og:description" content={t('seo.vocabulary.description', $locale)} />
 </svelte:head>
 
 <div class="vocab-layout">

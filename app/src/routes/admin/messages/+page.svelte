@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { fadeUp } from '$lib/motion';
 	import { fly, fade } from 'svelte/transition';
+	import { locale } from '$lib/stores/locale';
+	import { t } from '$lib/i18n';
 	import type { PageData } from './$types';
 	import Icon from '$lib/Icon.svelte';
 	import {
-		Mail01Icon,
+		Mailbox01Icon,
 		Copy01Icon,
 		ArrowRight01Icon,
 		CheckmarkCircle02Icon,
@@ -50,25 +52,25 @@
 </script>
 
 <svelte:head>
-	<title>Mensajes · Administración</title>
+	<title>{t('admin.messages.title', $locale)} · Administración</title>
 </svelte:head>
 
 <div class="settings-page">
 	<div use:fadeUp={{ delay: 0, y: 10 }}>
-		<a href="/settings" class="back-link">← Ajustes</a>
+		<a href="/settings" class="back-link">{t('admin.messages.back', $locale)}</a>
 	</div>
 
 	<h1 use:fadeUp={{ delay: 0.05, y: 14 }} class="page-title">
-		Mensajes
+		{t('admin.messages.title', $locale)}
 	</h1>
 
 	<div use:fadeUp={{ delay: 0.1, y: 16 }} class="sections">
 		{#if messages.length === 0}
 			<div class="empty-state" in:fade>
 				<div class="empty-icon">
-					<Icon icon={Mail01Icon} size={32} color="var(--fg-tertiary)" />
+					<Icon icon={Mailbox01Icon} size={32} color="var(--fg-tertiary)" />
 				</div>
-				<p>No hay mensajes recibidos</p>
+				<p>{t('admin.messages.empty', $locale)}</p>
 			</div>
 		{:else}
 			{#each messages as msg, i (msg.id)}
@@ -103,11 +105,11 @@
 							<div class="message-actions">
 								<button class="hm-btn hm-btn-sm hm-btn-secondary" onclick={() => copyEmail(msg.email, msg.id)}>
 									<Icon icon={copiedId === msg.id ? CheckmarkCircle02Icon : Copy01Icon} size={16} color="currentColor" />
-									{copiedId === msg.id ? 'Copiado' : 'Copiar email'}
+									{copiedId === msg.id ? t('admin.messages.copied', $locale) : t('admin.messages.copyEmail', $locale)}
 								</button>
 								<a href="mailto:{msg.email}" class="hm-btn hm-btn-sm hm-btn-primary">
 									<Icon icon={SentIcon} size={16} color="currentColor" />
-									Responder
+									{t('admin.messages.reply', $locale)}
 								</a>
 							</div>
 						</div>

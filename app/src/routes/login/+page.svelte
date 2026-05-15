@@ -277,6 +277,9 @@
 
 <svelte:head>
 	<title>{pageTitle}</title>
+	<meta name="description" content={t('seo.login.description', $locale)} />
+	<meta property="og:title" content={t('seo.login.title', $locale)} />
+	<meta property="og:description" content={t('seo.login.description', $locale)} />
 </svelte:head>
 
 <div class="login-layout" class:welcome={mode === 'welcome'}>
@@ -397,11 +400,14 @@
 			<div bind:this={formEl} class="auth-card">
 				<!-- Tabs -->
 				{#if mode === 'signin' || mode === 'signup'}
-					<div class="tab-row">
+					<div class="tab-row" role="tablist" aria-label={t('auth.signin', $locale)}>
 						<button
 							class="tab-btn"
 							class:active={mode === 'signin'}
 							type="button"
+							role="tab"
+							aria-selected={mode === 'signin'}
+							tabindex={mode === 'signin' ? 0 : -1}
 							onclick={() => toggleMode('signin')}
 						>
 							{t('auth.signin', $locale)}
@@ -410,6 +416,9 @@
 							class="tab-btn"
 							class:active={mode === 'signup'}
 							type="button"
+							role="tab"
+							aria-selected={mode === 'signup'}
+							tabindex={mode === 'signup' ? 0 : -1}
 							onclick={() => toggleMode('signup')}
 						>
 							{t('auth.signup', $locale)}
@@ -419,25 +428,29 @@
 
 				<form onsubmit={handleSubmit} class="auth-form">
 					{#if globalError}
-						<div class="global-error">
-							<span class="error-icon">⚠</span>
+						<div class="global-error" role="alert" aria-live="assertive">
+							<span class="error-icon" aria-hidden="true">⚠</span>
 							{globalError}
 						</div>
 					{/if}
 
 					<!-- Email -->
 					<div class="field">
-						<div class="label-meta">{t('auth.email', $locale)}</div>
+						<label for="login-email" class="label-meta">{t('auth.email', $locale)}</label>
 						<input
+							id="login-email"
 							type="email"
 							bind:value={email}
 							placeholder="tu@correo.com"
 							class="hm-input"
 							class:input-error={fieldErrors.email}
 							autocomplete="email"
+							required
+							aria-invalid={fieldErrors.email ? 'true' : undefined}
+							aria-describedby={fieldErrors.email ? 'login-email-err' : undefined}
 						/>
 						{#if fieldErrors.email}
-							<div class="field-error">
+							<div id="login-email-err" class="field-error" role="alert">
 								<svg
 									width="12"
 									height="12"
@@ -445,6 +458,7 @@
 									fill="none"
 									stroke="currentColor"
 									stroke-width="3"
+									aria-hidden="true"
 								>
 									<circle cx="12" cy="12" r="10"></circle>
 									<line x1="12" y1="8" x2="12" y2="12"></line>
@@ -458,21 +472,26 @@
 					<!-- Password -->
 					{#if mode === 'signin' || mode === 'signup'}
 						<div class="field">
-							<div class="label-meta">{t('auth.password', $locale)}</div>
+							<label for="login-password" class="label-meta">{t('auth.password', $locale)}</label>
 							<div class="pw-wrap">
 								<input
+									id="login-password"
 									type={showPassword ? 'text' : 'password'}
 									bind:value={password}
 									placeholder="••••••••"
 									class="hm-input"
 									class:input-error={fieldErrors.password}
 									autocomplete={mode === 'signin' ? 'current-password' : 'new-password'}
+									required
+									aria-invalid={fieldErrors.password ? 'true' : undefined}
+									aria-describedby={fieldErrors.password ? 'login-password-err' : undefined}
 								/>
 								<button
 									type="button"
 									class="pw-toggle"
 									onclick={() => (showPassword = !showPassword)}
-									aria-label="Toggle Password"
+									aria-label={showPassword ? t('auth.hidePassword', $locale) : t('auth.showPassword', $locale)}
+									aria-pressed={showPassword}
 								>
 									{#if showPassword}
 										<svg
@@ -504,7 +523,7 @@
 								</button>
 							</div>
 							{#if fieldErrors.password}
-								<div class="field-error">
+								<div id="login-password-err" class="field-error" role="alert">
 									<svg
 										width="12"
 										height="12"
@@ -512,6 +531,7 @@
 										fill="none"
 										stroke="currentColor"
 										stroke-width="3"
+										aria-hidden="true"
 									>
 										<circle cx="12" cy="12" r="10"></circle>
 										<line x1="12" y1="8" x2="12" y2="12"></line>
@@ -526,23 +546,28 @@
 					<!-- Confirm Password (Signup) -->
 					{#if mode === 'signup'}
 						<div class="field">
-							<div class="label-meta">
+							<label for="login-confirm" class="label-meta">
 								{t('auth.confirmPassword', $locale)}
-							</div>
+							</label>
 							<div class="pw-wrap">
 								<input
+									id="login-confirm"
 									type={showConfirm ? 'text' : 'password'}
 									bind:value={confirm}
 									placeholder="••••••••"
 									class="hm-input"
 									class:input-error={fieldErrors.confirm}
 									autocomplete="new-password"
+									required
+									aria-invalid={fieldErrors.confirm ? 'true' : undefined}
+									aria-describedby={fieldErrors.confirm ? 'login-confirm-err' : undefined}
 								/>
 								<button
 									type="button"
 									class="pw-toggle"
 									onclick={() => (showConfirm = !showConfirm)}
-									aria-label="Toggle Confirm Password"
+									aria-label={showConfirm ? t('auth.hidePassword', $locale) : t('auth.showPassword', $locale)}
+									aria-pressed={showConfirm}
 								>
 									{#if showConfirm}
 										<svg
@@ -574,7 +599,7 @@
 								</button>
 							</div>
 							{#if fieldErrors.confirm}
-								<div class="field-error">
+								<div id="login-confirm-err" class="field-error" role="alert">
 									<svg
 										width="12"
 										height="12"
@@ -582,6 +607,7 @@
 										fill="none"
 										stroke="currentColor"
 										stroke-width="3"
+										aria-hidden="true"
 									>
 										<circle cx="12" cy="12" r="10"></circle>
 										<line x1="12" y1="8" x2="12" y2="12"></line>
@@ -606,9 +632,11 @@
 						type="submit"
 						class="hm-btn hm-btn-primary hm-btn-full hm-btn-lg"
 						disabled={loading}
+						aria-busy={loading}
 					>
 						{#if loading}
-							<ButtonLoader size={24} />
+							<ButtonLoader size={24} aria-hidden="true" />
+							<span class="sr-only">{t('auth.loading', $locale)}</span>
 						{:else if mode === 'signin'}
 							{t('auth.signin', $locale)}
 						{:else if mode === 'signup'}
