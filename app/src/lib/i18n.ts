@@ -332,7 +332,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'privacy.s5.title': '5. Your Rights',
 		'privacy.s5.desc':
 			'You have the right to access, update, or delete your personal information at any time through your account settings.',
-		'seo.title': 'Hinomaru Japanese — Master Kanji, Grammar & Vocabulary',
+		'seo.title': 'Hinomaru — Learn Japanese: Kanji, Kana & JLPT N5–N1',
 		'seo.description':
 			'Master Japanese with Hinomaru. The premium, minimalist tool for JLPT N5-N1. Smart SRS reviews, handwriting practice, and dynamic quizzes.',
 		'seo.alphabet.title': 'Hiragana & Katakana Chart — Hinomaru',
@@ -920,7 +920,7 @@ const STRINGS: Record<Locale, Record<string, string>> = {
 		'privacy.s5.title': '5. Tus Derechos',
 		'privacy.s5.desc':
 			'Tienes derecho a acceder, actualizar o eliminar tu información personal en cualquier momento a través de la configuración de tu cuenta.',
-		'seo.title': 'Hinomaru Japanese — Domina el Kanji, la Gramática y el Vocabulario',
+		'seo.title': 'Hinomaru — Aprende Japonés: Kanji, Kana y JLPT N5–N1',
 		'seo.description':
 			'Domina el japonés con Hinomaru. La herramienta minimalista premium para JLPT N5-N1. Repasos SRS inteligentes, práctica de escritura y cuestionarios dinámicos.',
 		'seo.alphabet.title': 'Hiragana y Katakana — Hinomaru',

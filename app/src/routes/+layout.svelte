@@ -153,14 +153,16 @@
 <svelte:head>
 	<title>{t('seo.title', $locale)}</title>
 	<meta name="description" content={t('seo.description', $locale)} />
-	<link rel="canonical" href="https://hinomaru.app{$page.url.pathname}" />
+	<link rel="canonical" href="{$page.url.origin}{$page.url.pathname}" />
 
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://hinomaru.app{$page.url.pathname}" />
+	<meta property="og:site_name" content="Hinomaru" />
+	<meta property="og:url" content="{$page.url.origin}{$page.url.pathname}" />
 	<meta property="og:title" content={t('seo.title', $locale)} />
 	<meta property="og:description" content={t('seo.description', $locale)} />
-	<meta property="og:image" content="https://hinomaru.app/og-image.png" />
+	<meta property="og:image" content="{$page.url.origin}/og-image.png" />
+	<meta property="og:image:secure_url" content="{$page.url.origin}/og-image.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
 	<meta property="og:image:type" content="image/png" />
@@ -169,15 +171,15 @@
 	<meta property="og:locale:alternate" content={$locale === 'en' ? 'es_ES' : 'en_US'} />
 
 	<!-- Twitter -->
-	<meta property="twitter:card" content="summary_large_image" />
-	<meta property="twitter:url" content="https://hinomaru.app{$page.url.pathname}" />
-	<meta property="twitter:title" content={t('seo.title', $locale)} />
-	<meta property="twitter:description" content={t('seo.description', $locale)} />
-	<meta property="twitter:image" content="https://hinomaru.app/og-image.png" />
-	<meta property="twitter:image:alt" content={t('seo.title', $locale)} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:url" content="{$page.url.origin}{$page.url.pathname}" />
+	<meta name="twitter:title" content={t('seo.title', $locale)} />
+	<meta name="twitter:description" content={t('seo.description', $locale)} />
+	<meta name="twitter:image" content="{$page.url.origin}/og-image.png" />
+	<meta name="twitter:image:alt" content={t('seo.title', $locale)} />
 
 	<!-- hreflang: same URL serves both locales via cookie + Accept-Language negotiation -->
-	<link rel="alternate" hreflang="x-default" href="https://hinomaru.app{$page.url.pathname}" />
+	<link rel="alternate" hreflang="x-default" href="{$page.url.origin}{$page.url.pathname}" />
 
 	<!-- JSON-LD: EducationalApplication -->
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
