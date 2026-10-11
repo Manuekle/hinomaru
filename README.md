@@ -22,6 +22,8 @@ app/                 raíz del proyecto en Vercel (Root Directory = app)
 
 Sitio estático: HTML, CSS y un JS pequeño, sin build ni dependencias.
 
+- **Tipografía:** la misma de la app, SF Pro Rounded (títulos) y SF Pro Text (texto), vía las fuentes del sistema (`ui-rounded`, `-apple-system`). La licencia de Apple no permite alojar SF Pro en la web, así que fuera de Apple se ve la fuente del sistema.
+
 - **Idioma:** español por defecto; el botón ES/EN cambia los textos marcados con `data-i18n` (diccionario en `assets/site.js`) y los bloques `data-lang` de las páginas legales.
 - **App Store:** cuando la app esté publicada, pon el enlace en `APP_STORE_URL` dentro de `assets/site.js`; los botones pasan de “Muy pronto” a “Descargar”.
 - **Rutas viejas** de Hinomaru (`/login`, `/deck/…`, `/jlpt/…`, etc.) redirigen a la portada; `/contact` va a `/support`.

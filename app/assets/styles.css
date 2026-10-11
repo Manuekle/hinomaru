@@ -20,9 +20,12 @@
   --lilac: #a48bf0;
   --swirl: #f6a3b8;
 
-  --display: ui-rounded, "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", system-ui, sans-serif;
-  --body: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --jp: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", sans-serif;
+  /* Same faces as the app: SF Pro Rounded for the KanaGO! voice, SF Pro Text for body copy.
+     SF Pro can't be self-hosted (Apple's license), so these are the system keywords that
+     resolve to it on Apple devices; other platforms get their own system UI font. */
+  --display: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --jp: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
 
   --shadow: 0 10px 28px rgba(35, 33, 39, 0.08);
   --gutter: clamp(16px, 4vw, 40px);
@@ -35,7 +38,8 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font: 500 17px/1.6 var(--body);
+  font: 400 17px/1.6 var(--body);
+  letter-spacing: -0.01em;
   overflow-x: hidden;
 }
 img { max-width: 100%; display: block; }
