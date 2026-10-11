@@ -1,14 +1,6 @@
-# Claude Code internals
-.claude/
-
-# Design reference images (not source)
-uploads/
-scripts/
-scratch/
-
-# Internal tool descriptor
-SKILL.md
-
 # OS
 .DS_Store
 Thumbs.db
+
+# Vercel
+.vercel
