@@ -1,137 +1,41 @@
-# Hinomaru 日の丸
+# KanaGO! — sitio web
 
-[![Vercel Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com)
-[![PWA Ready](https://img.shields.io/badge/PWA-Ready-BC002D?style=flat-square)](https://hinomaru.app)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-[![Author](https://img.shields.io/badge/Author-Manuekle-BC002D?style=flat-square&logo=github)](https://github.com/Manuekle)
+Landing de **KanaGO!**, la app para iPhone que aprende japonés de la あ al N1 (antes *Hinomaru*). Publicada en [hinomaru.vercel.app](https://hinomaru.vercel.app).
 
-**Hinomaru** is a premium, minimalist Japanese study tool designed for clarity, focus, and long-term retention. Master JLPT levels from N5 to N1 through a scientifically-backed study flow.
+Hinomaru empezó como app web (SvelteKit + Supabase). Su contenido y su método ahora viven en la app nativa de iOS, así que este repositorio solo sirve la landing y las páginas que pide el App Store. La app web anterior sigue en el historial de git (último commit: `1f74312`).
 
-> "Learn Japanese, one card at a time."
+## Qué hay
 
----
+```
+app/                 raíz del proyecto en Vercel (Root Directory = app)
+  index.html         landing (ES/EN)
+  privacy.html       política de privacidad  → /privacy
+  terms.html         términos de uso         → /terms
+  support.html       soporte                 → /support
+  404.html
+  assets/            estilos, JS, capturas de la app e íconos
+  sw.js              reemplaza el service worker de la PWA vieja y se desinstala
+  registerSW.js      idem para páginas viejas en caché
+  vercel.json        URLs limpias, redirecciones de rutas viejas y cabeceras
+  og-image.png       imagen para redes (1200×630)
+```
 
-## ✨ Core Features
+Sitio estático: HTML, CSS y un JS pequeño, sin build ni dependencias.
 
-- **🧠 Smart SRS (Spaced Repetition System)**: Powered by the SM-2 algorithm. Hinomaru predicts when you're about to forget a word and brings it back for review at the perfect moment.
-- **🔊 Anime TTS (VOICEVOX)**: High-quality Japanese text-to-speech with expressive presets. Choose between **"Kawaii"** (High-energy) and **"Cool"** (Deep tone) voices for an immersive experience.
-- **✍️ Stroke-by-Stroke Writing**: Practice Hiragana, Katakana, and Kanji with real-time feedback and stroke order guidance.
-- **🎯 Multi-Modal Study**: Switch between Flashcards, Multiple Choice Quizzes, and Typing modes to reinforce active recall.
-- **📱 PWA & Offline Support**: Fully installable on iOS and Android. Study on the subway or in the mountains with comprehensive offline caching.
+- **Tipografía:** la misma de la app, SF Pro Rounded (títulos) y SF Pro Text (texto), vía las fuentes del sistema (`ui-rounded`, `-apple-system`). La licencia de Apple no permite alojar SF Pro en la web, así que fuera de Apple se ve la fuente del sistema.
 
----
+- **Idioma:** español por defecto; el botón ES/EN cambia los textos marcados con `data-i18n` (diccionario en `assets/site.js`) y los bloques `data-lang` de las páginas legales.
+- **App Store:** cuando la app esté publicada, pon el enlace en `APP_STORE_URL` dentro de `assets/site.js`; los botones pasan de “Muy pronto” a “Descargar”.
+- **Rutas viejas** de Hinomaru (`/login`, `/deck/…`, `/jlpt/…`, etc.) redirigen a la portada; `/contact` va a `/support`.
 
-## 🎨 Design Philosophy: "Sun & Sumi"
-
-Hinomaru's aesthetic is inspired by traditional Japanese minimalism and modern editorial design.
-
-### 🖋️ Typography
-- **Display**: [Inter Tight](https://fonts.google.com/specimen/Inter+Tight) — High-contrast, geometric, and authoritative for headings.
-- **Body / Japanese**: [Noto Sans JP](https://fonts.google.com/specimen/Noto+Sans+JP) — Clean, legible, and balanced for both Latin and Kanji characters.
-
----
-
-## 🛠️ Technology Stack
-
-### Frontend (Hinomaru App)
-- **Framework**: [SvelteKit 2](https://kit.svelte.dev/) (Runes mode)
-- **Database / Auth**: [Supabase](https://supabase.com/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & Vanilla CSS
-- **Animations**: [Motion](https://motion.dev/)
-
-### Microservices (TTS Service)
-- **Engine**: [VOICEVOX](https://voicevox.hiroshiba.jp/)
-- **API**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.10)
-- **Deployment**: [Docker](https://www.docker.com/) (Optimized for Hugging Face Spaces & Cloud Run)
-- **Caching**: Persistent disk-based audio caching.
-
----
-
-## 📂 Repository Structure
+## Desarrollo
 
 ```bash
-hinomaru/
-├── app/               # Main SvelteKit Application
-│   ├── src/
-│   │   ├── lib/
-│   │   │   ├── services/    # External service integrations (TTS, etc.)
-│   │   │   └── data/        # JLPT Content (N5–N1)
-│   │   └── routes/          # App pages and logic
-│   └── static/              # Icons, manifest, and PWA assets
-└── tts-service/       # Voicevox TTS Microservice
-    ├── app/                 # FastAPI routes and logic
-    ├── storage/             # Persistent audio cache (ignored by git)
-    └── Dockerfile           # Unified engine + API container
+npx serve app
 ```
 
----
+Despliega solo al hacer push a `main` (integración de Vercel con GitHub).
 
-## 🚀 Getting Started
+## Licencia
 
-### 1. App Installation
-```bash
-cd app
-npm install
-```
-
-### 2. TTS Microservice Setup (Local)
-Ensure you have Docker installed:
-```bash
-cd tts-service
-docker-compose up -d --build o sudo docker compose up -d --build
-```
-
-### 3. Environment Setup
-Copy `.env.example` to `.env` in the `app` folder:
-```env
-# Supabase
-PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-
-# TTS Service
-PUBLIC_VOICEVOX_URL=http://localhost:8000
-API_KEY=hinomaru-secret-key
-```
-
-### 4. Run Development
-```bash
-npm run dev
-```
-
----
-
-## ☁️ Deployment
-
-- **App**: Deployed on **Vercel** with automatic GitHub integration.
-- **TTS Service**: Optimized for **Hugging Face Spaces (Docker SDK)** or **Google Cloud Run**.
-  - High RAM (2GB+) required for the VOICEVOX engine.
-  - Set `API_KEY` and `PUBLIC_VOICEVOX_URL` in your Vercel project settings.
-
----
-
-## 📜 License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for the full text.
-
----
-
-## 📝 Licencia y Código Abierto
-
-**Hinomaru** es software de código abierto bajo la [Licencia MIT](LICENSE).
-
-Esto significa que puedes:
-- ✅ Usar el código libremente, incluso en proyectos comerciales
-- ✅ Modificarlo y distribuirlo
-- ✅ Contribuir al proyecto
-
-Siempre que se mantenga el aviso de copyright original en todas las copias. El código fue creado originalmente por **Manuekle** y toda redistribución debe reconocer la autoría.
-
----
-
-## 👤 Autor
-
-**Manuekle**
-
-- GitHub: [@Manuekle](https://github.com/Manuekle)
-
-Crafted with ❤️ for the love of the Japanese language.
+MIT — ver [LICENSE](LICENSE). Creado por [Manuekle](https://github.com/Manuekle).

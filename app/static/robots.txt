@@ -1,8 +1,0 @@
-# Allow crawling everything by default
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /admin/
-Disallow: /auth/
-
-Sitemap: https://hinomaru.app/sitemap.xml

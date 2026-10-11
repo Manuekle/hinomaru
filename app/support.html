@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Soporte — KanaGO!</title>
+  <meta name="description" content="Ayuda y contacto de KanaGO!: reporta un error, sugiere contenido o resuelve dudas sobre la app.">
+  <meta name="theme-color" content="#ff6f9c">
+  <link rel="canonical" href="https://hinomaru.vercel.app/support">
+  <link rel="icon" type="image/png" href="/assets/favicon-64.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body data-page="doc">
+  <header class="nav">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="KanaGO! inicio"><img src="/assets/icon.webp" alt="" width="38" height="38"><span>Kana<b>GO!</b></span></a>
+      <div class="lang" role="group" aria-label="Idioma / Language" style="margin-left:auto">
+        <button type="button" data-set="es" aria-pressed="true">ES</button>
+        <button type="button" data-set="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <div class="wrap">
+        <h1 data-i18n="doc.support">Soporte</h1>
+        <p data-i18n="doc.supportLede">¿Algo no funciona o encontraste un error en una lección? Te ayudamos.</p>
+      </div>
+    </div>
+
+    <article class="doc">
+      <div class="wrap" data-lang="es">
+        <div class="card">
+          <h2 style="margin-top:0">Escríbenos</h2>
+          <p>Abre un reporte en GitHub con lo que pasó, tu modelo de iPhone y la versión de iOS. Si es un error de contenido, indica la lección o el mazo.</p>
+          <p style="margin-top:18px"><a class="btn" href="https://github.com/Manuekle/hinomaru/issues/new" rel="noopener">Abrir un reporte</a></p>
+        </div>
+
+        <h2>Problemas frecuentes</h2>
+        <ul>
+          <li><b>No se oye la voz japonesa.</b> Sube el volumen y quita el modo silencio. En Ajustes → Accesibilidad → Contenido leído → Voces → Japonés puedes descargar una voz mejorada.</li>
+          <li><b>Pronunciar no me entiende.</b> Revisa que KanaGO! tenga permiso de Micrófono y Reconocimiento de voz en Ajustes. Habla cerca del iPhone y en un lugar tranquilo.</li>
+          <li><b>No me llega el recordatorio.</b> Actívalo en la pestaña Yo y permite las notificaciones de KanaGO! en Ajustes → Notificaciones.</li>
+          <li><b>Las canciones no cargan.</b> Los videos necesitan internet. Sin conexión puedes leer la letra y tocar cada línea para oírla.</li>
+          <li><b>Quiero empezar de cero.</b> En la pestaña Yo, toca «Reiniciar progreso». Tus ajustes se conservan.</li>
+        </ul>
+
+        <h2>Privacidad</h2>
+        <p>KanaGO! no tiene cuentas ni recoge datos. Lee la <a href="/privacy">política de privacidad</a>.</p>
+      </div>
+
+      <div class="wrap" data-lang="en" hidden>
+        <div class="card">
+          <h2 style="margin-top:0">Get in touch</h2>
+          <p>Open a report on GitHub describing what happened, your iPhone model and iOS version. For a content mistake, include the lesson or deck.</p>
+          <p style="margin-top:18px"><a class="btn" href="https://github.com/Manuekle/hinomaru/issues/new" rel="noopener">Open a report</a></p>
+        </div>
+
+        <h2>Common issues</h2>
+        <ul>
+          <li><b>I can't hear the Japanese voice.</b> Turn the volume up and switch off silent mode. In Settings → Accessibility → Spoken Content → Voices → Japanese you can download an enhanced voice.</li>
+          <li><b>Speak mode doesn't understand me.</b> Check that KanaGO! has Microphone and Speech Recognition access in Settings. Speak close to the iPhone somewhere quiet.</li>
+          <li><b>The reminder doesn't arrive.</b> Turn it on in the Me tab and allow KanaGO! notifications in Settings → Notifications.</li>
+          <li><b>Songs won't load.</b> Videos need the internet. Offline you can still read the lyrics and tap each line to hear it.</li>
+          <li><b>I want to start over.</b> In the Me tab, tap “Reset progress”. Your settings are kept.</li>
+        </ul>
+
+        <h2>Privacy</h2>
+        <p>KanaGO! has no accounts and collects no data. Read the <a href="/privacy">privacy policy</a>.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>
+        <a class="brand" href="/"><img src="/assets/icon.webp" alt="" width="38" height="38"><span>Kana<b>GO!</b></span></a>
+        <small>© <span data-year>2026</span> KanaGO!</small>
+      </div>
+      <nav aria-label="Legal">
+        <a href="/privacy" data-i18n="footer.privacy">Privacidad</a>
+        <a href="/terms" data-i18n="footer.terms">Términos</a>
+        <a href="/support" data-i18n="footer.support">Soporte</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="/assets/site.js" defer></script>
+</body>
+</html>
