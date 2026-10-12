@@ -56,6 +56,34 @@ def load(name):
     return json.loads((DATA / f"{name}.json").read_text("utf-8"))
 
 
+def sentence_chips(sentences):
+    """The sentence builder's chips for each sentence, cut by the app's own Swift tokenizer.
+
+    The iOS tokenizer splits a few sentences differently from the macOS one, so when a
+    simulator is booted its cut is added as well (the result can hold two lists per sentence).
+    Hand-cut chips in chunks.json win, as in the app (the CLI has no bundle to read them from)."""
+    overrides = load("chunks")
+    src = [ROOT / "KanaGO/Data/SentenceChunks.swift", ROOT / "scripts/sentence_chunks.swift"]
+    runs = [("macosx", [], [])]
+    booted = subprocess.run(["xcrun", "simctl", "list", "devices", "booted"], capture_output=True, text=True)
+    if "(Booted)" in booted.stdout:
+        runs.append(("iphonesimulator", ["-target", "arm64-apple-ios18.0-simulator"],
+                     ["xcrun", "simctl", "spawn", "booted"]))
+    else:
+        print("no booted simulator: sentence chips use the macOS tokenizer only", file=sys.stderr)
+    chips = []
+    for sdk, flags, launcher in runs:
+        exe = ROOT / f"build/sentence-chunks-{sdk}"
+        if not exe.exists() or exe.stat().st_mtime < max(p.stat().st_mtime for p in src):
+            exe.parent.mkdir(parents=True, exist_ok=True)
+            subprocess.run(["xcrun", "--sdk", sdk, "swiftc", "-O", "-parse-as-library", *flags,
+                            *map(str, src), "-o", str(exe)], check=True)
+        out = subprocess.run([*launcher, str(exe)], input=json.dumps(sentences).encode(),
+                             capture_output=True, check=True)
+        chips += [overrides.get(t, c) for t, c in zip(sentences, json.loads(out.stdout))]
+    return chips
+
+
 def collect():
     """Ordered (tier, text the app passes, text sent to the TTS) — most used first."""
     items = []
@@ -101,24 +129,41 @@ def collect():
             add(1, v["jp"], v.get("kana"))
             add(1, v.get("kana"))
 
-    # 2 · example sentences (cards, sentence builder, grammar)
+    # 2 · example sentences (cards, sentence builder, grammar) and the builder's word chips
+    build = []
     for d in decks:
         for c in d.get("cards") or []:
             add(2, c.get("example"))
+            build.append(c.get("example"))
         for g in d.get("grammar") or []:
             exs = g.get("examples") or []
             for ex in exs:
                 add(2, ex.get("jp"))
-            if not exs:
+            if exs:
+                build.append(exs[0].get("jp"))  # lessons build their sentence from the first example
+            else:
                 add(2, g.get("pattern"), (g.get("pattern") or "").replace("〜", "").replace("～", ""))
+    for chips in sentence_chips([s for s in build if s]):
+        if 2 <= len(chips) <= 7:  # the builder skips sentences outside this range
+            for chip in chips:
+                add(2, chip)
 
-    # 3 · conversations (NPC lines and the learner's choices)
+    # 3 · conversations (NPC lines, the prompt of each choice turn and the learner's choices),
+    #     story paragraphs (each has its own speaker button) and song lyrics (spoken when the
+    #     video can't play)
     for cv in convs:
         for t in cv.get("turns") or []:
             add(3, t.get("jp"))
+            add(3, t.get("prompt_jp"))
             add(3, (t.get("next_npc") or {}).get("jp"))
             for ch in t.get("choices") or []:
                 add(3, ch.get("jp"))
+    for s in stories:
+        for para in (s.get("body_jp") or "").split("\n"):  # Story.paragraphs
+            add(3, para)
+    for s in songs:
+        for line in s.get("lyrics") or []:
+            add(3, line.get("text"))
 
     # 4 · JLPT listening dialogues
     for lv in jlpt["levels"]:

@@ -476,6 +476,9 @@ final class Speaker: NSObject, AVAudioPlayerDelegate {
                 self.playClips([url], rate: rate)
                 return
             }
+            #if DEBUG
+            print("[Speaker] no clip, AVSpeech fallback: \(text)")
+            #endif
             self.haltAll()
             let u = AVSpeechUtterance(string: text)
             u.voice = self.resolveVoice()
@@ -495,6 +498,9 @@ final class Speaker: NSObject, AVAudioPlayerDelegate {
                 self.playClips(clips, rate: rate)
                 return
             }
+            #if DEBUG
+            print("[Speaker] dialogue missing \(lines.count - clips.count) clip(s), AVSpeech fallback")
+            #endif
             self.haltAll()
             let voices = self.resolveDialogueVoices()
             for line in lines {
