@@ -676,18 +676,17 @@ struct WriteSession: View {
 
     @State private var cards: [Card] = []
     @State private var index = 0
-    @State private var revealed = false
-    @State private var guide = false
+    @State private var pad: WritingPad?
     @State private var correct = 0
     @State private var finished = false
 
-    /// Short kana/kanji cards that make sense to write by hand.
+    /// Short kana/kanji cards that make sense to write by hand, and that have stroke data.
     static func writable(_ deck: Deck) -> [Card] {
         deck.cards.filter { c in
             let jp = c.jp.trimmingCharacters(in: .whitespaces)
             return (1...3).contains(jp.count) && jp.unicodeScalars.allSatisfy {
                 (0x3040...0x30FF).contains($0.value) || (0x4E00...0x9FAF).contains($0.value)
-            }
+            } && StrokeLibrary.has(jp)
         }
     }
 
@@ -696,7 +695,7 @@ struct WriteSession: View {
             KGBackground()
             if finished {
                 ResultView(correct: correct, total: cards.count, xp: correct * 3, title: deck.title(app.lang))
-            } else if let card = cards[safe: index] {
+            } else if let card = cards[safe: index], let pad {
                 VStack(spacing: 14) {
                     SessionTopBar(progress: Double(index) / Double(max(cards.count, 1)), trailing: "\(index + 1)/\(cards.count)")
                     VStack(spacing: 6) {
@@ -711,61 +710,57 @@ struct WriteSession: View {
                     }
                     .padding(.horizontal, 20)
 
-                    TraceCanvas(glyph: card.jp, guideOpacity: revealed ? 0.35 : guide ? 0.12 : 0)
-                        .id(index)
+                    TraceCanvas(pad: pad)
                         .padding(.horizontal, 20)
 
-                    if revealed {
-                        HStack(spacing: 10) {
-                            Text(card.jp).font(.system(size: 34, weight: .semibold, design: .rounded)).foregroundStyle(KG.ink)
-                            SpeakButton(text: card.kana ?? card.jp, size: 36)
+                    if let report = pad.report {
+                        VStack(spacing: 4) {
+                            HStack(spacing: 10) {
+                                Text(card.jp).font(.system(size: 34, weight: .semibold, design: .rounded)).foregroundStyle(KG.ink)
+                                SpeakButton(text: card.kana ?? card.jp, size: 36)
+                            }
+                            if !report.ok, let message = pad.message(app) {
+                                Text(message).kgFont(15, .semibold).foregroundStyle(KG.redDeep)
+                            }
                         }
                         .transition(.opacity)
                     }
                     Spacer(minLength: 0)
-                    if revealed {
-                        HStack(spacing: 10) {
-                            Button(app.t("Repasar", "Missed it")) { next(ok: false) }
-                                .buttonStyle(.chunkyRed)
-                            Button(app.t("¡Me salió!", "Got it!")) { next(ok: true) }
-                                .buttonStyle(.chunkyMint)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 10)
-                    } else {
-                        HStack(spacing: 10) {
-                            Button {
-                                guide.toggle()
-                            } label: {
-                                Label(app.t("Pista", "Hint"), hi: guide ? .viewOff : .view)
-                            }
-                            .buttonStyle(ChunkyButtonStyle(fill: .white, lip: KG.line, foreground: KG.inkSoft, fullWidth: false))
-                            Button(app.t("Comparar", "Compare")) { revealed = true }
-                                .buttonStyle(.chunky)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 10)
+                    StepFooter(result: pad.report?.ok, answer: nil, canCheck: pad.canCheck, check: check) {
+                        next(ok: pad.report?.ok == true)
                     }
                 }
             }
         }
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: revealed)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: pad?.report)
         .onAppear {
-            if cards.isEmpty { cards = Array(Self.writable(deck).shuffled().prefix(8)) }
+            if cards.isEmpty {
+                cards = Array(Self.writable(deck).shuffled().prefix(8))
+                load()
+            }
         }
+    }
+
+    private func load() {
+        pad = cards[safe: index].map { WritingPad(text: $0.jp, mode: .memory) }
+    }
+
+    private func check() {
+        guard let pad, let card = cards[safe: index] else { return }
+        pad.check()
+        SoundPlayer.shared.play(pad.report?.ok == true ? .correct : .wrong)
+        Speaker.shared.speak(card.kana ?? card.jp, rate: app.p.speechRate)
     }
 
     private func next(ok: Bool) {
         if ok { correct += 1 }
-        SoundPlayer.shared.play(ok ? .correct : .wrong)
-        revealed = false
-        guide = false
         if index + 1 >= cards.count {
             app.addXP(correct * 3)
             SoundPlayer.shared.play(.finish)
             finished = true
         } else {
             index += 1
+            load()
         }
     }
 }

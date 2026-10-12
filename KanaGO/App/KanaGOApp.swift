@@ -10,6 +10,7 @@ struct KanaGOApp: App {
         WindowGroup {
             LaunchGate(onFinished: {
                 Speaker.shared.prepare()
+                Task.detached(priority: .utility) { StrokeLibrary.warmUp() }
                 Task(priority: .utility) { @MainActor in
                     await SoundPlayer.shared.preload()
                     app.syncWidgets()

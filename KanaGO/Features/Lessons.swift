@@ -21,7 +21,7 @@ struct LessonItem: Hashable, Identifiable {
     let kanaId: String?
 
     var writable: Bool {
-        (kind == .kana || kind == .kanji) && (1...3).contains(jp.count)
+        (kind == .kana || kind == .kanji) && (1...3).contains(jp.count) && StrokeLibrary.has(jp)
     }
 
     var buildChunks: [String]? {
@@ -279,7 +279,7 @@ private struct StepHeader: View {
 }
 
 /// Bottom check/continue bar with success or correction message.
-private struct StepFooter: View {
+struct StepFooter: View {
     @Environment(AppModel.self) private var app
     var result: Bool?
     var answer: String?
@@ -713,48 +713,48 @@ private struct BuildStep: View {
 private struct WriteStep: View {
     @Environment(AppModel.self) private var app
     var item: LessonItem
-    /// First contact with a character: show the faint guide so it can be traced.
-    var guided = false
+    /// First contact with a character: trace it over the stroke-order guide, checked stroke by
+    /// stroke. Otherwise it's written from memory and graded as a whole.
+    var guided: Bool
     var onDone: (Bool) -> Void
 
-    @State private var revealed = false
-    @State private var guide = false
+    @State private var pad: WritingPad
+
+    init(item: LessonItem, guided: Bool = false, onDone: @escaping (Bool) -> Void) {
+        self.item = item
+        self.guided = guided
+        self.onDone = onDone
+        _pad = State(initialValue: WritingPad(text: item.jp, mode: guided ? .trace : .memory))
+    }
+
+    private var result: Bool? { guided ? (pad.complete ? pad.traceOK : nil) : pad.report?.ok }
 
     var body: some View {
         VStack(spacing: 12) {
-            StepHeader(text: guided ? app.t("Calca el trazo", "Trace it") : app.t("Escríbelo de memoria", "Write it from memory"),
-                       mood: revealed ? .wow : .curious)
+            StepHeader(text: pad.message(app) ?? (guided ? app.t("Calca el trazo", "Trace it")
+                                                  : app.t("Escríbelo de memoria", "Write it from memory")),
+                       mood: pad.mood)
             VStack(spacing: 2) {
                 Text(item.meaning).kgFont(24, .bold).foregroundStyle(KG.ink)
                 if let r = item.reading { Text(r).kgFont(14, .semibold).foregroundStyle(KG.pinkText) }
             }
-            TraceCanvas(glyph: item.jp, guideOpacity: revealed ? 0.35 : guide ? 0.12 : 0)
+            TraceCanvas(pad: pad, replayable: false)
                 .padding(.horizontal, 20)
             Spacer(minLength: 0)
-            HStack(spacing: 10) {
-                if revealed {
-                    Button(app.t("Repasar", "Missed it")) { onDone(false) }.buttonStyle(.chunkyRed)
-                    Button(app.t("¡Me salió!", "Got it!")) {
-                        SoundPlayer.shared.play(.correct)
-                        onDone(true)
-                    }
-                    .buttonStyle(.chunkyMint)
-                } else {
-                    Button { guide.toggle() } label: {
-                        Label(app.t("Pista", "Hint"), hi: guide ? .viewOff : .view)
-                    }
-                    .buttonStyle(ChunkyButtonStyle(fill: .white, lip: KG.line, foreground: KG.inkSoft, fullWidth: false))
-                    Button(app.t("Comparar", "Compare")) {
-                        revealed = true
-                        Speaker.shared.speak(item.speak, rate: app.p.speechRate)
-                    }
-                    .buttonStyle(.chunky)
-                }
+            if !guided || pad.complete {
+                StepFooter(result: result, answer: item.jp, canCheck: pad.canCheck, check: check) { onDone(result == true) }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 10)
         }
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: revealed)
-        .onAppear { if guided { guide = true } }
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: result)
+        .onChange(of: pad.complete) { _, done in
+            if done { Speaker.shared.speak(item.speak, rate: app.p.speechRate) }
+        }
+    }
+
+    private func check() {
+        pad.check()
+        playResult(pad.report?.ok == true, app)
+        Speaker.shared.speak(item.speak, rate: app.p.speechRate)
     }
 }

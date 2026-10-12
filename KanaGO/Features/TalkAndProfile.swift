@@ -260,6 +260,12 @@ struct ProfileView: View {
                             Button(app.t("Borrar progreso", "Erase progress"), role: .destructive) { app.resetProgress() }
                         }
 
+                        Link(destination: URL(string: "https://kanjivg.tagaini.net")!) {
+                            Text(app.t("Orden de trazos: KanjiVG · CC BY-SA 3.0", "Stroke order: KanjiVG · CC BY-SA 3.0"))
+                                .kgText(12, .medium)
+                                .foregroundStyle(KG.muted)
+                        }
+
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
