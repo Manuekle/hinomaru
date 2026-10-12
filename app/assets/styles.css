@@ -56,6 +56,9 @@ body[data-page="home"] .nav { position: fixed; inset: 0 0 auto; }
 .brand { display: inline-flex; flex: none; align-items: center; gap: 10px; text-decoration: none; }
 .brand img { width: 70px; height: auto; }
 .brand .brand-icon { width: 32px; border-radius: 8px; }
+.nav .brand { gap: 8px; }
+.nav .brand img { width: 52px; }
+.nav .brand .brand-icon { width: 28px; }
 .nav-badge { margin-left: auto; }
 .lang { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--soft); }
 .lang button { border: 0; background: transparent; color: var(--muted); font: 600 12px/1 var(--body); padding: 8px 10px; border-radius: 999px; cursor: pointer; }
@@ -324,7 +327,8 @@ footer small { display: block; margin-top: 10px; max-width: 37em; font-size: 11p
   .intro-lede { display: none; }
 }
 @media (max-width: 480px) {
-  .brand img { width: 62px; }
+  .nav .brand img { width: 46px; }
+  .nav .brand .brand-icon { width: 26px; }
   .faq summary { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
