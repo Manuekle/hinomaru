@@ -2,10 +2,12 @@ import SwiftUI
 
 /// KanaGO! design tokens — candy pink, sumi ink and sticker whites.
 enum KG {
-    /// Brand pink (the logo's GO!, a shade deeper) — fills that carry white text/icons (4.5:1).
-    static let pink = Color(hex: 0xDE2B62)
-    /// Button lips and gradient ends under `pink`.
-    static let pinkDeep = Color(hex: 0xB01E4C)
+    /// Brand pink, the widgets' tone — fills under bold white text/icons (3.7:1).
+    static let pink = Color(hex: 0xF23A7C)
+    /// Button lips under `pink`; also pink icons/text on light (5.3:1 on white).
+    static let pinkDeep = Color(hex: 0xCC2462)
+    /// Hero gradient, same stops as the widgets' pink moments.
+    static let pinkGradient = [Color(hex: 0xFF5F97), pink, Color(hex: 0xD92A6B)]
     static let pinkSoft = Color(hex: 0xFFE4ED)
     /// Pink for text on light surfaces — ≥ 4.5:1 on white, cream and pinkSoft.
     static let pinkText = Color(hex: 0xC2255B)
@@ -20,15 +22,19 @@ enum KG {
     /// Secondary text on light surfaces — 5.4:1 on white, 5:1 on cream. On ink use white.opacity(0.6).
     static let muted = Color(hex: 0x6C6872)
     static let line = Color(hex: 0xECE8E4)
-    /// Fills under white text (4.8:1); `skyDeep` for lips and blue text on light.
-    static let sky = Color(hex: 0x0D76BF)
-    static let skyDeep = Color(hex: 0x0B5E99)
+    /// Inactive icons: a zero streak, locked path nodes.
+    static let off = Color(hex: 0xA8A29C)
+    /// Fills under bold white text (3.5:1); `skyDeep` for lips and small blue text on light.
+    static let sky = Color(hex: 0x1A8CF0)
+    static let skyDeep = Color(hex: 0x1271C2)
     static let sun = Color(hex: 0xFFC83D)
     static let sunDeep = Color(hex: 0xE8A21A)
     static let flame = Color(hex: 0xFF9A1F)
-    /// Fills under white text (4.6:1); `mintDeep` for lips and green text on light.
-    static let mint = Color(hex: 0x188657)
-    static let mintDeep = Color(hex: 0x126441)
+    /// Fills under bold white text (3.1:1); `mintDeep` for lips and small green text on light.
+    static let mint = Color(hex: 0x12A865)
+    static let mintDeep = Color(hex: 0x0C7A4C)
+    /// N2 / build mode purple (the widgets' violet) — bold white text 3.5:1.
+    static let grape = Color(hex: 0x9B6BFF)
     static let lilac = Color(hex: 0xC3CBF4)
     static let red = Color(hex: 0xF0575D)
     static let redDeep = Color(hex: 0xC93E44)
@@ -41,14 +47,14 @@ enum KG {
         size >= 26 ? size * tracking : size >= 20 ? size * tracking * 0.5 : 0
     }
 
-    /// Content colour for a solid `fill`: white when it reaches 4.5:1, ink otherwise
-    /// (sky, mint, sun and lilac are too light for white text).
+    /// Content colour for a solid `fill`: white when it reaches 3:1, ink otherwise (sun and
+    /// lilac). Callers are bold/semibold labels, where Apple's HIG asks 3:1 at any size.
     static func on(_ fill: Color) -> Color {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         UIColor(fill).getRed(&r, green: &g, blue: &b, alpha: &a)
         func lin(_ c: CGFloat) -> CGFloat { c <= 0.03928 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4) }
         let luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
-        return 1.05 / (luminance + 0.05) >= 4.5 ? .white : ink
+        return 1.05 / (luminance + 0.05) >= 3 ? .white : ink
     }
 
     static func levelColor(_ level: String) -> Color {
@@ -57,7 +63,7 @@ enum KG {
         case "N5": return pink
         case "N4": return sky
         case "N3": return mint
-        case "N2": return Color(hex: 0xA48BF0)
+        case "N2": return grape
         case "N1": return ink
         default: return muted
         }
@@ -104,7 +110,7 @@ extension View {
 /// To add one: map it in scripts/hugeicons.js, re-run it, then add the case here.
 /// Solid twins (hi.<name>.fill) come from scripts/hugeicons_solid.py; list them in `solid`.
 enum HI: String {
-    case home, kana, cards, compass, user, arrowRightCircle, search, cancelCircle, cancel, volume
+    case home, kana, cards, brush, library, globe, user, arrowRightCircle, search, cancelCircle, cancel, volume
     case undo, star, translate, textFont, target, chevronDown, chevronLeft, chevronRight, flashcards
     case fire, play, pause, checkCircle, circle, quiz, headphones, link, keyboard, blocks, quill, kanji
     case puzzle, airplane, view, viewOff, music, mic, badgeCheck, sun, exclamation, heart, heartbreak
@@ -113,7 +119,7 @@ enum HI: String {
     case bookmark, bell, timer, award, share, trash, calendar, exam, route
 
     private static let solid: Set<HI> = [
-        .home, .kana, .book, .compass, .user, .route, .cards, .exam,
+        .home, .brush, .library, .globe, .kana, .book, .user, .route, .cards, .exam,
         .dumbbell, .headphones, .quiz, .crown, .tick, .lock,
         .bookmark, .star, .checkCircle, .cancelCircle, .arrowRightCircle, .subtitle, .play, .pause, .sparkle, .bell,
         .heart, .heartbreak, .sun, .exclamation, .fire, .droplet,
@@ -270,7 +276,7 @@ struct Pill: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            if let icon { HugeIcon(icon, size: 13) }
+            if let icon { HugeIcon(icon, size: 13, filled: true) }
             Text(text).kgFont(12, .semibold)
         }
         .foregroundStyle(foreground ?? KG.on(color))

@@ -277,8 +277,8 @@ enum KaraokeCheck {
         return min(max(similarity * 1.25, 0), 1)
     }
 
-    /// Bright fill for a score badge; always carries ink text. (KG.mint is a deep green made for
-    /// white text, so the top tier keeps the light mint.)
+    /// Bright fill for a score badge; always carries ink text. (KG.mint is tuned for bold
+    /// white text, so the top tier keeps the lighter mint.)
     static func color(_ score: Double) -> Color {
         score >= 0.85 ? Color(hex: 0x4FD39B) : score >= 0.6 ? KG.sun : score >= 0.3 ? KG.flame : KG.red
     }

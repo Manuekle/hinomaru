@@ -37,7 +37,7 @@ struct KanaView: View {
                                 }
                                 Spacer()
                                 // white arrow: the solid icon's cut-out shows the white disc beneath;
-                                // white on pink is 4.5:1
+                                // white on pink is 3.7:1, above the 3:1 icon bar
                                 HugeIcon(.arrowRightCircle, size: 30, filled: true)
                                     .foregroundStyle(KG.pink)
                                     .background(Circle().fill(.white).padding(6))

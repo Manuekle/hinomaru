@@ -3,7 +3,8 @@
 // This wipes Assets.xcassets/Hugeicons, so re-run hugeicons_solid.py afterwards for the .fill twins.
 const fs = require("fs"), path = require("path");
 const map = {
-  home: "Home09Icon", kana: "AlphabetJapaneseIcon", cards: "Cards01Icon", compass: "DiscoverCircleIcon",
+  home: "Home02Icon", kana: "AlphabetJapaneseIcon", cards: "Cards01Icon", brush: "BrushIcon",
+  library: "FolderLibraryIcon", globe: "GlobeIcon",
   user: "UserCircleIcon", arrowRightCircle: "CircleArrowRight01Icon", search: "Search01Icon",
   cancelCircle: "CancelCircleIcon", cancel: "Cancel01Icon", volume: "VolumeHighIcon",
   undo: "RotateLeft01Icon", star: "StarIcon", translate: "TranslateIcon", textFont: "TextFontIcon",

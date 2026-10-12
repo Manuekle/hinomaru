@@ -561,8 +561,8 @@ struct ResultView: View {
             Text(title).kgFont(16, .semibold).foregroundStyle(KG.muted).multilineTextAlignment(.center)
             HStack(spacing: 12) {
                 resultBox("\(appear ? pct : 0)%", app.t("precisión", "accuracy"), KG.mint, .target, index: 0)
-                resultBox("+\(appear ? xp : 0)", "XP", KG.sun, .star, index: 1)
-                resultBox("\(app.p.streak)", app.t("racha", "streak"), KG.flame, .fire, index: 2)
+                resultBox("+\(appear ? xp : 0)", "XP", KG.sun, .star, filled: true, index: 1)
+                resultBox("\(app.p.streak)", app.t("racha", "streak"), KG.flame, .fire, filled: true, index: 2)
             }
             .padding(.horizontal, 20)
             Spacer()
@@ -575,9 +575,9 @@ struct ResultView: View {
         .sensoryFeedback(.success, trigger: appear)
     }
 
-    private func resultBox(_ v: String, _ label: String, _ color: Color, _ icon: HI, index: Int) -> some View {
+    private func resultBox(_ v: String, _ label: String, _ color: Color, _ icon: HI, filled: Bool = false, index: Int) -> some View {
         VStack(spacing: 6) {
-            HugeIcon(icon, size: 22).foregroundStyle(color)
+            HugeIcon(icon, size: 22, filled: filled).foregroundStyle(color)
             Text(v).kgFont(24, .bold).foregroundStyle(KG.ink)
                 .contentTransition(.numericText())
                 .animation(.easeOut(duration: 0.9).delay(0.35), value: appear)

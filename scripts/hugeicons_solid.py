@@ -54,10 +54,12 @@ SQUIRCLE = P("M2.5 12C2.5 7.52 2.5 5.28 3.89 3.89C5.28 2.5 7.52 2.5 12 2.5C16.48
 # e = the outline icon's shapes, in document order.
 RECIPES = {
     # tab bar
-    "home": lambda e: area(e[0]),
+    "home": lambda e: D(area(e[0]), line(e[1], W + 0.4)),
+    "library": lambda e: U(area(e[0]), line(e[1]), line(e[2])),
+    # the globe's circle carries a transform picosvg drops, so it is redrawn here
+    "globe": lambda e: U(D(area(circle(13.5, 9, 7)), line(e[3]), line(e[4])), line(e[5]), line(e[0]), line(e[1])),
     "kana": lambda e: D(area(SQUIRCLE), *(line(scaled(p, 0.72), 1.6) for p in e)),
     "book": lambda e: D(U(area(e[0]), area(e[1])), line(P("M12 7V18.6"), 1.3)),
-    "compass": lambda e: U(D(area(e[0]), area(e[1])), circle(12, 12, 1.25)),
     "user": lambda e: D(area(e[2]), area(e[1]), I(area(_closed(e[0], "L5.5 23L18.5 23Z")), circle(12, 12, 8.4))),
     # learn modes
     "route": lambda e: U(D(area(e[0]), circle(18, 6, 1.5)), area(e[2]), line(e[3])),
@@ -97,6 +99,12 @@ def _closed(p, tail):
     return P(_D[id(p)] + tail)
 
 
+def _sub(p, i, tail=""):
+    """The i-th subpath (split on M) of a multi-part source path."""
+    parts = ["M" + s for s in _D[id(p)].split("M") if s.strip()]
+    return P(parts[i] + tail)
+
+
 def fmt(v):
     s = f"{v:.3f}".rstrip("0").rstrip(".")
     return "0" if s in ("-0", "") else s
@@ -132,7 +140,20 @@ def main(xcassets):
                 "info": {"author": "xcode", "version": 1},
                 "properties": {"preserves-vector-representation": True, "template-rendering-intent": "template"},
             }, f, indent=2)
-    print(len(RECIPES), "solid icons")
+    # hand-drawn solids that replace a recipe: scripts/<name>.fill.svg
+    here = os.path.dirname(os.path.abspath(__file__))
+    for name in ("brush",):
+        dst = os.path.join(root, f"hi.{name}.fill.imageset")
+        os.makedirs(dst, exist_ok=True)
+        with open(os.path.join(here, f"{name}.fill.svg")) as src, open(os.path.join(dst, f"{name}.fill.svg"), "w") as f:
+            f.write(src.read())
+        with open(os.path.join(dst, "Contents.json"), "w") as f:
+            json.dump({
+                "images": [{"filename": f"{name}.fill.svg", "idiom": "universal"}],
+                "info": {"author": "xcode", "version": 1},
+                "properties": {"preserves-vector-representation": True, "template-rendering-intent": "template"},
+            }, f, indent=2)
+    print(len(RECIPES) + 1, "solid icons")
 
 
 if __name__ == "__main__":

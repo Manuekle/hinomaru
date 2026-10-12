@@ -93,7 +93,7 @@ struct LearnView: View {
                         .background {
                             if on {
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(mode == .path ? KG.pink : mode == .decks ? KG.ink : KG.skyDeep)
+                                    .fill(mode == .path ? KG.pink : mode == .decks ? KG.ink : KG.sky)
                                     .matchedGeometryEffect(id: "learnMode", in: ns)
                             }
                         }
@@ -127,7 +127,7 @@ struct LearnView: View {
             HStack(spacing: 8) {
                 ForEach(router.learnMode == .jlpt ? JLPT.levels : Self.chips, id: \.self) { l in
                     let on = l == level
-                    let fill = l == "Kana" ? KG.pinkDeep : KG.levelColor(l)
+                    let fill = l == "Kana" ? KG.pink : KG.levelColor(l)
                     Button {
                         withAnimation(.spring(response: 0.3)) { level = l }
                     } label: {

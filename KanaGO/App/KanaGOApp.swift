@@ -100,13 +100,13 @@ struct RootView: View {
                         .tabItem { Label(app.t("Inicio", "Home"), tab: .home, selected: router.tab == .home) }
                         .tag(AppTab.home)
                     KanaView()
-                        .tabItem { Label("Kana", tab: .kana, selected: router.tab == .kana) }
+                        .tabItem { Label("Kana", tab: .brush, selected: router.tab == .kana) }
                         .tag(AppTab.kana)
                     LearnView()
-                        .tabItem { Label(app.t("Aprender", "Learn"), tab: .book, selected: router.tab == .learn) }
+                        .tabItem { Label(app.t("Aprender", "Learn"), tab: .library, selected: router.tab == .learn) }
                         .tag(AppTab.learn)
                     TalkView()
-                        .tabItem { Label(app.t("Explorar", "Explore"), tab: .compass, selected: router.tab == .talk) }
+                        .tabItem { Label(app.t("Explorar", "Explore"), tab: .globe, selected: router.tab == .talk) }
                         .tag(AppTab.talk)
                     ProfileView()
                         .tabItem { Label(app.t("Yo", "Me"), tab: .user, selected: router.tab == .me) }

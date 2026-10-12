@@ -62,14 +62,14 @@ struct RoadmapPath: View {
                     .frame(width: 54, height: 54)
                     .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.white.opacity(0.25)))
                 VStack(alignment: .leading, spacing: 3) {
-                    // solid white or ink, whichever reads on the unit colour (85% white fell under 4.5:1)
+                    // solid white or ink, whichever reads on the unit colour
                     Text(unit.title(app.lang)).kgFont(19, .bold).foregroundStyle(KG.on(color))
                     Text(unit.objective(app.lang)).kgFont(13, .semibold).foregroundStyle(KG.on(color))
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
                 Text("\(done)/\(unit.lessons.count)")
-                    .kgFont(13, .bold).foregroundStyle(color)
+                    .kgFont(13, .bold).foregroundStyle(KG.on(color) == .white ? color : KG.ink) // orange is too light on white
                     .padding(.horizontal, 10).padding(.vertical, 5)
                     .background(Capsule().fill(.white))
             }
@@ -89,7 +89,7 @@ struct RoadmapPath: View {
     }
 
     private func unitColor(_ unit: RoadmapUnit) -> Color {
-        let palette = [KG.pink, KG.sky, KG.mint, Color(hex: 0xA48BF0), KG.sunDeep, KG.ink]
+        let palette = [KG.pink, KG.sky, KG.mint, KG.grape, KG.flame, KG.ink]
         let index = level.units.firstIndex(of: unit) ?? 0
         return palette[index % palette.count]
     }
@@ -114,7 +114,7 @@ struct RoadmapPath: View {
                 Circle().fill(fill)
                 Circle().fill(.white.opacity(0.22)).frame(width: size * 0.62, height: size * 0.2).offset(y: -size * 0.26)
                 HugeIcon(done ? .tick : unlocked ? lesson.icon : .lock, size: size * 0.4, filled: true)
-                    .foregroundStyle(unlocked || done ? .white : Color(hex: 0xA8A29C))
+                    .foregroundStyle(done ? .white : unlocked ? KG.on(fill) : KG.off)
             }
             .frame(width: size, height: size)
         }

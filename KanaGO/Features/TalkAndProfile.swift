@@ -146,7 +146,7 @@ struct ScenarioRow: View {
             Spacer(minLength: 0)
             if let best {
                 VStack(spacing: 0) {
-                    HugeIcon(.star, size: 20)
+                    HugeIcon(.star, size: 20, filled: best >= 70)
                         .foregroundStyle(best >= 70 ? KG.sun : KG.line)
                     Text("\(best)%").kgFont(11, .bold).foregroundStyle(KG.muted)
                 }
@@ -186,8 +186,9 @@ struct ProfileView: View {
                         .padding(.top, 16)
 
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible())], spacing: 12) {
-                            stat(.fire, "\(app.p.streak)", app.t("días de racha", "day streak"), KG.flame)
-                            stat(.star, "\(app.p.xp)", app.t("XP total", "total XP"), KG.sun)
+                            stat(.fire, "\(app.p.streak)", app.t("días de racha", "day streak"),
+                                 app.p.streak > 0 ? KG.flame : KG.off, filled: true)
+                            stat(.star, "\(app.p.xp)", app.t("XP total", "total XP"), KG.sun, filled: true)
                             stat(.cards, "\(learnedWords)", app.t("tarjetas dominadas", "cards mastered"), KG.mint)
                             stat(.kana, "\(kanaMastered)", app.t("kana dominados", "kana mastered"), KG.pink)
                         }
@@ -200,7 +201,7 @@ struct ProfileView: View {
                                 Picker("", selection: $app.p.lang) {
                                     ForEach(Lang.allCases) { Text($0.label).tag($0) }
                                 }
-                                .tint(KG.pink)
+                                .tint(KG.pinkText) // picker value is regular-weight text
                             }
                             Divider().padding(.leading, 52)
                             settingRow(app.t("Mostrar romaji", "Show romaji"), icon: .textFont) {
@@ -219,7 +220,7 @@ struct ProfileView: View {
                                     Picker("", selection: $app.p.reminderHour) {
                                         ForEach(6..<24, id: \.self) { Text(String(format: "%02d:00", $0)).tag($0) }
                                     }
-                                    .tint(KG.pink)
+                                    .tint(KG.pinkText) // picker value is regular-weight text
                                 }
                             }
                             Divider().padding(.leading, 52)
@@ -227,7 +228,7 @@ struct ProfileView: View {
                                 Picker("", selection: $app.p.dailyGoal) {
                                     ForEach([20, 50, 100, 200], id: \.self) { Text("\($0) XP").tag($0) }
                                 }
-                                .tint(KG.pink)
+                                .tint(KG.pinkText) // picker value is regular-weight text
                             }
                             Divider().padding(.leading, 52)
                             VStack(alignment: .leading, spacing: 6) {
@@ -324,9 +325,9 @@ struct ProfileView: View {
         if app.p.reminderOn { Reminders.schedule(hour: app.p.reminderHour, lang: app.lang) }
     }
 
-    private func stat(_ icon: HI, _ value: String, _ label: String, _ color: Color) -> some View {
+    private func stat(_ icon: HI, _ value: String, _ label: String, _ color: Color, filled: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            HugeIcon(icon, size: 24).foregroundStyle(color).frame(height: 26)
+            HugeIcon(icon, size: 24, filled: filled).foregroundStyle(color).frame(height: 26)
             Text(value).kgFont(26, .bold).foregroundStyle(KG.ink).contentTransition(.numericText())
             Text(label).kgFont(13, .semibold).foregroundStyle(KG.muted)
         }

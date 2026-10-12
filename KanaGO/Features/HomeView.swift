@@ -60,8 +60,7 @@ struct HomeView: View {
                     .minimumScaleFactor(0.7)
             }
             Spacer(minLength: 8)
-            StatChip(icon: .fire, value: "\(app.p.streak)", color: app.p.streak > 0 ? KG.flame : KG.muted,
-                     filled: app.p.streak > 0)
+            StatChip(icon: .fire, value: "\(app.p.streak)", color: app.p.streak > 0 ? KG.flame : KG.off, filled: true)
             StatChip(icon: .star, value: "\(app.p.xp)", color: KG.sun, filled: true)
         }
     }
@@ -85,7 +84,7 @@ struct HomeView: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
-                .background(Capsule().fill(KG.pinkDeep.opacity(0.55))) // a white frost would drop white text under 4.5:1
+                .background(Capsule().fill(KG.pinkDeep.opacity(0.55))) // a white frost would wash out the white text
             Text(title)
                 .kgFont(26, .bold)
                 .foregroundStyle(.white)
@@ -94,7 +93,7 @@ struct HomeView: View {
                 .padding(.trailing, 96)
             if let detail {
                 Text(detail)
-                    .kgText(15, .medium)
+                    .kgText(15, .semibold)
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .padding(.top, 6)
@@ -130,7 +129,7 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .fill(LinearGradient(colors: [KG.pink, KG.pinkDeep], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .fill(LinearGradient(colors: KG.pinkGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                 .overlay(alignment: .bottomTrailing) {
                     Text("か")
                         .font(.system(size: 150, weight: .heavy))
@@ -183,8 +182,9 @@ struct HomeView: View {
                             ZStack {
                                 Circle()
                                     .fill(met ? KG.mint : (d.xp > 0 ? KG.pinkSoft : KG.cream))
-                                if met {
-                                    HugeIcon(.tick, size: 13, filled: true).foregroundStyle(.white)
+                                // any practice keeps the streak, so it earns a tick; the goal turns it mint
+                                if d.xp > 0 {
+                                    HugeIcon(.tick, size: 13, filled: true).foregroundStyle(met ? .white : KG.pinkText)
                                 }
                             }
                             .frame(width: 26, height: 26)
@@ -329,7 +329,7 @@ struct HomeView: View {
             HStack(spacing: 12) {
                 ForEach(Script.allCases) { s in
                     let mastery = app.kanaMastery(s)
-                    let color = s == .hiragana ? KG.pink : KG.skyDeep
+                    let color = s == .hiragana ? KG.pink : KG.sky
                     Button { router.tab = .kana } label: {
                         HStack(spacing: 12) {
                             Text(s == .hiragana ? "あ" : "ア")
