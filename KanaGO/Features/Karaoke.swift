@@ -48,13 +48,40 @@ enum LyricTiming {
         if !open.isEmpty { out.append(LyricChunk(text: open, weight: 0)) }
         return out
     }
+
+    /// 0…1 of `text` sung at `t`, when each space-separated phrase starts at `marks[k]` and the
+    /// last one is done by `end`. A phrase fills until the next one starts, so a held note keeps
+    /// glowing forward instead of stalling.
+    static func fraction(_ text: String, marks: [Double], end: Double, at t: Double) -> Double {
+        let weights = text.split(whereSeparator: \.isWhitespace).map { $0.reduce(0) { $0 + weight($1) } }
+        let total = weights.reduce(0, +)
+        // marks that don't line up with the phrases fall back to filling the whole line evenly
+        guard total > 0, marks.count == weights.count else {
+            let start = marks.first ?? end
+            return min(max((t - start) / max(end - start, 0.1), 0), 1)
+        }
+        if t >= end { return 1 }
+        var before = 0.0
+        for k in weights.indices {
+            let from = marks[k]
+            let to = k + 1 < marks.count ? marks[k + 1] : end
+            if t < from { return before / total }
+            if t < to { return (before + weights[k] * (t - from) / max(to - from, 0.05)) / total }
+            before += weights[k]
+        }
+        return 1
+    }
 }
 
 extension Song {
-    /// 0…1 of lyric line `i` sung at clip time `t`. The files only carry line start times, so the
-    /// line fills across the gap to the next one — or at a steady pace before an instrumental break.
+    /// 0…1 of lyric line `i` sung at clip time `t`. Lines timed against the recording carry an end
+    /// and the start of every phrase, so the fill follows the voice phrase by phrase; older lines
+    /// only have a start and fill across the gap to the next one at a steady pace.
     func sungFraction(_ i: Int, at t: Double) -> Double {
         guard let line = lyrics[safe: i] else { return 0 }
+        if let end = line.end, end > line.time {
+            return LyricTiming.fraction(line.text, marks: line.marks ?? [line.time], end: end, at: t)
+        }
         let next = lyrics[safe: i + 1]?.time ?? endSeconds
         let gap = max(next - line.time, 0.5)
         let morae = LyricTiming.chunks(line.text).reduce(0) { $0 + $1.weight }

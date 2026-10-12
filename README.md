@@ -97,7 +97,7 @@ KanaGO/
     Sounds/             Efectos de la interfaz en WAV
 KanaGOWidget/           Widgets de inicio y pantalla bloqueada
 Shared/                 Modelo de datos compartido con los widgets
-scripts/                Herramientas para generar audio y recursos
+scripts/                Herramientas para generar audio, recursos y tiempos de canciones
 design/                 Recursos y referencias de diseño
 app/vercel.json         Desactiva los despliegues de Vercel de la rama ios
 site/                   Copia local del sitio web, con repositorio propio
@@ -162,6 +162,22 @@ python3 scripts/generate_audio.py --voice kasane
 El script también graba cada ficha del modo **Construir frase**. Para saber cómo se cortará cada frase compila `KanaGO/Data/SentenceChunks.swift` junto con `scripts/sentence_chunks.swift`, la misma lógica que usa la app. Los cortes que el tokenizador hace mal, sobre todo en frases solo en kana, se corrigen a mano en `KanaGO/Resources/Data/chunks.json`.
 
 La generación usa créditos de ElevenLabs y omite los clips que ya existen. Puedes volver a ejecutar el comando para completar los pendientes.
+
+### Tiempos de las canciones
+
+Cada línea de `songs.json` lleva `time` (cuándo empieza la voz), `end` (cuándo termina) y `marks` (cuándo empieza cada frase separada por espacios, solo si la línea tiene más de una). El karaoke y la línea activa se iluminan con esos tiempos. Si una línea no tiene `end`, el relleno avanza a un ritmo estimado.
+
+Los tiempos se miden contra el video de cada canción, no a oído. El script baja el audio, separa la voz y alinea el romaji de cada línea con ella. Necesita `ffmpeg`, `yt-dlp` y un entorno con PyTorch (la primera vez descarga unos 1,3 GB de modelos):
+
+```bash
+python3 -m venv build/lyrics-venv
+build/lyrics-venv/bin/pip install torch torchaudio demucs soundfile
+build/lyrics-venv/bin/python scripts/lyrics/align_lyrics.py ctc unravel
+swift scripts/lyrics/lyric_marks.swift unravel
+python3 scripts/lyrics/align_lyrics.py apply unravel
+```
+
+`lyric_marks.swift` imprime cada línea con su tiempo anterior y el nuevo. Escucha las marcadas con `SHIFT`, `GAP`, `LONG` o `LOW`. El alineador falla con samples de baja calidad o coros repetidos, como la intro de `kick-back`. Para esas líneas, vuelve a alinear dentro de un rango de segundos con `ctc <id> --window PRIMERA ÚLTIMA DESDE HASTA`, o ajusta los tiempos a mano en `songs.json`.
 
 ### Orden de trazos
 

@@ -192,6 +192,10 @@ struct Scenario: Decodable, Identifiable, Hashable {
 
 struct LyricLine: Decodable, Hashable {
     let time: Double
+    /// When the singing of the line stops, so the karaoke fill can't run ahead of or lag the voice.
+    let end: Double?
+    /// When each space-separated phrase of `text` starts being sung; the first one is `time`.
+    let marks: [Double]?
     let text: String
     let romaji: String?
     let translationEs: String
