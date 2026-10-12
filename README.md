@@ -101,6 +101,41 @@ app/vercel.json         Desactiva los despliegues de Vercel de la rama ios
 site/                   Copia local del sitio web, con repositorio propio
 ```
 
+## Diseño
+
+Los tokens viven en `KanaGO/Design/Theme.swift` (`KG`). La paleta sigue el tono de los widgets:
+
+| Token | Color | Uso |
+| --- | --- | --- |
+| `KG.pink` | `#F23A7C` | Rellenos de marca; `KG.pinkGradient` replica el degradado de los widgets. |
+| `KG.mint` | `#12A865` | Aciertos, metas cumplidas, unidad verde de la ruta. |
+| `KG.sky` | `#1A8CF0` | Escucha, JLPT, unidad azul. |
+| `KG.grape` | `#9B6BFF` | N2 y modo Construir frase. |
+| `KG.pinkText`, `mintDeep`, `skyDeep` | — | Texto pequeño sobre fondos claros (≥ 4,5:1). |
+
+Regla de contraste: el texto blanco sobre un relleno debe ser semibold o bold y llegar a 3:1 (criterio de Apple para texto en negrita). `KG.on(_:)` elige blanco o tinta según el relleno. El texto de peso regular sobre fondos claros usa las variantes `Text`/`Deep`.
+
+El color del arranque (`LaunchBackground`) está en Display P3 con los valores equivalentes a `KG.pink`, para que la pantalla de arranque del sistema y la animación de `SplashView` coincidan. iOS guarda en caché la pantalla de arranque: tras cambiar ese color, reinicia el dispositivo o reinstala la app para verlo.
+
+### Íconos
+
+Los íconos son [Hugeicons](https://hugeicons.com) en contorno, convertidos a SVG de plantilla en `Assets.xcassets/Hugeicons`. Las versiones rellenas (`hi.<nombre>.fill`) se usan en estados activos (pestaña seleccionada, racha, XP).
+
+1. Añade el ícono en el mapa de `scripts/hugeicons.js` y en el enum `HI` de `Theme.swift`.
+2. Genera los contornos (necesita `@hugeicons/core-free-icons` en un `node_modules` junto al script):
+
+   ```bash
+   node scripts/hugeicons.js KanaGO/Assets.xcassets
+   ```
+
+3. Genera los rellenos (necesita `pip install skia-pathops picosvg`):
+
+   ```bash
+   python3 scripts/hugeicons_solid.py KanaGO/Assets.xcassets
+   ```
+
+El paso 2 borra la carpeta `Hugeicons`, así que ejecuta siempre el 3 después. Los rellenos se construyen con recetas en `hugeicons_solid.py`; el pincel de la pestaña Kana usa un SVG dibujado a mano (`scripts/brush.fill.svg`).
+
 ## Actualizar contenido y recursos
 
 Los archivos de `KanaGO/Resources/Data/` contienen los mazos, el silabario, la ruta, las conversaciones, canciones, historias y preguntas JLPT. Después de modificar textos japoneses, puedes generar los clips de voz que falten.
@@ -121,6 +156,8 @@ Para generar los clips de cada voz:
 python3 scripts/generate_audio.py --voice yona
 python3 scripts/generate_audio.py --voice kasane
 ```
+
+El script también graba cada ficha del modo **Construir frase**. Para saber cómo se cortará cada frase compila `KanaGO/Data/SentenceChunks.swift` junto con `scripts/sentence_chunks.swift`, la misma lógica que usa la app. Los cortes que el tokenizador hace mal, sobre todo en frases solo en kana, se corrigen a mano en `KanaGO/Resources/Data/chunks.json`.
 
 La generación usa créditos de ElevenLabs y omite los clips que ya existen. Puedes volver a ejecutar el comando para completar los pendientes.
 
