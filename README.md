@@ -41,9 +41,10 @@ Sitio estático: HTML, CSS y un JS pequeño, sin build ni dependencias.
 - **Tipografía:** la misma de la app, SF Pro Rounded (títulos) y SF Pro Text (texto), vía las fuentes del sistema (`ui-rounded`, `-apple-system`).
 - **Marca:** `assets/logo.svg` es el logotipo «Kana GO!»; `assets/kana/` tiene el ícono de la app (claro y oscuro), los seis ánimos de Kana-chan y los stickers.
 - **Botón del App Store:** insignia negra con el logotipo de Apple. Mientras `APP_STORE_URL` (en `assets/site.js`) esté vacío dice «Muy pronto en el App Store»; al rellenarlo pasa a «Descárgalo en el App Store» y enlaza a la ficha.
-- **Widgets:** la sección de widgets son réplicas en HTML/CSS de los widgets de la app, con interruptor claro/oscuro.
+- **Widgets:** réplicas en HTML/CSS que recorren cuatro momentos del día al hacer scroll.
 - **Caché:** `styles.css`, `site.js` y las capturas llevan `?v=N`; súbelo al cambiarlos.
-- **Capturas:** siete pantallas reales de la app iOS en inglés (`assets/shots/`) y español (`assets/shots/es/`), a 1206 × 2622. Actualizadas el 12 de octubre de 2026 desde la compilación actual del simulador: Inicio, Ruta, Lección, Kana, JLPT, Leer y Resultados.
+- **Capturas:** siete pantallas reales de la app iOS en inglés (`assets/shots/`) y español (`assets/shots/es/`), a 1206 × 2622. `assets/shots/mobile/` contiene versiones de 600 px de ancho, elegidas mediante `srcset`. Actualizadas el 12 de octubre de 2026 desde la compilación actual del simulador: Inicio, Ruta, Lección, Kana, JLPT, Leer y Resultados.
+- **Scroll:** las mediciones de geometría se agrupan antes de escribir estilos, con una actualización por `requestAnimationFrame`. Las secciones detenidas no reescriben sus estilos y el teléfono solo pinta la captura descubierta y la que entra. La altura de cada escena se toma del escenario fijo para evitar saltos al cambiar la barra de Safari.
 - **Imagen para redes:** `scripts/brand-assets.html` es la composición; `app/og-image.png` su exportación a 1200 × 630.
 
 ## Vista previa local
@@ -60,3 +61,12 @@ igual que `cleanUrls` en Vercel. `python3 -m http.server` solo reconoce los
 nombres de archivo con `.html` y devuelve 404 para esos enlaces.
 
 Para usar otro puerto: `python3 scripts/serve.py 4182`.
+
+Al actualizar las capturas, regenera las variantes móviles con `cwebp`:
+
+```bash
+for shot in home path lesson kana exam read result; do
+  cwebp -quiet -resize 600 0 -q 88 "app/assets/shots/$shot.webp" -o "app/assets/shots/mobile/$shot.webp"
+  cwebp -quiet -resize 600 0 -q 88 "app/assets/shots/es/$shot.webp" -o "app/assets/shots/mobile/es/$shot.webp"
+done
+```
