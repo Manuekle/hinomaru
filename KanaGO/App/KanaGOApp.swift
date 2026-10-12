@@ -116,12 +116,15 @@ struct RootView: View {
                 .transition(.opacity)
             } else {
                 OnboardingView()
+                    .topBreathingRoom()
                     .transition(.opacity)
             }
         }
         .animation(.easeInOut(duration: 0.35), value: app.p.onboarded)
         .fullScreenCover(item: $router.session) { session in
             SessionHost(session: session)
+                .topBreathingRoom()
+                .readableWidth(KG.sessionWidth)
         }
     }
 }

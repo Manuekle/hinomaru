@@ -36,7 +36,7 @@ struct ConversationSession: View {
                                 VStack(spacing: 6) {
                                     Text(scenario.icon).font(.system(size: 44))
                                     Text(scenario.title(app.lang)).kgFont(22, .bold).foregroundStyle(KG.ink)
-                                    Text(scenario.contextEs).kgText(14).foregroundStyle(KG.inkSoft)
+                                    Text(scenario.context(app.lang)).kgText(14).foregroundStyle(KG.inkSoft)
                                         .multilineTextAlignment(.center)
                                 }
                                 .padding(.vertical, 12)
@@ -224,12 +224,13 @@ struct ConversationSession: View {
         }
         .padding(16)
         .padding(.bottom, 8)
-        // only the backdrop runs under the home indicator; the buttons keep their safe-area spot
+        // only the backdrop runs under the home indicator (and out to the edges on wide screens);
+        // the buttons keep their safe-area spot
         .background {
             UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
                 .fill(.white.opacity(0.92))
                 .shadow(color: KG.ink.opacity(0.08), radius: 16, y: -4)
-                .ignoresSafeArea(edges: .bottom)
+                .ignoresSafeArea(edges: [.bottom, .horizontal])
         }
     }
 }

@@ -201,26 +201,36 @@ final class KaraokeListener {
     @ObservationIgnored private var line: Int?
     @ObservationIgnored private var run = 0
     @ObservationIgnored private var configObserver: NSObjectProtocol?
+    // bumped by stop(), so a start still waiting on the audio session knows to give up
+    @ObservationIgnored private var attempt = 0
+    @ObservationIgnored private var sessionOpen = false
 
-    func start() throws {
+    @MainActor
+    func start() async throws {
         stop()
         guard let recognizer, recognizer.isAvailable else { throw SpeechListener.Failure.unavailable }
-        let session = AVAudioSession.sharedInstance()
+        let attempt = self.attempt
+        sessionOpen = true
         // keep the song playing out loud while the mic is open
-        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothA2DP, .mixWithOthers])
-        try session.setActive(true)
+        try await AudioSession.activate(.playAndRecord, mode: .default,
+                                        options: [.defaultToSpeaker, .allowBluetoothA2DP, .mixWithOthers])
+        guard attempt == self.attempt else { return }
         try startEngine()
-        // headphones plugged in, or WebKit touching the session, stops the engine; pick it back up
-        configObserver = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine,
-                                                                queue: .main) { [weak self] _ in
-            guard let self, self.isRunning, !self.engine.isRunning else { return }
-            try? self.startEngine()
-        }
+        watchConfiguration()
         run += 1
         heard = [:]
         scores = [:]
         line = nil
         isRunning = true
+    }
+
+    /// Headphones plugged in, or WebKit touching the session, stops the engine; pick it back up.
+    private func watchConfiguration() {
+        configObserver = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine,
+                                                                queue: .main) { [weak self] _ in
+            guard let self, self.isRunning, !self.engine.isRunning else { return }
+            try? self.startEngine()
+        }
     }
 
     private func startEngine() throws {
@@ -272,21 +282,25 @@ final class KaraokeListener {
     }
 
     func stop() {
-        guard isRunning else { return }
-        isRunning = false
-        level = 0
-        line = nil
-        endRequest()
-        if let configObserver { NotificationCenter.default.removeObserver(configObserver) }
-        configObserver = nil
-        if engine.isRunning { engine.stop() }
-        engine.inputNode.removeTap(onBus: 0)
-        // give the last line's final result a moment to land, then drop the tasks
-        let pending = tasks
-        tasks = []
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { pending.forEach { $0.cancel() } }
-        // back to playback so the song and the TTS voice are loud again
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.duckOthers, .mixWithOthers])
+        attempt += 1
+        if isRunning {
+            isRunning = false
+            level = 0
+            line = nil
+            endRequest()
+            if let configObserver { NotificationCenter.default.removeObserver(configObserver) }
+            configObserver = nil
+            if engine.isRunning { engine.stop() }
+            engine.inputNode.removeTap(onBus: 0)
+            // give the last line's final result a moment to land, then drop the tasks
+            let pending = tasks
+            tasks = []
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { pending.forEach { $0.cancel() } }
+        }
+        if sessionOpen {
+            sessionOpen = false
+            AudioSession.restorePlayback()
+        }
     }
 
     private func endRequest() {

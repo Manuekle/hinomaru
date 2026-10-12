@@ -2,6 +2,38 @@ import AVFoundation
 import Speech
 import SwiftUI
 
+// MARK: - Audio session
+
+/// Category changes and activation block while the system arbitrates audio with other apps, so they
+/// run off the main thread, in order, on one serial queue.
+enum AudioSession {
+    private static let queue = DispatchQueue(label: "kanago.audio-session", qos: .userInitiated)
+
+    static func activate(_ category: AVAudioSession.Category, mode: AVAudioSession.Mode,
+                         options: AVAudioSession.CategoryOptions,
+                         activation: AVAudioSession.SetActiveOptions = []) async throws {
+        try await withCheckedThrowingContinuation { (done: CheckedContinuation<Void, Error>) in
+            queue.async {
+                do {
+                    let session = AVAudioSession.sharedInstance()
+                    try session.setCategory(category, mode: mode, options: options)
+                    try session.setActive(true, options: activation)
+                    done.resume()
+                } catch {
+                    done.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    /// Back to playback so the TTS voice and the songs are loud again.
+    static func restorePlayback() {
+        queue.async {
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.duckOthers, .mixWithOthers])
+        }
+    }
+}
+
 // MARK: - Speech recognition (ja-JP)
 
 @Observable
@@ -20,6 +52,9 @@ final class SpeechListener {
     @ObservationIgnored private var request: SFSpeechAudioBufferRecognitionRequest?
     @ObservationIgnored private var task: SFSpeechRecognitionTask?
     @ObservationIgnored private var stopTimer: DispatchWorkItem?
+    // bumped by cancel(), so a start still waiting on the audio session knows to give up
+    @ObservationIgnored private var attempt = 0
+    @ObservationIgnored private var sessionOpen = false
 
     static func authorize() async -> Bool {
         let speech = await withCheckedContinuation { c in
@@ -29,13 +64,16 @@ final class SpeechListener {
         return await AVAudioApplication.requestRecordPermission()
     }
 
-    func start(hints: [String]) throws {
+    @MainActor
+    func start(hints: [String]) async throws {
         cancel()
         guard let recognizer, recognizer.isAvailable else { throw Failure.unavailable }
 
-        let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .defaultToSpeaker])
-        try session.setActive(true, options: .notifyOthersOnDeactivation)
+        let attempt = self.attempt
+        sessionOpen = true
+        try await AudioSession.activate(.playAndRecord, mode: .measurement, options: [.duckOthers, .defaultToSpeaker],
+                                        activation: .notifyOthersOnDeactivation)
+        guard attempt == self.attempt else { return }
 
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
@@ -83,8 +121,8 @@ final class SpeechListener {
     }
 
     func cancel() {
-        guard isListening else { return }
-        teardown()
+        attempt += 1
+        if isListening { teardown() } else { closeSession() }
     }
 
     private func scheduleStop(after seconds: Double) {
@@ -104,8 +142,13 @@ final class SpeechListener {
         task?.cancel()
         request = nil
         task = nil
-        // back to playback so the TTS voice is loud again
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.duckOthers, .mixWithOthers])
+        closeSession()
+    }
+
+    private func closeSession() {
+        guard sessionOpen else { return }
+        sessionOpen = false
+        AudioSession.restorePlayback()
     }
 }
 
@@ -319,12 +362,14 @@ struct SpeakSession: View {
         micError = nil
         lastScore = nil
         Speaker.shared.stop()
-        do {
-            try listener.start(hints: [card.jp, card.kana].compactMap { $0 })
-        } catch SpeechListener.Failure.noMicrophone {
-            micError = app.t("No encuentro un micrófono.", "No microphone found.")
-        } catch {
-            micError = app.t("El reconocimiento de voz no está disponible ahora.", "Speech recognition isn't available right now.")
+        Task { @MainActor in
+            do {
+                try await listener.start(hints: [card.jp, card.kana].compactMap { $0 })
+            } catch SpeechListener.Failure.noMicrophone {
+                micError = app.t("No encuentro un micrófono.", "No microphone found.")
+            } catch {
+                micError = app.t("El reconocimiento de voz no está disponible ahora.", "Speech recognition isn't available right now.")
+            }
         }
     }
 

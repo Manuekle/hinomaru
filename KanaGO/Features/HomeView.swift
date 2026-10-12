@@ -3,6 +3,8 @@ import SwiftUI
 struct HomeView: View {
     @Environment(AppModel.self) private var app
     @Environment(Router.self) private var router
+    /// Regular only on the iPhone Duo unfolded: the page splits in two columns there.
+    @Environment(\.horizontalSizeClass) private var hSize
 
     private var greeting: String {
         let h = Calendar.current.component(.hour, from: .now)
@@ -28,11 +30,21 @@ struct HomeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
                         header
-                        VStack(spacing: 14) {
-                            hero
-                            weekCard
+                        if hSize == .regular {
+                            HStack(alignment: .top, spacing: 20) {
+                                VStack(spacing: 14) {
+                                    hero
+                                    weekCard
+                                }
+                                todaySection
+                            }
+                        } else {
+                            VStack(spacing: 14) {
+                                hero
+                                weekCard
+                            }
+                            todaySection
                         }
-                        todaySection
                         practiceSection
                         survivalRow
                     }
@@ -41,6 +53,8 @@ struct HomeView: View {
                     .padding(.bottom, 32)
                 }
             }
+            .topBreathingRoom()
+            .readableWidth(960)
             .toolbar(.hidden, for: .navigationBar)
         }
     }
@@ -329,35 +343,41 @@ struct HomeView: View {
     private var practiceSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle(app.t("Sigue practicando", "Keep practicing"), jp: "れんしゅう")
-            HStack(spacing: 12) {
-                ForEach(Script.allCases) { s in
-                    let mastery = app.kanaMastery(s)
-                    let color = s == .hiragana ? KG.pink : KG.sky
-                    Button { router.tab = .kana } label: {
-                        HStack(spacing: 12) {
-                            Text(s == .hiragana ? "あ" : "ア")
-                                .font(.system(size: 26, weight: .bold))
-                                .foregroundStyle(color)
-                                .frame(width: 48, height: 48)
-                                .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(color.opacity(0.12)))
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(s.latin).kgFont(16, .bold).foregroundStyle(KG.ink)
-                                ProgressBarKG(value: mastery, color: color, height: 6)
-                                Text("\(Int(mastery * 100))%").kgFont(12, .semibold).foregroundStyle(KG.muted)
+            // wide screens put all four on one row
+            let rows = hSize == .regular ? AnyLayout(HStackLayout(spacing: 12)) : AnyLayout(VStackLayout(spacing: 12))
+            rows {
+                HStack(spacing: 12) {
+                    ForEach(Script.allCases) { s in
+                        let mastery = app.kanaMastery(s)
+                        let color = s == .hiragana ? KG.pink : KG.sky
+                        Button { router.tab = .kana } label: {
+                            HStack(spacing: 12) {
+                                Text(s == .hiragana ? "あ" : "ア")
+                                    .font(.system(size: 26, weight: .bold))
+                                    .foregroundStyle(color)
+                                    .frame(width: 48, height: 48)
+                                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(color.opacity(0.12)))
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(s.latin).kgFont(16, .bold).foregroundStyle(KG.ink)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    ProgressBarKG(value: mastery, color: color, height: 6)
+                                    Text("\(Int(mastery * 100))%").kgFont(12, .semibold).foregroundStyle(KG.muted)
+                                }
                             }
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .sticker(radius: 22)
                         }
-                        .padding(14)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .sticker(radius: 22)
+                        .buttonStyle(.squish)
                     }
-                    .buttonStyle(.squish)
                 }
-            }
-            HStack(spacing: 12) {
-                exploreCard(.read, emoji: "📖", title: app.t("Historias", "Stories"),
-                            done: app.p.storiesRead.count, total: app.content.stories.count, dark: false)
-                exploreCard(.sing, emoji: "🎤", title: app.t("Canciones", "Songs"),
-                            done: app.p.songsDone.count, total: app.content.songs.count, dark: true)
+                HStack(spacing: 12) {
+                    exploreCard(.read, emoji: "📖", title: app.t("Historias", "Stories"),
+                                done: app.p.storiesRead.count, total: app.content.stories.count, dark: false)
+                    exploreCard(.sing, emoji: "🎤", title: app.t("Canciones", "Songs"),
+                                done: app.p.songsDone.count, total: app.content.songs.count, dark: true)
+                }
             }
         }
     }
@@ -374,6 +394,8 @@ struct HomeView: View {
                     .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(fg.opacity(0.08)))
                 VStack(alignment: .leading, spacing: 6) {
                     Text(title).kgFont(16, .bold).foregroundStyle(fg)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     ProgressBarKG(value: Double(done) / Double(max(total, 1)), color: KG.pink, track: fg.opacity(0.12), height: 6)
                     Text("\(done)/\(total)").kgFont(12, .semibold).foregroundStyle(fg.opacity(0.6))
                 }

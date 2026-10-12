@@ -56,6 +56,8 @@ struct KanaView: View {
                 }
                 .scrollDismissesKeyboard(.immediately)
             }
+            .topBreathingRoom()
+            .readableWidth()
             .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $selected) { c in
                 KanaDetailSheet(char: c)
@@ -362,7 +364,9 @@ struct KanaQuizSetupView: View {
     @State var script: Script
     @State private var picked: Set<String> = []
 
-    var body: some View {
+    var body: some View { page.readableWidth() }
+
+    @ViewBuilder private var page: some View {
         ZStack(alignment: .bottom) {
             KGBackground()
             ScrollView {

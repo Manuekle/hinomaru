@@ -474,7 +474,8 @@ struct SongSession: View {
     /// Karaoke-style cue dots ahead of a line: they go out one by one over the last three seconds,
     /// and only while nothing else is being sung.
     private func leadIn(_ i: Int) -> some View {
-        TimelineView(.animation(paused: !player.isPlaying)) { ctx in
+        // the dots only change a few times a second, so there's no need to redraw every frame
+        TimelineView(.animation(minimumInterval: 0.1, paused: !player.isPlaying)) { ctx in
             let t = player.smoothTime(at: ctx.date)
             let left = song.lyrics[i].time - t
             let free = activeIndex.map { song.sungFraction($0, at: t) >= 1 } ?? true
@@ -595,7 +596,7 @@ struct SongSession: View {
             guard micAccess == true, !Task.isCancelled else { return }
             do {
                 // open the mic before the music starts, so the audio route is settled
-                try listener.start()
+                try await listener.start()
             } catch SpeechListener.Failure.noMicrophone {
                 micError = app.t("No encuentro un micrófono.", "No microphone found.")
                 return
@@ -604,6 +605,7 @@ struct SongSession: View {
                                  "Speech recognition isn't available right now.")
                 return
             }
+            if Task.isCancelled { return }
             for n in [3, 2, 1, 0] {
                 countdown = n
                 SoundPlayer.shared.play(n == 0 ? .unlock : .tap)

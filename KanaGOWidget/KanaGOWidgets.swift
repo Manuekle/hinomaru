@@ -38,7 +38,7 @@ struct StreakView: View {
             Gauge(value: s.goalProgress(on: entry.date)) {
                 Image("hi.fire.fill")
             } currentValueLabel: {
-                Text("\(streak)").font(WG.rounded(20, .heavy))
+                Text("\(streak)").wgFont(20, .heavy, tracking: -0.04)
             }
             .gaugeStyle(.accessoryCircularCapacity)
             .widgetURL(URL(string: "kanago://home"))
@@ -66,7 +66,7 @@ struct StreakSmall: View {
         VStack(alignment: .leading, spacing: 4) {
             FlameStreak(streak: streak, size: 42, flame: moment.flame, ink: moment.ink, alert: moment.alert)
             Text(moment.message(snap))
-                .font(WG.rounded(15, .bold))
+                .wgFont(15)
                 .foregroundStyle(moment.soft)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
@@ -75,24 +75,18 @@ struct StreakSmall: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(alignment: .bottomTrailing) {
-            let pet = moment.pet(snap, at: date)
-            let nudge = Self.nudge(pet)
-            PetImage(asset: pet, height: 94, width: 112)
-                .rotationEffect(.degrees(-4))
-                .offset(x: 14 + nudge.width, y: 16 + nudge.height)
+        .background {
+            // Kana-chan takes whatever the text leaves free: 63pt of body on 170pt widgets, 51pt on 158pt.
+            GeometryReader { geo in
+                let pet = moment.pet(snap, at: date)
+                CornerPet(asset: pet, size: (geo.size.height - 107) * Self.scale(pet))
+            }
         }
     }
 
-    /// Some poses keep their face low (melting, crying, asleep) or hold a prop on the left (the
-    /// pencil), so they sit a little higher or further right to stay clear of the text.
-    static func nudge(_ pet: String) -> CGSize {
-        switch pet {
-        case "pet.melt": CGSize(width: 0, height: -12)
-        case "pet.cry", "pet.sleep": CGSize(width: 0, height: -6)
-        case "pet.study": CGSize(width: 10, height: 0)
-        default: .zero
-        }
+    /// The pencil and its sparkles stick out on both sides, so studying Kana-chan is a bit smaller.
+    static func scale(_ pet: String) -> CGFloat {
+        pet == "pet.study" ? 0.87 : 1
     }
 }
 
@@ -128,7 +122,7 @@ struct WordView: View {
             VStack(spacing: 6) {
                 PetImage(asset: "pet.wave", height: 54)
                 Text(s.t("Abre KanaGO! para tu primera palabra", "Open KanaGO! for your first word"))
-                    .font(WG.rounded(13, .semibold))
+                    .wgFont(13, .semibold)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(WG.ink(scheme))
             }
@@ -151,11 +145,11 @@ struct WordView: View {
         switch family {
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 0) {
-                Text(w.jp).font(WG.rounded(20, .heavy)).widgetAccentable()
+                Text(w.jp).wgFont(20, .heavy, tracking: -0.04).widgetAccentable()
                 if let reading = reading(w) {
-                    Text(reading).font(WG.rounded(12, .semibold)).lineLimit(1)
+                    Text(reading).wgFont(12, .semibold).lineLimit(1)
                 }
-                Text(meaning(w)).font(.system(size: 12)).lineLimit(1).foregroundStyle(.secondary)
+                Text(meaning(w)).font(.system(size: 12)).tracking(-0.12).lineLimit(1).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .containerBackground(for: .widget) { Color.clear }
@@ -163,8 +157,9 @@ struct WordView: View {
             card(w, jpSize: 46)
                 .background(alignment: .bottomTrailing) {
                     // Kana-chan peeking up from the bottom edge, curious about today's word.
+                    // Her hands rest on the edge, so they stay whole.
                     PetImage(asset: "pet.peek", height: 104, width: 150, glow: scheme == .dark ? WG.pink : nil)
-                        .offset(x: -14, y: 2)
+                        .offset(x: -14)
                 }
                 .containerBackground(for: .widget) { PaperBackground() }
         default:
@@ -177,7 +172,7 @@ struct WordView: View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(alignment: .top) {
                 Text(s.t("Palabra del día", "Word of the day"))
-                    .font(WG.rounded(11, .bold))
+                    .wgFont(11)
                     .foregroundStyle(WG.muted(scheme))
                     .lineLimit(2)
                 Spacer(minLength: 4)
@@ -188,19 +183,20 @@ struct WordView: View {
             Spacer(minLength: 0)
             Text(w.jp)
                 .font(.system(size: jpSize, weight: .bold))
+                .tracking(jpSize * -0.04)
                 .foregroundStyle(WG.ink(scheme))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
             if let reading = reading(w) {
                 Text(reading)
-                    .font(WG.rounded(12, .semibold))
+                    .wgFont(12, .semibold)
                     .foregroundStyle(WG.muted(scheme))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             HStack(spacing: 6) {
                 Text(meaning(w))
-                    .font(WG.rounded(16, .bold))
+                    .wgFont(16)
                     .foregroundStyle(WG.ink(scheme))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -223,7 +219,7 @@ struct WordView: View {
 
     private func level(_ w: WidgetSnapshot.DayWord) -> some View {
         Text(w.level)
-            .font(WG.rounded(10, .heavy))
+            .wgFont(10, .heavy)
             .foregroundStyle(scheme == .dark ? Color(hex: 0x16151A) : .white)
             .padding(.horizontal, 7).padding(.vertical, 3)
             .background(Capsule().fill(WG.ink(scheme)))
@@ -268,12 +264,12 @@ struct TodayMedium: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .center) {
-                FlameStreak(streak: snap.streak(on: date), size: 36, flame: moment.flame, ink: moment.ink, alert: moment.alert)
+                FlameStreak(streak: snap.streak(on: date), size: 42, flame: moment.flame, ink: moment.ink, alert: moment.alert)
                 Spacer(minLength: 8)
                 pill
             }
             Text(moment.message(snap))
-                .font(WG.rounded(15, .bold))
+                .wgFont(15)
                 .foregroundStyle(moment.soft)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -283,10 +279,21 @@ struct TodayMedium: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(alignment: .bottomTrailing) {
-            PetImage(asset: moment.pet(snap, at: date), height: 120, width: 150)
-                .rotationEffect(.degrees(-4))
-                .offset(x: 6, y: 12)
+        .background {
+            // 90pt of body on 170pt widgets, 79pt on 158pt.
+            GeometryReader { geo in
+                let pet = moment.pet(snap, at: date)
+                CornerPet(asset: pet, size: (geo.size.height - 70) * 0.9 * Self.scale(pet))
+            }
+        }
+    }
+
+    /// The pencil and the party hat stick out on top, toward the pill, so those two are a bit smaller.
+    static func scale(_ pet: String) -> CGFloat {
+        switch pet {
+        case "pet.study": 0.97
+        case "pet.party": 0.92
+        default: 1
         }
     }
 
@@ -295,7 +302,7 @@ struct TodayMedium: View {
             Image("hi.cards.fill")
                 .resizable().scaledToFit().frame(width: 12, height: 12)
             Text(due > 0 ? snap.t("\(due) por repasar", "\(due) to review") : snap.t("Repasos al día", "Reviews done"))
-                .font(WG.rounded(11, .bold))
+                .wgFont(11)
         }
         .foregroundStyle(moment.ink)
         .padding(.horizontal, 9).padding(.vertical, 5)

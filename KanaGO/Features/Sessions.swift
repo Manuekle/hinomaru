@@ -399,7 +399,8 @@ struct QuizSession: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 200)
+                    // 200pt when there's room; short screens (iPhone SE, the iPhone Duo) give it up for the options
+                    .frame(minHeight: 120, idealHeight: 200, maxHeight: 200)
                     .padding(20)
                     .sticker(radius: 32)
                     .padding(.horizontal, 20)
@@ -501,7 +502,7 @@ struct QuizSession: View {
                 (ok ? KG.mint : KG.red).opacity(0.14)
             }
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
-            .ignoresSafeArea(edges: .bottom)
+            .ignoresSafeArea(edges: [.bottom, .horizontal])
         )
         .sensoryFeedback(ok ? .success : .error, trigger: picked)
     }

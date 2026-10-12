@@ -323,7 +323,7 @@ struct StepFooter: View {
                 if let result { (result ? KG.mint : KG.red).opacity(0.14) }
             }
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
-            .ignoresSafeArea(edges: .bottom)
+            .ignoresSafeArea(edges: [.bottom, .horizontal])
         )
         .sensoryFeedback(result == true ? .success : .error, trigger: result) { _, new in new != nil }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: result)

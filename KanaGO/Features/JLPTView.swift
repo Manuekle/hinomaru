@@ -342,7 +342,7 @@ struct ExamSession: View {
         .padding(.horizontal, 20)
         .padding(.top, 14)
         .padding(.bottom, 10)
-        .background((ok ? KG.mint : KG.red).opacity(0.12).ignoresSafeArea(edges: .bottom))
+        .background((ok ? KG.mint : KG.red).opacity(0.12).ignoresSafeArea(edges: [.bottom, .horizontal]))
     }
 
     private func pick(_ i: Int, item: ExamItem) {

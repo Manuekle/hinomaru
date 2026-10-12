@@ -43,6 +43,13 @@ enum KG {
     /// spacing per size, so body text and small labels keep the default.
     static let tracking: CGFloat = -0.02
 
+    /// Widest a tab page's column grows on big screens (the iPhone Duo unfolded); phones never reach it.
+    static let readableWidth: CGFloat = 680
+    /// Study sessions keep a phone-like column there, so cards and buttons don't stretch.
+    static let sessionWidth: CGFloat = 600
+    /// Onboarding questions, narrower still.
+    static let formWidth: CGFloat = 520
+
     static func titleTracking(_ size: CGFloat) -> CGFloat {
         size >= 26 ? size * tracking : size >= 20 ? size * tracking * 0.5 : 0
     }
@@ -168,6 +175,41 @@ extension Label where Title == Text, Icon == Image {
     init(_ title: String, tab: HI, selected: Bool) {
         self.init { Text(title) } icon: { Image(tab, filled: selected) }
     }
+}
+
+// MARK: - Layout
+
+/// Screens without a status bar on top (the iPhone Duo's cover keeps it in a side column) give
+/// their first row some air, so headers don't touch the glass edge.
+private struct TopBreathingRoom: ViewModifier {
+    @State private var extra: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .safeAreaInset(edge: .top, spacing: 0) { Color.clear.frame(height: extra) }
+            .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.top } action: { extra = $0 < 20 ? 12 : 0 }
+    }
+}
+
+/// On screens wider than `width` (the iPhone Duo unfolded) the content keeps a centered column by
+/// widening the horizontal safe area, so backgrounds that ignore the safe area still fill the screen.
+private struct ReadableWidth: ViewModifier {
+    var width: CGFloat
+    @State private var inset: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .safeAreaPadding(.horizontal, inset)
+            // whole points: the inset nudges the width by float noise, which would re-trigger this forever
+            .onGeometryChange(for: CGFloat.self) { max(0, (($0.size.width - width) / 2).rounded()) } action: { inset = $0 }
+    }
+}
+
+extension View {
+    func topBreathingRoom() -> some View { modifier(TopBreathingRoom()) }
+
+    /// Use inside a NavigationStack: the inset doesn't cross UIKit containers.
+    func readableWidth(_ width: CGFloat = KG.readableWidth) -> some View { modifier(ReadableWidth(width: width)) }
 }
 
 // MARK: - Surfaces

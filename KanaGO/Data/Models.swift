@@ -182,9 +182,12 @@ struct Scenario: Decodable, Identifiable, Hashable {
     let level: String
     let icon: String
     let contextEs: String
+    let contextEn: String?
     let turns: [DialogueTurn]
 
     func title(_ lang: Lang) -> String { lang == .es ? titleEs : titleEn }
+
+    func context(_ lang: Lang) -> String { lang == .es ? contextEs : (contextEn ?? contextEs) }
     var choiceCount: Int { turns.filter(\.isChoice).count }
 }
 

@@ -57,6 +57,8 @@ struct LearnView: View {
                 .onAppear { scrollToCurrent(proxy) }
                 }
             }
+            .topBreathingRoom()
+            .readableWidth()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: String.self) { id in
                 if let deck = app.content.deck(id) { DeckDetailView(deck: deck) }
@@ -196,7 +198,9 @@ struct DeckDetailView: View {
     var deck: Deck
     @State private var expanded: String?
 
-    var body: some View {
+    var body: some View { page.readableWidth() }
+
+    @ViewBuilder private var page: some View {
         ZStack(alignment: .bottom) {
             KGBackground()
             ScrollView {

@@ -652,15 +652,35 @@ final class SoundPlayer {
         }
     }
 
+    private var sessionActive = false
+    private let sessionQueue = DispatchQueue(label: "SoundPlayer.session", qos: .userInitiated)
+
     func play(_ sfx: SFX, volume: Float = 1) {
         guard enabled else { return }
+        // AVAudioPlayer.play() activates the audio session synchronously on the calling thread,
+        // so do it off the main thread first and start playback once it's ready.
+        guard sessionActive else {
+            sessionQueue.async {
+                let session = AVAudioSession.sharedInstance()
+                try? session.setCategory(.playback, mode: .default, options: [.duckOthers, .mixWithOthers])
+                try? session.setActive(true)
+                DispatchQueue.main.async {
+                    self.sessionActive = true
+                    self.play(sfx, volume: volume)
+                }
+            }
+            return
+        }
         let pool = pool(sfx)
         guard !pool.isEmpty else { return }
         let i = next[sfx, default: 0] % pool.count
         next[sfx] = i + 1
-        pool[i].volume = volume
-        pool[i].currentTime = 0
-        pool[i].play()
+        let player = pool[i]
+        player.volume = volume
+        player.currentTime = 0
+        // play() re-activates the audio session synchronously if something else (speech recognition,
+        // an interruption) deactivated it, so always call it off the main thread.
+        sessionQueue.async { player.play() }
     }
 
     /// Plays a sound a moment later, e.g. a goal chime after the session-complete jingle.
@@ -672,7 +692,8 @@ final class SoundPlayer {
         if let made = players[sfx] { return made }
         guard let url = Bundle.main.url(forResource: sfx.rawValue, withExtension: "wav") else { return [] }
         let made = (0..<(sfx == .tap ? 3 : 2)).compactMap { _ in try? AVAudioPlayer(contentsOf: url) }
-        made.forEach { $0.prepareToPlay() }
+        // No prepareToPlay(): it activates the audio session synchronously, which blocks the main thread.
+        // The players already decode the file on init; play() activates the session when first needed.
         players[sfx] = made
         return made
     }

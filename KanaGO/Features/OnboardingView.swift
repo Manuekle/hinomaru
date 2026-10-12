@@ -7,6 +7,7 @@ struct OnboardingView: View {
     @State private var goal = 50
     @State private var reminderHour = 19
     @State private var finishing = false
+    @State private var questionsHeight: CGFloat = 800
     @FocusState private var nameFocused: Bool
 
     private static let lastStep = 4
@@ -46,28 +47,37 @@ struct OnboardingView: View {
     // MARK: - Welcome
 
     private var welcome: some View {
+        // Short screens (iPhone SE, the iPhone Duo's cover) shrink the hero so the tagline keeps both lines.
+        GeometryReader { geo in
+            welcomeContent(scale: min(1, max(0.68, (geo.size.height - 330) / 360)))
+        }
+    }
+
+    private func welcomeContent(scale s: CGFloat) -> some View {
         VStack(spacing: 0) {
             Spacer(minLength: 8)
             ZStack {
-                FloatingKana(glyph: "あ", angle: -10, delay: 0).offset(x: -128, y: -70)
-                FloatingKana(glyph: "カ", angle: 8, delay: 0.4).offset(x: 130, y: -92)
-                FloatingKana(glyph: "の", angle: 12, delay: 0.8).offset(x: -112, y: 78)
-                FloatingKana(glyph: "ん", angle: -6, delay: 1.2).offset(x: 122, y: 70)
-                KanaBlob(mood: .love, size: 150)
+                FloatingKana(glyph: "あ", angle: -10, delay: 0).offset(x: -128, y: -70 * s)
+                FloatingKana(glyph: "カ", angle: 8, delay: 0.4).offset(x: 130, y: -92 * s)
+                FloatingKana(glyph: "の", angle: 12, delay: 0.8).offset(x: -112, y: 78 * s)
+                FloatingKana(glyph: "ん", angle: -6, delay: 1.2).offset(x: 122, y: 70 * s)
+                KanaBlob(mood: .love, size: 150 * s)
             }
-            .frame(height: 250)
+            .frame(height: 250 * s)
 
-            KanaGOLogo(size: 64)
+            KanaGOLogo(size: 64 * s)
                 .padding(.top, 6)
 
             VStack(spacing: 10) {
                 Text(app.t("Japonés de la あ al N1,\na tu ritmo.", "Japanese from あ to N1,\nat your pace."))
                     .kgFont(26, .bold)
                     .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(app.t("Lecciones cortas, repaso inteligente\ny Kana-chan contigo en cada paso.",
                            "Bite-sized lessons, smart review\nand Kana-chan with you every step."))
                     .kgText(16)
                     .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .multilineTextAlignment(.center)
             .padding(.top, 26)
@@ -81,6 +91,7 @@ struct OnboardingView: View {
                 .foregroundStyle(.white.opacity(0.8))
                 .padding(.top, 10)
         }
+        .frame(maxWidth: KG.formWidth)
         .padding(.horizontal, 24)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -118,6 +129,7 @@ struct OnboardingView: View {
                     .accessibilityLabel(app.t("Atrás", "Back"))
                     ProgressBarKG(value: Double(step) / Double(Self.lastStep), height: 12)
                 }
+                .frame(maxWidth: KG.formWidth + 16)
                 .padding(.horizontal, 16)
                 .padding(.top, 6)
 
@@ -135,20 +147,25 @@ struct OnboardingView: View {
                         .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
                                                 removal: .move(edge: .leading).combined(with: .opacity)))
                     }
+                    .frame(maxWidth: KG.formWidth)
                     .padding(.horizontal, 24)
                     .padding(.top, 20)
                     .padding(.bottom, 24)
+                    .frame(maxWidth: .infinity)
                     .id(step)
                 }
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollDismissesKeyboard(.interactively)
 
                 footer
+                    .frame(maxWidth: KG.formWidth)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 8)
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { questionsHeight = $0 }
         .animation(.spring(response: 0.45, dampingFraction: 0.85), value: step)
+        .animation(.easeOut(duration: 0.25), value: questionsHeight >= 440)
     }
 
     private var header: some View {
@@ -165,7 +182,11 @@ struct OnboardingView: View {
             }
         }()
         return VStack(alignment: .leading, spacing: 14) {
-            KanaBlob(mood: mood, size: 76)
+            // with the keyboard up on a short screen (iPhone SE, iPhone Duo cover) the name field needs the room
+            if questionsHeight >= 440 {
+                KanaBlob(mood: mood, size: 76)
+                    .transition(.scale(scale: 0.6).combined(with: .opacity))
+            }
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .kgFont(28, .bold)
@@ -331,6 +352,7 @@ private struct FloatingKana: View {
     var angle: Double
     var delay: Double
     @State private var up = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Text(glyph)
@@ -345,6 +367,7 @@ private struct FloatingKana: View {
             .rotationEffect(.degrees(angle))
             .offset(y: up ? -6 : 4)
             .onAppear {
+                guard !reduceMotion else { return }
                 withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true).delay(delay)) { up = true }
             }
             .accessibilityHidden(true)

@@ -70,7 +70,7 @@ struct KanaBlob: View {
             .scaleEffect(x: bob ? 1.03 : 0.98, y: bob ? 0.97 : 1.02, anchor: .bottom)
             .offset(y: bob ? 1 : -size * 0.025)
             .onAppear {
-                guard animated else { return }
+                guard animated, !reduceMotion else { return }
                 withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) { bob = true }
             }
             .accessibilityHidden(true)

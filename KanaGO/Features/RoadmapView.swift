@@ -142,6 +142,7 @@ private struct CurrentBubble: View {
     @Environment(AppModel.self) private var app
     var text: String
     @State private var float = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 0) {
@@ -160,6 +161,7 @@ private struct CurrentBubble: View {
         .fixedSize()
         .offset(y: float ? -4 : 2)
         .onAppear {
+            guard !reduceMotion else { return }
             withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) { float = true }
         }
     }

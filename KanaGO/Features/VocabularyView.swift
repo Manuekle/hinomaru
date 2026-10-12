@@ -15,7 +15,9 @@ struct VocabularyView: View {
         }
     }
 
-    var body: some View {
+    var body: some View { page.readableWidth() }
+
+    @ViewBuilder private var page: some View {
         ZStack(alignment: .bottom) {
             KGBackground()
             ScrollView {

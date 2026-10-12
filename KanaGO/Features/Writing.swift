@@ -202,6 +202,7 @@ struct GlyphFrame {
 
 struct TraceCanvas: View {
     @Environment(AppModel.self) private var app
+    @Environment(\.horizontalSizeClass) private var hSize
     var pad: WritingPad
     /// Offer "write it again" once traced (the practice sheet; lessons move on instead).
     var replayable = true
@@ -231,7 +232,9 @@ struct TraceCanvas: View {
                     .onEnded { _ in pad.finish() }
             )
         }
-        .frame(height: 280)
+        // wide screens (the iPhone Duo unfolded) keep each character's box square instead of a long strip
+        .frame(maxWidth: hSize == .regular ? 360 * CGFloat(pad.cells) : .infinity)
+        .frame(height: hSize == .regular ? 360 : 280)
         .background(RoundedRectangle(cornerRadius: 28, style: .continuous).fill(.white))
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .shadow(color: KG.ink.opacity(0.07), radius: 14, y: 8)

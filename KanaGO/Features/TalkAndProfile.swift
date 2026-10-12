@@ -32,6 +32,8 @@ struct TalkView: View {
                     .padding(.bottom, 30)
                 }
             }
+            .topBreathingRoom()
+            .readableWidth()
             .toolbar(.hidden, for: .navigationBar)
             .animation(.spring(response: 0.35, dampingFraction: 0.85), value: router.explore)
         }
@@ -139,7 +141,7 @@ struct ScenarioRow: View {
                 .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(KG.levelColor(scenario.level).opacity(0.15)))
             VStack(alignment: .leading, spacing: 4) {
                 Text(scenario.title(app.lang)).kgFont(17, .bold).foregroundStyle(KG.ink)
-                Text(scenario.contextEs)
+                Text(scenario.context(app.lang))
                     .kgText(13).foregroundStyle(KG.muted)
                     .lineLimit(2).multilineTextAlignment(.leading)
             }
@@ -272,6 +274,8 @@ struct ProfileView: View {
                 }
                 .scrollDismissesKeyboard(.immediately)
             }
+            .topBreathingRoom()
+            .readableWidth()
             .toolbar(.hidden, for: .navigationBar)
             .onChange(of: app.p.reminderHour) { rescheduleReminder() }
             .onChange(of: app.p.lang) { rescheduleReminder() }

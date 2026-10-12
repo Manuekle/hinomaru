@@ -126,6 +126,7 @@ struct ListenPrompt: View {
     @Environment(AppModel.self) private var app
     var text: String
     @State private var pulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var tick = 0
 
     var body: some View {
@@ -157,6 +158,7 @@ struct ListenPrompt: View {
             .accessibilityLabel(app.t("Más lento", "Slower"))
         }
         .onAppear {
+            guard !reduceMotion else { return }
             withAnimation(.easeOut(duration: 1.4).repeatForever(autoreverses: false)) { pulse = true }
         }
     }
@@ -389,7 +391,10 @@ struct TypeSession: View {
                 VStack(spacing: 16) {
                     SessionTopBar(progress: Double(index) / Double(max(cards.count, 1)), trailing: "\(index + 1)/\(cards.count)")
                     HStack(alignment: .bottom) {
-                        KanaBlob(mood: result == nil ? .curious : result == true ? .happy : .sad, size: 64)
+                        // the keyboard leaves little height (iPhone SE, the iPhone Duo): the card and field matter more
+                        if !focused {
+                            KanaBlob(mood: result == nil ? .curious : result == true ? .happy : .sad, size: 64)
+                        }
                         Text(app.t("Escribe qué significa", "Type what it means"))
                             .kgFont(18, .bold).foregroundStyle(KG.ink)
                         Spacer()
@@ -406,7 +411,7 @@ struct TypeSession: View {
                         }
                         SpeakButton(text: card.kana ?? card.jp, size: 40)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 190)
+                    .frame(maxWidth: .infinity, minHeight: 90, idealHeight: 190, maxHeight: 190)
                     .padding(16)
                     .sticker(radius: 30)
                     .padding(.horizontal, 20)
@@ -457,6 +462,7 @@ struct TypeSession: View {
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: result)
+        .animation(.easeOut(duration: 0.2), value: focused)
         .onAppear {
             if cards.isEmpty { cards = Array(deck.cards.shuffled().prefix(10)) }
             focused = true

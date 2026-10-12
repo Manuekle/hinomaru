@@ -45,6 +45,14 @@ enum WG {
     }
 }
 
+extension View {
+    /// SF Pro Rounded with the landing page's tracking (in em): −0.04 for big numbers, −0.02 for big
+    /// Japanese, −0.01 for copy.
+    func wgFont(_ size: CGFloat, _ weight: Font.Weight = .bold, tracking em: CGFloat = -0.04) -> some View {
+        font(WG.rounded(size, weight)).tracking(size * em)
+    }
+}
+
 extension Color {
     init(hex: UInt32) {
         self.init(red: Double((hex >> 16) & 0xFF) / 255, green: Double((hex >> 8) & 0xFF) / 255, blue: Double(hex & 0xFF) / 255)
@@ -175,7 +183,7 @@ struct PaperBackground: View {
 
 // MARK: - Pieces
 
-/// Kana-chan, always in full color, peeking in from the bottom-right corner.
+/// Kana-chan, always in full color, in the bottom-right corner.
 struct PetImage: View {
     let asset: String
     var height: CGFloat
@@ -209,6 +217,59 @@ struct PetImage: View {
     }
 }
 
+/// Where Kana-chan is in each pose's artwork, as fractions of the image, measured from the SVGs
+/// tilted −4°. `body` is her body without props; `reach` is how far right anything visible goes
+/// (loose confetti and sweat drops excepted) and how low her hands and eyes go; `corner` is how far
+/// (× art width) she backs off diagonally so her hands clear the widget's rounded corner.
+struct PetPose {
+    let aspect: CGFloat
+    let body: CGRect
+    let reach: CGPoint
+    let corner: CGFloat
+
+    static subscript(_ asset: String) -> PetPose {
+        all[asset] ?? PetPose(aspect: 1, body: CGRect(x: 0, y: 0, width: 1, height: 1), reach: CGPoint(x: 1, y: 1), corner: 0)
+    }
+
+    private static let all: [String: PetPose] = [
+        "pet.wave": PetPose(aspect: 1.0953, body: CGRect(x: 0.000, y: 0.224, width: 0.856, height: 0.774), reach: CGPoint(x: 0.991, y: 1.010), corner: 0.008),
+        "pet.study": PetPose(aspect: 1.3269, body: CGRect(x: 0.146, y: 0.383, width: 0.684, height: 0.614), reach: CGPoint(x: 0.995, y: 0.861), corner: 0.013),
+        "pet.wow": PetPose(aspect: 1.2404, body: CGRect(x: 0.056, y: 0.094, width: 0.834, height: 0.891), reach: CGPoint(x: 1.005, y: 0.831), corner: 0.015),
+        "pet.cool": PetPose(aspect: 1.2320, body: CGRect(x: 0.042, y: 0.225, width: 0.786, height: 0.768), reach: CGPoint(x: 0.982, y: 0.950), corner: 0.014),
+        "pet.party": PetPose(aspect: 1.0918, body: CGRect(x: 0.000, y: 0.333, width: 0.664, height: 0.665), reach: CGPoint(x: 0.800, y: 0.960), corner: 0.006),
+        "pet.alarm": PetPose(aspect: 0.9760, body: CGRect(x: 0.000, y: 0.180, width: 0.886, height: 0.795), reach: CGPoint(x: 0.986, y: 0.893), corner: 0.008),
+        "pet.melt": PetPose(aspect: 1.5677, body: CGRect(x: 0.122, y: 0.132, width: 0.756, height: 0.865), reach: CGPoint(x: 1.018, y: 1.007), corner: 0.013),
+        "pet.panic": PetPose(aspect: 1.0146, body: CGRect(x: 0.040, y: 0.329, width: 0.780, height: 0.669), reach: CGPoint(x: 0.880, y: 0.839), corner: 0.028),
+        "pet.sleep": PetPose(aspect: 1.1510, body: CGRect(x: 0.000, y: 0.376, width: 0.754, height: 0.619), reach: CGPoint(x: 0.977, y: 0.864), corner: 0.006),
+        "pet.cry": PetPose(aspect: 1.1744, body: CGRect(x: 0.038, y: 0.214, width: 0.786, height: 0.692), reach: CGPoint(x: 0.977, y: 0.930), corner: 0.007),
+    ]
+}
+
+/// Kana-chan big in the bottom-right corner, like the stickers on the landing page. Every pose gets
+/// the same body size (`size`, the geometric mean of her body's width and height), and her body may
+/// sink below the bottom edge (up to 18% of it), but her hands, eyes and props stay 3pt inside.
+struct CornerPet: View {
+    let asset: String
+    let size: CGFloat
+    var glow: Color?
+
+    var body: some View {
+        GeometryReader { geo in
+            let p = PetPose[asset]
+            let width = size / (p.body.width * p.body.height / p.aspect).squareRoot()
+            let height = width / p.aspect
+            let inset: CGFloat = 3
+            let right = (1 - p.reach.x) * width - inset
+            let bottom = min((1 - p.reach.y) * height - inset, (0.18 * p.body.height + 1 - p.body.maxY) * height)
+            let pull = p.corner * width
+            PetImage(asset: asset, height: height, width: width, glow: glow)
+                .rotationEffect(.degrees(-4))
+                .position(x: geo.size.width + right - pull - width / 2,
+                          y: geo.size.height + bottom - pull - height / 2)
+        }
+    }
+}
+
 struct FlameStreak: View {
     let streak: Int
     var size: CGFloat = 30
@@ -237,7 +298,7 @@ struct FlameStreak: View {
                 .padding(.trailing, alert == nil ? 0 : size * 0.12)
                 .widgetAccentable()
             Text("\(streak)")
-                .font(WG.rounded(size, .heavy))
+                .wgFont(size, .heavy, tracking: -0.04)
                 .foregroundStyle(ink)
                 .contentTransition(.numericText())
         }
@@ -261,7 +322,7 @@ struct WeekDots: View {
                 let today = Calendar.current.isDate(day.day, inSameDayAs: date)
                 VStack(spacing: 4) {
                     Text(f.string(from: day.day).uppercased())
-                        .font(WG.rounded(9, .bold))
+                        .wgFont(9)
                         .foregroundStyle(moment.soft)
                     Circle()
                         .fill(done ? moment.dotOn : day.xp > 0 ? moment.dotOn.opacity(0.5) : moment.dot)
