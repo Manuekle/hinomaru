@@ -44,7 +44,7 @@ Los datos, las voces pregrabadas y los efectos de sonido ya están incluidos. No
 | Sección | Funciones |
 | --- | --- |
 | **Inicio** | Racha, XP, meta diaria, repasos pendientes, siguiente lección, palabra e historia del día. |
-| **Kana** | Hiragana y katakana con audio, búsqueda por romaji, práctica de trazo, palabras de ejemplo y quiz por filas. |
+| **Kana** | Hiragana y katakana con audio, búsqueda por romaji, práctica de trazo con corrección automática, palabras de ejemplo y quiz por filas. |
 | **Aprender → Ruta** | Siete rutas: Kana, Viaje y N5–N1. Las lecciones se desbloquean de forma progresiva y repiten los errores para reforzar lo aprendido. |
 | **Aprender → Mazos** | Vocabulario, kanji y gramática con tarjetas y repaso espaciado SM-2. |
 | **Aprender → JLPT** | Práctica de vocabulario y gramática N5–N1, escucha en N5, temporizador y repaso de errores. |
@@ -52,6 +52,8 @@ Los datos, las voces pregrabadas y los efectos de sonido ya están incluidos. No
 | **Yo** | Estadísticas, vocabulario guardado, idioma, romaji, sonido, meta diaria, recordatorios y elección de voz. |
 
 Los mazos ofrecen hasta siete modos de práctica: **Quiz**, **Escuchar**, **Pronunciar**, **Emparejar**, **Teclear**, **Construir frase** y **Escribir a mano**. Los modos disponibles dependen del contenido de cada mazo.
+
+La escritura a mano se corrige sola. Al calcar, cada trazo se revisa al levantar el dedo: posición, dirección, forma y orden. Al escribir de memoria se revisa el carácter completo al tocar **Comprobar**, sin importar su tamaño ni dónde se dibuje en el lienzo. Si algo falla, Kana-chan dice qué trazo está mal y la app anima el orden correcto.
 
 El simulacro JLPT combina 30 preguntas de vocabulario y gramática en 20 minutos. Un resultado de al menos 70 % desbloquea un certificado de práctica para compartir. Los simulacros y certificados no son oficiales.
 
@@ -160,6 +162,21 @@ python3 scripts/generate_audio.py --voice kasane
 El script también graba cada ficha del modo **Construir frase**. Para saber cómo se cortará cada frase compila `KanaGO/Data/SentenceChunks.swift` junto con `scripts/sentence_chunks.swift`, la misma lógica que usa la app. Los cortes que el tokenizador hace mal, sobre todo en frases solo en kana, se corrigen a mano en `KanaGO/Resources/Data/chunks.json`.
 
 La generación usa créditos de ElevenLabs y omite los clips que ya existen. Puedes volver a ejecutar el comando para completar los pendientes.
+
+### Orden de trazos
+
+`KanaGO/Resources/Data/strokes.json` guarda los trazos de cada carácter que la app pide escribir, sacados de [KanjiVG](https://kanjivg.tagaini.net) (CC BY-SA 3.0, con crédito en **Yo**). Si cambian los mazos o el silabario, descarga el XML del [último release](https://github.com/KanjiVG/kanjivg/releases) y regenera el archivo. El script avisa si falta algún carácter:
+
+```bash
+python3 scripts/build_strokes.py kanjivg-20260714.xml.gz
+```
+
+`KanaGO/Data/Strokes.swift` compara los trazos. Para ajustar sus umbrales, `scripts/stroke_harness.swift` simula escritura imprecisa, trazos invertidos o en otro orden, y kana parecidos, y mide cuántos acepta:
+
+```bash
+swiftc -O -parse-as-library KanaGO/Data/Strokes.swift scripts/stroke_harness.swift -o /tmp/strokes
+cp KanaGO/Resources/Data/strokes.json /tmp/ && /tmp/strokes
+```
 
 ### Efectos de sonido
 

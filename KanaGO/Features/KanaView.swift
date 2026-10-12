@@ -258,6 +258,12 @@ struct KanaDetailSheet: View {
     @Environment(AppModel.self) private var app
     @Environment(\.dismiss) private var dismiss
     var char: KanaChar
+    @State private var pad: WritingPad
+
+    init(char: KanaChar) {
+        self.char = char
+        _pad = State(initialValue: WritingPad(text: char.jp, mode: .trace))
+    }
 
     var body: some View {
         ScrollView {
@@ -287,7 +293,13 @@ struct KanaDetailSheet: View {
 
                 VStack(alignment: .leading, spacing: 10) {
                     SectionTitle(app.t("Practica el trazo", "Practice writing"), jp: "かいて")
-                    TraceCanvas(glyph: char.jp)
+                    TraceCanvas(pad: pad)
+                    if pad.glyph != nil {
+                        Text(pad.message(app) ?? app.t("Empieza en el punto rosa", "Start at the pink dot"))
+                            .kgFont(15, .semibold)
+                            .foregroundStyle(pad.complete ? KG.mintDeep : KG.inkSoft)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
 
                 let words = app.content.words(for: char)
@@ -339,62 +351,6 @@ struct SpeakButton: View {
         }
         .buttonStyle(.squish)
         .accessibilityLabel(app.t("Escuchar", "Listen"))
-    }
-}
-
-struct TraceCanvas: View {
-    var glyph: String
-    var guideOpacity: Double = 0.14
-    @State private var strokes: [[CGPoint]] = []
-    @State private var current: [CGPoint] = []
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 28, style: .continuous).fill(.white)
-            // guide cross
-            GeometryReader { geo in
-                Path { p in
-                    p.move(to: CGPoint(x: geo.size.width / 2, y: 12))
-                    p.addLine(to: CGPoint(x: geo.size.width / 2, y: geo.size.height - 12))
-                    p.move(to: CGPoint(x: 12, y: geo.size.height / 2))
-                    p.addLine(to: CGPoint(x: geo.size.width - 12, y: geo.size.height / 2))
-                }
-                .stroke(KG.line, style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
-            }
-            Text(glyph)
-                .font(.system(size: 190, weight: .regular, design: .rounded))
-                .minimumScaleFactor(0.4)
-                .foregroundStyle(KG.pink.opacity(guideOpacity))
-                .animation(.easeInOut(duration: 0.25), value: guideOpacity)
-            Canvas { ctx, _ in
-                for s in strokes + [current] where s.count > 1 {
-                    var path = Path()
-                    path.addLines(s)
-                    ctx.stroke(path, with: .color(KG.ink), style: StrokeStyle(lineWidth: 14, lineCap: .round, lineJoin: .round))
-                }
-            }
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { current.append($0.location) }
-                    .onEnded { _ in strokes.append(current); current = [] }
-            )
-        }
-        .frame(height: 280)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .shadow(color: KG.ink.opacity(0.07), radius: 14, y: 8)
-        .overlay(alignment: .bottomTrailing) {
-            if !strokes.isEmpty {
-                Button {
-                    withAnimation { strokes.removeAll() }
-                } label: {
-                    HugeIcon(.undo, size: 20)
-                        .foregroundStyle(KG.ink)
-                        .frame(width: 42, height: 42)
-                        .background(Circle().fill(KG.cream))
-                }
-                .padding(12)
-            }
-        }
     }
 }
 
