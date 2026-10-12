@@ -56,18 +56,22 @@ body[data-page="home"] .nav { position: fixed; inset: 0 0 auto; }
 .brand { display: inline-flex; flex: none; align-items: center; gap: 10px; text-decoration: none; }
 .brand img { width: 70px; height: auto; }
 .brand .brand-icon { width: 32px; border-radius: 8px; }
+.nav .brand { gap: 8px; }
+.nav .brand img { width: 52px; }
+.nav .brand .brand-icon { width: 28px; }
 .nav-badge { margin-left: auto; }
 .lang { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--soft); }
 .lang button { border: 0; background: transparent; color: var(--muted); font: 600 12px/1 var(--body); padding: 8px 10px; border-radius: 999px; cursor: pointer; }
 .lang button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(22,21,26,.12); }
 
 /* Phone: black glass, screenshot, real iPhone frame on top */
-.phone { position: relative; width: 100%; aspect-ratio: 1390 / 2858; filter: drop-shadow(0 30px 40px rgba(22,21,26,.14)); }
-.phone::before { content: ""; position: absolute; inset: .84% 2.37%; border-radius: 18% / 8.7%; background: #000; }
+.phone { position: relative; width: 100%; aspect-ratio: 1390 / 2858; }
+.phone::before { content: ""; position: absolute; inset: .84% 2.37%; border-radius: 18% / 8.7%; background: #000; box-shadow: 0 30px 40px rgba(22,21,26,.14); }
 .phone::after { content: ""; position: absolute; inset: 0; background: url(/assets/iphone-frame.webp) center / 100% 100% no-repeat; pointer-events: none; }
 .screens { position: absolute; left: 3.67%; top: 1.47%; width: 92.66%; height: 97.06%; border-radius: 17% / 7.9%; overflow: hidden; background: #fff; }
 .screen { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.js .screen:not([data-ready]) { visibility: hidden; }
+.js .screen { visibility: hidden; }
+.js .screen.is-visible[data-ready] { visibility: visible; }
 /* The frame only has the camera lens, so every screen gets the same Dynamic Island on top. */
 .screens::after { content: ""; position: absolute; z-index: 1; left: 34.4%; top: 1.15%; width: 31.2%; height: 4.25%; border-radius: 999px; background: #000; }
 
@@ -275,6 +279,8 @@ footer small { display: block; margin-top: 10px; max-width: 37em; font-size: 11p
 
 /* Responsive */
 @media (max-width: 899px) {
+  /* A moving backdrop blur repaints the entire header on mobile. */
+  .nav { background: rgba(255,255,255,.97); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .nav-badge { display: none; }
   .lang { margin-left: auto; }
   .intro { inset-block-start: calc(var(--nav) + 5svh); }
@@ -321,7 +327,8 @@ footer small { display: block; margin-top: 10px; max-width: 37em; font-size: 11p
   .intro-lede { display: none; }
 }
 @media (max-width: 480px) {
-  .brand img { width: 62px; }
+  .nav .brand img { width: 46px; }
+  .nav .brand .brand-icon { width: 26px; }
   .faq summary { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {

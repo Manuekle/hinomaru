@@ -114,9 +114,16 @@
   const shots = [...document.querySelectorAll("img[data-es]")];
   shots.forEach((img) => {
     img.dataset.en = img.getAttribute("src");
+    img.dataset.srcsetEn = img.getAttribute("srcset") || "";
     img.dataset.altEn = img.alt;
     let retriedSrc;
-    const ready = () => img.toggleAttribute("data-ready", img.complete && img.naturalWidth > 0);
+    const ready = (event) => {
+      img.toggleAttribute("data-ready", img.complete && img.naturalWidth > 0);
+      if (event) {
+        lastFilmProgress = -1;
+        scheduleFrame();
+      }
+    };
     const retry = () => {
       ready();
       const src = img.getAttribute("src");
@@ -141,8 +148,10 @@
     });
     shots.forEach((img) => {
       const src = lang === "es" ? img.dataset.es : img.dataset.en;
+      const srcset = lang === "es" ? img.dataset.srcsetEs : img.dataset.srcsetEn;
       if (img.getAttribute("src") !== src) {
         img.removeAttribute("data-ready");
+        if (srcset) img.srcset = srcset;
         img.src = src;
       }
       img.alt = lang === "es" ? img.dataset.altEs : img.dataset.altEn;
@@ -158,7 +167,8 @@
     store.set("kanago-lang", lang);
     setupStoreButtons(lang);
     splitWords();
-    window.dispatchEvent(new Event("scroll"));
+    lastLit = -1;
+    invalidateFrame();
   }
   document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.set)));
 
@@ -193,10 +203,10 @@
   // ---------- scroll engine ----------
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ease = (x) => 1 - Math.pow(1 - x, 3);
-  // How far a pinned section has scrolled, 0 → 1.
-  const pinned = (el) => {
-    const r = el.getBoundingClientRect();
-    return clamp(-r.top / Math.max(1, r.height - innerHeight));
+  // Use the sticky stage's stable height: Safari's toolbar changes innerHeight during a swipe.
+  const pinned = (rect, stageHeight) => clamp(-rect.top / Math.max(1, rect.height - stageHeight));
+  const setStyle = (el, name, value) => {
+    if (el && el.style.getPropertyValue(name) !== value) el.style.setProperty(name, value);
   };
   const setActive = (items, index) => items.forEach((el, i) => {
     el.classList.toggle("is-active", i === index);
@@ -213,21 +223,35 @@
   const screens = film ? [...film.querySelectorAll(".screen")] : [];
   const ticks = film ? [...film.querySelectorAll(".rail i")] : [];
   const buddy = film?.querySelector(".buddy");
+  const introCopy = film?.querySelector(".intro");
+  const device = film?.querySelector(".device");
+  const filmStage = film?.querySelector(".stage");
   const moodFor = ["hello", "happy", "wow", "happy", "meh", "hello", "happy"];
   let lastStep = -1;
+  let lastFilmProgress = -1;
 
-  function drawFilm() {
-    const t = pinned(film) * filmSteps;
+  function drawFilm(progress) {
+    if (progress === lastFilmProgress) return;
+    lastFilmProgress = progress;
+    const t = progress * filmSteps;
     const intro = reduced ? 1 : ease(clamp(t / 0.9));
     const slide = ease(clamp((t - 0.55) / 0.5));
-    film.style.setProperty("--intro", intro.toFixed(4));
-    film.style.setProperty("--slide", (reduced ? (t >= 0.5 ? 1 : 0) : slide).toFixed(4));
-    film.style.setProperty("--fade", clamp(1 - t / 0.45).toFixed(4));
-    film.style.setProperty("--sway", reduced ? "0deg" : `${(Math.sin(t * Math.PI) * 5).toFixed(2)}deg`);
+    setStyle(introCopy, "--intro", intro.toFixed(4));
+    setStyle(device, "--intro", intro.toFixed(4));
+    setStyle(device, "--slide", (reduced ? (t >= 0.5 ? 1 : 0) : slide).toFixed(4));
+    setStyle(introCopy, "--fade", clamp(1 - t / 0.45).toFixed(4));
+    setStyle(buddy, "--sway", reduced ? "0deg" : `${(Math.sin(t * Math.PI) * 5).toFixed(2)}deg`);
+    // Only the uncovered screenshot and the incoming wipe need to be painted.
+    // Keep the previous ready image underneath while a language variant loads.
+    const reveals = screens.map((s, i) => !i ? 1 : reduced ? (t >= i ? 1 : 0) : clamp((t - i + 0.2) / 0.3));
+    let base = 0;
     screens.forEach((s, i) => {
-      if (!i) return;
-      const r = reduced ? (t >= i ? 1 : 0) : clamp((t - i + 0.2) / 0.3);
-      s.style.setProperty("--r", r.toFixed(4));
+      if (reveals[i] === 1 && s.hasAttribute("data-ready")) base = i;
+    });
+    screens.forEach((s, i) => {
+      const visible = i === base || (i > base && reveals[i] > 0);
+      s.classList.toggle("is-visible", visible);
+      if (visible && i) setStyle(s, "--r", reveals[i].toFixed(4));
     });
     const step = Math.min(filmSteps - 1, Math.floor(t + (t < 1 ? 0.15 : 0)));
     if (step !== lastStep) {
@@ -246,17 +270,23 @@
   const moodImgs = moodsFilm ? [...moodsFilm.querySelectorAll(".mood-track img")] : [];
   const captions = moodsFilm ? [...moodsFilm.querySelectorAll(".mood-captions li")] : [];
   const dots = moodsFilm ? [...moodsFilm.querySelectorAll(".mood-dots i")] : [];
+  const moodsStage = moodsFilm?.querySelector(".stage");
   let lastMood = -1;
+  let lastMoodProgress = -1;
+  let lastMoodWidth = -1;
 
-  function drawMoods() {
-    const raw = pinned(moodsFilm) * (moodImgs.length - 1);
+  function drawMoods(progress, width) {
+    if (progress === lastMoodProgress && width === lastMoodWidth) return;
+    lastMoodProgress = progress;
+    lastMoodWidth = width;
+    const raw = progress * (moodImgs.length - 1);
     const m = reduced ? Math.round(raw) : raw;
-    const gap = Math.min(innerWidth * 0.34, 340);
+    const gap = Math.min(width * 0.34, 340);
     moodImgs.forEach((img, i) => {
       const d = i - m;
       const a = Math.min(Math.abs(d), 2);
-      img.style.transform = `translateX(${(d * gap).toFixed(1)}px) scale(${(1 - Math.min(Math.abs(d), 1) * 0.42).toFixed(3)}) rotate(${(d * -8).toFixed(1)}deg)`;
-      img.style.opacity = (1 - a * 0.42).toFixed(3);
+      setStyle(img, "transform", `translateX(${(d * gap).toFixed(1)}px) scale(${(1 - Math.min(Math.abs(d), 1) * 0.42).toFixed(3)}) rotate(${(d * -8).toFixed(1)}deg)`);
+      setStyle(img, "opacity", (1 - a * 0.42).toFixed(3));
     });
     const now = Math.round(raw);
     if (now !== lastMood) {
@@ -271,11 +301,12 @@
   const homescreen = wFilm?.querySelector(".homescreen");
   const times = wFilm ? [...wFilm.querySelectorAll(".clock-time span")] : [];
   const caps = wFilm ? [...wFilm.querySelectorAll(".clock-caps li")] : [];
+  const widgetsStage = wFilm?.querySelector(".stage");
   const wStates = ["ready", "late", "last", "done"];
   let lastW = -1;
 
-  function drawWidgets() {
-    const w = Math.min(wStates.length - 1, Math.floor(pinned(wFilm) * wStates.length));
+  function drawWidgets(progress) {
+    const w = Math.min(wStates.length - 1, Math.floor(progress * wStates.length));
     if (w === lastW) return;
     lastW = w;
     homescreen.dataset.state = wStates[w];
@@ -283,30 +314,51 @@
     setActive(caps, w);
   }
 
-  function drawWords() {
-    const r = line.getBoundingClientRect();
-    const p = clamp((innerHeight * 0.85 - r.top) / (innerHeight * 0.5 + r.height * 0.5));
+  let lastLit = -1;
+  function drawWords(r, height) {
+    const p = clamp((height * 0.85 - r.top) / (height * 0.5 + r.height * 0.5));
     const lit = Math.round(p * words.length);
+    if (lit === lastLit) return;
+    lastLit = lit;
     words.forEach((w, i) => w.classList.toggle("lit", i < lit));
   }
 
   const final = document.querySelector(".final");
-  function drawFinal() {
-    const r = final.getBoundingClientRect();
-    final.style.setProperty("--rise", (reduced ? 1 : ease(clamp((innerHeight - r.top) / (innerHeight * 0.6)))).toFixed(4));
+  const finalPet = final?.querySelector(".final-pet");
+  function drawFinal(r, height) {
+    setStyle(finalPet, "--rise", (reduced ? 1 : ease(clamp((height - r.top) / (height * 0.6)))).toFixed(4));
   }
 
-  // Scroll events already arrive once per frame, so draw straight away.
+  let pendingFrame = 0;
+  let sizesDirty = true;
+  let stageHeights = [];
+  // Read all geometry before writing any styles; never force layout between sections.
   function frame() {
-    if (film) drawFilm();
-    if (moodsFilm) drawMoods();
-    if (wFilm && homescreen) drawWidgets();
-    if (line && words.length) drawWords();
-    if (final) drawFinal();
+    pendingFrame = 0;
+    const height = innerHeight;
+    const width = innerWidth;
+    const rects = [film, moodsFilm, wFilm, line, final].map(el => el?.getBoundingClientRect());
+    if (sizesDirty) {
+      stageHeights = [filmStage, moodsStage, widgetsStage].map(el => el?.getBoundingClientRect().height || height);
+      sizesDirty = false;
+    }
+    if (film) drawFilm(pinned(rects[0], stageHeights[0]));
+    if (moodsFilm) drawMoods(pinned(rects[1], stageHeights[1]), width);
+    if (wFilm && homescreen) drawWidgets(pinned(rects[2], stageHeights[2]));
+    if (line && words.length) drawWords(rects[3], height);
+    if (final) drawFinal(rects[4], height);
     if (!film && nav) nav.classList.toggle("solid", scrollY > 8);
   }
-  addEventListener("scroll", frame, { passive: true });
-  addEventListener("resize", frame);
+  function scheduleFrame() {
+    if (!pendingFrame) pendingFrame = requestAnimationFrame(frame);
+  }
+  function invalidateFrame() {
+    sizesDirty = true;
+    lastFilmProgress = -1;
+    scheduleFrame();
+  }
+  addEventListener("scroll", scheduleFrame, { passive: true });
+  addEventListener("resize", invalidateFrame);
 
   // Reveals run both ways, so scrolling back up replays them.
   const reveals = document.querySelectorAll(".reveal");
@@ -324,7 +376,6 @@
   const asked = new URLSearchParams(location.search).get("lang");
   const saved = store.get("kanago-lang");
   setLang(["en", "es"].includes(asked) ? asked : saved === "es" ? "es" : "en");
-  frame();
   const year = document.querySelector("[data-year]");
   if (year) year.textContent = new Date().getFullYear();
 })();

@@ -2,6 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "git": {
+    "deploymentEnabled": {
+      "web": true,
+      "ios": false
+    }
+  },
   "redirects": [
     { "source": "/contact", "destination": "/support", "permanent": true },
     {
