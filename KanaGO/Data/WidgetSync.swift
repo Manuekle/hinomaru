@@ -21,6 +21,7 @@ extension AppModel {
         s.lastActiveDay = p.lastActiveDay
         s.xpByDay = p.xpByDay.filter { $0.key >= Self.dayKey(Calendar.current.date(byAdding: .day, value: -8, to: .now)!) }
         s.dailyGoal = p.dailyGoal
+        s.showRomaji = p.showRomaji
         s.onboarded = p.onboarded
         s.dueDates = Array(p.srs.values.map(\.due).sorted().prefix(400))
         let level = studyLevel

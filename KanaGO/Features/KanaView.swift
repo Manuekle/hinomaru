@@ -298,7 +298,7 @@ struct KanaDetailSheet: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(w.jp).kgFont(24, .semibold).foregroundStyle(KG.ink)
-                                    Text("\(w.romaji) · \(w.meaning(app.lang))")
+                                    Text(app.p.showRomaji ? "\(w.romaji) · \(w.meaning(app.lang))" : w.meaning(app.lang))
                                         .kgText(14, .medium).foregroundStyle(KG.muted)
                                 }
                                 Spacer()
@@ -474,13 +474,15 @@ struct KanaQuizSetupView: View {
 /// Simple wrapping layout for chips.
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
+    /// Gap between rows; `spacing` when nil.
+    var lineSpacing: CGFloat? = nil
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let maxW = proposal.width ?? .infinity
         var x: CGFloat = 0, y: CGFloat = 0, rowH: CGFloat = 0, widest: CGFloat = 0
         for v in subviews {
             let s = v.sizeThatFits(.unspecified)
-            if x + s.width > maxW, x > 0 { x = 0; y += rowH + spacing; rowH = 0 }
+            if x + s.width > maxW, x > 0 { x = 0; y += rowH + (lineSpacing ?? spacing); rowH = 0 }
             x += s.width + spacing
             rowH = max(rowH, s.height)
             widest = max(widest, x - spacing)
@@ -492,7 +494,7 @@ struct FlowLayout: Layout {
         var x = bounds.minX, y = bounds.minY, rowH: CGFloat = 0
         for v in subviews {
             let s = v.sizeThatFits(.unspecified)
-            if x + s.width > bounds.maxX, x > bounds.minX { x = bounds.minX; y += rowH + spacing; rowH = 0 }
+            if x + s.width > bounds.maxX, x > bounds.minX { x = bounds.minX; y += rowH + (lineSpacing ?? spacing); rowH = 0 }
             v.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(s))
             x += s.width + spacing
             rowH = max(rowH, s.height)

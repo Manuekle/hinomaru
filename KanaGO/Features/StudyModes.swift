@@ -705,7 +705,7 @@ struct WriteSession: View {
                         Text(card.meaning(app.lang))
                             .kgFont(26, .bold).foregroundStyle(KG.ink)
                             .multilineTextAlignment(.center)
-                        if card.romaji != card.meaning(app.lang) {
+                        if app.p.showRomaji, card.romaji != card.meaning(app.lang) {
                             Text(card.romaji).kgFont(15, .semibold).foregroundStyle(KG.pinkText)
                         }
                     }

@@ -286,6 +286,7 @@ struct QuizQuestion: Identifiable {
     let id = UUID()
     let prompt: String
     let promptIsJapanese: Bool
+    /// Romaji revealed after answering, while the "Show romaji" switch is on.
     let hint: String?
     let speak: String?
     let options: [String]
@@ -319,7 +320,7 @@ enum QuizBuilder {
             var opts = distractors.map { $0.meaning(lang) } + [card.meaning(lang)]
             opts.shuffle()
             return QuizQuestion(prompt: card.jp, promptIsJapanese: true,
-                                hint: app.p.showRomaji ? card.romaji : nil, speak: card.kana ?? card.jp,
+                                hint: card.romaji, speak: card.kana ?? card.jp,
                                 options: opts, answer: opts.firstIndex(of: card.meaning(lang))!, optionsAreJapanese: false)
         }
     }
@@ -391,7 +392,7 @@ struct QuizSession: View {
                                 .foregroundStyle(KG.ink)
                                 .multilineTextAlignment(.center)
                                 .minimumScaleFactor(0.4)
-                            if let hint = q.hint, picked != nil {
+                            if app.p.showRomaji, let hint = q.hint, picked != nil {
                                 Text(hint).kgFont(16, .semibold).foregroundStyle(KG.pinkText)
                             }
                             if let s = q.speak { SpeakButton(text: s, size: 42) }

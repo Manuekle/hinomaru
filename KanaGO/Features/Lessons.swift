@@ -47,7 +47,7 @@ extension ContentStore {
                 let ex = g.examples.first
                 return LessonItem(id: "\(deck.id)#\(g.pattern)", jp: g.pattern, reading: nil, meaning: g.meaning(lang),
                                   note: g.usage, example: ex?.jp, exampleMeaning: ex.map { lang == .es ? $0.es : $0.en },
-                                  exampleRomaji: nil, speak: ex?.jp ?? g.pattern, kind: .grammar, srsKey: nil, kanaId: nil)
+                                  exampleRomaji: ex?.romaji, speak: ex?.jp ?? g.pattern, kind: .grammar, srsKey: nil, kanaId: nil)
             }
         }
         let kind: LessonItem.Kind = ["Hiragana", "Katakana"].contains(deck.kind) ? .kana : deck.kind == "Kanji" ? .kanji : .vocab
@@ -283,6 +283,8 @@ private struct StepFooter: View {
     @Environment(AppModel.self) private var app
     var result: Bool?
     var answer: String?
+    /// Shown under a missed answer while the "Show romaji" switch is on.
+    var answerRomaji: String? = nil
     var canCheck: Bool
     var check: () -> Void
     var proceed: () -> Void
@@ -297,6 +299,9 @@ private struct StepFooter: View {
                             .kgFont(19, .bold)
                         if !result, let answer {
                             Text(app.t("Respuesta: ", "Answer: ") + answer).kgFont(15, .semibold)
+                            if app.p.showRomaji, let r = answerRomaji {
+                                Text(r).kgText(13, .medium).opacity(0.8)
+                            }
                         }
                     }
                     Spacer()
@@ -364,6 +369,9 @@ private struct IntroStep: View {
                 if let ex = item.example {
                     VStack(spacing: 3) {
                         Text(ex).font(.system(size: 17, weight: .semibold, design: .rounded)).foregroundStyle(KG.ink)
+                        if app.p.showRomaji, let r = item.exampleRomaji {
+                            Text(r).kgText(13, .medium).foregroundStyle(KG.pinkText)
+                        }
                         if let m = item.exampleMeaning { Text(m).kgText(13, .medium).foregroundStyle(KG.muted) }
                     }
                     .multilineTextAlignment(.center)
@@ -674,7 +682,7 @@ private struct BuildStep: View {
             }
             .padding(.horizontal, 20)
             Spacer(minLength: 0)
-            StepFooter(result: result, answer: item.example, canCheck: !chosen.isEmpty, check: check) { onDone(result == true) }
+            StepFooter(result: result, answer: item.example, answerRomaji: item.exampleRomaji, canCheck: !chosen.isEmpty, check: check) { onDone(result == true) }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: chosen)
         .onAppear(perform: setup)

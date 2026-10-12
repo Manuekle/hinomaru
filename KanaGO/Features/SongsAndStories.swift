@@ -287,6 +287,9 @@ struct SongSession: View {
                         Button { Speaker.shared.speak(v.kana, rate: app.p.speechRate) } label: {
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(v.jp).font(.system(size: 17, weight: .semibold, design: .rounded))
+                                if app.p.showRomaji, let r = v.romaji {
+                                    Text(r).kgFont(11, .semibold).foregroundStyle(KG.pinkText)
+                                }
                                 Text("\(v.kana) · \(v.meaning(app.lang))").kgFont(11, .semibold).opacity(0.7)
                             }
                             .foregroundStyle(KG.ink)
@@ -544,7 +547,6 @@ struct StorySession: View {
     var story: Story
 
     @State private var quizzing = false
-    @State private var revealed: Set<Int> = []
     @State private var frozenQuestions: [QuizQuestion] = []
 
     var body: some View {
@@ -555,7 +557,10 @@ struct StorySession: View {
             }
             .transition(.move(edge: .trailing))
         } else {
-            reader
+            StoryReader(story: story) {
+                frozenQuestions = questions
+                withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) { quizzing = true }
+            }
         }
     }
 
@@ -567,123 +572,6 @@ struct StorySession: View {
             return QuizQuestion(prompt: q.question(app.lang), promptIsJapanese: false, hint: nil, speak: nil,
                                 options: opts, answer: opts.firstIndex(of: correct) ?? 0, optionsAreJapanese: false,
                                 label: app.t("Comprensión", "Comprehension"))
-        }
-    }
-
-    private var reader: some View {
-        ZStack(alignment: .bottom) {
-            KGBackground()
-            VStack(spacing: 0) {
-                SessionTopBar(progress: 0.5)
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(spacing: 8) {
-                            Text(story.emoji).font(.system(size: 64))
-                            Text(story.title(app.lang)).kgFont(28, .bold).foregroundStyle(KG.ink)
-                                .multilineTextAlignment(.center)
-                            HStack(spacing: 8) {
-                                Pill(text: story.level, color: KG.levelColor(story.level) == KG.ink ? KG.pink : KG.levelColor(story.level))
-                                Button {
-                                    Speaker.shared.speak(story.bodyJp, rate: app.p.speechRate)
-                                } label: {
-                                    Label(app.t("Leer en voz alta", "Read aloud"), hi: .volume, size: 16)
-                                        .kgFont(13, .bold)
-                                        .foregroundStyle(KG.pinkText)
-                                        .padding(.horizontal, 12).padding(.vertical, 6)
-                                        .background(Capsule().fill(KG.pinkSoft))
-                                }
-                                .buttonStyle(.squish)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.bottom, 4)
-
-                        Text(app.t("Toca un párrafo para ver la traducción", "Tap a paragraph to see the translation"))
-                            .kgFont(13, .semibold).foregroundStyle(KG.muted)
-
-                        ForEach(Array(story.paragraphs(app.lang).enumerated()), id: \.offset) { i, para in
-                            paragraph(i, para.jp, para.translation)
-                        }
-
-                        if !story.vocab.isEmpty {
-                            SectionTitle(app.t("Vocabulario", "Vocabulary"), jp: "ことば")
-                                .padding(.top, 8)
-                            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible())], spacing: 10) {
-                                ForEach(story.vocab, id: \.jp) { v in
-                                    Button { Speaker.shared.speak(v.kana, rate: app.p.speechRate) } label: {
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(v.jp).font(.system(size: 19, weight: .semibold, design: .rounded)).foregroundStyle(KG.ink)
-                                                .padding(.trailing, 30)
-                                            if v.kana != v.jp {
-                                                Text(v.kana).kgFont(12, .semibold).foregroundStyle(KG.pinkText)
-                                            }
-                                            Text(v.meaning(app.lang)).kgText(12, .medium).foregroundStyle(KG.muted)
-                                                .lineLimit(2)
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(12)
-                                        .sticker(radius: 18)
-                                    }
-                                    .buttonStyle(.squish)
-                                    .overlay(alignment: .topTrailing) {
-                                        SaveWordButton(word: SavedWord(story: v, source: "\(story.emoji) \(story.title(app.lang))"), size: 30)
-                                            .padding(8)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 120)
-                }
-            }
-            if !story.quiz.isEmpty {
-                Button {
-                    Speaker.shared.stop()
-                    frozenQuestions = questions
-                    withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) { quizzing = true }
-                } label: {
-                    Label(app.t("Hacer el quiz (\(story.quiz.count))", "Take the quiz (\(story.quiz.count))"),
-                          hi: .chatDone)
-                }
-                .buttonStyle(.chunky)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 8)
-                .padding(.top, 14)
-                .background(LinearGradient(colors: [KG.cream.opacity(0), KG.cream], startPoint: .top, endPoint: .center)
-                    .ignoresSafeArea())
-            }
-        }
-    }
-
-    private func paragraph(_ i: Int, _ jp: String, _ translation: String?) -> some View {
-        let open = revealed.contains(i)
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 10) {
-                Text(jp)
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
-                    .foregroundStyle(KG.ink)
-                    .lineSpacing(8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                SpeakButton(text: jp, size: 34)
-            }
-            if open, let translation {
-                Text(translation)
-                    .kgText(15)
-                    .foregroundStyle(KG.inkSoft)
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(KG.pinkSoft.opacity(0.6)))
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-        .padding(16)
-        .sticker(radius: 22)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                if open { revealed.remove(i) } else { revealed.insert(i) }
-            }
         }
     }
 }

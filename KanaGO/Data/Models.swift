@@ -26,6 +26,7 @@ struct Card: Decodable, Hashable {
 
 struct GrammarExample: Decodable, Hashable {
     let jp: String
+    let romaji: String?
     let en: String
     let es: String
 }
@@ -244,10 +245,33 @@ struct Song: Decodable, Identifiable, Hashable {
 struct StoryVocab: Decodable, Hashable {
     let jp: String
     let kana: String
+    let romaji: String?
     let en: String
     let es: String
 
     func meaning(_ lang: Lang) -> String { lang == .es ? es : en }
+}
+
+/// One reading unit of a story — a word with its particles and punctuation ("私は", "起きます。"),
+/// split and romanized by scripts/romaji.py.
+struct StoryWord: Decodable, Hashable {
+    let jp: String
+    /// nil for bare punctuation.
+    let romaji: String?
+    /// Hiragana reading, when `jp` has kanji.
+    let kana: String?
+    /// The word inside `jp` without its particles/endings, when they differ ("起き" in "起きます。").
+    let head: String?
+    /// Dictionary form of `head`, when it differs ("起きる").
+    let base: String?
+    /// The story vocab entry this unit shows.
+    let vocab: String?
+
+    /// The unit without brackets and punctuation.
+    var core: String {
+        jp.trimmingCharacters(in: CharacterSet(charactersIn: "、。！？!?…・「」『』（）() "))
+    }
+    var word: String { head ?? core }
 }
 
 struct StoryQuestion: Decodable, Hashable {
@@ -273,6 +297,8 @@ struct Story: Decodable, Identifiable, Hashable {
     let bodyEn: String
     let bodyEs: String
     let bodyRomaji: String?
+    /// Paragraphs split into reading units, same order as `paragraphs(_:)`.
+    let bodyWords: [[StoryWord]]?
     let vocab: [StoryVocab]
     let quiz: [StoryQuestion]
 

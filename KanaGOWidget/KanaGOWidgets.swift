@@ -139,10 +139,12 @@ struct WordView: View {
 
     private func meaning(_ w: WidgetSnapshot.DayWord) -> String { s.lang == "es" ? w.es : w.en }
 
-    /// Reading line: kana (when the word has kanji) and romaji.
-    private func reading(_ w: WidgetSnapshot.DayWord) -> String {
-        if let kana = w.kana, !kana.isEmpty, kana != w.jp { return "\(kana) · \(w.romaji)" }
-        return w.romaji
+    /// Reading line: kana (when the word has kanji) and romaji, unless the app's
+    /// "Show romaji" switch is off; nil when there's nothing left to show.
+    private func reading(_ w: WidgetSnapshot.DayWord) -> String? {
+        let romaji = s.showRomaji == false ? nil : w.romaji
+        guard let kana = w.kana, !kana.isEmpty, kana != w.jp else { return romaji }
+        return romaji.map { "\(kana) · \($0)" } ?? kana
     }
 
     @ViewBuilder private func content(_ w: WidgetSnapshot.DayWord) -> some View {
@@ -150,7 +152,9 @@ struct WordView: View {
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 0) {
                 Text(w.jp).font(WG.rounded(20, .heavy)).widgetAccentable()
-                Text(reading(w)).font(WG.rounded(12, .semibold)).lineLimit(1)
+                if let reading = reading(w) {
+                    Text(reading).font(WG.rounded(12, .semibold)).lineLimit(1)
+                }
                 Text(meaning(w)).font(.system(size: 12)).lineLimit(1).foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -187,11 +191,13 @@ struct WordView: View {
                 .foregroundStyle(WG.ink(scheme))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
-            Text(reading(w))
-                .font(WG.rounded(12, .semibold))
-                .foregroundStyle(WG.muted(scheme))
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+            if let reading = reading(w) {
+                Text(reading)
+                    .font(WG.rounded(12, .semibold))
+                    .foregroundStyle(WG.muted(scheme))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
             HStack(spacing: 6) {
                 Text(meaning(w))
                     .font(WG.rounded(16, .bold))

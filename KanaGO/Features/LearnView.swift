@@ -330,6 +330,9 @@ struct GrammarCard: View {
                     HStack(alignment: .top, spacing: 10) {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(ex.jp).font(.system(size: 18, weight: .semibold, design: .rounded)).foregroundStyle(KG.ink)
+                            if app.p.showRomaji, let r = ex.romaji {
+                                Text(r).kgText(13, .medium).foregroundStyle(KG.pinkText)
+                            }
                             Text(app.lang == .es ? ex.es : ex.en).kgText(13).foregroundStyle(KG.muted)
                         }
                         Spacer(minLength: 0)

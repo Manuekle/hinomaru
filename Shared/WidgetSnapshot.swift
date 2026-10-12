@@ -23,6 +23,8 @@ struct WidgetSnapshot: Codable {
     var dueDates: [Date] = []
     /// Word of the day for today and the next few days.
     var words: [DayWord] = []
+    /// The app's "Show romaji" switch (optional so snapshots written by older builds still decode).
+    var showRomaji: Bool?
     var onboarded = false
 
     static let appGroup = "group.com.manuekle.kanago"

@@ -28,7 +28,7 @@ extension SavedWord {
     }
 
     init(story v: StoryVocab, source: String) {
-        self.init(jp: v.jp, kana: v.kana, romaji: Romaji.from(v.kana), es: v.es, en: v.en, source: source)
+        self.init(jp: v.jp, kana: v.kana, romaji: v.romaji ?? Romaji.from(v.kana), es: v.es, en: v.en, source: source)
     }
 
     init(song v: SongVocab, source: String) {

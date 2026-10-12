@@ -38,6 +38,21 @@ final class ContentStore {
 
     func jlptLevel(_ level: String) -> JLPTLevel? { jlpt.first { $0.level == level } }
 
+    /// Vocabulary cards by written form and reading, for looking up a word tapped in a story.
+    /// Kanji cards only fill gaps: their romaji field lists on/kun readings, not one word.
+    private(set) lazy var cardsByWord: [String: Card] = {
+        var out: [String: Card] = [:]
+        let vocab = self.decks.filter { !$0.isGrammar && !["Hiragana", "Katakana"].contains($0.kind) }
+        for deck in vocab.filter({ $0.kind != "Kanji" }) + vocab.filter({ $0.kind == "Kanji" }) {
+            for card in deck.cards {
+                for key in card.jp.components(separatedBy: " / ") + [card.kana].compactMap({ $0 }) where out[key] == nil {
+                    out[key] = card
+                }
+            }
+        }
+        return out
+    }()
+
     /// Path order used to pick "your next lesson".
     static let pathOrder = ["Kana", "N5", "Survival", "N4", "N3", "N2", "N1"]
 
@@ -389,7 +404,7 @@ final class AppModel {
 
 // MARK: - Voice & sound
 
-final class Speaker: NSObject, AVAudioPlayerDelegate {
+final class Speaker: NSObject, AVAudioPlayerDelegate, AVSpeechSynthesizerDelegate {
     static let shared = Speaker()
     private let synth = AVSpeechSynthesizer()
     // Pre-recorded ElevenLabs clips (scripts/generate_audio.py): tts_<sha1(text)[:16]>.m4a for
@@ -403,8 +418,17 @@ final class Speaker: NSObject, AVAudioPlayerDelegate {
     private var voice: AVSpeechSynthesisVoice?
     private var voiceResolved = false
     private var dialogueVoices: (female: AVSpeechSynthesisVoice?, male: AVSpeechSynthesisVoice?)?
+    // Read-along (speakSequence): the text index of each queued clip / utterance, and who to tell.
+    private var pendingLines: [Int] = []
+    private var utteranceLines: [ObjectIdentifier: Int] = [:]
+    private var onLine: ((Int?) -> Void)?
     /// Set from the Yona / Kasane voice preference.
     var style: VoiceStyle = .kawaii
+
+    override init() {
+        super.init()
+        synth.delegate = self
+    }
 
     /// Warm up the Japanese voice off the main thread.
     func prepare() {
@@ -441,6 +465,15 @@ final class Speaker: NSObject, AVAudioPlayerDelegate {
         pending = []
         player?.stop()
         player = nil
+        endSequence()
+    }
+
+    private func endSequence() {
+        pendingLines = []
+        utteranceLines = [:]
+        guard let report = onLine else { return }
+        onLine = nil
+        DispatchQueue.main.async { report(nil) }
     }
 
     private func playClips(_ urls: [URL], rate: Double) {
@@ -451,14 +484,16 @@ final class Speaker: NSObject, AVAudioPlayerDelegate {
     }
 
     private func playNext() {
-        guard !pending.isEmpty else { player = nil; return }
+        guard !pending.isEmpty else { player = nil; endSequence(); return }
         let url = pending.removeFirst()
+        let line = pendingLines.isEmpty ? nil : pendingLines.removeFirst()
         guard let p = try? AVAudioPlayer(contentsOf: url) else { playNext(); return }
         p.enableRate = true
         p.rate = playbackRate
         p.delegate = self
         player = p
         p.play()
+        if let line, let report = onLine { DispatchQueue.main.async { report(line) } }
     }
 
     func audioPlayerDidFinishPlaying(_ p: AVAudioPlayer, successfully flag: Bool) {
@@ -520,6 +555,52 @@ final class Speaker: NSObject, AVAudioPlayerDelegate {
                 u.postUtteranceDelay = 0.35
                 self.synth.speak(u)
             }
+        }
+    }
+
+    /// Reads `texts` one after another (a story's paragraphs). `onLine` gets, on the main thread,
+    /// the index being read, then nil once the last one ends or anything else is spoken or stopped.
+    func speakSequence(_ texts: [String], rate: Double = 0.42, onLine: @escaping (Int?) -> Void) {
+        let style = self.style
+        queue.async {
+            let clips = texts.compactMap { Self.clipURL(for: $0, style: style) }
+            self.haltAll()
+            self.onLine = onLine
+            if !texts.isEmpty, clips.count == texts.count {
+                self.pending = clips
+                self.pendingLines = Array(texts.indices)
+                self.playbackRate = Self.clipRate(rate)
+                self.playNext()
+                return
+            }
+            #if DEBUG
+            print("[Speaker] sequence missing \(texts.count - clips.count) clip(s), AVSpeech fallback")
+            #endif
+            for (i, text) in texts.enumerated() {
+                let u = AVSpeechUtterance(string: text)
+                u.voice = self.resolveVoice()
+                u.rate = Float(rate) * AVSpeechUtteranceMaximumSpeechRate
+                u.pitchMultiplier = style.pitch
+                u.postUtteranceDelay = 0.35
+                self.utteranceLines[ObjectIdentifier(u)] = i
+                self.synth.speak(u)
+            }
+        }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
+        let id = ObjectIdentifier(utterance)
+        queue.async {
+            guard let line = self.utteranceLines[id], let report = self.onLine else { return }
+            DispatchQueue.main.async { report(line) }
+        }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        let id = ObjectIdentifier(utterance)
+        queue.async {
+            guard self.utteranceLines.removeValue(forKey: id) != nil, self.utteranceLines.isEmpty else { return }
+            self.endSequence()
         }
     }
 

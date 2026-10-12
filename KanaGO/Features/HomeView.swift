@@ -250,6 +250,9 @@ struct HomeView: View {
             if let ex = card.example, ex != card.jp {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(ex).font(.system(size: 16, weight: .medium)).foregroundStyle(KG.ink)
+                    if app.p.showRomaji, let r = card.exampleRomaji {
+                        Text(r).kgText(13, .medium).foregroundStyle(KG.pinkText)
+                    }
                     if let m = card.exampleMeaning(app.lang) {
                         Text(m).kgText(14).foregroundStyle(KG.muted)
                     }
