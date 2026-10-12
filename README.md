@@ -215,3 +215,9 @@ python3 site/scripts/serve.py
 Abre [localhost:4181](http://localhost:4181). El servidor reconoce las rutas sin extensión, como `/privacy` y `/support`.
 
 Más detalles sobre la web, los recursos de marca y el botón del App Store están en [el README del sitio](site/README.md).
+
+## Capturas de App Store
+
+La serie v7 está en inglés, con capturas reales de la interfaz, titulares centrados, fondos pastel por función y mascotas que asoman por detrás del teléfono; Ruta tiene una pose más grande hacia la izquierda y JLPT una más grande y centrada. Conserva la isla dinámica del marco SVG y limpia la que el simulador incorpora en cada captura para evitar duplicarla.
+
+Las doce imágenes RGB de subida están en `design/appstore/KanaGO-AppStore-en/`, en 1206 × 2622 y 1320 × 2868, y en `design/appstore/KanaGO-AppStore-en.zip`. [Las instrucciones](design/appstore/KanaGO-AppStore-en/README.md) incluyen el origen y la regeneración con `python3 scripts/appstore_assets.py`; [la dirección visual](design/appstore/KanaGO-AppStore-en/design.md) documenta el sistema. La carpeta conserva únicamente el ZIP actualizado y su contenido descomprimido.
