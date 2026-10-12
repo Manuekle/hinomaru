@@ -2,6 +2,23 @@
 
 Landing de **KanaGO!**, la app para iPhone que enseña japonés de la あ al N1, y las páginas públicas que pide el App Store.
 
+## Ramas y despliegue
+
+El repositorio es [Manuekle/kanago](https://github.com/Manuekle/kanago). Este directorio trabaja en la rama **`web`**.
+
+- **`web`:** contiene el sitio y es la rama de producción de Vercel. Cada push despliega automáticamente la web; el directorio raíz de Vercel es `app`.
+- **`main`:** mantiene la versión de la web integrada mediante pull requests.
+- **`ios`:** contiene el proyecto nativo en el checkout principal de KanaGO!. Sus despliegues de Vercel están desactivados.
+
+Para subir cambios del sitio desde este directorio:
+
+```bash
+git status
+git push origin web
+```
+
+El commit debe estar creado antes del push. El proyecto iOS y su README se versionan desde el directorio superior, en la rama `ios`.
+
 ## Qué hay
 
 ```
