@@ -1,5 +1,5 @@
-// Hinomaru used to be a PWA with a service worker at this path. This one replaces it,
-// clears the old caches, unregisters itself and reloads open tabs onto the new site.
+// An earlier version of this site was a PWA with a service worker at this path. This one
+// replaces it, clears the old caches, unregisters itself and reloads open tabs onto the new site.
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {

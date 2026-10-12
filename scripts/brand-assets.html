@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>KanaGO! — social image</title>
+<!-- Renders app/og-image.png (1200×630). Same look as the home: white, ink type, a faint glyph, the real iPhone frame. -->
+<style>
+*{box-sizing:border-box}body{margin:0;width:1200px;height:630px;background:#fff;color:#16151a;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;overflow:hidden;position:relative;letter-spacing:-.01em}
+.glyph{position:absolute;right:-30px;top:50%;translate:0 -50%;font:700 620px/1 "Hiragino Sans",-apple-system,sans-serif;color:#f2f1f4}
+.brand{position:absolute;left:80px;top:64px;display:flex;align-items:center;gap:14px}.brand .icon{width:56px;border-radius:13px}.brand .word{width:120px;height:auto}
+h1{position:absolute;left:80px;top:198px;margin:0;font:700 76px/.98 ui-rounded,"SF Pro Rounded",system-ui,sans-serif;letter-spacing:-.055em}
+h1 .jp{font-family:"Hiragino Sans",-apple-system,sans-serif}
+p{position:absolute;left:80px;top:392px;width:560px;margin:0;font-size:24px;line-height:1.45;color:#55515b;text-wrap:balance}
+.note{top:auto;bottom:64px;font-size:18px;font-weight:500;color:#8b8691}
+.phone{position:absolute;right:150px;top:44px;height:600px;aspect-ratio:1390/2858;filter:drop-shadow(0 30px 40px rgba(22,21,26,.14))}
+.phone::before{content:"";position:absolute;inset:.84% 2.37%;border-radius:18%/8.7%;background:#000}
+.phone::after{content:"";position:absolute;inset:0;background:url(../app/assets/iphone-frame.webp) center/100% 100% no-repeat}
+.screen{position:absolute;left:3.67%;top:1.47%;width:92.66%;height:97.06%;border-radius:17%/7.9%;overflow:hidden}.screen img{width:100%;height:100%;object-fit:cover;display:block}
+.mascot{position:absolute;right:330px;bottom:40px;width:190px;height:auto;filter:drop-shadow(0 10px 10px rgba(22,21,26,.1))}
+</style>
+<span class="glyph">あ</span>
+<div class="brand"><img class="icon" src="../app/assets/kana/icon.svg" alt=""><img class="word" src="../app/assets/logo.svg" alt="KanaGO!"></div>
+<h1>Japanese,<br>from <span class="jp">あ</span> to N1.</h1>
+<p>One-minute lessons, reviews that come back right before you forget, and Kana-chan with you every step.</p>
+<p class="note">iPhone · iOS 17+ · No account · No ads</p>
+<div class="phone"><div class="screen"><img src="../app/assets/shots/home.webp" alt="KanaGO! home"></div></div>
+<img class="mascot" src="../app/assets/kana/pet-hello.svg" alt="Kana-chan">
+</html>

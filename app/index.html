@@ -1,273 +1,236 @@
 <!doctype html>
-<html lang="es">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>KanaGO! — Japonés de la あ al N1 en tu iPhone</title>
-  <meta name="description" content="Aprende japonés con una ruta guiada de kana a JLPT N1: lecciones cortas, tarjetas con repaso espaciado, simulacros JLPT, historias, karaoke y conversaciones. Para iPhone.">
-  <meta name="theme-color" content="#ff6f9c">
-  <link rel="canonical" href="https://hinomaru.vercel.app/">
-  <link rel="icon" type="image/png" href="/assets/favicon-64.png">
+  <title>KanaGO! — Japanese from あ to N1 on your iPhone</title>
+  <meta name="description" content="Learn Japanese on your iPhone with a guided path from kana to JLPT N1: one-minute lessons, spaced-repetition reviews, JLPT mock tests, conversations, stories and karaoke.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="https://kanago.vercel.app/">
+  <link rel="icon" type="image/svg+xml" href="/assets/kana/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/kana/icon-dark.svg" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KanaGO!">
-  <meta property="og:title" content="KanaGO! — Japonés de la あ al N1 en tu iPhone">
-  <meta property="og:description" content="Ruta guiada, tarjetas con SRS, simulacros JLPT, historias, karaoke y conversaciones. Con Kana-chan.">
-  <meta property="og:url" content="https://hinomaru.vercel.app/">
-  <meta property="og:image" content="https://hinomaru.vercel.app/og-image.png">
+  <meta property="og:title" content="KanaGO! — Japanese from あ to N1 on your iPhone">
+  <meta property="og:description" content="A guided path, reviews that come back right before you forget, JLPT mock tests and Kana-chan cheering you on.">
+  <meta property="og:url" content="https://kanago.vercel.app/">
+  <meta property="og:image" content="https://kanago.vercel.app/og-image.png?v=2">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="stylesheet" href="/assets/styles.css">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="/assets/styles.css?v=14">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"MobileApplication","name":"KanaGO!","operatingSystem":"iOS 17+","applicationCategory":"EducationalApplication","inLanguage":["es","en","ja"],"description":"Aprende japonés de kana a JLPT N1 con una ruta guiada, tarjetas con repaso espaciado, simulacros JLPT, historias, karaoke y conversaciones.","url":"https://hinomaru.vercel.app/","author":{"@type":"Person","name":"Manuekle","url":"https://github.com/Manuekle"}}
+  {"@context":"https://schema.org","@type":"MobileApplication","name":"KanaGO!","operatingSystem":"iOS 17+","applicationCategory":"EducationalApplication","inLanguage":["en","es","ja"],"description":"Learn Japanese from kana to JLPT N1 with a guided path, spaced-repetition reviews, JLPT mock tests, conversations, stories and karaoke.","url":"https://kanago.vercel.app/"}
   </script>
 </head>
 <body data-page="home">
-  <a class="skip" href="#ruta">Saltar al contenido</a>
+  <a class="skip" href="#story">Skip to content</a>
 
   <header class="nav">
     <div class="wrap">
-      <a class="brand" href="/" aria-label="KanaGO! inicio">
-        <img src="/assets/icon.webp" alt="" width="38" height="38">
-        <span>Kana<b>GO!</b></span>
-      </a>
-      <nav class="nav-links" aria-label="Secciones">
-        <a href="#ruta" data-i18n="nav.features">Funciones</a>
-        <a href="#jlpt" data-i18n="nav.jlpt">JLPT</a>
-        <a href="#faq" data-i18n="nav.faq">Preguntas</a>
-      </nav>
-      <div class="lang" role="group" aria-label="Idioma / Language">
-        <button type="button" data-set="es" aria-pressed="true">ES</button>
-        <button type="button" data-set="en" aria-pressed="false">EN</button>
+      <a class="brand" href="/" aria-label="KanaGO! home"><img class="brand-icon" src="/assets/kana/icon.svg" alt="" width="1162" height="1158"><img src="/assets/logo.svg" alt="KanaGO!" width="1235" height="955"></a>
+      <a class="store-badge store-badge-sm nav-badge" data-store aria-disabled="true"><svg class="apple" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.53 3.83c.84-1.01 1.4-2.43 1.25-3.83-1.21.05-2.66.8-3.53 1.82-.78.9-1.46 2.34-1.27 3.71 1.34.1 2.71-.69 3.55-1.7M12.15 6.9c-.95 0-2.42-1.08-3.96-1.04-2.04.03-3.91 1.18-4.96 3.01-2.12 3.68-.55 9.1 1.52 12.09 1.01 1.45 2.2 3.09 3.79 3.04 1.52-.07 2.09-.99 3.94-.99 1.83 0 2.35.99 3.96.95 1.64-.03 2.68-1.48 3.68-2.95 1.15-1.69 1.63-3.33 1.66-3.42-.04-.01-3.18-1.22-3.22-4.86-.03-3.04 2.48-4.49 2.6-4.56-1.43-2.09-3.62-2.32-4.39-2.38-2-.15-3.68 1.09-4.62 1.09"/></svg><span><small data-store-pre>Coming soon to the</small><b>App Store</b></span></a>
+      <div class="lang" role="group" aria-label="Language / Idioma">
+        <button type="button" data-set="en" aria-pressed="true">EN</button>
+        <button type="button" data-set="es" aria-pressed="false">ES</button>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="wrap hero-grid">
-        <div class="hero-copy">
-          <div class="wordmark display" aria-hidden="true">
-            <span class="kana sticker-text">Kana</span>
-            <span class="go sticker-text">GO!</span>
-          </div>
-          <h1 id="hero-title" data-i18n="hero.title">Japonés de la <span class="jp">あ</span> al N1, en tu iPhone.</h1>
-          <p class="lede" data-i18n="hero.lede">Una ruta guiada de lecciones cortas, tarjetas que vuelven justo antes de que las olvides, simulacros JLPT, historias, karaoke y conversaciones. Con Kana-chan dándote ánimos.</p>
-          <div class="hero-cta">
-            <a class="btn btn-white" data-store aria-disabled="true">
-              <span class="stack"><span data-store-label>Muy pronto en el App Store</span><small data-i18n="cta.sub">iPhone · iOS 17 o superior</small></span>
-            </a>
-            <p class="note" data-i18n="hero.note">Sin cuenta · sin anuncios · funciona sin internet</p>
-          </div>
-          <div class="kana-row">
-            <p class="hint" data-i18n="hero.hint">Toca una kana para oírla</p>
-            <button class="kana-sticker" type="button" data-kana="あ" data-romaji="a" aria-label="あ, a">あ<span class="r">a</span></button>
-            <button class="kana-sticker" type="button" data-kana="カ" data-romaji="ka" aria-label="カ, ka">カ<span class="r">ka</span></button>
-            <button class="kana-sticker" type="button" data-kana="の" data-romaji="no" aria-label="の, no">の<span class="r">no</span></button>
-            <button class="kana-sticker" type="button" data-kana="さ" data-romaji="sa" aria-label="さ, sa">さ<span class="r">sa</span></button>
-            <button class="kana-sticker" type="button" data-kana="ん" data-romaji="n" aria-label="ん, n">ん<span class="r">n</span></button>
+    <!-- One pinned stage: the headline gives way to the phone, then each chapter swaps the screen, the text and Kana-chan's mood. -->
+    <section id="story" class="film" aria-label="KanaGO! tour" style="--steps: 7">
+      <div class="stage">
+        <div class="glyphs" aria-hidden="true">
+          <span class="glyph is-active">あ</span>
+          <span class="glyph">道</span>
+          <span class="glyph">音</span>
+          <span class="glyph">字</span>
+          <span class="glyph">試</span>
+          <span class="glyph">話</span>
+          <span class="glyph">毎日</span>
+        </div>
+
+        <div class="intro">
+          <h1 data-i18n="hero.title">Japanese, <br>from <span class="jp">あ</span> to N1.</h1>
+          <p class="intro-lede" data-i18n="hero.lede">One-minute lessons, reviews that come back right before you forget, and Kana-chan with you every step.</p>
+          <div class="intro-cta">
+            <a class="store-badge" data-store aria-disabled="true"><svg class="apple" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.53 3.83c.84-1.01 1.4-2.43 1.25-3.83-1.21.05-2.66.8-3.53 1.82-.78.9-1.46 2.34-1.27 3.71 1.34.1 2.71-.69 3.55-1.7M12.15 6.9c-.95 0-2.42-1.08-3.96-1.04-2.04.03-3.91 1.18-4.96 3.01-2.12 3.68-.55 9.1 1.52 12.09 1.01 1.45 2.2 3.09 3.79 3.04 1.52-.07 2.09-.99 3.94-.99 1.83 0 2.35.99 3.96.95 1.64-.03 2.68-1.48 3.68-2.95 1.15-1.69 1.63-3.33 1.66-3.42-.04-.01-3.18-1.22-3.22-4.86-.03-3.04 2.48-4.49 2.6-4.56-1.43-2.09-3.62-2.32-4.39-2.38-2-.15-3.68 1.09-4.62 1.09"/></svg><span><small data-store-pre>Coming soon to the</small><b>App Store</b></span></a>
+            <p class="note" data-i18n="hero.note">iPhone · iOS 17+ · No account · No ads</p>
           </div>
         </div>
 
-        <div class="hero-stage">
-          <p class="bubble" aria-live="polite">¡Toca una kana!</p>
-          <div class="mascot">
-            <svg class="blob" viewBox="0 0 114 100" data-mood="curious" role="img" aria-label="Kana-chan">
-              <defs>
-                <radialGradient id="sheen" cx="57" cy="33" r="34" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#fff" stop-opacity="0.12"/>
-                  <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <path d="M52.99 17.32 Q67.03 16.46 77.06 7.86 Q77.06 13.88 73.05 19.04 C95.12 24.20 107.16 43.12 106.16 63.76 C105.15 84.40 85.09 92.14 59.01 92.14 C30.92 92.14 8.85 86.12 7.84 67.20 C6.84 41.40 26.90 17.32 52.99 17.32Z" fill="#fff" stroke="#fff" stroke-width="8.5" stroke-linejoin="round"/>
-              <path d="M52.99 17.32 Q67.03 16.46 77.06 7.86 Q77.06 13.88 73.05 19.04 C95.12 24.20 107.16 43.12 106.16 63.76 C105.15 84.40 85.09 92.14 59.01 92.14 C30.92 92.14 8.85 86.12 7.84 67.20 C6.84 41.40 26.90 17.32 52.99 17.32Z" fill="#111014" stroke="#000" stroke-width="1.8"/>
-              <ellipse cx="57" cy="36" rx="32" ry="20" fill="url(#sheen)"/>
-              <path d="M49.78 34.90 C53.24 35.93 57.00 35.31 58.81 33.87 C61.82 31.60 59.41 28.71 55.50 29.02 C50.23 29.33 50.68 37.79 55.80 37.99 C60.01 38.30 62.72 37.38 64.22 35.72" fill="none" stroke="#f6a3b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              <g class="mood mood-curious">
-                <circle cx="40.95" cy="58.6" r="12.04" fill="#fff"/>
-                <circle cx="73.05" cy="58.6" r="12.04" fill="#fff"/>
-                <g class="pupil" transform="translate(-1.8 -2.5)">
-                  <circle cx="40.95" cy="58.6" r="6.62" fill="#111014"/>
-                  <circle cx="37.97" cy="55.62" r="2.12" fill="#fff"/>
-                </g>
-                <g class="pupil" transform="translate(-1.8 -2.5)">
-                  <circle cx="73.05" cy="58.6" r="6.62" fill="#111014"/>
-                  <circle cx="70.07" cy="55.62" r="2.12" fill="#fff"/>
-                </g>
-              </g>
-              <g class="mood mood-happy" fill="none" stroke="#fff" stroke-width="5.06" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M32.52 51.98 L47.57 58.6 L32.52 65.22"/>
-                <path d="M81.48 51.98 L66.43 58.6 L81.48 65.22"/>
-              </g>
-              <g class="mood mood-wow">
-                <circle cx="40.95" cy="58.6" r="12.64" fill="#fff"/>
-                <circle cx="73.05" cy="58.6" r="12.64" fill="#fff"/>
-                <path fill="#ffc83d" d="M40.95 51.08 Q42.30 57.25 48.47 58.6 Q42.30 59.95 40.95 66.12 Q39.60 59.95 33.43 58.6 Q39.60 57.25 40.95 51.08Z M73.05 51.08 Q74.40 57.25 80.57 58.6 Q74.40 59.95 73.05 66.12 Q71.70 59.95 65.53 58.6 Q71.70 57.25 73.05 51.08Z"/>
-              </g>
-              <g class="mood mood-love" fill="#ff6f9c" stroke="#fff" stroke-width="3.6" stroke-linejoin="round">
-                <path transform="translate(28.91 46.56)" d="M12 22.8C4.8 18 0 13.2 0 7.68 0 0 9.6-.48 12 4.32 14.4-.48 24 0 24 7.68 24 13.2 19.2 18 12 22.8Z"/>
-                <path transform="translate(61.01 46.56)" d="M12 22.8C4.8 18 0 13.2 0 7.68 0 0 9.6-.48 12 4.32 14.4-.48 24 0 24 7.68 24 13.2 19.2 18 12 22.8Z"/>
-              </g>
-            </svg>
-          </div>
+        <ol class="chapters">
+          <li class="chapter" data-step="1">
+            <p class="ch-n"><span>01</span><span data-i18n="ch1.k">The path</span></p>
+            <h2 data-i18n="ch1.t">One path, <br>kana to N1.</h2>
+            <p class="ch-p" data-i18n="ch1.p">Start with the five vowels and finish reading real Japanese. Every lesson unlocks the next.</p>
+            <dl class="ch-stats"><div><dt>7</dt><dd data-i18n="ch1.s1">tracks</dd></div><div><dt>641</dt><dd data-i18n="ch1.s2">lessons</dd></div></dl>
+          </li>
+          <li class="chapter" data-step="2">
+            <p class="ch-n"><span>02</span><span data-i18n="ch2.k">Lessons</span></p>
+            <h2 data-i18n="ch2.t">A minute <br>at a time.</h2>
+            <p class="ch-p" data-i18n="ch2.p">Listen, tap, type, draw and speak in steps that take seconds. Your iPhone hears you and grades your pronunciation.</p>
+            <dl class="ch-stats"><div><dt>7</dt><dd data-i18n="ch2.s1">practice modes</dd></div><div><dt>5–30</dt><dd data-i18n="ch2.s2">min a day</dd></div></dl>
+          </li>
+          <li class="chapter" data-step="3">
+            <p class="ch-n"><span>03</span><span data-i18n="ch3.k">Kana</span></p>
+            <h2 data-i18n="ch3.t">Every kana, <br>with sound.</h2>
+            <p class="ch-p" data-i18n="ch3.p">Hiragana and katakana with audio, stroke practice and quick row quizzes. Search by romaji when you get stuck.</p>
+            <dl class="ch-stats"><div><dt>46</dt><dd>hiragana</dd></div><div><dt>46</dt><dd>katakana</dd></div></dl>
+          </li>
+          <li class="chapter" data-step="4">
+            <p class="ch-n"><span>04</span>JLPT</p>
+            <h2 data-i18n="ch4.t">Mock tests, <br>N5 to N1.</h2>
+            <p class="ch-p" data-i18n="ch4.p">Vocabulary and grammar laid out like the real exam, with a timer and a review of every mistake.</p>
+            <dl class="ch-stats"><div><dt>282</dt><dd data-i18n="ch4.s1">questions</dd></div><div><dt>70%</dt><dd data-i18n="ch4.s2">to pass</dd></div></dl>
+          </li>
+          <li class="chapter" data-step="5">
+            <p class="ch-n"><span>05</span><span data-i18n="ch5.k">Explore</span></p>
+            <h2 data-i18n="ch5.t">Talk, read <br>and sing.</h2>
+            <p class="ch-p" data-i18n="ch5.p">Real Tokyo situations, graded stories with translations, and anime and J-pop karaoke with synced lyrics.</p>
+            <dl class="ch-stats"><div><dt>37</dt><dd data-i18n="ch5.s1">conversations</dd></div><div><dt>18</dt><dd data-i18n="ch5.s2">stories</dd></div><div><dt>19</dt><dd data-i18n="ch5.s3">songs</dd></div></dl>
+          </li>
+          <li class="chapter" data-step="6">
+            <p class="ch-n"><span>06</span><span data-i18n="ch6.k">Every day</span></p>
+            <h2 data-i18n="ch6.t">Remember it <br>for good.</h2>
+            <p class="ch-p" data-i18n="ch6.p">What you miss comes back right before you forget it. Keep your streak and watch it stick.</p>
+          </li>
+        </ol>
+
+        <div class="device">
           <div class="phone">
-            <img src="/assets/shots/home.webp" width="640" height="1391" alt="Pantalla de inicio de KanaGO! con la racha, la meta diaria y la palabra del día">
+            <div class="screens">
+              <img class="screen" src="/assets/shots/home.webp?v=5" data-es="/assets/shots/es/home.webp?v=5" width="1206" height="2622" fetchpriority="high" alt="KanaGO! home: your next lesson, today's goal and the word of the day" data-alt-es="Inicio de KanaGO!: tu siguiente lección, la meta del día y la palabra del día">
+              <img class="screen" src="/assets/shots/path.webp?v=5" data-es="/assets/shots/es/path.webp?v=5" width="1206" height="2622" decoding="async" fetchpriority="low" alt="The kana path with the vowels unit and its first lesson" data-alt-es="La ruta de kana con la unidad de vocales y su primera lección">
+              <img class="screen" src="/assets/shots/lesson.webp?v=5" data-es="/assets/shots/es/lesson.webp?v=5" width="1206" height="2622" decoding="async" fetchpriority="low" alt="A lesson step introducing a new kana with audio" data-alt-es="Un paso de lección que presenta una kana nueva con audio">
+              <img class="screen" src="/assets/shots/kana.webp?v=5" data-es="/assets/shots/es/kana.webp?v=5" width="1206" height="2622" decoding="async" fetchpriority="low" alt="Hiragana table with romaji search and row quizzes" data-alt-es="Tabla de hiragana con búsqueda por romaji y quiz por filas">
+              <img class="screen" src="/assets/shots/exam.webp?v=5" data-es="/assets/shots/es/exam.webp?v=5" width="1206" height="2622" decoding="async" fetchpriority="low" alt="An N5 vocabulary question with the right answer marked" data-alt-es="Una pregunta de vocabulario N5 con la respuesta correcta marcada">
+              <img class="screen" src="/assets/shots/read.webp?v=5" data-es="/assets/shots/es/read.webp?v=5" width="1206" height="2622" decoding="async" fetchpriority="low" alt="Graded N5 stories: my morning routine, the weather, my family" data-alt-es="Historias N5: mi rutina matutina, el clima de hoy y mi familia">
+              <img class="screen" src="/assets/shots/result.webp?v=5" data-es="/assets/shots/es/result.webp?v=5" width="1206" height="2622" decoding="async" fetchpriority="low" alt="Session results: 100% accuracy, XP earned and your streak" data-alt-es="Resultados de la sesión: 100% de precisión, XP ganada y racha">
+            </div>
+          </div>
+          <div class="buddy" data-mood="hello" aria-hidden="true">
+            <img class="pet" data-m="hello" src="/assets/kana/pet-hello.svg" width="1164" height="1061" alt="">
+            <img class="pet" data-m="wow" src="/assets/kana/pet-wow.svg" width="1130" height="911" alt="" loading="lazy">
+            <img class="pet" data-m="happy" src="/assets/kana/pet-happy.svg" width="1190" height="867" alt="" loading="lazy">
+            <img class="pet" data-m="meh" src="/assets/kana/pet-meh.svg" width="1105" height="1016" alt="" loading="lazy">
+          </div>
+        </div>
+
+        <div class="rail" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </section>
+
+    <!-- Kana-chan: scrolling slides her six moods past a fixed center. -->
+    <section id="kana-chan" class="moods-film" aria-labelledby="kc-title" style="--steps: 6">
+      <div class="stage">
+        <div class="moods-head">
+          <p class="kicker"><span data-i18n="kc.k">Meet Kana-chan</span><span class="jp">かなちゃん</span></p>
+          <h2 id="kc-title" data-i18n="kc.t">She feels every answer.</h2>
+        </div>
+        <div class="mood-track" aria-hidden="true">
+          <img src="/assets/kana/pet-hello.svg" width="1164" height="1061" alt="" loading="lazy">
+          <img src="/assets/kana/pet-happy.svg" width="1190" height="867" alt="" loading="lazy">
+          <img src="/assets/kana/pet-wow.svg" width="1130" height="911" alt="" loading="lazy">
+          <img src="/assets/kana/pet-meh.svg" width="1105" height="1016" alt="" loading="lazy">
+          <img src="/assets/kana/pet-angry.svg" width="1212" height="1108" alt="" loading="lazy">
+          <img src="/assets/kana/pet-sad.svg" width="1060" height="906" alt="" loading="lazy">
+        </div>
+        <ul class="mood-captions">
+          <li class="is-active"><span class="jp">だいすき</span><b data-i18n="kc.hello">Hi there</b><span data-i18n="kc.helloD">Greets you and celebrates your streak.</span></li>
+          <li><span class="jp">うれしい</span><b data-i18n="kc.happy">Happy</b><span data-i18n="kc.happyD">Every time you get it right.</span></li>
+          <li><span class="jp">びっくり</span><b data-i18n="kc.wow">Surprised</b><span data-i18n="kc.wowD">A new word, or cards waiting for you.</span></li>
+          <li><span class="jp">まあまあ</span><b data-i18n="kc.meh">So-so</b><span data-i18n="kc.mehD">When the pronunciation isn't there yet.</span></li>
+          <li><span class="jp">おこった</span><b data-i18n="kc.angry">Grumpy</b><span data-i18n="kc.angryD">Miss a pair in Match and she'll let you know.</span></li>
+          <li><span class="jp">かなしい</span><b data-i18n="kc.sad">Sad</b><span data-i18n="kc.sadD">A wrong answer… that comes back in your review.</span></li>
+        </ul>
+        <div class="mood-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </section>
+
+    <!-- Widgets: scrolling moves the clock, and the widgets react like the real ones do. -->
+    <section id="widgets" class="w-film" aria-labelledby="widgets-title" style="--steps: 4">
+      <div class="stage">
+        <div class="wrap w-grid">
+          <div class="w-copy">
+            <p class="kicker"><span data-i18n="w.k">Widgets</span><span class="jp">ウィジェット</span></p>
+            <h2 id="widgets-title" data-i18n="w.t">She keeps an eye <br>on your streak.</h2>
+            <p class="lede" data-i18n="w.p">Widgets that change with the clock: a nudge in the morning, a warning at night, a party when you're done.</p>
+            <div class="clock" aria-hidden="true">
+              <div class="clock-time"><span class="is-active">9:41</span><span>19:30</span><span>22:45</span><span>22:52</span></div>
+              <ul class="clock-caps">
+                <li class="is-active" data-i18n="w.c1">Morning. Ready when you are.</li>
+                <li data-i18n="w.c2">Evening. It's getting late.</li>
+                <li data-i18n="w.c3">Almost midnight. Last chance.</li>
+                <li data-i18n="w.c4">Lesson done. Streak saved.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="homescreen" data-state="ready" aria-label="KanaGO! widgets on an iPhone Home Screen" role="img">
+            <div class="wx wx-sm">
+              <i class="wx-bg" data-s="ready"></i><i class="wx-bg" data-s="late"></i><i class="wx-bg" data-s="last"></i><i class="wx-bg" data-s="done"></i>
+              <div class="wx-top"><span class="wx-fire"><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.071 22.874Q13.614 22.986 13.261 22.675Q12.586 22.08 13.181 21.405Q15.552 18.715 15.758 16.48Q15.958 14.315 14.142 12.315Q14.083 14.368 12.698 16.068Q12.494 16.319 12.177 16.383Q11.294 16.559 11.117 15.677Q10.855 14.364 9.474 13.496Q9.327 14.662 8.603 15.876Q8.386 16.24 8.305 16.402Q7.234 18.545 9.441 21.164Q9.596 21.347 9.665 21.432Q9.99 21.831 9.811 22.314Q9.654 22.735 9.365 22.868Q9.075 23 8.653 22.844Q4.127 21.16 2.923 17.253Q1.678 13.213 4.855 9.422Q5.496 8.657 6.576 7.436Q9.345 4.303 10.056 1.758Q10.089 1.641 10.152 1.536Q10.615 0.765 11.387 1.229Q18.889 5.742 20.95 12.487Q22.054 16.1 20.5 18.766Q18.779 21.718 14.071 22.874Z"/></svg><i class="wx-alert" aria-hidden="true">!</i></span><b class="wx-n"><span class="n-before">6</span><span class="n-after">7</span></b></div>
+              <p class="wx-msg"><span data-s="ready" data-i18n="w.ready">Ready to learn?</span><span data-s="late" data-i18n="w.late">It’s getting late…</span><span data-s="last" data-i18n="w.last">Last chance!</span><span data-s="done" data-i18n="w.done">Goal reached!</span></p>
+              <img class="wx-pet" data-s="ready" src="/assets/kana/pet-study.svg" width="1104" height="832" alt=""><img class="wx-pet" data-s="late" src="/assets/kana/pet-alarm.svg" width="936" height="959" alt=""><img class="wx-pet" data-s="last" src="/assets/kana/pet-panic.svg" width="1045" height="1030" alt=""><img class="wx-pet" data-s="done" src="/assets/kana/pet-party.svg" width="951" height="871" alt="">
+            </div>
+            <div class="wx wx-sm wx-word">
+              <span class="wx-label" data-i18n="w.wotd">Word of the day</span>
+              <span class="wx-level">N5</span>
+              <b class="jp">学校</b>
+              <span class="wx-reading"><span class="jp">がっこう</span> · gakkou</span>
+              <span class="wx-mean" data-i18n="w.school">school</span>
+              <span class="wx-mark jp" aria-hidden="true">学</span>
+            </div>
+            <div class="wx wx-md">
+              <i class="wx-bg" data-s="ready"></i><i class="wx-bg" data-s="late"></i><i class="wx-bg" data-s="last"></i><i class="wx-bg" data-s="done"></i>
+              <div class="wx-col">
+                <div class="wx-top"><span class="wx-fire"><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.071 22.874Q13.614 22.986 13.261 22.675Q12.586 22.08 13.181 21.405Q15.552 18.715 15.758 16.48Q15.958 14.315 14.142 12.315Q14.083 14.368 12.698 16.068Q12.494 16.319 12.177 16.383Q11.294 16.559 11.117 15.677Q10.855 14.364 9.474 13.496Q9.327 14.662 8.603 15.876Q8.386 16.24 8.305 16.402Q7.234 18.545 9.441 21.164Q9.596 21.347 9.665 21.432Q9.99 21.831 9.811 22.314Q9.654 22.735 9.365 22.868Q9.075 23 8.653 22.844Q4.127 21.16 2.923 17.253Q1.678 13.213 4.855 9.422Q5.496 8.657 6.576 7.436Q9.345 4.303 10.056 1.758Q10.089 1.641 10.152 1.536Q10.615 0.765 11.387 1.229Q18.889 5.742 20.95 12.487Q22.054 16.1 20.5 18.766Q18.779 21.718 14.071 22.874Z"/></svg><i class="wx-alert" aria-hidden="true">!</i></span><b class="wx-n"><span class="n-before">6</span><span class="n-after">7</span></b><span class="wx-pill" data-i18n="w.review">12 to review</span></div>
+                <p class="wx-msg"><span data-s="ready" data-i18n="w.ready">Ready to learn?</span><span data-s="late" data-i18n="w.late">It’s getting late…</span><span data-s="last" data-i18n="w.last">Last chance!</span><span data-s="done" data-i18n="w.done">Goal reached!</span></p>
+                <div class="wx-week" data-i18n="w.week"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+                <div class="wx-dots"><i class="done"></i><i class="part"></i><i class="done"></i><i class="done"></i><i class="part"></i><i class="done"></i><i class="today"></i></div>
+              </div>
+              <img class="wx-pet" data-s="ready" src="/assets/kana/pet-study.svg" width="1104" height="832" alt=""><img class="wx-pet" data-s="late" src="/assets/kana/pet-alarm.svg" width="936" height="959" alt=""><img class="wx-pet" data-s="last" src="/assets/kana/pet-panic.svg" width="1045" height="1030" alt=""><img class="wx-pet" data-s="done" src="/assets/kana/pet-party.svg" width="951" height="871" alt="">
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="ruta" aria-labelledby="path-title">
-      <div class="wrap path-grid">
-        <div>
-          <div class="section-head reveal">
-            <p class="eyebrow"><span data-i18n="path.eyebrow">La ruta</span><span class="jp">みち</span></p>
-            <h2 id="path-title" data-i18n="path.title">Siete rutas, un paso a la vez.</h2>
-            <p class="lede" data-i18n="path.lede">Empiezas por las cinco vocales y terminas leyendo japonés de verdad. Cada lección desbloquea la siguiente, y lo que fallas vuelve al rato hasta que sale solo.</p>
-          </div>
-          <ol class="path reveal">
-            <li><span class="node jpn" style="--c: var(--pink-deep)">あ</span><div><b>Kana</b><span data-i18n="path.kana">Hiragana y katakana con trazo y audio</span></div><p class="count"><b>7</b> <span data-i18n="path.units">unidades</span> · <b>21</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-            <li><span class="node" style="--c: var(--pink)">N5</span><div><b>N5</b><span data-i18n="path.n5">Saludos, números, comida y tus primeros verbos</span></div><p class="count"><b>21</b> <span data-i18n="path.units">unidades</span> · <b>105</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-            <li><span class="node" style="--c: var(--sun)">✈️</span><div><b data-i18n="path.travel">Viaje</b><span data-i18n="path.travelDesc">Restaurante, hotel, compras y direcciones</span></div><p class="count"><b>31</b> <span data-i18n="path.units">unidades</span> · <b>155</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-            <li><span class="node" style="--c: var(--sky-deep)">N4</span><div><b>N4</b><span data-i18n="path.n4">Conversación diaria y gramática esencial</span></div><p class="count"><b>21</b> <span data-i18n="path.units">unidades</span> · <b>105</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-            <li><span class="node" style="--c: var(--mint-deep)">N3</span><div><b>N3</b><span data-i18n="path.n3">Situaciones cotidianas y kanji intermedio</span></div><p class="count"><b>19</b> <span data-i18n="path.units">unidades</span> · <b>95</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-            <li><span class="node" style="--c: var(--lilac)">N2</span><div><b>N2</b><span data-i18n="path.n2">Noticias, trabajo y temas generales</span></div><p class="count"><b>15</b> <span data-i18n="path.units">unidades</span> · <b>75</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-            <li><span class="node" style="--c: var(--ink)">N1</span><div><b>N1</b><span data-i18n="path.n1">Comprensión amplia y matices</span></div><p class="count"><b>17</b> <span data-i18n="path.units">unidades</span> · <b>85</b> <span data-i18n="path.lessons">lecciones</span></p></li>
-          </ol>
-        </div>
-        <div class="phone tilt-r reveal">
-          <img src="/assets/shots/path.webp" width="640" height="1391" loading="lazy" alt="La ruta de Kana en KanaGO!: unidad de vocales con su primera lección">
-        </div>
-      </div>
-    </section>
-
-    <section id="practica" aria-labelledby="modes-title" style="padding-top:0">
+    <!-- Words light up one by one as the line scrolls through the viewport. -->
+    <section class="block promise" aria-label="Promises">
       <div class="wrap">
-        <div class="section-head reveal">
-          <p class="eyebrow"><span data-i18n="modes.eyebrow">Práctica</span><span class="jp">れんしゅう</span></p>
-          <h2 id="modes-title" data-i18n="modes.title">Siete maneras de no olvidar.</h2>
-          <p class="lede" data-i18n="modes.lede">Cada mazo se practica como prefieras. Todos los modos alimentan el mismo repaso espaciado (SM-2).</p>
-        </div>
-        <div class="modes reveal">
-          <div class="mode"><i style="--c: var(--pink)">？</i><div><b>Quiz</b><p data-i18n="mode.quiz">Opción múltiple con la palabra o su significado.</p></div></div>
-          <div class="mode"><i style="--c: var(--sky-deep)">耳</i><div><b data-i18n="mode.listen">Escuchar</b><p data-i18n="mode.listenDesc">Oye la palabra y elígela, con modo lento.</p></div></div>
-          <div class="mode"><i style="--c: var(--flame)">話</i><div><b data-i18n="mode.speak">Pronunciar</b><p data-i18n="mode.speakDesc">Dila en voz alta; tu iPhone te escucha y te corrige.</p></div></div>
-          <div class="mode"><i style="--c: var(--mint-deep)">対</i><div><b data-i18n="mode.match">Emparejar</b><p data-i18n="mode.matchDesc">Pares japonés–significado contra reloj.</p></div></div>
-          <div class="mode"><i style="--c: var(--sun)">字</i><div><b data-i18n="mode.type">Teclear</b><p data-i18n="mode.typeDesc">Escribe el significado; las tildes y los sinónimos valen.</p></div></div>
-          <div class="mode"><i style="--c: var(--lilac)">文</i><div><b data-i18n="mode.build">Construir frase</b><p data-i18n="mode.buildDesc">Ordena las piezas de una frase real.</p></div></div>
-          <div class="mode"><i style="--c: var(--ink)">書</i><div><b data-i18n="mode.write">Escribir a mano</b><p data-i18n="mode.writeDesc">Traza el kana o kanji de memoria y compáralo.</p></div></div>
-        </div>
-        <div class="srs reveal">
-          <b data-i18n="srs.title">Las tarjetas vuelven justo antes de que las olvides.</b>
-          <div class="grades" aria-hidden="true">
-            <span style="background:#f0575d" data-i18n="srs.again">Otra vez</span>
-            <span style="background:var(--sun);color:var(--ink)" data-i18n="srs.hard">Difícil</span>
-            <span style="background:var(--mint)" data-i18n="srs.good">Bien</span>
-            <span style="background:var(--sky-deep)" data-i18n="srs.easy">Fácil</span>
-          </div>
-        </div>
+        <p class="promise-line" data-i18n="promise.line">No account. No ads. No tracking. Lessons, audio and mock tests work offline, and your progress never leaves your iPhone.</p>
       </div>
     </section>
 
-    <section id="jlpt" class="jlpt" aria-labelledby="jlpt-title">
-      <div class="wrap jlpt-grid">
-        <div class="reveal">
-          <p class="eyebrow">JLPT <span class="jp">しけん</span></p>
-          <h2 id="jlpt-title" style="margin:14px 0" data-i18n="jlpt.title">Simulacros con formato real, del N5 al N1.</h2>
-          <p class="lede" data-i18n="jlpt.lede">282 preguntas de vocabulario y gramática como en el examen, con temporizador y repaso de errores. En N5, además, escucha con diálogos a dos voces.</p>
-          <div class="sections-jp">
-            <span>語彙<small data-i18n="jlpt.vocab">vocabulario</small></span>
-            <span>文法<small data-i18n="jlpt.grammar">gramática</small></span>
-            <span>聴解<small data-i18n="jlpt.listening">escucha</small></span>
-            <span>模擬試験<small data-i18n="jlpt.mock">simulacro</small></span>
-          </div>
-          <div class="jlpt-facts">
-            <div><b>282</b><span data-i18n="jlpt.q">preguntas</span></div>
-            <div><b>20</b><span data-i18n="jlpt.min">min el simulacro</span></div>
-            <div><b>70%</b><span data-i18n="jlpt.pass">para aprobar</span></div>
-          </div>
-          <p class="lede" style="margin-top:24px" data-i18n="jlpt.cert">Apruébalo y llévate un certificado de práctica para compartir.</p>
-          <p class="fine" data-i18n="jlpt.fine">Simulacros no oficiales. JLPT es una marca de The Japan Foundation y JEES.</p>
-        </div>
-        <div class="jlpt-shots reveal">
-          <div class="phone"><img src="/assets/shots/exam.webp" width="640" height="1391" loading="lazy" alt="Pregunta de vocabulario N5 con la palabra subrayada y la respuesta correcta marcada"></div>
-          <div class="phone"><img src="/assets/shots/cert.webp" width="640" height="1391" loading="lazy" alt="Certificado de práctica JLPT N5 con los puntajes de vocabulario, gramática y simulacro"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="explorar" aria-labelledby="explore-title">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <p class="eyebrow"><span data-i18n="explore.eyebrow">Explorar</span><span class="jp">たんけん</span></p>
-          <h2 id="explore-title" data-i18n="explore.title">Habla, lee y canta.</h2>
-        </div>
-        <div class="explore reveal">
-          <article>
-            <span class="kanji" aria-hidden="true">話す</span>
-            <p class="n">37<small data-i18n="explore.talk">conversaciones</small></p>
-            <p data-i18n="explore.talkDesc">Situaciones reales de Tokio: tú eliges qué responder y Kana-chan te dice si sonó natural.</p>
-          </article>
-          <article>
-            <span class="kanji" aria-hidden="true">読む</span>
-            <p class="n">18<small data-i18n="explore.read">historias</small></p>
-            <p data-i18n="explore.readDesc">Lecturas por nivel con traducción por párrafo, vocabulario y quiz de comprensión.</p>
-          </article>
-          <article class="dark">
-            <span class="kanji" aria-hidden="true">歌う</span>
-            <p class="n">19<small data-i18n="explore.sing">canciones</small></p>
-            <p data-i18n="explore.singDesc">Karaoke de anime y J-pop con letra sincronizada, romaji y traducción.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section aria-label="KanaGO! en tu iPhone" style="padding-top:24px">
-      <div class="wrap promises reveal">
-        <div style="--c: var(--pink)"><b data-i18n="promise.account">Sin cuenta</b><p data-i18n="promise.accountDesc">Abres la app y empiezas. Tu progreso vive en tu iPhone.</p></div>
-        <div style="--c: var(--sky-deep)"><b data-i18n="promise.offline">Sin conexión</b><p data-i18n="promise.offlineDesc">Lecciones, audio y simulacros funcionan sin internet. Solo los videos de las canciones lo necesitan.</p></div>
-        <div style="--c: var(--mint)"><b data-i18n="promise.ads">Sin anuncios</b><p data-i18n="promise.adsDesc">Nada interrumpe tu racha. Ni anuncios ni rastreadores.</p></div>
-      </div>
-    </section>
-
-    <section id="faq" aria-labelledby="faq-title" style="padding-top:24px">
+    <section id="faq" class="block" aria-labelledby="faq-title">
       <div class="wrap faq-grid">
         <div class="reveal">
-          <h2 id="faq-title" data-i18n="faq.title">Preguntas</h2>
-          <p class="lede" style="margin-top:14px" data-i18n="faq.lede">Y si la tuya no está, <a href="/support">escríbenos</a>.</p>
-          <svg class="blob mascot-static" viewBox="0 0 114 100" aria-hidden="true">
-            <path d="M52.99 17.32 Q67.03 16.46 77.06 7.86 Q77.06 13.88 73.05 19.04 C95.12 24.20 107.16 43.12 106.16 63.76 C105.15 84.40 85.09 92.14 59.01 92.14 C30.92 92.14 8.85 86.12 7.84 67.20 C6.84 41.40 26.90 17.32 52.99 17.32Z" fill="#fff" stroke="#fff" stroke-width="8.5" stroke-linejoin="round"/>
-            <path d="M52.99 17.32 Q67.03 16.46 77.06 7.86 Q77.06 13.88 73.05 19.04 C95.12 24.20 107.16 43.12 106.16 63.76 C105.15 84.40 85.09 92.14 59.01 92.14 C30.92 92.14 8.85 86.12 7.84 67.20 C6.84 41.40 26.90 17.32 52.99 17.32Z" fill="#111014" stroke="#000" stroke-width="1.8"/>
-            <path d="M49.78 34.90 C53.24 35.93 57.00 35.31 58.81 33.87 C61.82 31.60 59.41 28.71 55.50 29.02 C50.23 29.33 50.68 37.79 55.80 37.99 C60.01 38.30 62.72 37.38 64.22 35.72" fill="none" stroke="#f6a3b8" stroke-width="3" stroke-linecap="round"/>
-            <g fill="#ff6f9c" stroke="#fff" stroke-width="3.6" stroke-linejoin="round">
-              <path transform="translate(28.91 46.56)" d="M12 22.8C4.8 18 0 13.2 0 7.68 0 0 9.6-.48 12 4.32 14.4-.48 24 0 24 7.68 24 13.2 19.2 18 12 22.8Z"/>
-              <path transform="translate(61.01 46.56)" d="M12 22.8C4.8 18 0 13.2 0 7.68 0 0 9.6-.48 12 4.32 14.4-.48 24 0 24 7.68 24 13.2 19.2 18 12 22.8Z"/>
-            </g>
-          </svg>
+          <h2 id="faq-title" data-i18n="faq.title">Questions</h2>
+          <p class="faq-lede" data-i18n="faq.lede">More help on the <a href="/support">support page</a>.</p>
         </div>
         <div class="faq reveal">
-          <details><summary data-i18n="faq.q1">¿Necesito saber algo de japonés?</summary><p data-i18n="faq.a1">No. La ruta empieza en las vocales あいうえお y avanza a tu ritmo.</p></details>
-          <details><summary data-i18n="faq.q2">¿Tengo que crear una cuenta?</summary><p data-i18n="faq.a2">No. Todo se guarda en tu iPhone; si borras la app, tu progreso se va con ella.</p></details>
-          <details><summary data-i18n="faq.q3">¿Funciona sin internet?</summary><p data-i18n="faq.a3">Sí. Solo los videos de las canciones necesitan conexión; sin ella puedes leer la letra y oír cada línea.</p></details>
-          <details><summary data-i18n="faq.q4">¿Hay versión para Android o web?</summary><p data-i18n="faq.a4">Por ahora KanaGO! es solo para iPhone (iOS 17 o superior).</p></details>
-          <details><summary data-i18n="faq.q5">¿Qué pasó con Hinomaru?</summary><p data-i18n="faq.a5">Hinomaru era la versión web. Su contenido y su método ahora viven en KanaGO!, una app nativa para iPhone. La web y sus cuentas se retiraron, así que el progreso de Hinomaru no se transfiere.</p></details>
-          <details><summary data-i18n="faq.q6">¿Los simulacros son oficiales?</summary><p data-i18n="faq.a6">No. Son preguntas de práctica con el formato del JLPT; el certificado es un recuerdo de tu avance, no un resultado oficial.</p></details>
-          <details><summary data-i18n="faq.q7">¿Qué datos recoge?</summary><p data-i18n="faq.a7">Ninguno. Los detalles están en la <a href="/privacy">política de privacidad</a>.</p></details>
+          <details><summary data-i18n="faq.q1">Do I need to know any Japanese?</summary><p data-i18n="faq.a1">No. The path starts with the vowels あいうえお and moves at your pace.</p></details>
+          <details><summary data-i18n="faq.q2">Do I need an account?</summary><p data-i18n="faq.a2">No. Everything is saved on your iPhone; if you delete the app, your progress goes with it.</p></details>
+          <details><summary data-i18n="faq.q3">Does it work without internet?</summary><p data-i18n="faq.a3">Yes. Only song videos need a connection; without one you can still read the lyrics and hear each line.</p></details>
+          <details><summary data-i18n="faq.q4">Is there an Android or web version?</summary><p data-i18n="faq.a4">For now KanaGO! is iPhone-only (iOS 17 or later).</p></details>
+          <details><summary data-i18n="faq.q8">How do I add a widget?</summary><p data-i18n="faq.a8">Touch and hold your Home Screen, tap “Edit” → “Add Widget” and search for KanaGO!. On the Lock Screen, touch and hold it and tap “Customize”.</p></details>
+          <details><summary data-i18n="faq.q6">Are the mock tests official?</summary><p data-i18n="faq.a6">No. They are practice questions in the JLPT format; the certificate is a keepsake of your progress, not an official result.</p></details>
+          <details><summary data-i18n="faq.q7">What data does it collect?</summary><p data-i18n="faq.a7">None. Details are in the <a href="/privacy">privacy policy</a>.</p></details>
         </div>
       </div>
     </section>
 
     <section class="final" aria-labelledby="final-title">
-      <div class="wrap reveal">
-        <div class="wordmark display" aria-hidden="true">
-          <span class="kana sticker-text">Kana</span>
-          <span class="go sticker-text">GO!</span>
-        </div>
-        <h2 id="final-title" class="lede" style="font:800 clamp(22px,3vw,30px)/1.2 var(--display);color:var(--ink);letter-spacing:-0.03em" data-i18n="final.lede">Tu primera kana te está esperando.</h2>
-        <a class="btn" data-store aria-disabled="true">
-          <span class="stack"><span data-store-label>Muy pronto en el App Store</span><small data-i18n="cta.sub">iPhone · iOS 17 o superior</small></span>
-        </a>
+      <div class="wrap">
+        <img class="final-pet" src="/assets/kana/pet-happy.svg" width="1190" height="867" alt="" aria-hidden="true" loading="lazy">
+        <h2 id="final-title" data-i18n="final.t">Your first kana <br>is waiting.</h2>
+        <a class="store-badge" data-store aria-disabled="true"><svg class="apple" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.53 3.83c.84-1.01 1.4-2.43 1.25-3.83-1.21.05-2.66.8-3.53 1.82-.78.9-1.46 2.34-1.27 3.71 1.34.1 2.71-.69 3.55-1.7M12.15 6.9c-.95 0-2.42-1.08-3.96-1.04-2.04.03-3.91 1.18-4.96 3.01-2.12 3.68-.55 9.1 1.52 12.09 1.01 1.45 2.2 3.09 3.79 3.04 1.52-.07 2.09-.99 3.94-.99 1.83 0 2.35.99 3.96.95 1.64-.03 2.68-1.48 3.68-2.95 1.15-1.69 1.63-3.33 1.66-3.42-.04-.01-3.18-1.22-3.22-4.86-.03-3.04 2.48-4.49 2.6-4.56-1.43-2.09-3.62-2.32-4.39-2.38-2-.15-3.68 1.09-4.62 1.09"/></svg><span><small data-store-pre>Coming soon to the</small><b>App Store</b></span></a>
+        <p class="note" data-i18n="cta.sub">iPhone · iOS 17 or later</p>
       </div>
     </section>
   </main>
@@ -275,19 +238,19 @@
   <footer>
     <div class="wrap">
       <div>
-        <a class="brand" href="/"><img src="/assets/icon.webp" alt="" width="38" height="38"><span>Kana<b>GO!</b></span></a>
-        <small data-i18n="footer.made">Basado en Hinomaru · hecho con ❤️ por Manuekle. JLPT es una marca de The Japan Foundation y JEES. App Store es una marca de Apple Inc.</small>
+        <a class="brand" href="/"><img class="brand-icon" src="/assets/kana/icon.svg" alt="" width="1162" height="1158"><img src="/assets/logo.svg" alt="KanaGO!" width="1235" height="955"></a>
+        <small data-i18n="footer.made">JLPT is a trademark of The Japan Foundation and JEES. Apple, the Apple logo, iPhone and App Store are trademarks of Apple Inc.</small>
         <small>© <span data-year>2026</span> KanaGO!</small>
       </div>
       <nav aria-label="Legal">
-        <a href="/privacy" data-i18n="footer.privacy">Privacidad</a>
-        <a href="/terms" data-i18n="footer.terms">Términos</a>
-        <a href="/support" data-i18n="footer.support">Soporte</a>
-        <a href="https://github.com/Manuekle/hinomaru">GitHub</a>
+        <a href="/privacy" data-i18n="footer.privacy">Privacy</a>
+        <a href="/terms" data-i18n="footer.terms">Terms</a>
+        <a href="/cookies" data-i18n="footer.cookies">Cookies</a>
+        <a href="/support" data-i18n="footer.support">Support</a>
       </nav>
     </div>
   </footer>
 
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=14" defer></script>
 </body>
 </html>

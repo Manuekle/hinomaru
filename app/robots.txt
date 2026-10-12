@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hinomaru.vercel.app/sitemap.xml
+Sitemap: https://kanago.vercel.app/sitemap.xml

@@ -1,23 +1,25 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Soporte — KanaGO!</title>
-  <meta name="description" content="Ayuda y contacto de KanaGO!: reporta un error, sugiere contenido o resuelve dudas sobre la app.">
-  <meta name="theme-color" content="#ff6f9c">
-  <link rel="canonical" href="https://hinomaru.vercel.app/support">
-  <link rel="icon" type="image/png" href="/assets/favicon-64.png">
+  <title>Support — KanaGO!</title>
+  <meta name="description" content="KanaGO! help: common questions about lessons, widgets, offline use and privacy.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="https://kanago.vercel.app/support">
+  <link rel="icon" type="image/svg+xml" href="/assets/kana/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/kana/icon-dark.svg" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon-64.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css?v=14">
 </head>
-<body data-page="doc">
+<body data-page="doc" data-title="doc.support">
   <header class="nav">
     <div class="wrap">
-      <a class="brand" href="/" aria-label="KanaGO! inicio"><img src="/assets/icon.webp" alt="" width="38" height="38"><span>Kana<b>GO!</b></span></a>
+      <a class="brand" href="/" aria-label="KanaGO! home"><img class="brand-icon" src="/assets/kana/icon.svg" alt="" width="1162" height="1158"><img src="/assets/logo.svg" alt="KanaGO!" width="1235" height="955"></a>
       <div class="lang" role="group" aria-label="Idioma / Language" style="margin-left:auto">
-        <button type="button" data-set="es" aria-pressed="true">ES</button>
-        <button type="button" data-set="en" aria-pressed="false">EN</button>
+        <button type="button" data-set="en" aria-pressed="true">EN</button>
+        <button type="button" data-set="es" aria-pressed="false">ES</button>
       </div>
     </div>
   </header>
@@ -25,17 +27,16 @@
   <main>
     <div class="page-hero">
       <div class="wrap">
-        <h1 data-i18n="doc.support">Soporte</h1>
-        <p data-i18n="doc.supportLede">¿Algo no funciona o encontraste un error en una lección? Te ayudamos.</p>
+        <h1 data-i18n="doc.support">Support</h1>
+        <p data-i18n="doc.supportLede">Find answers to common questions and keep learning.</p>
       </div>
     </div>
 
     <article class="doc">
-      <div class="wrap" data-lang="es">
+      <div class="wrap" data-lang="es" hidden>
         <div class="card">
-          <h2 style="margin-top:0">Escríbenos</h2>
-          <p>Abre un reporte en GitHub con lo que pasó, tu modelo de iPhone y la versión de iOS. Si es un error de contenido, indica la lección o el mazo.</p>
-          <p style="margin-top:18px"><a class="btn" href="https://github.com/Manuekle/hinomaru/issues/new" rel="noopener">Abrir un reporte</a></p>
+          <h2 style="margin-top:0">Antes de empezar</h2>
+          <p>Comprueba que tienes la última versión de KanaGO! y revisa la ayuda de abajo. Tu progreso se guarda en tu iPhone: evita borrar la app si quieres conservarlo.</p>
         </div>
 
         <h2>Problemas frecuentes</h2>
@@ -45,17 +46,18 @@
           <li><b>No me llega el recordatorio.</b> Actívalo en la pestaña Yo y permite las notificaciones de KanaGO! en Ajustes → Notificaciones.</li>
           <li><b>Las canciones no cargan.</b> Los videos necesitan internet. Sin conexión puedes leer la letra y tocar cada línea para oírla.</li>
           <li><b>Quiero empezar de cero.</b> En la pestaña Yo, toca «Reiniciar progreso». Tus ajustes se conservan.</li>
+          <li><b>Quiero añadir un widget.</b> Mantén pulsada la pantalla de inicio, toca «Editar» → «Añadir widget» y busca KanaGO!. Hay widgets de Racha, Palabra del día y Hoy, también para la pantalla de bloqueo. Si muestran datos viejos, abre la app un momento para actualizarlos.</li>
+          <li><b>Quiero quitar los sonidos.</b> Desactiva «Efectos de sonido» en la pestaña Yo. La voz japonesa sigue funcionando.</li>
         </ul>
 
         <h2>Privacidad</h2>
         <p>KanaGO! no tiene cuentas ni recoge datos. Lee la <a href="/privacy">política de privacidad</a>.</p>
       </div>
 
-      <div class="wrap" data-lang="en" hidden>
+      <div class="wrap" data-lang="en">
         <div class="card">
-          <h2 style="margin-top:0">Get in touch</h2>
-          <p>Open a report on GitHub describing what happened, your iPhone model and iOS version. For a content mistake, include the lesson or deck.</p>
-          <p style="margin-top:18px"><a class="btn" href="https://github.com/Manuekle/hinomaru/issues/new" rel="noopener">Open a report</a></p>
+          <h2 style="margin-top:0">Before you start</h2>
+          <p>Check that you have the latest version of KanaGO! and read the help below. Your progress is saved on your iPhone: avoid deleting the app if you want to keep it.</p>
         </div>
 
         <h2>Common issues</h2>
@@ -65,6 +67,8 @@
           <li><b>The reminder doesn't arrive.</b> Turn it on in the Me tab and allow KanaGO! notifications in Settings → Notifications.</li>
           <li><b>Songs won't load.</b> Videos need the internet. Offline you can still read the lyrics and tap each line to hear it.</li>
           <li><b>I want to start over.</b> In the Me tab, tap “Reset progress”. Your settings are kept.</li>
+          <li><b>I want to add a widget.</b> Touch and hold the Home Screen, tap “Edit” → “Add Widget” and search for KanaGO!. There are Streak, Word of the day and Today widgets, also for the Lock Screen. If they show old data, open the app for a moment to refresh them.</li>
+          <li><b>I want to turn off sounds.</b> Switch off “Sound effects” in the Me tab. The Japanese voice keeps working.</li>
         </ul>
 
         <h2>Privacy</h2>
@@ -76,16 +80,17 @@
   <footer>
     <div class="wrap">
       <div>
-        <a class="brand" href="/"><img src="/assets/icon.webp" alt="" width="38" height="38"><span>Kana<b>GO!</b></span></a>
+        <a class="brand" href="/"><img class="brand-icon" src="/assets/kana/icon.svg" alt="" width="1162" height="1158"><img src="/assets/logo.svg" alt="KanaGO!" width="1235" height="955"></a>
         <small>© <span data-year>2026</span> KanaGO!</small>
       </div>
       <nav aria-label="Legal">
-        <a href="/privacy" data-i18n="footer.privacy">Privacidad</a>
-        <a href="/terms" data-i18n="footer.terms">Términos</a>
-        <a href="/support" data-i18n="footer.support">Soporte</a>
+        <a href="/privacy" data-i18n="footer.privacy">Privacy</a>
+        <a href="/terms" data-i18n="footer.terms">Terms</a>
+        <a href="/cookies" data-i18n="footer.cookies">Cookies</a>
+        <a href="/support" data-i18n="footer.support">Support</a>
       </nav>
     </div>
   </footer>
-  <script src="/assets/site.js" defer></script>
+  <script src="/assets/site.js?v=14" defer></script>
 </body>
 </html>

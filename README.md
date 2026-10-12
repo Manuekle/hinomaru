@@ -1,8 +1,6 @@
 # KanaGO! — sitio web
 
-Landing de **KanaGO!**, la app para iPhone que aprende japonés de la あ al N1 (antes *Hinomaru*). Publicada en [hinomaru.vercel.app](https://hinomaru.vercel.app).
-
-Hinomaru empezó como app web (SvelteKit + Supabase). Su contenido y su método ahora viven en la app nativa de iOS, así que este repositorio solo sirve la landing y las páginas que pide el App Store. La app web anterior sigue en el historial de git (último commit: `1f74312`).
+Landing de **KanaGO!**, la app para iPhone que enseña japonés de la あ al N1, y las páginas públicas que pide el App Store.
 
 ## Qué hay
 
@@ -11,10 +9,11 @@ app/                 raíz del proyecto en Vercel (Root Directory = app)
   index.html         landing (ES/EN)
   privacy.html       política de privacidad  → /privacy
   terms.html         términos de uso         → /terms
+  cookies.html       política de cookies     → /cookies
   support.html       soporte                 → /support
   404.html
-  assets/            estilos, JS, capturas de la app e íconos
-  sw.js              reemplaza el service worker de la PWA vieja y se desinstala
+  assets/            estilos, JS, capturas de la app, íconos y arte de Kana-chan (assets/kana/)
+  sw.js              reemplaza el service worker de la versión PWA anterior y se desinstala
   registerSW.js      idem para páginas viejas en caché
   vercel.json        URLs limpias, redirecciones de rutas viejas y cabeceras
   og-image.png       imagen para redes (1200×630)
@@ -22,20 +21,25 @@ app/                 raíz del proyecto en Vercel (Root Directory = app)
 
 Sitio estático: HTML, CSS y un JS pequeño, sin build ni dependencias.
 
-- **Tipografía:** la misma de la app, SF Pro Rounded (títulos) y SF Pro Text (texto), vía las fuentes del sistema (`ui-rounded`, `-apple-system`). La licencia de Apple no permite alojar SF Pro en la web, así que fuera de Apple se ve la fuente del sistema.
+- **Tipografía:** la misma de la app, SF Pro Rounded (títulos) y SF Pro Text (texto), vía las fuentes del sistema (`ui-rounded`, `-apple-system`).
+- **Marca:** `assets/logo.svg` es el logotipo «Kana GO!»; `assets/kana/` tiene el ícono de la app (claro y oscuro), los seis ánimos de Kana-chan y los stickers.
+- **Botón del App Store:** insignia negra con el logotipo de Apple. Mientras `APP_STORE_URL` (en `assets/site.js`) esté vacío dice «Muy pronto en el App Store»; al rellenarlo pasa a «Descárgalo en el App Store» y enlaza a la ficha.
+- **Widgets:** la sección de widgets son réplicas en HTML/CSS de los widgets de la app, con interruptor claro/oscuro.
+- **Caché:** `styles.css`, `site.js` y las capturas llevan `?v=N`; súbelo al cambiarlos.
+- **Capturas:** siete pantallas reales de la app iOS en inglés (`assets/shots/`) y español (`assets/shots/es/`), a 1206 × 2622. Actualizadas el 12 de octubre de 2026 desde la compilación actual del simulador: Inicio, Ruta, Lección, Kana, JLPT, Leer y Resultados.
+- **Imagen para redes:** `scripts/brand-assets.html` es la composición; `app/og-image.png` su exportación a 1200 × 630.
 
-- **Idioma:** español por defecto; el botón ES/EN cambia los textos marcados con `data-i18n` (diccionario en `assets/site.js`) y los bloques `data-lang` de las páginas legales.
-- **App Store:** cuando la app esté publicada, pon el enlace en `APP_STORE_URL` dentro de `assets/site.js`; los botones pasan de “Muy pronto” a “Descargar”.
-- **Rutas viejas** de Hinomaru (`/login`, `/deck/…`, `/jlpt/…`, etc.) redirigen a la portada; `/contact` va a `/support`.
+## Vista previa local
 
-## Desarrollo
+Desde este directorio:
 
 ```bash
-npx serve app
+python3 scripts/serve.py
 ```
 
-Despliega solo al hacer push a `main` (integración de Vercel con GitHub).
+Abre `http://localhost:4181`. El servidor reconoce las rutas sin extensión
+(`/privacy`, `/terms`, `/cookies` y `/support`) y sirve sus archivos HTML,
+igual que `cleanUrls` en Vercel. `python3 -m http.server` solo reconoce los
+nombres de archivo con `.html` y devuelve 404 para esos enlaces.
 
-## Licencia
-
-MIT — ver [LICENSE](LICENSE). Creado por [Manuekle](https://github.com/Manuekle).
+Para usar otro puerto: `python3 scripts/serve.py 4182`.
