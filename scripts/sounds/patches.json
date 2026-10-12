@@ -1,0 +1,36 @@
+{
+  "_about": "Interface sounds for KanaGO!, picked from https://procedural-sounds.vercel.app (core library + remix engine). Render with scripts/sounds/render.sh. peak = normalized peak level of the exported WAV.",
+  "correct": {"peak": 0.7, "layers": [
+    {"source": {"type": "sine", "frequency": 1047, "fm": {"ratio": 2.76, "depth": 200}}, "envelope": {"attack": 0, "decay": 0.18, "sustain": 0, "release": 0.07}, "effects": [{"type": "reverb", "decay": 0.4, "damping": 0.6, "mix": 0.08}], "gain": 0.118},
+    {"source": {"type": "sine", "frequency": 1320, "fm": {"ratio": 2.76, "depth": 180}}, "envelope": {"attack": 0, "decay": 0.16, "sustain": 0, "release": 0.06}, "delay": 0.06, "effects": [{"type": "reverb", "decay": 0.4, "damping": 0.6, "mix": 0.08}], "gain": 0.094}
+  ]},
+  "wrong": {"peak": 0.6, "layers": [
+    {"source": {"type": "sine", "frequency": {"start": 276.647, "end": 184.64}}, "envelope": {"attack": 0.005, "decay": 0.2, "sustain": 0, "release": 0.08}, "gain": 0.078, "filter": {"type": "lowpass", "frequency": 600, "Q": 1}},
+    {"source": {"type": "sine", "frequency": {"start": 265.029, "end": 397.095}}, "envelope": {"attack": 0.005, "decay": 0.18, "sustain": 0, "release": 0.07}, "gain": 0.061, "delay": 0.015, "filter": {"type": "lowpass", "frequency": 600, "Q": 1}}
+  ]},
+  "finish": {"peak": 0.7, "layers": [
+    {"source": {"type": "sine", "frequency": 584.515}, "envelope": {"attack": 0.002, "decay": 0.0556, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.136, "effects": [{"type": "delay", "delay": 0.136, "feedback": 0.252, "wet": 0.147, "lowpass": 2549}]},
+    {"source": {"type": "sine", "frequency": 736.442}, "envelope": {"attack": 0.002, "decay": 0.0446, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.148, "delay": 0.0871, "effects": [{"type": "delay", "delay": 0.136, "feedback": 0.252, "wet": 0.147, "lowpass": 2549}]},
+    {"source": {"type": "sine", "frequency": 927.859}, "envelope": {"attack": 0.002, "decay": 0.0607, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.142, "delay": 0.1511, "effects": [{"type": "delay", "delay": 0.136, "feedback": 0.252, "wet": 0.147, "lowpass": 2549}]},
+    {"source": {"type": "sine", "frequency": 1169.03}, "envelope": {"attack": 0.002, "decay": 0.077, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.143, "delay": 0.1983, "effects": [{"type": "delay", "delay": 0.136, "feedback": 0.252, "wet": 0.147, "lowpass": 2549}]},
+    {"source": {"type": "sine", "frequency": 1339.91}, "envelope": {"attack": 0.002, "decay": 0.2302, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.127, "delay": 0.2336, "effects": [{"type": "delay", "delay": 0.136, "feedback": 0.252, "wet": 0.147, "lowpass": 2549}]}
+  ]},
+  "tap": {"peak": 0.45, "layers": [
+    {"source": {"type": "noise", "color": "white"}, "filter": {"type": "bandpass", "frequency": 3972.8, "resonance": 1.1}, "envelope": {"attack": 0, "decay": 0.004, "sustain": 0, "release": 0.002}, "gain": 0.112},
+    {"source": {"type": "sine", "frequency": {"start": 2200, "end": 1800}, "fm": {"ratio": 0.5, "depth": 42}}, "envelope": {"attack": 0, "decay": 0.014, "sustain": 0, "release": 0.005}, "gain": 0.306},
+    {"source": {"type": "triangle", "frequency": {"start": 320, "end": 240}}, "envelope": {"attack": 0, "decay": 0.021, "sustain": 0, "release": 0.008}, "gain": 0.112},
+    {"source": {"type": "sine", "frequency": {"start": 2936.648, "end": 2402.712}, "fm": {"ratio": 0.5, "depth": 42}}, "envelope": {"attack": 0, "decay": 0.014, "sustain": 0, "release": 0.005}, "gain": 0.168}
+  ]},
+  "flip": {"peak": 0.55, "layers": [
+    {"source": {"type": "sine", "frequency": {"start": 580.775, "end": 871.163}}, "envelope": {"attack": 0, "decay": 0.3083, "sustain": 0, "release": 0.004}, "gain": 0.104},
+    {"source": {"type": "sine", "frequency": {"start": 1161.55, "end": 1742.326}}, "envelope": {"attack": 0, "decay": 0.249, "sustain": 0, "release": 0.004}, "gain": 0.022},
+    {"source": {"type": "sine", "frequency": {"start": 1742.326, "end": 2613.489}}, "envelope": {"attack": 0, "decay": 0.1223, "sustain": 0, "release": 0.004}, "gain": 0.01},
+    {"source": {"type": "noise", "color": "white"}, "envelope": {"attack": 0.0002, "decay": 0.01, "sustain": 0, "release": 0.004}, "gain": 0.035, "filter": {"type": "bandpass", "frequency": 3500, "Q": 2}}
+  ]},
+  "unlock": {"peak": 0.7, "layers": [
+    {"source": {"type": "sine", "frequency": 302.355}, "envelope": {"attack": 0.003, "decay": 0.0562, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.084, "effects": [{"type": "delay", "delay": 0.116, "feedback": 0.267, "wet": 0.192, "lowpass": 4058}]},
+    {"source": {"type": "sine", "frequency": 604.71}, "envelope": {"attack": 0.003, "decay": 0.056, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.072, "delay": 0.1153, "effects": [{"type": "delay", "delay": 0.116, "feedback": 0.267, "wet": 0.192, "lowpass": 4058}]},
+    {"source": {"type": "sine", "frequency": 1209.42}, "envelope": {"attack": 0.003, "decay": 0.288, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.119, "delay": 0.2132, "effects": [{"type": "delay", "delay": 0.116, "feedback": 0.267, "wet": 0.192, "lowpass": 4058}]},
+    {"source": {"type": "sine", "frequency": 1209.42, "detune": 8}, "envelope": {"attack": 0.003, "decay": 0.3112, "sustain": 0, "release": 0.004, "curve": "ramp"}, "gain": 0.052, "delay": 0.2132, "effects": [{"type": "delay", "delay": 0.116, "feedback": 0.267, "wet": 0.192, "lowpass": 4058}]}
+  ]}
+}

@@ -1,0 +1,13 @@
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+.DS_Store
+/site/
+__pycache__/
+*.pyc
+.claude/
+.codex/
+scripts/sounds/.chrome-profile/
+
+.env*

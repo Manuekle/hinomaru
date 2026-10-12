@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Merged with the generated Info.plist: pink launch screen with Kana-chan. -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchMascot</string>
+	</dict>
+	<!-- kanago:// links from the home-screen widgets. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.manuekle.kanago</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kanago</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
