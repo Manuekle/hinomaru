@@ -22,7 +22,12 @@ struct SongSession: View {
     /// A karaoke run reached the end, so the result card shows the score.
     @State private var sangAlong = false
     @State private var earnedXP = 15
+    /// Karaoke reads along in romaji by default, whatever the app-wide setting says.
+    @State private var karaokeRomaji = true
+    @State private var videoHeight: CGFloat = 0
     @Namespace private var ns
+
+    private var isKaraoke: Bool { mode == .karaoke }
 
     private var activeIndex: Int? {
         if player.failed { return manualLine }
@@ -47,16 +52,36 @@ struct SongSession: View {
 
             VStack(spacing: 14) {
                 SessionTopBar(progress: completed ? 1 : progress)
+                // karaoke folds the video away for the lyrics, but the player stays mounted so the
+                // song keeps playing: it fades out while its slot collapses underneath it
                 video
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { videoHeight = $0 }
+                    .scaleEffect(isKaraoke ? 0.88 : 1, anchor: .top)
+                    .opacity(isKaraoke ? 0 : 1)
+                    .allowsHitTesting(!isKaraoke)
+                    .padding(.bottom, isKaraoke ? -(videoHeight + 14) : 0)
+                    .accessibilityHidden(isKaraoke)
                 header
                 modePicker
-                if mode == .karaoke {
-                    karaokeStage
-                    karaokeBar
-                } else {
-                    controls
-                    lyrics
+                // both modes share one slot, so switching crossfades instead of stacking two panels
+                ZStack {
+                    if isKaraoke {
+                        VStack(spacing: 14) {
+                            karaokeStage
+                            karaokeBar
+                        }
+                        .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: 28)),
+                                                removal: .opacity.combined(with: .scale(scale: 0.97))))
+                    } else {
+                        VStack(spacing: 14) {
+                            controls
+                            lyrics
+                        }
+                        .transition(.asymmetric(insertion: .opacity.combined(with: .offset(y: 28)),
+                                                removal: .opacity.combined(with: .scale(scale: 0.97))))
+                    }
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
             }
 
             if completed { completeCard.transition(.scale(scale: 0.85).combined(with: .opacity)) }
@@ -110,7 +135,28 @@ struct SongSession: View {
                 Text(song.artist).kgFont(14, .semibold).foregroundStyle(.white.opacity(0.55)).lineLimit(1)
             }
             Spacer()
-            Pill(text: song.level, color: KG.levelColor(song.level) == KG.ink ? KG.pink : KG.levelColor(song.level))
+            if isKaraoke {
+                HStack(spacing: 8) {
+                    Button { karaokeRomaji.toggle() } label: {
+                        Text("Rōmaji")
+                            .kgFont(13, .bold)
+                            .foregroundStyle(.white.opacity(karaokeRomaji ? 1 : 0.6))
+                            .padding(.horizontal, 12)
+                            .frame(height: 36)
+                            .background(Capsule().fill(karaokeRomaji ? KG.pink : .white.opacity(0.12)))
+                    }
+                    .buttonStyle(.squish)
+                    roundButton(.subtitle, size: 36, active: showTranslation) { showTranslation.toggle() }
+                }
+                .animation(.spring(response: 0.3, dampingFraction: 0.75), value: karaokeRomaji)
+                .animation(.spring(response: 0.3, dampingFraction: 0.75), value: showTranslation)
+                .sensoryFeedback(.selection, trigger: karaokeRomaji)
+                .sensoryFeedback(.selection, trigger: showTranslation)
+                .transition(.blurReplace)
+            } else {
+                Pill(text: song.level, color: KG.levelColor(song.level) == KG.ink ? KG.pink : KG.levelColor(song.level))
+                    .transition(.blurReplace)
+            }
         }
         .padding(.horizontal, 20)
     }
@@ -307,31 +353,35 @@ struct SongSession: View {
 
     // MARK: Karaoke
 
+    private enum StageRole { case past, active, next, later }
+
     /// The previous line, the one being sung and what's coming, centred like a karaoke screen.
     private var karaokeStage: some View {
         let current = activeIndex
-        let first = max((current ?? 0) - 1, 0)
-        let window = Array(first..<min(first + 3, song.lyrics.count))
-        // takes whatever height is left; long lines spill past the bottom and fade out instead of
-        // pushing the video off screen
+        // during the intro the first line already waits on stage, so it can be read before it starts
+        let window = (current.map { [$0 - 1, $0, $0 + 1] } ?? [0, 1]).filter { song.lyrics.indices.contains($0) }
+        let next = (current ?? -1) + 1
+        // takes whatever height is left; a very long line spills past the edges and fades out
         return Color.clear
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay(alignment: .top) {
-                VStack(spacing: 16) {
+            .overlay {
+                VStack(spacing: 22) {
                     ForEach(window, id: \.self) { i in
-                        stageLine(i, active: i == current, past: (current ?? -1) > i)
+                        let role: StageRole = i == current ? .active : i < next ? .past : i == next ? .next : .later
+                        stageLine(i, role: role)
                             .fixedSize(horizontal: false, vertical: true)
                             .transition(.asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity),
                                                     removal: .move(edge: .top).combined(with: .opacity)))
                     }
                 }
                 .padding(.horizontal, 22)
-                .padding(.top, 10)
             }
-            .mask(LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.04),
-                                         .init(color: .black, location: 0.85), .init(color: .clear, location: 1)],
+            .mask(LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.06),
+                                         .init(color: .black, location: 0.9), .init(color: .clear, location: 1)],
                                  startPoint: .top, endPoint: .bottom))
-            .opacity(countdown == nil ? 1 : 0.15)
+            // the first line stays faintly readable behind the countdown
+            .opacity(countdown == nil ? 1 : 0.3)
+            .blur(radius: countdown == nil ? 0 : 3)
         .overlay {
             if let countdown {
                 VStack(spacing: 10) {
@@ -346,34 +396,106 @@ struct SongSession: View {
                 }
             }
         }
-        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: current)
+        .animation(.spring(response: 0.5, dampingFraction: 0.84), value: current)
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: karaokeRomaji)
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showTranslation)
         .animation(.spring(response: 0.35, dampingFraction: 0.6), value: countdown)
+        .animation(.easeInOut(duration: 0.3), value: countdown == nil)
         .sensoryFeedback(.impact(weight: .medium), trigger: countdown)
     }
 
-    private func stageLine(_ i: Int, active: Bool, past: Bool) -> some View {
+    private func stageLine(_ i: Int, role: StageRole) -> some View {
         let line = song.lyrics[i]
-        return VStack(spacing: 5) {
-            if active {
-                sungLine(i, size: 26, center: true)
-                if app.p.showRomaji, let r = line.romaji {
-                    Text(r).kgFont(13, .semibold).foregroundStyle(KG.candy).multilineTextAlignment(.center)
+        let romaji = karaokeRomaji ? line.romaji : nil
+        // old and new looks share one slot, so a line changing role blurs into place instead of
+        // stacking both layouts for a moment
+        return ZStack {
+            switch role {
+            case .active:
+                VStack(spacing: 8) {
+                    activeStageLine(i, romaji: romaji)
+                    if showTranslation {
+                        Text(line.translation(app.lang)).kgText(14).foregroundStyle(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
-                if showTranslation {
-                    Text(line.translation(app.lang)).kgText(13).foregroundStyle(.white.opacity(0.7))
+                .transition(.blurReplace)
+            case .next, .later:
+                VStack(spacing: 6) {
+                    Text(line.text)
+                        .font(.system(size: role == .next ? 19 : 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(role == .next ? 0.55 : 0.3))
                         .multilineTextAlignment(.center)
+                    if let romaji {
+                        Text(romaji)
+                            .font(.system(size: role == .next ? 16 : 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(role == .next ? 0.6 : 0.3))
+                            .multilineTextAlignment(.center)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
+                    if role == .next { leadIn(i) }
                 }
-            } else {
-                Text(line.text)
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white.opacity(past ? 0.3 : 0.45))
-                    .multilineTextAlignment(.center)
-            }
-            if past, listener.isRunning {
-                scoreChip(listener.scores[i] ?? 0)
+                .transition(.blurReplace)
+            case .past:
+                VStack(spacing: 6) {
+                    Text(romaji ?? line.text)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.3))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                    if listener.isRunning {
+                        scoreChip(listener.scores[i] ?? 0)
+                    }
+                }
+                .transition(.blurReplace)
             }
         }
         .frame(maxWidth: .infinity)
+    }
+
+    /// The line being sung: kana on top and romaji under it, both lighting up together.
+    private func activeStageLine(_ i: Int, romaji: String?) -> some View {
+        let text = song.lyrics[i].text
+        return TimelineView(.animation(paused: !player.isPlaying)) { ctx in
+            let p = song.sungFraction(i, at: player.smoothTime(at: ctx.date))
+            VStack(spacing: 8) {
+                KaraokeLine(text: text, progress: p, size: romaji == nil ? 30 : 26, center: true)
+                if let romaji {
+                    // romaji is what most learners actually sing from, so the unsung part stays bright
+                    KaraokeLine(text: romaji, progress: p, size: 21, center: true, weight: .heavy,
+                                base: .white.opacity(0.78), fill: KG.candy)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+            }
+        }
+    }
+
+    /// Karaoke-style cue dots ahead of a line: they go out one by one over the last three seconds,
+    /// and only while nothing else is being sung.
+    private func leadIn(_ i: Int) -> some View {
+        TimelineView(.animation(paused: !player.isPlaying)) { ctx in
+            let t = player.smoothTime(at: ctx.date)
+            let left = song.lyrics[i].time - t
+            let free = activeIndex.map { song.sungFraction($0, at: t) >= 1 } ?? true
+            let show = player.isPlaying && free && left > 0 && left <= 3
+            let lit = show ? Int((left / 0.75).rounded(.up)) : 0
+            HStack(spacing: 8) {
+                ForEach(0..<4, id: \.self) { d in
+                    Circle()
+                        .fill(KG.candy)
+                        .frame(width: 9, height: 9)
+                        .scaleEffect(d < lit ? 1 : 0.4)
+                        .opacity(d < lit ? 1 : 0.2)
+                        .shadow(color: KG.candy.opacity(d < lit ? 0.8 : 0), radius: 6)
+                }
+            }
+            .opacity(show ? 1 : 0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: lit)
+            .animation(.easeInOut(duration: 0.25), value: show)
+        }
+        .frame(height: 12)
+        .padding(.top, 2)
     }
 
     private func scoreChip(_ score: Double) -> some View {
@@ -386,49 +508,65 @@ struct SongSession: View {
     }
 
     private var karaokeBar: some View {
-        Group {
-            if micAccess == false {
-                VStack(spacing: 10) {
-                    Text(app.t("Activa Micrófono y Reconocimiento de voz en Ajustes para cantar.",
-                               "Turn on Microphone and Speech Recognition in Settings to sing."))
-                        .kgFont(14, .semibold).foregroundStyle(.white.opacity(0.75))
-                        .multilineTextAlignment(.center)
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        Link(destination: url) { Text(app.t("Abrir Ajustes", "Open Settings")) }
-                            .buttonStyle(.chunky)
+        // one slot, so the start button and the live bar swap in place
+        ZStack {
+            Group {
+                if micAccess == false {
+                    VStack(spacing: 10) {
+                        Text(app.t("Activa Micrófono y Reconocimiento de voz en Ajustes para cantar.",
+                                   "Turn on Microphone and Speech Recognition in Settings to sing."))
+                            .kgFont(14, .semibold).foregroundStyle(.white.opacity(0.75))
+                            .multilineTextAlignment(.center)
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            Link(destination: url) { Text(app.t("Abrir Ajustes", "Open Settings")) }
+                                .buttonStyle(.chunky)
+                        }
                     }
-                }
-            } else if listener.isRunning || countdown != nil {
-                HStack(spacing: 14) {
-                    roundButton(.replay, size: 46) { startKaraoke() }
-                    micOrb
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(app.t("Te escucho…", "Listening…")).kgFont(12, .bold).foregroundStyle(KG.candy)
-                        Text(activeIndex.flatMap { listener.heard[$0] } ?? "…")
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.8))
-                            .lineLimit(2)
+                } else if listener.isRunning || countdown != nil {
+                    HStack(spacing: 14) {
+                        roundButton(.replay, size: 46) { startKaraoke() }
+                        micOrb
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(app.t("Te escucho…", "Listening…")).kgFont(12, .bold).foregroundStyle(KG.candy)
+                            Text(activeIndex.flatMap { listener.heard[$0] } ?? "…")
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.8))
+                                .lineLimit(2)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        roundButton(player.isPlaying ? .pause : .play, size: 46) { player.toggle() }
+                            .disabled(countdown != nil)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    roundButton(player.isPlaying ? .pause : .play, size: 46) { player.toggle() }
-                        .disabled(countdown != nil)
-                }
-            } else {
-                VStack(spacing: 8) {
-                    if let micError {
-                        Text(micError).kgFont(14, .semibold).foregroundStyle(KG.red).multilineTextAlignment(.center)
-                    }
-                    Button { startKaraoke() } label: {
-                        Label(app.t("¡A cantar!", "Let's sing!"), hi: .mic, size: 22)
-                    }
-                    .buttonStyle(.chunky)
-                    .disabled(!player.ready)
-                    .opacity(player.ready ? 1 : 0.5)
-                    Label(app.t("Con audífonos te escucho mejor", "I hear you better with headphones"), hi: .headphones, size: 15)
+                } else {
+                    VStack(spacing: 8) {
+                        if let micError {
+                            Text(micError).kgFont(14, .semibold).foregroundStyle(KG.red).multilineTextAlignment(.center)
+                        }
+                        Button { startKaraoke() } label: {
+                            Label(app.t("¡A cantar!", "Let's sing!"), hi: .mic, size: 22)
+                        }
+                        .buttonStyle(.chunky)
+                        .disabled(!player.ready)
+                        .opacity(player.ready ? 1 : 0.5)
+                        // the video is folded away in karaoke, so say here when the song is still loading
+                        ZStack {
+                            if player.ready {
+                                Label(app.t("Con audífonos te escucho mejor", "I hear you better with headphones"), hi: .headphones, size: 15)
+                                    .transition(.blurReplace)
+                            } else {
+                                Text(app.t("Cargando canción…", "Loading song…"))
+                                    .transition(.blurReplace)
+                            }
+                        }
                         .kgFont(12, .semibold).foregroundStyle(.white.opacity(0.5))
+                    }
+                    .animation(.easeInOut(duration: 0.3), value: player.ready)
                 }
             }
+            .transition(.blurReplace)
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: listener.isRunning || countdown != nil)
+        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: micAccess)
         .padding(.horizontal, 20)
         .padding(.bottom, 10)
     }

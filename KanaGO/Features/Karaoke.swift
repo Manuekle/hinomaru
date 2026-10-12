@@ -71,6 +71,10 @@ struct KaraokeLine: View {
     let progress: Double
     var size: CGFloat = 24
     var center = false
+    var weight: Font.Weight = .bold
+    /// Unsung text; romaji keeps it bright enough to read ahead.
+    var base: Color = .white.opacity(0.32)
+    var fill: Color = .white
 
     var body: some View {
         let chunks = LyricTiming.chunks(text)
@@ -85,19 +89,19 @@ struct KaraokeLine: View {
         return ZStack {
             LyricFlow(center: center) {
                 ForEach(chunks.indices, id: \.self) { i in
-                    Text(chunks[i].text).foregroundStyle(.white.opacity(0.32))
+                    Text(chunks[i].text).foregroundStyle(base)
                 }
             }
             LyricFlow(center: center) {
                 ForEach(chunks.indices, id: \.self) { i in
                     Text(chunks[i].text)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(fill)
                         .mask(wipe(fills[i]))
                 }
             }
-            .shadow(color: KG.candy.opacity(0.85), radius: 9)
+            .shadow(color: KG.candy.opacity(0.85), radius: size * 0.36)
         }
-        .font(.system(size: size, weight: .bold, design: .rounded))
+        .font(.system(size: size, weight: weight, design: .rounded))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(text)
     }
