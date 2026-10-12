@@ -60,6 +60,7 @@ struct VocabularyView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar) // the floating review button takes its place
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: app.p.savedWords)
     }
 

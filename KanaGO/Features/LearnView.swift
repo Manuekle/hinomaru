@@ -235,6 +235,7 @@ struct DeckDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar) // the floating study button takes its place
     }
 
     private var header: some View {

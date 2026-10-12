@@ -189,11 +189,11 @@ struct HomeView: View {
                             }
                             .frame(width: 26, height: 26)
                             .overlay {
-                                if d.isToday { Circle().strokeBorder(KG.pink, lineWidth: 2) }
+                                if d.isToday { Circle().strokeBorder(met ? KG.mintDeep : KG.pink, lineWidth: 2) }
                             }
                             Text(d.label)
                                 .font(.system(size: 11, weight: d.isToday ? .bold : .medium))
-                                .foregroundStyle(d.isToday ? KG.pinkText : KG.muted)
+                                .foregroundStyle(d.isToday ? (met ? KG.mintDeep : KG.pinkText) : KG.muted)
                         }
                         .frame(maxWidth: .infinity)
                     }

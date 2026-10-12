@@ -461,6 +461,7 @@ struct KanaQuizSetupView: View {
             .padding(.bottom, 10)
         }
         .navigationTitle(app.t("Quiz de kana", "Kana quiz"))
+        .toolbar(.hidden, for: .tabBar) // the floating start button takes its place
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             if picked.isEmpty, let first = app.content.sections(script).first {

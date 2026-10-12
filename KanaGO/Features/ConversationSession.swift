@@ -51,6 +51,8 @@ struct ConversationSession: View {
                             .padding(.horizontal, 16)
                             .padding(.bottom, 16)
                         }
+                        // the panel insets the scroll view, so the last bubble scrolls clear of it
+                        .safeAreaInset(edge: .bottom, spacing: 0) { controls }
                         .onChange(of: bubbles.count) {
                             withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("bottom", anchor: .bottom) }
                         }
@@ -58,7 +60,6 @@ struct ConversationSession: View {
                             withAnimation(.easeOut(duration: 0.3)) { proxy.scrollTo("bottom", anchor: .bottom) }
                         }
                     }
-                    controls
                 }
             }
         }
@@ -223,9 +224,12 @@ struct ConversationSession: View {
         }
         .padding(16)
         .padding(.bottom, 8)
-        .background(.white.opacity(0.92))
-        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous))
-        .shadow(color: KG.ink.opacity(0.08), radius: 16, y: -4)
-        .ignoresSafeArea(edges: .bottom)
+        // only the backdrop runs under the home indicator; the buttons keep their safe-area spot
+        .background {
+            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28, style: .continuous)
+                .fill(.white.opacity(0.92))
+                .shadow(color: KG.ink.opacity(0.08), radius: 16, y: -4)
+                .ignoresSafeArea(edges: .bottom)
+        }
     }
 }
